@@ -1,0 +1,86 @@
+<!-- 
+* File Name : cloud-vm-wizard.html  
+* Date Created : 2020.03.03
+* Writer  : 박동혁
+* Description : ABLESTACK 클라우드센터 VM을 배포하기 위한 절차를 진행하는 마법사 Modal 대화상자
+-->
+
+<div class="pf-l-bullseye" >
+    <div class="pf-c-modal-box pf-m-lg" role="dialog" aria-modal="true" aria-label="Basic wizard">
+        <div class="pf-c-wizard">
+            <div class="pf-c-wizard__header">
+                <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" id="button-close-modal-wizard-cloud-vm">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <h1 class="pf-c-title pf-m-3xl pf-c-wizard__title">ABLESTACK 클라우드센터 VM 배포 마법사</h1>
+                <p class="pf-c-wizard__description">ABLESTACK 클러스터에 클라우드센터를 실행하는 가상머신 어플라이언스를 배포합니다. </p>
+            </div>    
+            <div class="pf-c-wizard__outer-wrap">
+                <div class="pf-c-wizard__inner-wrap">
+                    <nav class="pf-c-wizard__nav" aria-label="Steps">
+                        <ol class="pf-c-wizard__nav-list">
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link pf-m-current" id="nav-button-cloud-vm-overview">개요</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-cluster">장애조치 클러스터 설정</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-appliance">클라우드센터 VM 설정</button>
+                                <ol class="pf-c-wizard__nav-list">
+                                    <li class="pf-c-wizard__nav-item">
+                                        <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-compute">컴퓨트</button>
+                                    </li>
+                                    <li class="pf-c-wizard__nav-item">
+                                        <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-disk">디스크</button>
+                                    </li>
+                                    <li class="pf-c-wizard__nav-item">
+                                        <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-network">네트워크</button>
+                                    </li>
+                                </ol>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-additional">추가 네트워크 정보</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-ssh-key">SSH Key 정보</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-finish">완료</button>
+                            </li>
+                        </ol>
+                    </nav>
+                    <main class="pf-c-wizard__main">
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-overview">
+                            <div class="pf-c-content">
+                                <p>
+                                    ABLESTACK 클러스터 구성 준비 마법사는 클러스터를 자동으로 구성하고, 스토리지센터 및 클라우드센터를 구성하기 위해 필요한 다음의 정보를 입력받아 준비합니다.  
+                                </p>
+                                <ul>
+                                    <li>모든 호스트 및 가상머신에서 사용자 인증을 위해 공통으로 사용할 SSH Key 정보</li>
+                                    <li>클러스터를 구성하는 호스트 및 가상머신들의 호스트명 및 IP 정보</li>
+                                    <li>호스트 및 가상머신의 시간 동기화를 위한 시간서버</li>
+                                </ul>
+                                <p>
+                                    필요한 정보를 먼저 준비하십시오. 정보가 준비되었다면 "다음" 버튼을 눌러 클러스터 구성 준비를 시작합니다.  
+                                </p>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+                <footer class="pf-c-wizard__footer" style="box-shadow:var(--pf-global--BoxShadow--sm-top)">
+                    <button class="pf-c-button pf-m-primary" type="submit" id="button-next-step-modal-wizard-cloud-vm">다음</button>
+                    <button class="pf-c-button pf-m-secondary" type="button" id="button-before-step-modal-wizard-cloud-vm">이전</button>
+                    <div class="pf-c-wizard__footer-cancel">
+                        <button class="pf-c-button pf-m-link" type="button" id="button-cancel-config-modal-wizard-cloud-vm">취소</button>
+                    </div>
+                </footer>
+            </div>    
+        </div>
+    </div>
+</div>
+
+
+<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+<script src="./src/features/cloud-vm-wizard.js"></script>
+<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
