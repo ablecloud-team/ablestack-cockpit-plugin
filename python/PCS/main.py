@@ -34,6 +34,11 @@ def main():
             pcs.cleanupResource(args.resource)
         except Exception as e:
             print(e)
+    elif (args.action) == 'status':
+        try:
+            pcs.statusResource(args.resource)
+        except Exception as e:
+            print(e)
     else:
         print('??????')
 

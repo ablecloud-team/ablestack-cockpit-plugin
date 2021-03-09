@@ -5,6 +5,7 @@ import argparse
 import json
 import sys
 from subprocess import call
+from subprocess import check_output
 
 
 def parseArgs():
@@ -40,8 +41,8 @@ class Pacemaker:
         call(['echo', 'pcs', 'host', 'auth', '-u', 'hacluster', '-p', 'password', *hostnames])
         call(['echo', 'pcs', 'cluster', 'setup', self.cluster_name, *hostnames])
         call(['echo', 'pcs', 'cluster', 'start', '--all'])
-        call(['echo', 'systemctl', 'enable', 'corosync.service'])
-        call(['echo', 'systemctl', 'enable', 'pacemaker.service'])
+        call(['echo', 'systemctl', 'enable', '--now', 'corosync.service'])
+        call(['echo', 'systemctl', 'enable', '--now', 'pacemaker.service'])
         call(['echo', 'pcs', 'property', 'set', 'stonith-enabled=false'])
 
 
@@ -56,7 +57,6 @@ class Pacemaker:
     def enableResource(self, resource_name):
         self.resource_name = resource_name
         
-        call(['echo', 'pcs', 'resource', 'failcount', 'reset', resource_name])
         call(['echo', 'pcs', 'resource', 'cleanup', resource_name])
         call(['echo', 'pcs', 'resource', 'enable', self.resource_name])
 
@@ -74,8 +74,15 @@ class Pacemaker:
     def cleanupResource(self, resource_name):
         self.resource_name = resource_name
         
-        call(['echo', 'pcs', 'resource', 'failcount', 'reset', self.resource_name])
         call(['echo', 'pcs', 'resource', 'cleanup', self.resource_name])
-
-
         
+        
+    def statusResource(self, resource_name):
+        self.resource_name = resource_name
+        
+        call(['echo', 'pcs', 'status', 'resources', '|grep', self.resource_name])
+
+
+a = Pacemaker()
+s = a.statusResource('dd')
+d = check_output(s)
