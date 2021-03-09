@@ -1,8 +1,28 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 
+import argparse
 import json
+import sys
 from subprocess import call
+
+def parseArgs():
+    parser = argparse.ArgumentParser(
+        description='Pacemaker cluster')
+    
+    parser.add_argument('action', choices={'config','create','enable', 'disable','move','cleanup'})
+    parser.add_argument('--cluster', metavar='name', type=str,
+                        help='create cluster name')
+    parser.add_argument('--hosts', metavar='name', type=str,
+                        help='cluster host name')
+    parser.add_argument('--resource', metavar='name', type=str,
+                        help='pcs resource name') 
+    parser.add_argument('--xml', metavar='name', type=str,
+                        help='xml path')
+    parser.add_argument('--target', metavar='name', type=str,
+                        help='move target host name')
+    return parser.parseArgs()
+
 
 class Pacemaker:
     def __init__(self):
@@ -13,7 +33,6 @@ class Pacemaker:
         self.target_host = None
     
     def configCluster(self, cluster_name, *hostnames):
-
         self.cluster_name = cluster_name
         self.hostnames = hostnames
 
@@ -24,14 +43,8 @@ class Pacemaker:
         call(['echo', 'systemctl', 'enable', 'pacemaker.service'])
         call(['echo', 'pcs', 'property', 'set', 'stonith-enabled=false'])
 
-        # print ('pcs host auth -u hacluster -p,', password, *hostnames)
-        # print ('pcs cluster setup --name', cluster_name, *hostnames)
-        # print ('pcs cluster start --all')
-        # print ('systemctl enable corosync.service')
-        # print ('systemctl enable pacemaker.service')
-        # print ('pcs property set stonith-enabled=false')
 
-    def makeResource(self, resource_name, xml_path):
+    def createResource(self, resource_name, xml_path):
         self.resource_name = resource_name
         self.xml_path = xml_path
 
@@ -41,36 +54,27 @@ class Pacemaker:
 
     def enableResource(self, resource_name):
         self.resource_name = resource_name
-        # call(['echo', 'pcs', 'resource', 'failcount', 'reset', resource_name])
-        # call(['echo', 'pcs', 'resource', 'cleanup', resource_name])
+        
+        call(['echo', 'pcs', 'resource', 'failcount', 'reset', resource_name])
+        call(['echo', 'pcs', 'resource', 'cleanup', resource_name])
         call(['echo', 'pcs', 'resource', 'enable', self.resource_name])
 
     def disableResource(self, resource_name):
         self.resource_name = resource_name
+        
         call(['echo', 'pcs', 'resource', 'disable', self.resource_name])
 
     def moveResource(self, resource_name, target_host):
         self.resource_name = resource_name
         self.target_host = target_host
+        
         call(['echo', 'pcs', 'resource', 'move', self.resource_name, self.target_host])
 
     def cleanupResource(self, resource_name):
         self.resource_name = resource_name
+        
         call(['echo', 'pcs', 'resource', 'failcount', 'reset', self.resource_name])
         call(['echo', 'pcs', 'resource', 'cleanup', self.resource_name])
 
 
-a = Pacemaker()
-a.hostnames = ['host1', 'host2', 'host3']
-# print('======================================== configCluster ========================================')
-# a.configCluster('cloudcenter_cluster', *a.hostnames)
-# print('======================================== makeResource ========================================')
-# a.makeResource('cloudcenter_res', '/opt/ablestack/cloudcenter.xml')
-# print('======================================== enableResource ========================================')
-# a.enableResource('cloudcenter_res')
-# print('======================================== disableResource ========================================')
-# a.disableResource('cloudcenter_res')
-# print('======================================== moveResource ========================================')
-# a.moveResource('cloudcenter_res', a.hostnames[2])
-# print('======================================== cleanupResource ========================================')
-# a.cleanupResource('cloudcenter_res')
+        
