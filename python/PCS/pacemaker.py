@@ -6,11 +6,12 @@ import json
 import sys
 from subprocess import call
 
+
 def parseArgs():
     parser = argparse.ArgumentParser(
         description='Pacemaker cluster')
     
-    parser.add_argument('action', choices={'config','create','enable', 'disable','move','cleanup'})
+    parser.add_argument('action', choices=['config','create','enable', 'disable','move','cleanup'])
     parser.add_argument('--cluster', metavar='name', type=str,
                         help='create cluster name')
     parser.add_argument('--hosts', metavar='name', type=str,
@@ -21,7 +22,7 @@ def parseArgs():
                         help='xml path')
     parser.add_argument('--target', metavar='name', type=str,
                         help='move target host name')
-    return parser.parseArgs()
+    return parser.parse_args()
 
 
 class Pacemaker:
