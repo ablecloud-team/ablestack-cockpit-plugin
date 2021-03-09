@@ -162,21 +162,21 @@
                                                     </button>
                                                     <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-cloud-cluster-status" id="dropdown-menu-cloud-cluster-status">
                                                         <li>
-                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>클러스터 시작</button>
+                                                            <button id="cloud-cluster-start" class="pf-c-dropdown__menu-item" type="button">클러스터 시작</button>
                                                         </li>
                                                         <li>
-                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>클러스터 중지</button>
+                                                            <button id="cloud-cluster-stop" class="pf-c-dropdown__menu-item" type="button">클러스터 중지</button>
                                                         </li>
                                                         <li>
-                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>클러스터 클린업</button>
-                                                        </li>
-                                                        <li class="pf-c-divider" role="separator"></li>
-                                                        <li>
-                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>클라우드센터VM 마이그레이션</button>
+                                                            <button id="cloud-cluster-cleanup" class="pf-c-dropdown__menu-item" type="button">클러스터 클린업</button>
                                                         </li>
                                                         <li class="pf-c-divider" role="separator"></li>
                                                         <li>
-                                                            <a class="pf-c-dropdown__menu-item pf-m-disabled" href="#" aria-disabled="true" tabindex="-1">클라우드센터 연결</a>
+                                                            <button id="cloud-cluster-migration" class="pf-c-dropdown__menu-item" type="button">클라우드센터VM 마이그레이션</button>
+                                                        </li>
+                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li>
+                                                            <a id="cloud-cluster-connect" class="pf-c-dropdown__menu-item " href="#" aria-disabled="true" tabindex="-1">클라우드센터 연결</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -549,6 +549,7 @@
 
         <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
         <script src="./src/features/main.js"></script>
+        <script src="./src/features/card-cloud-cluster-status.js"></script>
         <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
     </body>
 </html>
