@@ -1,6 +1,6 @@
 # ABLESTACK Common Library
 ABLESTACK의 공통 패키지를 모아놓은 Library입니다.
-본 문서는 PluginRoot(ablestack)/tools/AblestackCommon/README.md와 같습니다.
+본 문서는 PluginRoot(ablestack)/tools/ablestack_common/README.md와 같습니다.
 
 ## 빌드 방법
 ### dependency
@@ -55,7 +55,7 @@ def createLogger(loggername: str,
 ### 사용법
 ```python3
 import logging
-from Ablestack import createLogger
+from ablestack import createLogger
 
 logger=createLogger(loggername="SampleModule", verbosity=logging.INFO, log_file="log.txt", file_log_level=logging.ERROR)
 logger.debug("debug")       #출력없음

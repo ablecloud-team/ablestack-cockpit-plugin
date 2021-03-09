@@ -8,7 +8,7 @@ now = datetime.datetime.now()
 setup(
     name                = 'ablestack-common',
     version             = f'0.1.{now.strftime("post%Y%m%d.dev%H")}',
-    description         = 'Ablestack common library',
+    description         = 'Ablestack Common Library',
     author              = 'ycyun<ycyun@ycyun.xyz>',
     author_email        = 'ycyun@ycyun.xyz',
     url                 = 'https://github.com/ablecloud-team/cockpit-plugin-ablestack',
