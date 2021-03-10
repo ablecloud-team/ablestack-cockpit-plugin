@@ -2,6 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import json
+import sys
+
+def funcname():
+    return sys._getframe(1).f_code.co_name
+
+def callername():
+    return sys._getframe(2).f_code.co_name
+
 
 
 def createReturn(retname: str = "",
@@ -17,6 +25,10 @@ def createReturn(retname: str = "",
     :param code: 상태 코드
     :return: json string
     """
+    if type_str == "":
+        type_str = str(type(val)).replace('<class \'', '').replace('\'>', '')
+    if retname == "":
+        retname = callername()
     retdic = {
         'code': code,
         'val': val,
