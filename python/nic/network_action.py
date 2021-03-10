@@ -73,6 +73,8 @@ def listNetworkInterface(H=False):
             for line in fin:
                 if "bus-info" in line:
                     item['PCI']=line.split(' ')[1]
+                elif "driver" in line:
+                    item['DRIVER']=line.split(' ')[1]
             ethernets.append(item)
         else:
             others.append(item)
