@@ -28,7 +28,7 @@ def createReturn(retname: str = "",
     if type_str == "":
         type_str = str(type(val)).replace('<class \'', '').replace('\'>', '')
     if retname == "":
-        retname = funcname()
+        retname = callername()
     retdic = {
         'code': code,
         'val': val,
