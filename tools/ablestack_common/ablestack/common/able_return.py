@@ -17,6 +17,8 @@ def createReturn(retname: str = "",
     :param code: 상태 코드
     :return: json string
     """
+    if type_str == "":
+        type_str = str(type(val)).replace('<class \'', '').replace('\'>', '')
     retdic = {
         'code': code,
         'val': val,
