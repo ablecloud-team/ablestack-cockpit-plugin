@@ -1,4 +1,8 @@
-from pacemaker import *
+#!/usr/bin/python3
+#-*- coding: utf-8 -*-
+
+from python.PCS.pacemaker import *
+from python.PCS.able_return import *
 
 def main():
     pcs = Pacemaker()
@@ -36,11 +40,12 @@ def main():
             print(e)
     elif (args.action) == 'status':
         try:
-            pcs.statusResource(args.resource)
+            pcs.statusResource()
         except Exception as e:
             print(e)
     else:
-        print('??????')
+        print('no match actions')
+        sys.exit(0)
 
 
 
