@@ -16,6 +16,12 @@ $(document).ready(function(){
     $('#div-modal-wizard-cluster-config-time-server').hide();
     $('#div-modal-wizard-cluster-config-review').hide();
     $('#div-modal-wizard-cluster-config-finish').hide();
+    $('#div-form-hosts-file').hide();
+    $('#span-timeserver2-required').hide();
+    $('#span-timeserver3-required').hide();
+    $('#div-accordion-ssh-key').hide();
+    $('#div-accordion-hosts-file').hide();
+    $('#div-accordion-timeserver').hide();
 
     $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
     $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', true);    
@@ -225,6 +231,91 @@ $('#button-cancel-config-modal-wizard-cluster-config-prepare').on('click', funct
 
 
 /* 마법사 Footer 영역의 버튼 클릭 이벤트 처리 끝 */
+
+/* HTML Object에서 발생하는 이벤트 처리 시작 */
+
+// SSH Key 준비 방법 중 신규생성을 클릭하는 경우 SSH Key 파일 항목을 비활성화함
+$('#form-radio-ssh-key-new').on('click', function(){
+    $('#form-input-cluster-config-ssh-key-file').attr('disabled', true);
+});
+
+// SSH Key 준비 방법 중 기존 파일 사용을 클릭하는 경우 SSH Key 파일 항목을 활성화함
+$('#form-radio-ssh-key-file').on('click', function(){
+    $('#form-input-cluster-config-ssh-key-file').attr('disabled', false);
+});
+
+// Host 파일 준비 방법 중 신규생성을 클릭하는 경우 Host 프로파일 디비전을 보여주고 Hosts 파일 디비전은 숨긴다.
+$('#form-radio-hosts-new').on('click', function(){
+    $('#div-form-hosts-profile').show();
+    $('#div-form-hosts-file').hide();
+});
+
+// Host 파일 준비 방법 중 기존 파일 사용을 클릭하는 경우 Host 프로파일 디비전을 숨기고 Hosts 파일 디비전은 보여준다.
+$('#form-radio-hosts-file').on('click', function(){
+    $('#div-form-hosts-profile').hide();
+    $('#div-form-hosts-file').show();
+});
+
+// 외부 시간서버를 시간서버로 선택하면 시간서버 2, 3은 선택 입력으로 전환한다.
+$('#form-radio-timeserver-ext').on('click', function(){
+    $('#span-timeserver2-required').hide();
+    $('#span-timeserver3-required').hide();
+});
+
+// 로컬 시간서버를 시간서버로 선택하면 시간서버 2, 3은 필수 입력으로 전환한다. 
+$('#form-radio-timeserver-int').on('click', function(){
+    $('#span-timeserver2-required').show();
+    $('#span-timeserver3-required').show();
+});
+
+// 아코디언 개체의 버튼 클릭 이벤트 처리
+$('#button-accordion-ssh-key').on('click', function(){
+    if ($('#button-accordion-ssh-key').attr("aria-expanded") == "false") {
+        $('#button-accordion-ssh-key').attr("aria-expanded", "true");
+        $('#button-accordion-ssh-key').addClass("pf-m-expanded");
+        $('#div-accordion-ssh-key').fadeIn();
+        $('#div-accordion-ssh-key').addClass("pf-m-expanded");
+    }
+    else {
+        $('#button-accordion-ssh-key').attr("aria-expanded", "false");
+        $('#button-accordion-ssh-key').removeClass("pf-m-expanded");
+        $('#div-accordion-ssh-key').fadeOut();
+        $('#div-accordion-ssh-key').removeClass("pf-m-expanded");
+    }
+});
+
+$('#button-accordion-hosts-file').on('click', function(){
+    if ($('#button-accordion-hosts-file').attr("aria-expanded") == "false") {
+        $('#button-accordion-hosts-file').attr("aria-expanded", "true");
+        $('#button-accordion-hosts-file').addClass("pf-m-expanded");
+        $('#div-accordion-hosts-file').fadeIn();
+        $('#div-accordion-hosts-file').addClass("pf-m-expanded");
+    }
+    else {
+        $('#button-accordion-hosts-file').attr("aria-expanded", "false");
+        $('#button-accordion-hosts-file').removeClass("pf-m-expanded");
+        $('#div-accordion-hosts-file').fadeOut();
+        $('#div-accordion-hosts-file').removeClass("pf-m-expanded");
+    }
+});
+
+$('#button-accordion-timeserver').on('click', function(){
+    if ($('#button-accordion-timeserver').attr("aria-expanded") == "false") {
+        $('#button-accordion-timeserver').attr("aria-expanded", "true");
+        $('#button-accordion-timeserver').addClass("pf-m-expanded");
+        $('#div-accordion-timeserver').fadeIn();
+        $('#div-accordion-timeserver').addClass("pf-m-expanded");
+    }
+    else {
+        $('#button-accordion-timeserver').attr("aria-expanded", "false");
+        $('#button-accordion-timeserver').removeClass("pf-m-expanded");
+        $('#div-accordion-timeserver').fadeOut();
+        $('#div-accordion-timeserver').removeClass("pf-m-expanded");
+    }
+});
+
+/* HTML Object에서 발생하는 이벤트 처리 끝 */
+
 
 /**
  * Meathod Name : resetClusterConfigWizard
