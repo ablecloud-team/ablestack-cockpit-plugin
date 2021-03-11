@@ -4,15 +4,16 @@
 import argparse
 import json
 import sys
-from subprocess import call
 from subprocess import check_output
+from subprocess import run
+import subprocess
 
 
 def parseArgs():
     parser = argparse.ArgumentParser(
         description='Pacemaker cluster')
     
-    parser.add_argument('action', choices=['config','create','enable', 'disable','move','cleanup'])
+    parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status'])
     parser.add_argument('--cluster', metavar='name', type=str,
                         help='create cluster name')
     parser.add_argument('--hosts', metavar='name', type=str,
@@ -38,46 +39,56 @@ class Pacemaker:
         self.cluster_name = cluster_name
         self.hostnames = hostnames
 
-        call(['pcs', 'host', 'auth', '-u', 'hacluster', '-p', 'password', *hostnames])
-        call(['pcs', 'cluster', 'setup', self.cluster_name, *hostnames])
-        call(['pcs', 'cluster', 'start', '--all'])
-        call(['systemctl', 'enable', '--now', 'corosync.service'])
-        call(['systemctl', 'enable', '--now', 'pacemaker.service'])
-        call(['pcs', 'property', 'set', 'stonith-enabled=false'])
+        run(['pcs', 'host', 'auth', '-u', 'hacluster', '-p', 'password', *hostnames])
+        run(['pcs', 'cluster', 'setup', self.cluster_name, *hostnames])
+        run(['pcs', 'cluster', 'start', '--all'])
+        run(['systemctl', 'enable', '--now', 'corosync.service'])
+        run(['systemctl', 'enable', '--now', 'pacemaker.service'])
+        run(['pcs', 'property', 'set', 'stonith-enabled=false'])
 
 
     def createResource(self, resource_name, xml_path):
         self.resource_name = resource_name
         self.xml_path = xml_path
 
-        call(['pcs', 'resource', 'create', self.resource_name, 'VirtualDomain', 'hypervisor="qemu:///system"', 
+        run(['pcs', 'resource', 'create', self.resource_name, 'VirtualDomain', 'hypervisor="qemu:///system"', 
         'config=', self.xml_path, 'migration_transport=ssh', 'op', 'start', 'timeout="120s"', 'op', 'monitor', 'timeout="30"', 
         'nterval="10"', 'meta', 'allow-migrate="true"', 'priority="100"'])
 
     def enableResource(self, resource_name):
         self.resource_name = resource_name
         
-        call(['pcs', 'resource', 'cleanup', resource_name])
-        call(['pcs', 'resource', 'enable', self.resource_name])
+        run(['pcs', 'resource', 'cleanup', resource_name])
+        run(['pcs', 'resource', 'enable', self.resource_name])
 
     def disableResource(self, resource_name):
         self.resource_name = resource_name
         
-        call(['pcs', 'resource', 'disable', self.resource_name])
+        run(['pcs', 'resource', 'disable', self.resource_name])
 
     def moveResource(self, resource_name, target_host):
         self.resource_name = resource_name
         self.target_host = target_host
         
-        call(['pcs', 'resource', 'move', self.resource_name, self.target_host])
+        run(['pcs', 'resource', 'move', self.resource_name, self.target_host])
 
     def cleanupResource(self, resource_name):
         self.resource_name = resource_name
         
-        call(['pcs', 'resource', 'cleanup', self.resource_name])
+        run(['pcs', 'resource', 'cleanup', self.resource_name])
         
         
-    def statusResource(self, resource_name):
-        self.resource_name = resource_name
+    def statusResource(self):
         
-        call(['pcs', 'status', 'resources'])
+        self.res_result = check_output(['pcs', 'status', 'resources'], universal_newlines=True)
+        self.nodes_result = check_output(['pcs', 'status', 'nodes'], universal_newlines=True)
+        
+        self.res_result.split()[-2] # Started / 
+        self.res_result.split()[-1].strip('()') # host
+        self.nodes_result.splitlines()[1].split(':')[-1] # online
+        self.nodes_result.splitlines()[5].split(':')[-1] # offline
+
+        
+        
+        
+        
