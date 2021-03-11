@@ -1,0 +1,554 @@
+<!-- 
+* File Name : main.html  
+* Date Created : 2020.02.17
+* Writer  : 박동혁
+* Description : ABLESTACK Cockpit Plugin 메인페이지
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ABLESTACK</title>
+
+        <!-- 공통 필요 스타일 및 자바스크립트 영역 시작 -->
+        <meta charset="utf-8">
+        <link href="../base1/cockpit.css" type="text/css" rel="stylesheet">
+        <link href="./css/patternfly.css" type="text/css" rel="stylesheet">
+        <script src="../base1/cockpit.js"></script>
+        <script src="./src/common/jquery-3.5.1.js"></script>
+        <!-- 공통 필요 스타일 및 자바스크립트 영역 끝 -->
+ 
+    </head>
+    <body>
+        <div class="pf-c-page" id="main-page-ablestack">
+            <main class="pf-c-page__main" tabindex="-1" id="main-content-card-view">
+                <!-- ui 영역 시작 -->
+                <!-- ABLESTACK 상태 요약 및 바로가기 ALERT Ribbon 영역 시작 -->
+                <section class="pf-c-page__main-section pf-m-no-padding">
+                    <div class="pf-c-alert pf-m-warning" aria-label="Warning alert">
+                        <div class="pf-c-alert__icon">
+                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                        </div>
+                        <p class="pf-c-alert__title">
+                            <strong>
+                            <span class="pf-screen-reader">Warning alert:</span>ABLESTACK 가상어플라이언스 상태</strong>
+                        </p>
+                        <div class="pf-c-alert__description">
+                            <p>ABLESTACK 스토리지센터 및 클라우드센터 VM이 배포되지 않았습니다.</p>
+                        </div>
+                        <div class="pf-c-alert__action-group">
+                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-open-modal-wizard-storage-cluster">클러스터 구성 준비</button>
+                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-open-modal-wizard-storage-vm">스토리지센터 VM 배포</button>
+                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-open-modal-wizard-cloud-vm">클라우드센터 VM 배포</button>
+                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-storage-center-dashboard">스토리지센터 대시보드 연결</button>
+                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-cloud-center">클라우드센터 연결</button>
+                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-monitoring-center">모니터링센터 연결</button>
+                        </div>
+                    </div>  
+                </section>
+                <!-- ABLESTACK 상태 요약 및 바로가기 ALERT Ribbon 영역 끝 -->
+                <!-- 상태를 보여주기 위한 레이아웃 시작 -->
+                <section class="pf-c-page__main-section">
+                    <div class="pf-l-grid pf-m-gutter">
+                        <div class="pf-l-grid__item pf-m-12-col">
+                            <div class="pf-l-grid pf-m-gutter">
+                                <div class="pf-l-grid__item pf-m-6-col">
+                                    <!-- 스토리지 센터 클러스터 상태 카드 영역 시작-->
+                                    <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-storage-cluster-status">
+                                        <div class="pf-c-card__header">
+                                            <div class="pf-c-card__header-main">
+                                                <i class="pf-icon pf-icon-registry" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
+                                            </div>
+                                            <div class="pf-c-card__title" id="card-storage-cluster-status-title">스토리지센터 클러스터 상태</div>
+                                            <div class="pf-c-card__actions">
+                                                <div class="pf-c-dropdown">
+                                                    <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-status" aria-expanded="false" type="button" aria-label="Actions">
+                                                        <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+                                                    </button>
+                                                    <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status">
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-set-maintenance-mode" disabled>유지보수 모드 설정</button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-unset-maintenance-mode" disabled>유지보수 모드 해제</button>
+                                                        </li>
+                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li>
+                                                            <a class="pf-c-dropdown__menu-item pf-m-disabled" href="#" aria-disabled="true" tabindex="-1" id="menu-item-linkto-storage-center">스토리지센터 연결</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-divider" role="separator"></div>
+                                        <div class="pf-c-card__body">
+                                            <section class="pf-c-page__main-breadcrumb">
+                                                <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">클러스터 상태</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">
+                                                                <span class="pf-c-label pf-m-red">
+                                                                    <span class="pf-c-label__content">
+                                                                        <span class="pf-c-label__icon">
+                                                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                                                        </span>Health Err
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">디스크</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">전체 N/A개의 디스크 중 N/A개 작동 중</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">게이트웨이</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">RBD GW N/A개 제공 중</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">관리데몬</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">N/A(전체 N/A개가 실행 중)</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">스토리지 풀</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">N/A개의 풀</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">스토리지 용량</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">전체 N/A TB 중 N/A TB 사용 중(사용률 N/A %)</div>
+                                                        </dd>
+                                                    </div>
+                                                </dl>
+                                            </section>
+                                        </div>
+                                        <div class="pf-c-divider" role="separator"></div>
+                                        <div class="pf-c-card__footer" style="color: var(--pf-global--danger-color--100);">스토리지센터 클러스터가 구성되지 않았습니다.</div>
+                                    </div>
+                                    <!-- 스토리지 클러스터 상태 카드 영역 끝 -->
+                                </div>
+                                <div class="pf-l-grid__item pf-m-6-col">
+                                    <!-- 클라우드센터 클러스터 상태 카드 영역 시작-->
+                                    <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-cloud-cluster-status">
+                                        <div class="pf-c-card__header">
+                                            <div class="pf-c-card__header-main">
+                                                <i class="pf-icon pf-icon-network" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
+                                            </div>
+                                            <div class="pf-c-card__title" id="card-storage-cluster-status-title">클라우드센터 클러스터 상태</div>
+                                            <div class="pf-c-card__actions">
+                                                <div class="pf-c-dropdown">
+                                                    <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-cloud-cluster-status" aria-expanded="false" type="button" aria-label="Actions">
+                                                        <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+                                                    </button>
+                                                    <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-cloud-cluster-status" id="dropdown-menu-cloud-cluster-status">
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>클러스터 시작</button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>클러스터 중지</button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>클러스터 클린업</button>
+                                                        </li>
+                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>클라우드센터VM 마이그레이션</button>
+                                                        </li>
+                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li>
+                                                            <a class="pf-c-dropdown__menu-item pf-m-disabled" href="#" aria-disabled="true" tabindex="-1">클라우드센터 연결</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-divider" role="separator"></div>
+                                        <div class="pf-c-card__body">
+                                            <section class="pf-c-page__main-breadcrumb">
+                                                <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">클러스터 상태</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">
+                                                                <span class="pf-c-label pf-m-red">
+                                                                    <span class="pf-c-label__content">
+                                                                        <span class="pf-c-label__icon">
+                                                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                                                        </span>Health Err
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">노드구성</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">총 N/A 노드로 구성됨(호스트명 알 수 없음)</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">리소스 상태</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">VM실행노드</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">&nbsp;</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">&nbsp;</div>
+                                                        </dd>
+                                                    </div>
+                                                </dl>
+                                            </section>
+                                        </div>
+                                        <div class="pf-c-divider" role="separator"></div>
+                                        <div class="pf-c-card__footer" style="color: var(--pf-global--danger-color--100);">클라우드센터 클러스터가 구성되지 않았습니다.</div>
+                                    </div>
+                                    <!-- 클라우드센터 클러스터 상태 카드 영역 끝 -->
+                                </div>
+                                <div class="pf-l-grid__item pf-m-6-col">
+                                    <!-- 스토리지센터VM 상태 카드 영역 시작-->
+                                    <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-storage-vm-status">
+                                        <div class="pf-c-card__header">
+                                            <div class="pf-c-card__header-main">
+                                                <i class="pf-icon pf-icon-virtual-machine" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
+                                            </div>
+                                            <div class="pf-c-card__title" id="card-storage-cluster-status-title">스토리지센터 가상머신 상태</div>
+                                            <div class="pf-c-card__actions">
+                                                <div class="pf-c-dropdown">
+                                                    <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-vm-status" aria-expanded="false" type="button" aria-label="Actions">
+                                                        <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+                                                    </button>
+                                                    <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-vm-status" id="dropdown-menu-storage-vm-status">
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>스토리지센터VM 시작</button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>스토리지센터VM 정지</button>
+                                                        </li>
+                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>스토리지센터VM 삭제</button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>스토리지센터VM 자원변경</button>
+                                                        </li>
+                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li>
+                                                            <a class="pf-c-dropdown__menu-item pf-m-disabled" href="#" aria-disabled="true" tabindex="-1">스토리지센터VM 연결</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-divider" role="separator"></div>
+                                        <div class="pf-c-card__body">
+                                            <section class="pf-c-page__main-breadcrumb">
+                                                <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">가상머신상태</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">
+                                                                <span class="pf-c-label pf-m-red">
+                                                                    <span class="pf-c-label__content">
+                                                                        <span class="pf-c-label__icon">
+                                                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                                                        </span>Status Err
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">CPU</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">N/A vCore(N/A Socket, N/A Core)</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">Memory</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">N/A GiB</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">ROOT Disk 크기</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">N/A GiB</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">관리 NIC</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">NIC Type : N/A (Parent : N/A)</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">IP : N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">GW : N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">스토리지 NIC</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">NIC Type : N/A (Parent : N/A)</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">서버용 IP : N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">복제용 IP : N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">Data 디스크</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">Disk Type : N/A (Parent : N/A)</div>
+                                                        </dd>
+                                                    </div>
+                                                </dl>
+                                            </section>
+                                        </div>
+                                        <div class="pf-c-divider" role="separator"></div>
+                                        <div class="pf-c-card__footer" style="color: var(--pf-global--danger-color--100);">스토리지센터 가상머신이 배포되지 않았습니다.</div>
+                                    </div>
+                                    <!-- 스토리지센터VM 상태 카드 영역 끝 -->
+                                </div>
+                                <div class="pf-l-grid__item pf-m-6-col">
+                                    <!-- 클라우드센터VM 상태 카드 영역 시작-->
+                                    <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-cloud-vm-status">
+                                        <div class="pf-c-card__header">
+                                            <div class="pf-c-card__header-main">
+                                                <i class="pf-icon pf-icon-virtual-machine" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
+                                            </div>
+                                            <div class="pf-c-card__title" id="card-cloud-vm-title">클라우드센터 가상머신 상태</div>
+                                            <div class="pf-c-card__actions">
+                                                <div class="pf-c-dropdown">
+                                                    <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-cloud-vm-status" aria-expanded="false" type="button" aria-label="Actions">
+                                                        <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+                                                    </button>
+                                                    <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-cloud-vm-status" id="dropdown-menu-cloud-vm-status">
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>클라우드센터VM 자원변경</button>
+                                                        </li>
+                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li>
+                                                            <a class="pf-c-dropdown__menu-item pf-m-disabled" href="#" aria-disabled="true" tabindex="-1">클라우드센터VM 연결</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-divider" role="separator"></div>
+                                        <div class="pf-c-card__body">
+                                            <section class="pf-c-page__main-breadcrumb">
+                                                <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">가상머신상태</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">
+                                                                <span class="pf-c-label pf-m-red">
+                                                                    <span class="pf-c-label__content">
+                                                                        <span class="pf-c-label__icon">
+                                                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                                                        </span>Status Err
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">CPU</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">N/A vCore(N/A Socket, N/A Core)</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">Memory</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">N/A GiB</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">ROOT Disk 크기</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">N/A GiB</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">관리 NIC</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">NIC Type : N/A (Parent : N/A)</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">IP : N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">GW : N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">&nbsp;</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">&nbsp;</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">&nbsp;</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text">&nbsp;</div>
+                                                        </dd>
+                                                    </div>
+                                                </dl>
+                                            </section>
+                                        </div>
+                                        <div class="pf-c-divider" role="separator"></div>
+                                        <div class="pf-c-card__footer" style="color: var(--pf-global--danger-color--100);">클라우드센터 가상머신이 배포되지 않았습니다.</div>
+                                    </div>
+                                    <!-- 클라우드센터VM 상태 카드 영역 끝 -->                       
+                                </div>
+                            </div>                
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+        <!-- ui 영역 끝  -->
+
+        <!-- 모달 영역 시작  -->
+        
+        <!-- 클러스터 구성 준비 마법사 : ./src/features/cluster-config-prepare.html을 내용으로 load -->
+        <div class="pf-c-backdrop" id="div-modal-wizard-cluster-config-prepare"></div>
+
+        <!-- 스토리지센터VM 배포 마법사 : ./src/features/storage-vm-wizard.html을 내용으로 load -->
+        <div class="pf-c-backdrop" id="div-modal-wizard-storage-vm"></div>
+
+        <!-- 클라우드센터VM 배포 마법사 : ./src/features/cloud-vm-wizard.html을 내용으로 load -->
+        <div class="pf-c-backdrop" id="div-modal-wizard-cloud-vm"></div>
+
+        <!-- 모달 영역 끝  -->
+
+        <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+        <script src="./src/features/main.js"></script>
+        <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
+    </body>
+</html>
