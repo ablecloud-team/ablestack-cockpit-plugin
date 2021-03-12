@@ -4,11 +4,10 @@
 import argparse
 from subprocess import check_output
 from subprocess import run
-from python.PCS.able_return import *
+from able_return import *
 
 def parseArgs():
-    parser = argparse.ArgumentParser(
-        description='Pacemaker cluster')
+    parser = argparse.ArgumentParser(description='Pacemaker cluster')
     
     parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status'])
     parser.add_argument('--cluster', metavar='name', type=str,
@@ -42,8 +41,8 @@ class Pacemaker:
         run(['systemctl', 'enable', '--now', 'corosync.service'])
         run(['systemctl', 'enable', '--now', 'pacemaker.service'])
         run(['pcs', 'property', 'set', 'stonith-enabled=false'])
-        
-        ret_val = {'cluster name :':self.cluster_name, 'hosts': *hostnames}
+
+        ret_val = {'cluster name :':self.cluster_name, 'hosts': hostnames}
         ret = createReturn(code=200, val=ret_val)
         print(json.dumps(json.loads(ret), indent=4))
 
@@ -113,23 +112,21 @@ class Pacemaker:
         
     def statusResource(self):
         
-        res_output = check_output(['pcs', 'status', 'resources'], universal_newlines=True)
-        nodes_output = check_output(['pcs', 'status', 'nodes'], universal_newlines=True)
+        try:
+            res_output = check_output(['pcs', 'status', 'resources'], universal_newlines=True)
+            nodes_output = check_output(['pcs', 'status', 'nodes'], universal_newlines=True)
         
-        res_output.split()[-2] # Started / 
-        res_output.split()[-1].strip('()') # host
-        nodes_output.splitlines()[1].split(':')[-1] # online
-        nodes_output.splitlines()[5].split(':')[-1] # offline
-        
-        nodes = (nodes_output.splitlines()[1].split(':')[-1] + nodes_output.splitlines()[5].split(':')[-1]).strip()
+            res_output.split()[-2] # Started / Stop
+            res_output.split()[-1].strip('()') # host
+            nodes_output.splitlines()[1].split(':')[-1] # online
+            nodes_output.splitlines()[5].split(':')[-1] # offline
+            nodes = (nodes_output.splitlines()[1].split(':')[-1] + nodes_output.splitlines()[5].split(':')[-1]).strip()
+            ret_val = {'status':res_output.split()[-2], 'started':res_output.split()[-1].strip('()'), 'hosts': nodes}
+            ret = createReturn(code=200, val=ret_val)
+            print(json.dumps(json.loads(ret), indent=4))
 
-        ret_val = {'status':res_output.split()[-2], 'started':res_output.split()[-1].strip('()'), 'hosts': nodes}
-        ret = createReturn(code=200, val=ret_val)
-        print(json.dumps(json.loads(ret), indent=4))
+        except Exception as e:
+            ret = createReturn(code=500, val='ERROR')
+            print ('EXCEPTION')
 
         return ret
-
-        
-        
-        
-        

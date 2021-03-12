@@ -3,12 +3,15 @@
 
 import json
 import sys
+import os
 
 def funcname():
     return sys._getframe(1).f_code.co_name
 
 def callername():
     return sys._getframe(2).f_code.co_name
+
+
 
 def createReturn(retname: str = "",
                  val: object = "",
@@ -26,6 +29,7 @@ def createReturn(retname: str = "",
     if type_str == "":
         type_str = str(type(val)).replace('<class \'', '').replace('\'>', '')
     if retname == "":
+
         retname = callername()
     retdic = {
         'code': code,
