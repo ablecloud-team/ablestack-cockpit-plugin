@@ -14,7 +14,8 @@ def parseArgs():
     
     parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status'])
     parser.add_argument('--cluster', metavar='name', type=str, help='create cluster name')
-    parser.add_argument('--hosts', metavar='name', type=str, help='cluster host name')
+    #parser.add_argument('--hosts', metavar='name', type=str, help='cluster host name')
+    parser.add_argument('hosts', metavar='name', type=str, help='cluster host name', nargs='+')
     parser.add_argument('--resource', metavar='name', type=str, help='pcs resource name')
     parser.add_argument('--xml', metavar='name', type=str, help='xml path')
     parser.add_argument('--target', metavar='name', type=str, help='move target host name')
@@ -32,14 +33,14 @@ class Pacemaker:
         self.cluster_name = cluster_name
         self.hostnames = hostnames
 
-        pcs('host', 'auth', '-u', 'hacluster', '-p', 'password', *hostnames)
-        pcs('cluster', 'setup', self.cluster_name, *hostnames)
+        pcs('host', 'auth', '-u', 'hacluster', '-p', 'password', *self.hostnames)
+        pcs('cluster', 'setup', self.cluster_name, *self.hostnames)
         pcs('cluster', 'start', '--all')
         systemctl('enable', '--now', 'corosync.service')
         systemctl('enable', '--now', 'pacemaker.service')
         pcs('property', 'set', 'stonith-enabled=false')
 
-        ret_val = {'cluster name :':self.cluster_name, 'hosts': hostnames}
+        ret_val = {'cluster name :':self.cluster_name, 'hosts': *self.hostnames}
         ret = createReturn(code=200, val=ret_val)
         print(json.dumps(json.loads(ret), indent=4))
 
