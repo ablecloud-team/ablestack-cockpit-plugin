@@ -32,8 +32,6 @@ class Pacemaker:
         self.cluster_name = cluster_name
         self.hostnames = hostnames
 
-
-
         pcs('host', 'auth', '-u', 'hacluster', '-p', 'password', *hostnames)
         pcs('cluster', 'setup', self.cluster_name, *hostnames)
         pcs('cluster', 'start', '--all')
@@ -62,6 +60,7 @@ class Pacemaker:
 
         return ret
 
+
     def enableResource(self, resource_name):
         self.resource_name = resource_name
         
@@ -73,6 +72,7 @@ class Pacemaker:
 
         return ret
 
+
     def disableResource(self, resource_name):
         self.resource_name = resource_name
         
@@ -82,6 +82,7 @@ class Pacemaker:
         print(json.dumps(json.loads(ret), indent=4))
 
         return ret
+
 
     def moveResource(self, resource_name, target_host):
         self.resource_name = resource_name
@@ -107,6 +108,7 @@ class Pacemaker:
 
         return ret
 
+
     def cleanupResource(self, resource_name):
         self.resource_name = resource_name
         
@@ -120,7 +122,6 @@ class Pacemaker:
         
     def statusResource(self, resource_name):
         self.resource_name = resource_name
-
 
         status_output = pcs('status').stdout.decode().splitlines()
         nodes_output = pcs('status', 'nodes', 'corosync').stdout.decode().splitlines()
