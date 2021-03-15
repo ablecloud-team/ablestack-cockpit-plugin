@@ -4,17 +4,19 @@
 import argparse
 import json
 import logging
-import sys
 
 from ablestack import *
 import sh
 import os
-lsblk_cmd=sh.Command('/usr/bin/lsblk')
-lspci_cmd=sh.Command('/usr/bin/lspci')
 
-env=os.environ.copy()
-env['LANG']="en_US.utf-8"
-env['LANGUAGE']="en"
+lsblk_cmd = sh.Command('/usr/bin/lsblk')
+lspci_cmd = sh.Command('/usr/bin/lspci')
+
+env = os.environ.copy()
+env['LANG'] = "en_US.utf-8"
+env['LANGUAGE'] = "en"
+
+
 def createArgumentParser():
     """
     입력된 argument를 파싱하여 dictionary 처럼 사용하게 만들어 주는 parser를 생성하는 함수
@@ -31,7 +33,6 @@ def createArgumentParser():
     # 선택지 추가(동작 선택)
     tmp_parser.add_argument('action', choices=['list', ], help="disk action")
 
-
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐)
     tmp_parser.add_argument("-v", "--verbose", action='count', default=0,
                             help="increase output verbosity")
@@ -46,16 +47,17 @@ def createArgumentParser():
                             version="%(prog)s 1.0")
     return tmp_parser
 
+
 def listPCIInterface(classify=None):
     list_output = lspci_cmd('-vmm', '-k').stdout.decode().splitlines()
-    if classify == None:
+    if classify is None:
         list_pci = []
         newpci = {}
         for output in list_output:
             try:
                 (k, v) = output.split(':', 1)
                 newpci[k] = v.strip()
-            except ValueError as e:
+            except ValueError:
                 list_pci.append(newpci)
                 newpci = {}
     else:
@@ -65,7 +67,7 @@ def listPCIInterface(classify=None):
             try:
                 (k, v) = output.split(':', 1)
                 newpci[k] = v.strip()
-            except ValueError as e:
+            except ValueError:
 
                 if newpci[classify] in list_pci:
                     list_pci[newpci[classify]].append(newpci)
@@ -74,11 +76,12 @@ def listPCIInterface(classify=None):
                 newpci = {}
     return list_pci
 
+
 def listDiskInterface(H=False, classify=None):
     # output = nmcli_cmd('-c', 'no', '-f', 'TYPE,ACTIVE,DEVICE,STATE,SLAVE', 'con', 'show')
     # output = nmcli_cmd('-c', 'no', '-f', 'ALL', 'con', 'show')
     # outputs = output.splitlines()
-    #for out in outputs:
+    # for out in outputs:
     #    print(out.split())
 
     item = json.loads(lsblk_cmd(J=True, o="name,path,rota,model,size,state,group,type,tran,subsystems").stdout.decode())
@@ -88,21 +91,20 @@ def listDiskInterface(H=False, classify=None):
         if 'loop' not in dev['type']:
             newbd.append(dev)
 
-    item['blockdevices']=newbd
+    item['blockdevices'] = newbd
     # print(output)
 
-
-    list_pci=listPCIInterface()
+    list_pci = listPCIInterface(classify=classify)
     item['raidcontrollers'] = [
         # testdevice
-        {
-                "Slot": "00:00.0",
-                "Class": "Raid",
-                "Vendor": "Advanced Micro Devices, Inc. [AMD]",
-                "Device": "Raid",
-                "SVendor": "Advanced Micro Devices, Inc. [AMD]",
-                "SDevice": "testRaid"
-            }
+        # {
+        #     "Slot": "00:00.0",
+        #     "Class": "Raid",
+        #     "Vendor": "Advanced Micro Devices, Inc. [AMD]",
+        #     "Device": "Raid",
+        #     "SVendor": "Advanced Micro Devices, Inc. [AMD]",
+        #     "SDevice": "testRaid"
+        # }
     ]
     for pci in list_pci:
         if 'raid' in pci['Device'].lower():
