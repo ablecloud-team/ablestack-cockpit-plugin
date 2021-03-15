@@ -1,0 +1,152 @@
+<!-- 
+* File Name : cloud-vm-wizard.html  
+* Date Created : 2020.03.03
+* Writer  : 박동혁
+* Description : ABLESTACK 클라우드센터 VM을 배포하기 위한 절차를 진행하는 마법사 Modal 대화상자
+-->
+
+<div class="pf-l-bullseye" >
+    <div class="pf-c-modal-box pf-m-lg" role="dialog" aria-modal="true" aria-label="Basic wizard">
+        <div class="pf-c-wizard">
+            <div class="pf-c-wizard__header">
+                <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" id="button-close-modal-wizard-cloud-vm">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <h1 class="pf-c-title pf-m-3xl pf-c-wizard__title">ABLESTACK 클라우드센터 VM 배포 마법사</h1>
+                <p class="pf-c-wizard__description">ABLESTACK 클러스터에 클라우드센터를 실행하는 가상머신 어플라이언스를 배포합니다. </p>
+            </div>    
+            <div class="pf-c-wizard__outer-wrap">
+                <div class="pf-c-wizard__inner-wrap">
+                    <nav class="pf-c-wizard__nav" aria-label="Steps">
+                        <ol class="pf-c-wizard__nav-list">
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link pf-m-current" id="nav-button-cloud-vm-overview">개요</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-cluster">장애조치 클러스터 설정</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-appliance">클라우드센터 VM 설정</button>
+                                <ol class="pf-c-wizard__nav-list">
+                                    <li class="pf-c-wizard__nav-item">
+                                        <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-compute">컴퓨트</button>
+                                    </li>
+                                    <li class="pf-c-wizard__nav-item">
+                                        <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-network">네트워크</button>
+                                    </li>
+                                </ol>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-additional">추가 네트워크 정보</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-ssh-key">SSH Key 정보</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-review">설정확인</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-finish">완료</button>
+                            </li>
+                        </ol>
+                    </nav>
+                    <main class="pf-c-wizard__main">
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-overview">
+                            <div class="pf-c-content">
+                                <p>
+                                    ABLESTACK 클라우드센터 VM을 배포하기 위해 필요한 정보를 다음과 같이 마법사를 통해 입력받습니다.    
+                                </p>
+                                <ul>
+                                    <li>클라우드센터 VM의 HA구성을 위한 클러스터 설정 정보</li>
+                                    <li>클라우드센터 VM의 CPU, Memory, Disk, Network에 대한 정보</li>
+                                    <li>가상머신의 호스트명 등의 네트워크 정보</li>
+                                    <li>호스트 및 가상머신 간의 상호 SSH 연결을 위한 SSH Key 정보</li>
+                                </ul>
+                                <p>
+                                    필요한 정보를 먼저 준비하십시오. 정보가 준비되었다면 "다음" 버튼을 눌러 클라우드센터 VM 배포를 시작합니다. 
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-failover-cluster">
+                            <div class="pf-c-content">
+                                <p>
+                                    장애조치 클러스터는 클라우드센터 VM이 실행 중인 호스트에 장애가 발생하는 경우 클라우드센터 VM을 안전하게 다른 호스트에서 실행하도록 하기 위해 구성합니다.
+                                    장애조치 클러스터를 구성하기 위해 필요한 정보를 아래에 입력하십시오. 
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-compute">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM의 CPU 및 Memory, ROOT Disk 등의 정보를 설정합니다. 
+                                    아래의 항목에 적합한 값을 선택하여 입력하십시오.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-network">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM이 사용할 관리 네트워크용 NIC 정보를 설정합니다. 
+                                    아래의 항목에 적합한 값을 선택하여 입력하십시오.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-additional">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM에 호스트명 등의 부가적인 네트워크 정보를 설정합니다. 아래의 항목에 값을 입력하십시오.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-ssh-key">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM과 호스트, 그리고 ABLESTACK을 구성하고 있는 가상머신들과의 SSH 연결을 위해 SSH Key를 설정합니다. 
+                                    미리 생성한 SSH Key 파일을 등록할 수 있습니다. 
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-review">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM의 배포를 위해 입력한 설정 정보는 다음과 같습니다. 
+                                    입력한 정보를 수정하고자 하는 경우, 해당 탭으로 이동하여 정보를 수정하십시오. 
+                                    <br/>
+                                    <br/>
+                                    모든 정보를 확인한 후 "배포"를 시작합니다. 
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-finish">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM의 배포를 완료했습니다. 가상머신이 배포되면 다음의 작업을 수행해야 합니다. 
+                                </p>
+                                <ul>
+                                    <li>클라우드센터 VM의 웹관리콘솔에 접속</li>
+                                    <li>ABLESTACK에 대한 클라우드 Zone 구성</li>
+                                    <li>가상머신 생성을 위한 각종 정책 준비</li>
+                                </ul>
+                                <p>
+                                    위의 모든 작업은 클라우드센터 VM의 웹 관리콘솔을 이용해 진행합니다. 
+                                </p>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+                <footer class="pf-c-wizard__footer" style="box-shadow:var(--pf-global--BoxShadow--sm-top)">
+                    <button class="pf-c-button pf-m-primary" type="submit" id="button-next-step-modal-wizard-cloud-vm">다음</button>
+                    <button class="pf-c-button pf-m-secondary" type="button" id="button-before-step-modal-wizard-cloud-vm">이전</button>
+                    <div class="pf-c-wizard__footer-cancel">
+                        <button class="pf-c-button pf-m-link" type="button" id="button-cancel-config-modal-wizard-cloud-vm">취소</button>
+                    </div>
+                </footer>
+            </div>    
+        </div>
+    </div>
+</div>
+
+
+<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+<script src="./src/features/cloud-vm-wizard.js"></script>
+<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
