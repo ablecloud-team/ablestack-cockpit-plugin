@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import argparse
 from subprocess import check_output
@@ -7,21 +7,16 @@ from subprocess import run
 from able_return import *
 
 def parseArgs():
-    parser = argparse.ArgumentParser(description='Pacemaker cluster')
+    parser = argparse.ArgumentParser(description='Pacemaker cluster',
+                                     epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
     
     parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status'])
-    parser.add_argument('--cluster', metavar='name', type=str,
-                        help='create cluster name')
-    parser.add_argument('--hosts', metavar='name', type=str,
-                        help='cluster host name')
-    parser.add_argument('--resource', metavar='name', type=str,
-                        help='pcs resource name') 
-    parser.add_argument('--xml', metavar='name', type=str,
-                        help='xml path')
-    parser.add_argument('--target', metavar='name', type=str,
-                        help='move target host name')
+    parser.add_argument('--cluster', metavar='name', type=str, help='create cluster name')
+    parser.add_argument('--hosts', metavar='name', type=str, help='cluster host name')
+    parser.add_argument('--resource', metavar='name', type=str, help='pcs resource name')
+    parser.add_argument('--xml', metavar='name', type=str, help='xml path')
+    parser.add_argument('--target', metavar='name', type=str, help='move target host name')
     return parser.parse_args()
-
 
 class Pacemaker:
     def __init__(self):
@@ -110,7 +105,8 @@ class Pacemaker:
         return ret
         
         
-    def statusResource(self):
+    def statusResource(self, resource_name):
+        self.resource_name = resource_name
         
         try:
             res_output = check_output(['pcs', 'status', 'resources'], universal_newlines=True)
@@ -127,6 +123,6 @@ class Pacemaker:
 
         except Exception as e:
             ret = createReturn(code=500, val='ERROR')
-            print ('EXCEPTION')
+            print ('EXCEPTION : ',e)
 
         return ret

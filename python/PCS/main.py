@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from pacemaker import *
 from able_return import *
@@ -22,7 +22,7 @@ def main():
     elif (args.action) == 'cleanup':
         pcs.cleanupResource(args.resource)
     elif (args.action) == 'status':
-        pcs.statusResource()
+        pcs.statusResource(args.resource)
 
 
 if __name__ == "__main__":
