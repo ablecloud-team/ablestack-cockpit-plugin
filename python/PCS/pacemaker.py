@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-from subprocess import check_output
 from able_return import *
 from sh import pcs
 from sh import systemctl
