@@ -6,7 +6,6 @@ from able_return import *
 from sh import pcs
 from sh import systemctl
 import sys
-import xml.etree.ElementTree as ET
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Pacemaker cluster for Cloud Center VM',
