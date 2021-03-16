@@ -1,8 +1,8 @@
 <domain type='kvm' id='1'>
-  <name>csvm</name>
-  <memory unit='GiB'>16</memory>
-  <currentMemory unit='GiB'>16</currentMemory>
-  <vcpu placement='static'>4</vcpu>
+  <name>scvm</name>
+  <memory unit='GiB'><!--memory--></memory>
+  <currentMemory unit='GiB'><!--memory--></currentMemory>
+  <vcpu placement='static'><!--cpu--></vcpu>
   <resource>
     <partition>/machine</partition>
   </resource>
@@ -31,7 +31,7 @@
     <emulator>/usr/libexec/qemu-kvm</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
-      <source file='/opt/pentaARK/cvm.qcow2'/>
+      <source file='/opt/scvm/vm.qcow2'/>
       <backingStore/>
       <target dev='vda' bus='virtio'/>
       <boot order='1'/>
@@ -39,6 +39,7 @@
       <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
     </disk>
     
+<!--lun_passthrough-->
     <controller type='usb' index='0' model='ich9-ehci1'>
       <alias name='usb'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x7'/>
@@ -86,15 +87,9 @@
       <address type='pci' domain='0x0000' bus='0x00' slot='0x0c' function='0x0'/>
     </controller>
     
-		<interface type='bridge'>
-			<mac address='00:24:81:4b:1f:30'/>
-			<source bridge='br0'/>
-			<target dev='vnet0'/>
-			<model type='virtio'/>
-			<alias name='net0'/>
-			<address type='pci' domain='0x0000' bus='0x00' slot='0x14' function='0x0'/>
-		</interface>
-
+<!--management_network_bridge-->
+<!--server_network_bridge-->
+<!--replication_network_bridge-->
     <serial type='pty'>
       <source path='/dev/pts/0'/>/
       <target type='isa-serial' port='0'>
@@ -144,56 +139,8 @@
       <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
     </video>
     
-		<hostdev mode='subsystem' type='pci' managed='yes'>
-			<driver name='vfio'/>
-			<source>
-				<address domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>
-			</source>
-			<alias name='hostdev0'/>
-			<address type='pci' domain='0x0000' bus='0x00' slot='0x15' function='0x0'/>
-		</hostdev>
-		<hostdev mode='subsystem' type='pci' managed='yes'>
-			<driver name='vfio'/>
-			<source>
-				<address domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
-			</source>
-			<alias name='hostdev1'/>
-			<address type='pci' domain='0x0000' bus='0x00' slot='0x16' function='0x0'/>
-		</hostdev>
-
-		<hostdev mode='subsystem' type='pci' managed='yes'>
-			<driver name='vfio'/>
-			<source>
-				<address domain='0x0003' bus='0x03' slot='0x03' function='0x3'/>
-			</source>
-			<alias name='hostdev2'/>
-			<address type='pci' domain='0x0000' bus='0x00' slot='0x17' function='0x0' multifunction='on'/>
-		</hostdev>
-		<hostdev mode='subsystem' type='pci' managed='yes'>
-			<driver name='vfio'/>
-			<source>
-				<address domain='0x0005' bus='0x05' slot='0x05' function='0x5'/>
-			</source>
-			<alias name='hostdev3'/>
-			<address type='pci' domain='0x0000' bus='0x00' slot='0x17' function='0x1'/>
-		</hostdev>
-		<hostdev mode='subsystem' type='pci' managed='yes'>
-			<driver name='vfio'/>
-			<source>
-				<address domain='0x0004' bus='0x04' slot='0x04' function='0x4'/>
-			</source>
-			<alias name='hostdev4'/>
-			<address type='pci' domain='0x0000' bus='0x00' slot='0x18' function='0x0' multifunction='on'/>
-		</hostdev>
-		<hostdev mode='subsystem' type='pci' managed='yes'>
-			<driver name='vfio'/>
-			<source>
-				<address domain='0x0006' bus='0x06' slot='0x06' function='0x6'/>
-			</source>
-			<alias name='hostdev5'/>
-			<address type='pci' domain='0x0000' bus='0x00' slot='0x18' function='0x1'/>
-		</hostdev>
-
+<!--raid_passthrough-->
+<!--nic_passthrough-->
     <redirdev bus='usb' type='spicevmc'>
       <alias name='redir0'/>
       <address type='usb' bus='0' port='2'/>

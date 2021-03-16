@@ -1,5 +1,5 @@
 <domain type='kvm' id='1'>
-  <name>csvm</name>
+  <name>scvm</name>
   <memory unit='GiB'><!--memory--></memory>
   <currentMemory unit='GiB'><!--memory--></currentMemory>
   <vcpu placement='static'><!--cpu--></vcpu>
@@ -31,7 +31,7 @@
     <emulator>/usr/libexec/qemu-kvm</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
-      <source file='/opt/pentaARK/cvm.qcow2'/>
+      <source file='/opt/scvm/scvm.qcow2'/>
       <backingStore/>
       <target dev='vda' bus='virtio'/>
       <boot order='1'/>
