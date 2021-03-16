@@ -8,16 +8,16 @@ from sh import systemctl
 import sys
 
 def parseArgs():
-    parser = argparse.ArgumentParser(description='Pacemaker cluster',
+    parser = argparse.ArgumentParser(description='Pacemaker cluster for Cloud Center VM',
                                      epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
     
-    parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status'])
-    parser.add_argument('--cluster', metavar='name', type=str, help='create cluster name')
+    parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status'], help='choose one of the actions')
+    parser.add_argument('--cluster', metavar='name', type=str, help='The name of the cluster to be created')
     #parser.add_argument('--hosts', metavar='name', type=str, help='cluster host name')
-    parser.add_argument('hosts', metavar='name', type=str, help='cluster host name', nargs='+')
-    parser.add_argument('--resource', metavar='name', type=str, help='pcs resource name')
-    parser.add_argument('--xml', metavar='name', type=str, help='xml path')
-    parser.add_argument('--target', metavar='name', type=str, help='move target host name')
+    parser.add_argument('hosts', metavar='name', type=str, help='Hostnames to form a cluster', nargs='+')
+    parser.add_argument('--resource', metavar='name', type=str, help='The name of the resource to be created')
+    parser.add_argument('--xml', metavar='name', type=str, help='Cloud Center VM''s xml file PATH')
+    parser.add_argument('--target', metavar='name', type=str, help='Target hostname to migrate Cloud Center VM')
     return parser.parse_args()
 
 class Pacemaker:
@@ -39,7 +39,7 @@ class Pacemaker:
         systemctl('enable', '--now', 'pacemaker.service')
         pcs('property', 'set', 'stonith-enabled=false')
 
-        ret_val = {'cluster name :':self.cluster_name, 'hosts': *self.hostnames}
+        ret_val = {'cluster name :':self.cluster_name, 'hosts': self.*hostnames}
         ret = createReturn(code=200, val=ret_val)
         print(json.dumps(json.loads(ret), indent=4))
 
