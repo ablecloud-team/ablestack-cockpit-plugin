@@ -13,10 +13,10 @@ def parseArgs():
     
     parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status'], help='choose one of the actions')
     parser.add_argument('--cluster', metavar='name', type=str, help='The name of the cluster to be created')
-    #parser.add_argument('--hosts', metavar='name', type=str, help='cluster host name')
-    parser.add_argument('hosts', metavar='name', type=str, help='Hostnames to form a cluster', nargs='+')
+    parser.add_argument('--hosts', metavar='name', type=str, nargs='*', help='Hostnames to form a cluster')
+    #parser.add_argument('hosts', metavar='name', type=str, help='Hostnames to form a cluster', nargs='*')
     parser.add_argument('--resource', metavar='name', type=str, help='The name of the resource to be created')
-    parser.add_argument('--xml', metavar='name', type=str, help='Cloud Center VM''s xml file PATH')
+    parser.add_argument('--xml', metavar='name', type=str, help='Cloud Center VM\'s xml file PATH')
     parser.add_argument('--target', metavar='name', type=str, help='Target hostname to migrate Cloud Center VM')
     return parser.parse_args()
 
@@ -51,7 +51,7 @@ class Pacemaker:
         self.xml_path = xml_path
 
         pcs('resource', 'create', self.resource_name, 'VirtualDomain', 'hypervisor="qemu:///system"', 
-        'config=', self.xml_path, 'migration_transport=ssh', 'op', 'start', 'timeout="120s"', 'op', 'monitor', 'timeout="30"', 
+        f'config={self.xml_path}', 'migration_transport=ssh', 'op', 'start', 'timeout="120s"', 'op', 'monitor', 'timeout="30"', 
         'interval="10"', 'meta', 'allow-migrate="true"', 'priority="100"')
         
         ret_val = {'resource name :':self.resource_name, 'hypervisor':'qemu:///system', 'config':self.xml_path, 'migration_transport':'ssh'}
@@ -137,6 +137,12 @@ class Pacemaker:
             if "Offline" in line:
                 offline_host = line.split(':')[-1]
         corosync_hosts = (online_host + offline_host).strip()
+
+        if current_host not in corosync_hosts:
+            ret_val = {'status':'Error', 'started':'Unknown', 'hosts': 'Unknown'}
+            ret = createReturn(code=500, val=ret_val)
+            print(json.dumps(json.loads(ret), indent=4))
+            sys.exit(1)
 
         ret_val = {'status':status_pcs, 'started':current_host, 'hosts': corosync_hosts}
         ret = createReturn(code=200, val=ret_val)
