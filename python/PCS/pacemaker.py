@@ -39,7 +39,7 @@ class Pacemaker:
         systemctl('enable', '--now', 'pacemaker.service')
         pcs('property', 'set', 'stonith-enabled=false')
 
-        ret_val = {'cluster name :':self.cluster_name, 'hosts': self.*hostnames}
+        ret_val = {'cluster name :':self.cluster_name, 'hosts': self.hostnames}
         ret = createReturn(code=200, val=ret_val)
         print(json.dumps(json.loads(ret), indent=4))
 
