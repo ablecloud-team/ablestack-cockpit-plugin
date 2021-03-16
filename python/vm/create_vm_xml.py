@@ -95,6 +95,7 @@ def createVmXml(args):
         alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',]
         slot_hex_num = generateDecToHex()
         host_dev_num = 0
+        br_num = 0
         
         # 생성할 가상머신 xml 템플릿
         template_file = '/usr/share/cockpit/cockpit-plugin-ablestack/tools/xml-template/scvm.xml'
@@ -130,24 +131,26 @@ def createVmXml(args):
                     mnb_txt = "\t\t<interface type='bridge'>\n"
                     mnb_txt += "\t\t\t<mac address='" + generateMacAddress() + "'/>\n"
                     mnb_txt += "\t\t\t<source bridge='" + args.management_network_bridge + "'/>\n"
-                    mnb_txt += "\t\t\t<target dev='vnet0'/>\n"
+                    mnb_txt += "\t\t\t<target dev='vnet" + str(br_num) + "'/>\n"
                     mnb_txt += "\t\t\t<model type='virtio'/>\n"
-                    mnb_txt += "\t\t\t<alias name='net0'/>\n"
+                    mnb_txt += "\t\t\t<alias name='net" + str(br_num) + "'/>\n"
                     mnb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
                     mnb_txt += "\t\t</interface>\n"
 
+                    br_num += 1
                     line = line.replace('<!--management_network_bridge-->', mnb_txt)
                 elif '<!--server_network_bridge-->' in line:
                     if 'bridge' == args.storage_traffic_network_type:
                         snb_txt = "\t\t<interface type='bridge'>\n"
                         snb_txt += "\t\t\t<mac address='" + generateMacAddress() + "'/>\n"
                         snb_txt += "\t\t\t<source bridge='" + args.server_network_bridge + "'/>\n"
-                        snb_txt += "\t\t\t<target dev='vnet0'/>\n"
+                        snb_txt += "\t\t\t<target dev='vnet" + str(br_num) + "'/>\n"
                         snb_txt += "\t\t\t<model type='virtio'/>\n"
-                        snb_txt += "\t\t\t<alias name='net0'/>\n"
+                        snb_txt += "\t\t\t<alias name='net" + str(br_num) + "'/>\n"
                         snb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
                         snb_txt += "\t\t</interface>\n"
                         
+                        br_num += 1
                         line = line.replace('<!--server_network_bridge-->', snb_txt)
                     else:
                         # <!--server_network_bridge--> 주석제거
@@ -158,12 +161,13 @@ def createVmXml(args):
                         rnb_txt = "\t\t<interface type='bridge'>\n"
                         rnb_txt += "\t\t\t<mac address='" + generateMacAddress() + "'/>\n"
                         rnb_txt += "\t\t\t<source bridge='" + args.replication_network_bridge + "'/>\n"
-                        rnb_txt += "\t\t\t<target dev='vnet0'/>\n"
+                        rnb_txt += "\t\t\t<target dev='vnet" + str(br_num) + "'/>\n"
                         rnb_txt += "\t\t\t<model type='virtio'/>\n"
-                        rnb_txt += "\t\t\t<alias name='net0'/>\n"
+                        rnb_txt += "\t\t\t<alias name='net" + str(br_num) + "'/>\n"
                         rnb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
                         rnb_txt += "\t\t</interface>\n"
                         
+                        br_num += 1
                         line = line.replace('<!--replication_network_bridge-->', rnb_txt)
                     else:    
                         # <!--replication_network_bridge--> 주석제거
