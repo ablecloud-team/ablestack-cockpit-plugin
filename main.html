@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>ABLESTACK</title>
+        <title>ABLESTACK1</title>
 
         <!-- 공통 필요 스타일 및 자바스크립트 영역 시작 -->
         <meta charset="utf-8">
@@ -66,10 +66,10 @@
                                                     </button>
                                                     <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status">
                                                         <li>
-                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-set-maintenance-mode" disabled>유지보수 모드 설정</button>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-set-maintenance-mode" >유지보수 모드 설정</button>
                                                         </li>
                                                         <li>
-                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-unset-maintenance-mode" disabled>유지보수 모드 해제</button>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-unset-maintenance-mode" >유지보수 모드 해제</button>
                                                         </li>
                                                         <li class="pf-c-divider" role="separator"></li>
                                                         <li>
@@ -89,11 +89,11 @@
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
                                                             <div class="pf-c-description-list__text">
-                                                                <span class="pf-c-label pf-m-red">
+                                                                <span class="pf-c-label pf-m-red" id="scc_span_css">
                                                                     <span class="pf-c-label__content">
                                                                         <span class="pf-c-label__icon">
                                                                             <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
-                                                                        </span>Health Err
+                                                                        </span><div id="scc_status"></div>
                                                                     </span>
                                                                 </span>
                                                             </div>
@@ -104,7 +104,7 @@
                                                             <span class="pf-c-description-list__text">디스크</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">전체 N/A개의 디스크 중 N/A개 작동 중</div>
+                                                            <div class="pf-c-description-list__text" id="scc_osd">전체 N/A개의 디스크 중 N/A개 작동 중</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -120,7 +120,7 @@
                                                             <span class="pf-c-description-list__text">관리데몬</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">N/A(전체 N/A개가 실행 중)</div>
+                                                            <div class="pf-c-description-list__text" id="scc_mgr">N/A(전체 N/A개가 실행 중)</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -128,7 +128,7 @@
                                                             <span class="pf-c-description-list__text">스토리지 풀</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">N/A개의 풀</div>
+                                                            <div class="pf-c-description-list__text" id="scc_pools">N/A개의 풀</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -136,7 +136,7 @@
                                                             <span class="pf-c-description-list__text">스토리지 용량</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">전체 N/A TB 중 N/A TB 사용 중(사용률 N/A %)</div>
+                                                            <div class="pf-c-description-list__text" id="scc_usage">전체 N/A TB 중 N/A TB 사용 중(사용률 N/A %)</div>
                                                         </dd>
                                                     </div>
                                                 </dl>
@@ -548,7 +548,12 @@
         <!-- 모달 영역 끝  -->
 
         <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
-        <script src="./src/features/main.js"></script>
+        <!-- <script src="./src/features/main.js"></script> -->
+        <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
+
+
+        <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+        <script src="./src/features/main_js.js"></script>
         <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
     </body>
 </html>
