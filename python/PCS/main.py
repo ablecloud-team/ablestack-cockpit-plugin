@@ -24,7 +24,5 @@ def main():
     elif (args.action) == 'status':
         pcs.statusResource(args.resource)
 
-
 if __name__ == "__main__":
-    
     main()

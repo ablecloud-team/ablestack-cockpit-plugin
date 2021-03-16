@@ -11,8 +11,6 @@ def funcname():
 def callername():
     return sys._getframe(2).f_code.co_name
 
-
-
 def createReturn(retname: str = "",
                  val: object = "",
                  code: int = 500,
