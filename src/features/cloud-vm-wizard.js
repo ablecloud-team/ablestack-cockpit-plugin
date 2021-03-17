@@ -423,6 +423,28 @@ $('#button-accordion-cloud-vm-ssh-key').on('click', function(){
     }
 });
 
+// 네트워크 구성에서 "서비스네트워크"의 선택여부가 변경되었을 때의 이벤트 처리
+$('#form-checkbox-svc-network').on('change', function(){
+    if ($('#form-checkbox-svc-network').is(':checked') == true) {
+        // 서비스네트워크를 사용하으로 선택한 경우 서비스네트워크 브릿지 선택상자를 활성화 함
+        $('#form-select-cloud-vm-svc-parent').attr('disabled', false);
+
+        // 추가 네트워크 정보에서 서비스 NIC 정보를 입력할 수 있도록 활성화 해야 함
+        $('#form-input-cloud-vm-svc-nic-ip').attr('disabled', false);
+        $('#form-input-cloud-vm-svc-vlan').attr('disabled', false);
+        $('#form-input-cloud-vm-svc-gw').attr('disabled', false);
+    }
+    else {
+        // 서비스네트워크를 사용하지 않음으로 선택한 경우 서비스네트워크 브릿지 선택상자를 비활성화 함
+        $('#form-select-cloud-vm-svc-parent').attr('disabled', true);
+
+        // 추가 네트워크 정보에서 서비스 NIC 정보를 입력할 수 없도록 비활성화 해야 함
+        $('#form-input-cloud-vm-svc-nic-ip').attr('disabled', true);
+        $('#form-input-cloud-vm-svc-vlan').attr('disabled', true);
+        $('#form-input-cloud-vm-svc-gw').attr('disabled', true);
+    }
+});
+
 /* HTML Object에서 발생하는 이벤트 처리 끝 */
 
 /* 함수 정의 시작 */
@@ -474,7 +496,7 @@ function resetCloudVMWizard(){
  */
 function deployCloudCenterVM() {
     resetCloudVMWizard();
-    
+
     $('#div-modal-wizard-cloud-vm-deploy').show();
     $('#nav-button-cloud-vm-finish').addClass('pf-m-current');
 

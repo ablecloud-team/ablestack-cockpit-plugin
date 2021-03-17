@@ -321,7 +321,7 @@
                                                         </label>
                                                     </div>
                                                     <div class="pf-c-form__group-control">
-                                                        <select class="pf-c-form-control" id="form-select-cloud-vm-svc-parent" name="form-select-cloud-vm-svc-parent" style="width:40%;">
+                                                        <select class="pf-c-form-control" id="form-select-cloud-vm-svc-parent" name="form-select-cloud-vm-svc-parent" style="width:40%;" disabled>
                                                             <option selected>선택하십시오</option>
                                                             <option value="16">cloud0</option>
                                                             <option value="32">br0</option>
@@ -410,24 +410,22 @@
                                             <div class="pf-c-form__group-label">
                                                 <label class="pf-c-form__label" for="form-input-cloud-vm-svc-nic-ip">
                                                     <span class="pf-c-form__label-text">서비스 NIC IP</span>
-                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                                 </label>
                                             </div>
                                             <div class="pf-c-form__group-control pf-m-inline">
-                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cloud-vm-svc-nic-ip" name="form-input-cloud-vm-svc-nic-ip" placeholder="xxx.xxx.xxx.xxx/xx 형식으로 입력"/>
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cloud-vm-svc-nic-ip" name="form-input-cloud-vm-svc-nic-ip" placeholder="xxx.xxx.xxx.xxx/xx 형식으로 입력" disabled/>
                                                 <label class="pf-c-form__label-text" style="margin-top:8px" for="form-input-cloud-vm-svc-vlan">VLAN ID</label>
-                                                <input class="pf-c-form-control" style="width:10%" type="text" id="form-input-cloud-vm-svc-vlan" name="form-input-cloud-vm-svc-vlan"/>
+                                                <input class="pf-c-form-control" style="width:10%" type="text" id="form-input-cloud-vm-svc-vlan" name="form-input-cloud-vm-svc-vlan" disabled/>
                                             </div>
                                         </div>
                                         <div class="pf-c-form__group">
                                             <div class="pf-c-form__group-label">
                                                 <label class="pf-c-form__label" for="form-input-cloud-vm-svc-gw">
                                                     <span class="pf-c-form__label-text">서비스 NIC Gateway</span>
-                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                                 </label>
                                             </div>
                                             <div class="pf-c-form__group-control pf-m-inline">
-                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cloud-vm-svc-gw" name="form-input-cloud-vm-svc-gw" placeholder="xxx.xxx.xxx.xxx 형식으로 입력"/>
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cloud-vm-svc-gw" name="form-input-cloud-vm-svc-gw" placeholder="xxx.xxx.xxx.xxx 형식으로 입력" disabled/>
                                             </div>
                                         </div>
                                     </section>
