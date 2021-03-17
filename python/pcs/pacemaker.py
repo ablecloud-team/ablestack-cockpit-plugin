@@ -6,6 +6,8 @@ from able_return import *
 from sh import pcs
 from sh import systemctl
 import sys
+from bs4 import BeautifulSoup
+import lxml
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Pacemaker cluster for Cloud Center VM',
@@ -122,31 +124,74 @@ class Pacemaker:
     def statusResource(self, resource_name):
         self.resource_name = resource_name
 
-        status_list = {'Starting':'200', 'Started':'200', 'Stopping':'201', 'Stopped':'201', 'FAILED':'500'}
+        xml = pcs('status', 'xml').stdout.decode()
+        soup = BeautifulSoup(xml, 'lxml')
+        soup_resource = soup.select('resource')
+        soup_nodes = soup.find('nodes').select('node')
 
-        status_output = pcs('status').stdout.decode().splitlines()
-        nodes_output = pcs('status', 'nodes', 'corosync').stdout.decode().splitlines()
+        resources = []
+        nodes = []
+        host_list = []
+        
+        for soup_node in soup_nodes:
+            node = {}
+            node['host'] = soup_node['name']
+            node['online'] = soup_node['online']
+            node['resource_running'] = soup_node['resources_running']
+            nodes.append(node)
 
-        for line in status_output:
-            if self.resource_name in line:
-                current_host = line.split(' ')[-1]
-                status_pcs = line.split(' ')[-2]
+        for soup_res in soup_resource:
+            res = {}
+            res['active'] = soup_res['active']
+            res['blocked'] = soup_res['blocked']
+            res['failed'] = soup_res['failed']
+            res['resource'] = soup_res['id']
+            resources.append(res)
 
-        for line in nodes_output:
-            if "Online" in line:
-                online_host = line.split(':')[-1]
-            if "Offline" in line:
-                offline_host = line.split(':')[-1]
-        corosync_hosts = (online_host + offline_host).strip()
+        for i in range(0, len(nodes)):
+            clustered_hosts = nodes[i].get('host')
+            host_list.append(clustered_hosts)
+            if nodes[i].get('resource_running') == '1':
+                current_host = (nodes[i].get('host'))
+            else:
+                current_host = "false"
 
-        if status_pcs in status_list.keys():
-            ret_val = {'status':status_pcs, 'started':current_host.strip('()'), 'hosts': corosync_hosts}
-            ret = createReturn(code=status_list.get(status_pcs), val=ret_val)
-            print(json.dumps(json.loads(ret), indent=4))
+        for i in range(0, len(resources)):
+            if resources[i].get('resource') == self.resource_name:
+                res_active = resources[i].get('active')
+                res_blocked = resources[i].get('blocked')
+                res_failed = resources[i].get('failed')
 
-        elif status_pcs not in status_list.keys():   
-            ret_val = {'status':'Error', 'started':'Unknown', 'hosts': 'Unknown'}
-            ret = createReturn(code=500, val=ret_val)
-            print(json.dumps(json.loads(ret), indent=4))
+        ret_val = {'clustered_host':host_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
+        ret = createReturn(code=200, val=ret_val)
+        print(json.dumps(json.loads(ret), indent=4))
 
         return ret
+
+        """
+        기존 코드
+
+        # self.resource_name = resource_name
+        # status_list = {'Starting':'200', 'Started':'200', 'Stopping':'201', 'Stopped':'201', 'FAILED':'500'}
+        # status_output = pcs('status').stdout.decode().splitlines()
+        # nodes_output = pcs('status', 'nodes', 'corosync').stdout.decode().splitlines()
+        # for line in status_output:
+        #     if self.resource_name in line:
+        #         current_host = line.split(' ')[-1]
+        #         status_pcs = line.split(' ')[-2]
+        # for line in nodes_output:
+        #     if "Online" in line:
+        #         online_host = line.split(':')[-1]
+        #     if "Offline" in line:
+        #         offline_host = line.split(':')[-1]
+        # clustered_hosts = (online_host + offline_host).strip()
+        # if status_pcs in status_list.keys():
+        #     ret_val = {'status':status_pcs, 'started':current_host.strip('()'), 'hosts': corosync_hosts}
+        #     ret = createReturn(code=status_list.get(status_pcs), val=ret_val)
+        #     print(json.dumps(json.loads(ret), indent=4))
+        # elif status_pcs not in status_list.keys():   
+        #     ret_val = {'status':'Error', 'started':'Unknown', 'hosts': 'Unknown'}
+        #     ret = createReturn(code=500, val=ret_val)
+        #     print(json.dumps(json.loads(ret), indent=4))
+        # return ret
+        """
