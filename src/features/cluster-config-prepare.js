@@ -323,15 +323,23 @@ $('#button-accordion-timeserver').on('click', function(){
     }
 });
 
+// 업로드 및 다운로드에 필요한 폴더 생성
+mkdirShareFolder();
+
 // 파일 선택 시 sshkey 생성 및 업로드 실행
 let input_pri = document.querySelector('#form-input-cluster-config-ssh-key-pri-file');
 let input_pub = document.querySelector('#form-input-cluster-config-ssh-key-pub-file');
-
-console.log(input_pri.getAttribute("id"));
-
 fileReaderFunc(input_pri);
 fileReaderFunc(input_pub);
 
+
+// 파일 보여주기
+// SSH KEY 보여주기
+
+// 버튼 클릭 시 파일 읽어오기
+$('#button-accordion-ssh-key').on('click', function(){
+    readFile();
+});
 
 
 
@@ -399,12 +407,12 @@ function generateSshkey() {
 function writeFile(result, ssh_key_type) {
     if (ssh_key_type == 'form-input-cluster-config-ssh-key-pri-file') {
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "makePri"])
-        cockpit.file("/root/.ssh/ablecloud").replace(result)
+        cockpit.file("/root/share/ablecloud").replace(result)
             .done(function (tag) {})
             .fail(function (error) {});
     }else if (ssh_key_type == 'form-input-cluster-config-ssh-key-pub-file'){
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "makePub"])
-        cockpit.file("/root/.ssh/ablecloud.pub").replace(result)
+        cockpit.file("/root/share/ablecloud.pub").replace(result)
             .done(function (tag) {})
             .fail(function (error) {});
     }
@@ -412,10 +420,34 @@ function writeFile(result, ssh_key_type) {
 
 
 /**
+ * Meathod Name : readFile
+ * Date Created : 2021.03.17
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 SSHKey를 업로드하는 함수
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.03.11 최초 작성
+**/
+
+function readFile() {
+        cockpit.file("/root/share/ablecloud").read()
+            .done(function (tag) {
+                console.log(tag);
+                $('#div-textarea-cluster-config-ssh-key-pri-file').text(tag);
+            })
+            .fail(function (error) {});
+        /*cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "readPub"])
+        cockpit.file("/root/.ssh/ablecloud.pub").read()
+            .done(function (tag) {})
+            .fail(function (error) {});*/
+}
+
+
+/**
  * Meathod Name : fileReaderFunc
  * Date Created : 2021.03.17
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 SSHKey파일을 선택하면 읽어오는 함수
+ * Description : 클러스터 준비 마법사에서 SSHKey파일을 선택하면 문자열로 읽어오는 함수
  * Parameter : input
  * Return  : 없음
  * History  : 2021.03.11 최초 작성
@@ -432,7 +464,6 @@ function fileReaderFunc(input) {
             reader.onload = function (progressEvent) {
                 console.log(progressEvent.target.result);
                 let result = progressEvent.target.result;
-
                 let ssh_key_type = input.getAttribute('id');
                 writeFile(result, ssh_key_type);
             };
@@ -441,4 +472,18 @@ function fileReaderFunc(input) {
             console.error(err);
         }
     });
+}
+
+/**
+ * Meathod Name : mkdirShareFolder
+ * Date Created : 2021.03.17
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 필요한 /home/share 폴더를 생성하는 함수
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.03.17 최초 작성
+**/
+
+function mkdirShareFolder() {
+    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "makeShare"])
 }
