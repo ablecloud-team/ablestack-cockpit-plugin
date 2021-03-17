@@ -90,7 +90,7 @@ def generateDecToHex():
         hex_list.append(hex(num))
     return hex_list
 
-def createVmXml(args):
+def createScvmXml(args):
     try:
         alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',]
         slot_hex_num = generateDecToHex()
@@ -316,5 +316,5 @@ if __name__ == '__main__':
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
     # 실제 로직 부분 호출 및 결과 출력
-    ret = createVmXml(args)
+    ret = createScvmXml(args)
     print(ret)
