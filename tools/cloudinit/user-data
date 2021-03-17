@@ -1,0 +1,34 @@
+#cloud-config
+# vim:syntax=yaml
+users:
+# A user by the name ec2-user is created in the image by default.
+  - default
+# Following entry create user1 and assigns password specified in plain text.
+# Please not use of plain text password is not recommended from security best
+# practises standpoint
+  - name: user1
+    groups: sudo
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    plain_text_passwd: Ablecloud1!
+    lock_passwd: false
+# Following entry creates user2 and attaches a hashed passwd to the user. Hashed
+# passwords can be generated with:
+# python3 -c 'import crypt,getpass; print(crypt.crypt("Ablecloud1!"))'
+  - name: user2
+    passwd: $6$ThIY6...IVx9tD/
+    lock_passwd: false
+# Following entry creates user3, disables password based login and enables an SSH public key
+  - name: user3
+    ssh-authorized-keys:
+      - ssh-rsa AAAA...4pU= ycyun@yun-yeocheon-ui-Macmini.local
+    lock_passwd: true
+chpasswd:
+  list: |
+    ec2-user: Ablecloud1!
+write_files:
+   - path: /root/.ssh/id_rsa.pub
+     permissions: '0644'
+     content: "ssh-rsa AAAA...4pU= ycyun@yun-yeocheon-ui-Macmini.local"
+   - path: /root/.ssh/id_rsa
+     permissions: '0600'
+     content: "-----BEGIN OPENSSH PRIVATE KEY-----\nYWw=\n-----END OPENSSH PRIVATE KEY-----\n"
