@@ -162,9 +162,12 @@ class Pacemaker:
                 res_blocked = resources[i].get('blocked')
                 res_failed = resources[i].get('failed')
 
-        ret_val = {'clustered_host':host_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
-        ret = createReturn(code=200, val=ret_val)
-        print(json.dumps(json.loads(ret), indent=4))
+                ret_val = {'clustered_host':host_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
+                ret = createReturn(code=200, val=ret_val)
+                print(json.dumps(json.loads(ret), indent=4))
+            else:
+                ret = createReturn(code=500, val='Resource not found.')
+                print(json.dumps(json.loads(ret), indent=4))
 
         return ret
 
