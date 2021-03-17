@@ -82,7 +82,7 @@
                                         </div>
                                         <div class="pf-c-form__group-control">
                                             <select class="pf-c-form-control" id="form-select-storage-vm-cpu" name="form-select-storage-vm-cpu" style="width:40%">
-                                                <option selected>선택하십시오</option>
+                                                <option value="" selected>선택하십시오</option>
                                                 <option value="8">8 vCore</option>
                                                 <option value="16">16 vCore</option>
                                             </select>
@@ -97,7 +97,7 @@
                                         </div>
                                         <div class="pf-c-form__group-control">
                                             <select class="pf-c-form-control" id="form-select-storage-vm-memory" name="form-select-storage-vm-memory" style="width:40%">
-                                                <option selected>선택하십시오</option>
+                                                <option value="" selected>선택하십시오</option>
                                                 <option value="16">16 GiB</option>
                                                 <option value="32">32 GiB</option>
                                                 <option value="64">64 GiB</option>
@@ -152,11 +152,11 @@
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="raid-passthrough" name="form-radio-storage-vm-disk-type" checked/>
+                                                <input class="pf-c-radio__input" type="radio" id="raid-passthrough" value="rp" name="form-radio-storage-vm-disk-type" checked/>
                                                 <label class="pf-c-radio__label" for="raid-passthrough">RAID Passthrough</label>
                                             </div>
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="lun-passthrough" name="form-radio-storage-vm-disk-type" />
+                                                <input class="pf-c-radio__input" type="radio" id="lun-passthrough" value="lp" name="form-radio-storage-vm-disk-type" />
                                                 <label class="pf-c-radio__label" for="lun-passthrough">LUN Passthrough</label>
                                             </div>
                                         </div>
@@ -168,15 +168,7 @@
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
-                                        <div class="pf-c-form__group-control pf-m-stack" style="margin-top:8px">
-                                            <div class="pf-c-check">
-                                                <input class="pf-c-check__input" type="checkbox" id="form-checkbox-disk1" name="form-checkbox-disk1" />
-                                                <label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-disk1">01:00.0 RAID bus controller: Symbios Logic MegaRAID SAS</label>
-                                            </div>
-                                            <div class="pf-c-check">
-                                                <input class="pf-c-check__input" type="checkbox" id="form-checkbox-disk2" name="form-checkbox-disk2" />
-                                                <label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-disk2">02:00.0 RAID bus controller: Dell BOSS SATA</label>
-                                            </div>    
+                                        <div class="pf-c-form__group-control pf-m-stack" id="disk-pci-list" style="margin-top:8px">
                                         </div>
                                     </div>
                                 </section>
@@ -217,10 +209,6 @@
                                         </div>
                                         <div class="pf-c-form__group-control">
                                             <select class="pf-c-form-control" style="width:40%" id="form-select-storage-vm-mngt-nic" name="form-select-storage-vm-mngt-nic">
-                                                <option selected>선택하십시오</option>
-                                                <option value="br0">br0</option>
-                                                <option value="cloud0">cloud0</option>
-                                                <option value="bridge1">bridge1</option>
                                             </select>
                                         </div>
                                     </div>
@@ -236,11 +224,15 @@
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="nic-passthrough" name="form-radio-storage-vm-nic-type" checked/>
+                                                <input class="pf-c-radio__input" type="radio" id="nic-passthrough" value="np" name="form-radio-storage-vm-nic-type" checked/>
                                                 <label class="pf-c-radio__label" for="nic-passthrough">NIC Passthrough</label>
                                             </div>
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="bridge-network" name="form-radio-storage-vm-nic-type" />
+                                                <input class="pf-c-radio__input" type="radio" id="nic-passthrough-bonding" value="npb" name="form-radio-storage-vm-nic-type" />
+                                                <label class="pf-c-radio__label" for="nic-passthrough-bonding">NIC Passthrough Bonding</label>
+                                            </div>
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="bridge-network" value="bn" name="form-radio-storage-vm-nic-type" />
                                                 <label class="pf-c-radio__label" for="bridge-network">Bridge Network</label>
                                             </div>
                                         </div>
@@ -252,32 +244,20 @@
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
-                                        <div class="pf-c-form__group-control">
-                                            <select class="pf-c-form-control" id="form-select-storage-vm-public-nic" name="form-select-storage-vm-public-nic">
-                                                <option selected>선택하십시오</option>
-                                                <option value="10:00.0">10:00.0 Intel 10G Network Interface Card</option>
-                                                <option value="11:00.0">11:00.0 Broadcom 10G Network Interface Card</option>
-                                                <option value="12:00.0">12:00.0 Mellanox 10G Network Interface Card</option>
+                                        <div class="pf-c-form__group-control"  id="public-nic">
+                                            <select class="pf-c-form-control" id="form-select-storage-vm-public-nic1" name="form-select-storage-vm-public-nic1">
                                             </select>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-select-storage-vm-public-nic">
+                                            <label class="pf-c-form__label" for="form-select-storage-vm-cluster-nic1">
                                                 <span class="pf-c-form__label-text">복제용 NIC</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
-                                        <div class="pf-c-form__group-control">
-                                            <div class="pf-c-check" style="margin-bottom:10px">
-                                                <input class="pf-c-check__input" type="checkbox" id="form-check-same-storage-nic" name="form-check-same-storage-nic"/>
-                                                <label class="pf-c-check__label" style="margin-top:5px" for="form-check-same-storage-nic">서버용 NIC를 같이 사용</label>
-                                            </div>
-                                            <select class="pf-c-form-control" id="form-select-storage-vm-public-nic" name="form-select-storage-vm-public-nic">
-                                                <option selected>선택하십시오</option>
-                                                <option value="10:00.0">10:00.0 Intel 10G Network Interface Card</option>
-                                                <option value="11:00.0">11:00.0 Broadcom 10G Network Interface Card</option>
-                                                <option value="12:00.0">12:00.0 Mellanox 10G Network Interface Card</option>
+                                        <div class="pf-c-form__group-control" id="cluster-nic">
+                                            <select class="pf-c-form-control" id="form-select-storage-vm-cluster-nic1" name="form-select-storage-vm-cluster-nic1">
                                             </select>
                                         </div>
                                     </div>
@@ -442,7 +422,7 @@
                                             <span class="pf-c-description-list__text">CPU</span>
                                         </dt>
                                         <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text">16 vCore</div>
+                                            <div class="pf-c-description-list__text" id="rv-cpu"></div>
                                         </dd>
                                     </div>
                                     <div class="pf-c-description-list__group">
@@ -450,7 +430,7 @@
                                             <span class="pf-c-description-list__text">Memory</span>
                                         </dt>
                                         <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text">32 GiB</div>
+                                            <div class="pf-c-description-list__text" id="rv-memory"></div>
                                         </dd>
                                     </div>
                                     <div class="pf-c-description-list__group">
@@ -466,8 +446,7 @@
                                             <span class="pf-c-description-list__text">Data Disk</span>
                                         </dt>
                                         <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text">
-                                                RAID Passthrough, 01:00.0 MegaRAID SAS
+                                            <div class="pf-c-description-list__text" id="rv-data-disk">
                                             </div>
                                         </dd>
                                     </div>
@@ -476,11 +455,9 @@
                                             <span class="pf-c-description-list__text">네트워크</span>
                                         </dt>
                                         <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text">
-                                                관리트래픽 : Bridge, br0
+                                            <div class="pf-c-description-list__text" id="rv-management-traffic">
                                             </div>
-                                            <div class="pf-c-description-list__text">
-                                                스토리지트래픽 : NIC Passthrough, 10:00.0 Intel 10Gb Ethernet Card
+                                            <div class="pf-c-description-list__text" id="rv-storage-traffic">
                                             </div>
                                         </dd>
                                     </div>
