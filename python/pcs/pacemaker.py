@@ -142,56 +142,71 @@ class Pacemaker:
         
     def statusResource(self, resource_name):
         self.resource_name = resource_name
+        
+        resources = []
+        res={}
+        nodes = []
+        host_list = []
+        current_host = None
 
         xml = pcs('status', 'xml').stdout.decode()
         soup = BeautifulSoup(xml, 'lxml')
-        soup_resource = soup.select('resource')
+        # soup_resource = soup.select('resource')
+        # soup_tmp = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
+        # current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
+
         soup_nodes = soup.find('nodes').select('node')
 
-        resources = []
-        nodes = []
-        host_list = []
-        ret = None
-        
+        soup_resource = soup.select_one(f'#{self.resource_name}')
+
+        if soup_resource['nodes_running_on'] == '1':
+            current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
+
+        res_active = res['active'] = soup_resource['active']
+        res_blocked = res['blocked'] = soup_resource['blocked']
+        res_failed = res['failed'] = soup_resource['failed']
+        res['resource'] = soup_resource['id']
+        resources.append(res)
+ 
         for soup_node in soup_nodes:
             node = {}
             node['host'] = soup_node['name']
             node['online'] = soup_node['online']
-            node['resource_running'] = soup_node['resources_running']
+            node['resources_running'] = soup_node['resources_running']
             nodes.append(node)
-        print("1")
 
-        for soup_res in soup_resource:
-            res = {}
-            res['active'] = soup_res['active']
-            res['blocked'] = soup_res['blocked']
-            res['failed'] = soup_res['failed']
-            res['resource'] = soup_res['id']
-            resources.append(res)
-        print("2")
         for i in range(0, len(nodes)):
             clustered_hosts = nodes[i].get('host')
             host_list.append(clustered_hosts)
-            if nodes[i].get('resource_running') == '1':
-                current_host = (nodes[i].get('host'))
-            else:
-                current_host = "false"
 
-        for i in range(0, len(resources)):
-            if resources[i].get('resource') == self.resource_name:
-                res_active = resources[i].get('active')
-                res_blocked = resources[i].get('blocked')
-                res_failed = resources[i].get('failed')
-                print("1")
+        ret_val = {'clustered_host':host_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
+        ret = createReturn(code=200, val=ret_val)
+        print(json.dumps(json.loads(ret), indent=4))
 
-                ret_val = {'clustered_host':host_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
-                ret = createReturn(code=200, val=ret_val)
-                print(json.dumps(json.loads(ret), indent=4))
-            else:
-                ret = createReturn(code=500, val='Resource not found.')
-                print(json.dumps(json.loads(ret), indent=4))
 
-        return ret
+
+        # for soup_res in soup_resource:
+        #     res = {}
+        #     print(soup_resource)
+        #     res['active'] = soup_resource['active']
+        #     res['blocked'] = soup_resource['blocked']
+        #     res['failed'] = soup_resource['failed']
+        #     res['resource'] = soup_resource['id']
+        #     resources.append(res)
+
+
+
+        # for i in range(0, len(resources)):
+        #     if resources[i].get('resource') == self.resource_name:
+        #         res_active = resources[i].get('active')
+        #         res_blocked = resources[i].get('blocked')
+        #         res_failed = resources[i].get('failed')
+
+        #         ret_val = {'clustered_host':host_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
+        #         ret = createReturn(code=200, val=ret_val)
+        #         print(json.dumps(json.loads(ret), indent=4))
+
+        # return ret
 
         """
         기존 코드
