@@ -32,9 +32,6 @@
                                         <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-compute">컴퓨트</button>
                                     </li>
                                     <li class="pf-c-wizard__nav-item">
-                                        <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-disk">디스크</button>
-                                    </li>
-                                    <li class="pf-c-wizard__nav-item">
                                         <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-network">네트워크</button>
                                     </li>
                                 </ol>
@@ -46,6 +43,9 @@
                                 <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-ssh-key">SSH Key 정보</button>
                             </li>
                             <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-review">설정확인</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
                                 <button class="pf-c-wizard__nav-link" id="nav-button-cloud-vm-finish">완료</button>
                             </li>
                         </ol>
@@ -54,15 +54,711 @@
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-overview">
                             <div class="pf-c-content">
                                 <p>
-                                    ABLESTACK 클러스터 구성 준비 마법사는 클러스터를 자동으로 구성하고, 스토리지센터 및 클라우드센터를 구성하기 위해 필요한 다음의 정보를 입력받아 준비합니다.  
+                                    ABLESTACK 클라우드센터 VM을 배포하기 위해 필요한 정보를 다음과 같이 마법사를 통해 입력받습니다.    
                                 </p>
                                 <ul>
-                                    <li>모든 호스트 및 가상머신에서 사용자 인증을 위해 공통으로 사용할 SSH Key 정보</li>
-                                    <li>클러스터를 구성하는 호스트 및 가상머신들의 호스트명 및 IP 정보</li>
-                                    <li>호스트 및 가상머신의 시간 동기화를 위한 시간서버</li>
+                                    <li>클라우드센터 VM의 HA구성을 위한 클러스터 설정 정보</li>
+                                    <li>클라우드센터 VM의 CPU, Memory, Disk, Network에 대한 정보</li>
+                                    <li>가상머신의 호스트명 등의 네트워크 정보</li>
+                                    <li>호스트 및 가상머신 간의 상호 SSH 연결을 위한 SSH Key 정보</li>
                                 </ul>
                                 <p>
-                                    필요한 정보를 먼저 준비하십시오. 정보가 준비되었다면 "다음" 버튼을 눌러 클러스터 구성 준비를 시작합니다.  
+                                    필요한 정보를 먼저 준비하십시오. 정보가 준비되었다면 "다음" 버튼을 눌러 클라우드센터 VM 배포를 시작합니다. 
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-failover-cluster">
+                            <div class="pf-c-content">
+                                <p>
+                                    장애조치 클러스터는 클라우드센터 VM이 실행 중인 호스트에 장애가 발생하는 경우 클라우드센터 VM을 안전하게 다른 호스트에서 실행하도록 하기 위해 구성합니다.
+                                    장애조치 클러스터를 구성하기 위해 필요한 정보를 아래에 입력하십시오. 
+                                </p>
+                                <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                    <section class="pf-c-form__section">
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-member-number">
+                                                    <span class="pf-c-form__label-text">클러스터 멤버수</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:15%" type="text" id="form-input-cloud-vm-failover-cluster-member-number" name="form-input-cloud-vm-failover-cluster-member-number" value="3" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__field-group">
+                                            <div class="pf-c-form__field-group-header"  style="padding-bottom:8px;">
+                                                <div class="pf-c-form__field-group-header-main">
+                                                    <div class="pf-c-form__field-group-header-title">
+                                                        <div class="pf-c-form__field-group-header-title-text">호스트 #1 정보</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="pf-c-form__field-group-body" style="padding-top:0px;">
+                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host1-name">
+                                                            <span class="pf-c-form__label-text">Hostname</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host1-name" name="form-input-cloud-vm-failover-cluster-host1-name" required />
+                                                    </div>
+                                                </div>
+                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host1-addr">
+                                                            <span class="pf-c-form__label-text">IP Address</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host1-addr" name="form-input-cloud-vm-failover-cluster-host1-addr" required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__field-group">
+                                            <div class="pf-c-form__field-group-header"  style="padding-bottom:8px;">
+                                                <div class="pf-c-form__field-group-header-main">
+                                                    <div class="pf-c-form__field-group-header-title">
+                                                        <div class="pf-c-form__field-group-header-title-text">호스트 #2 정보</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="pf-c-form__field-group-body" style="padding-top:0px;">
+                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host2-name">
+                                                            <span class="pf-c-form__label-text">Hostname</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host2-name" name="form-input-cloud-vm-failover-cluster-host2-name" required />
+                                                    </div>
+                                                </div>
+                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host2-addr">
+                                                            <span class="pf-c-form__label-text">IP Address</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host2-addr" name="form-input-cloud-vm-failover-cluster-host2-addr" required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__field-group">
+                                            <div class="pf-c-form__field-group-header"  style="padding-bottom:8px;">
+                                                <div class="pf-c-form__field-group-header-main">
+                                                    <div class="pf-c-form__field-group-header-title">
+                                                        <div class="pf-c-form__field-group-header-title-text">호스트 #3 정보</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="pf-c-form__field-group-body" style="padding-top:0px;">
+                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host3-name">
+                                                            <span class="pf-c-form__label-text">Hostname</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host3-name" name="form-input-cloud-vm-failover-cluster-host3-name" required />
+                                                    </div>
+                                                </div>
+                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host3-addr">
+                                                            <span class="pf-c-form__label-text">IP Address</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host3-addr" name="form-input-cloud-vm-failover-cluster-host3-addr" required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-compute">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM의 CPU 및 Memory, ROOT Disk 등의 정보를 설정합니다. 
+                                    아래의 항목에 적합한 값을 선택하여 입력하십시오.
+                                </p>
+                                <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                    <section class="pf-c-form__section">
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-select-cloud-vm-compute-cpu-core">
+                                                    <span class="pf-c-form__label-text">CPU Core</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <select class="pf-c-form-control" id="form-select-cloud-vm-compute-cpu-core" name="form-select-cloud-vm-compute-cpu-core" style="width:40%;">
+                                                    <option selected>선택하십시오</option>
+                                                    <option value="4">4 vCore</option>
+                                                    <option value="8">8 vCore</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-select-cloud-vm-compute-memory">
+                                                    <span class="pf-c-form__label-text">Memory</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control">
+                                                <select class="pf-c-form-control" id="form-select-cloud-vm-compute-memory" name="form-select-cloud-vm-compute-memory" style="width:40%;">
+                                                    <option selected>선택하십시오</option>
+                                                    <option value="16">8 GiB</option>
+                                                    <option value="32">16 GiB</option>
+                                                    <option value="64">32 GiB</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-select-cloud-vm-root-disk">
+                                                    <span class="pf-c-form__label-text">ROOT Disk</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" id="form-select-cloud-vm-root-disk" name="form-select-cloud-vm-root-disk" style="width:40%">
+                                                    <span class="pf-c-form__label-text">70 GiB (THIN Provisioning)</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </form>
+                                <br/>
+                                <div class="pf-c-alert pf-m-info pf-m-inline" aria-label="VM Compute Info" style="margin-left:15px;margin-top:32px">
+                                    <div class="pf-c-alert__icon">
+                                        <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="pf-c-alert__title pf-m-truncate">
+                                        <strong><span class="pf-screen-reader">Info alert:</span>컴퓨트 자원 구성 시 참고사항</strong>
+                                    </p>
+                                    <div class="pf-c-alert__description">
+                                        <p>클라우드센터 VM의 Compute 자원은 클라우드센터가 관리해야 할 호스트의 수에 따라 탄력적으로 선택합니다. </p>
+                                        <p>
+                                            가상머신이 컨트롤 할 호스트의 수가 10개 미만이면 4 vCore를, 그 이상이면 8 vCore를 선택하십시오. 
+                                            메모리는 컨트롤할 호스트의 수가 10개 미만이면 8GiB를, 10 ~ 20개 이면 16GiB를, 21개 이상이면 32GiB를 선택해야 합니다. 
+                                        </p>
+                                        <p>ROOT Disk의 크기는 70GiB를 디스크가 Thin Provisioning 방식으로 제공됩니다. </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-network">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM이 사용할 관리 네트워크용 NIC 정보를 설정합니다. 
+                                    아래의 항목에 적합한 값을 선택하여 입력하십시오.
+                                </p>
+                                <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                    <section class="pf-c-form__section">
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label">
+                                                    <span class="pf-c-form__label-text">네트워크 구성</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-stack" style="margin-top:8px">
+                                                <div class="pf-c-check">
+                                                    <input class="pf-c-check__input" type="checkbox" id="form-checkbox-mngt-network" name="form-checkbox-mngt-network" checked disabled/>
+                                                    <label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-mngt-network">관리네트워크</label>
+                                                </div>
+                                                <div class="pf-c-check">
+                                                    <input class="pf-c-check__input" type="checkbox" id="form-checkbox-svc-network" name="form-checkbox-svc-network" />
+                                                    <label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-svc-network">서비스네트워크</label>
+                                                </div>    
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__field-group">
+                                            <div class="pf-c-form__field-group-header"  style="padding-bottom:8px;">
+                                                <div class="pf-c-form__field-group-header-main">
+                                                    <div class="pf-c-form__field-group-header-title">
+                                                        <div class="pf-c-form__field-group-header-title-text">가상머신에 할당할 Parent Bridge</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="pf-c-form__field-group-body">
+                                                <div class="pf-c-form__group">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-select-cloud-vm-mngt-parent">
+                                                            <span class="pf-c-form__label-text">관리네트워크</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <select class="pf-c-form-control" id="form-select-cloud-vm-mngt-parent" name="form-select-cloud-vm-mngt-parent" style="width:40%;">
+                                                            <option selected>선택하십시오</option>
+                                                            <option value="16">cloud0</option>
+                                                            <option value="32">br0</option>
+                                                            <option value="64">br1</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-select-cloud-vm-svc-parent">
+                                                            <span class="pf-c-form__label-text">서비스네트워크</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <select class="pf-c-form-control" id="form-select-cloud-vm-svc-parent" name="form-select-cloud-vm-svc-parent" style="width:40%;" disabled>
+                                                            <option selected>선택하십시오</option>
+                                                            <option value="16">cloud0</option>
+                                                            <option value="32">br0</option>
+                                                            <option value="64">br1</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </form>
+                                <div class="pf-c-alert pf-m-info pf-m-inline" aria-label="VM Compute Info" style="margin-left:15px;margin-top:32px">
+                                    <div class="pf-c-alert__icon">
+                                        <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="pf-c-alert__title pf-m-truncate">
+                                        <strong><span class="pf-screen-reader">Info alert:</span>네트워크 구성 시 참고사항</strong>
+                                    </p>
+                                    <div class="pf-c-alert__description">
+                                        <p>클라우드센터에 접근하고자 하는 네트워크 위치에 따라 가상머신에 할당할 네트워크와 네트워크의 상위 브릿지를 선택합니다. </p>
+                                        <p>
+                                            관리네트워크는 호스트를 관리하기 위해 필수적인 네트워크이며, 기본 선택되어 있고, 선택 여부를 변경할 수 없습니다. 
+                                            서비스네트워크는 사용자가 접근하고자 하는 네트워크 위치이며, 관리네트워크와 서비스네트워크가 다른 경우 선택합니다. 
+                                        </p>
+                                        <p>가상머신에 네트워크를 할당하기 전에 반드시 상위 브릿지를 먼저 생성해야 합니다. </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-additional">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM에 호스트명 등의 부가적인 네트워크 정보를 설정합니다. 아래의 항목에 값을 입력하십시오.
+                                </p>
+                                <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                    <section class="pf-c-form__section">
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label">
+                                                    <span class="pf-c-form__label-text">정보 입력 소스</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-check__input" style="margin-top:12px;margin-right:5px" type="checkbox" id="form-input-cloud-vm-additional-file" name="form-input-cloud-vm-additional-file"/>
+                                                <label class="pf-c-check__label" style="margin-top:8px;margin-left:0px" for="form-input-cloud-vm-additional-file">Hosts 파일 사용</label>
+                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-hosts-file" name="form-input-cloud-vm-hosts-file"/>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-cloud-vm-hostname">
+                                                    <span class="pf-c-form__label-text">호스트명</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control">
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cloud-vm-hostname" name="form-input-cloud-vm-hostname"/>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-cloud-vm-mngt-nic-ip">
+                                                    <span class="pf-c-form__label-text">관리 NIC IP</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cloud-vm-mngt-nic-ip" name="form-input-cloud-vm-mngt-nic-ip" placeholder="xxx.xxx.xxx.xxx/xx 형식으로 입력"/>
+                                                <label class="pf-c-form__label-text" style="margin-top:8px" for="form-input-cloud-vm-mngt-vlan">VLAN ID</label>
+                                                <input class="pf-c-form-control" style="width:10%" type="text" id="form-input-cloud-vm-mngt-vlan" name="form-input-cloud-vm-mngt-vlan"/>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-cloud-vm-mngt-gw">
+                                                    <span class="pf-c-form__label-text">관리 NIC Gateway</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cloud-vm-mngt-gw" name="form-input-cloud-vm-mngt-gw" placeholder="xxx.xxx.xxx.xxx 형식으로 입력"/>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-cloud-vm-svc-nic-ip">
+                                                    <span class="pf-c-form__label-text">서비스 NIC IP</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cloud-vm-svc-nic-ip" name="form-input-cloud-vm-svc-nic-ip" placeholder="xxx.xxx.xxx.xxx/xx 형식으로 입력" disabled/>
+                                                <label class="pf-c-form__label-text" style="margin-top:8px" for="form-input-cloud-vm-svc-vlan">VLAN ID</label>
+                                                <input class="pf-c-form-control" style="width:10%" type="text" id="form-input-cloud-vm-svc-vlan" name="form-input-cloud-vm-svc-vlan" disabled/>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-cloud-vm-svc-gw">
+                                                    <span class="pf-c-form__label-text">서비스 NIC Gateway</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cloud-vm-svc-gw" name="form-input-cloud-vm-svc-gw" placeholder="xxx.xxx.xxx.xxx 형식으로 입력" disabled/>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-ssh-key">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM과 호스트, 그리고 ABLESTACK을 구성하고 있는 가상머신들과의 SSH 연결을 위해 SSH Key를 설정합니다. 
+                                    미리 생성한 SSH Key 파일을 등록할 수 있습니다. 
+                                </p>
+                                <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                    <section class="pf-c-form__section">
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-cloud-vm-ssh-key-file">
+                                                    <span class="pf-c-form__label-text">SSH Key 파일</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-key-file" name="form-input-cloud-vm-ssh-key-file"/>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </form>
+                                <br/>
+                                <div class="pf-c-alert pf-m-info pf-m-inline" aria-label="VM Compute Info" style="margin-left:15px;margin-top:32px">
+                                    <div class="pf-c-alert__icon">
+                                        <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="pf-c-alert__title pf-m-truncate">
+                                        <strong><span class="pf-screen-reader">Info alert:</span>SSH Key 등록 참고사항</strong>
+                                    </p>
+                                    <div class="pf-c-alert__description">
+                                        <p>
+                                            SSH Key는 호스트 및 클라우드센터, 스토리지센터 가상머신 등의 ABLESTACK 구성요소 간의 암호화된 인증을 위해 사용됩니다. 
+                                        </p>
+                                        <p>
+                                            호스트 간, 가상머신 간의 모든 명령은 SSH를 이용해 전달되며 이 때 SSH Key를 이용해 인증을 처리합니다. 따라서 모든 호스트, 가상머신은 동일한 SSH Key를 사용해야 합니다.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-review">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM의 배포를 위해 입력한 설정 정보는 다음과 같습니다. 
+                                    입력한 정보를 수정하고자 하는 경우, 해당 탭으로 이동하여 정보를 수정하십시오. 
+                                    <br/>
+                                    <br/>
+                                    모든 정보를 확인한 후 "배포"를 시작합니다. 
+                                </p>
+                            </div>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:10px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-cloud-vm-failover-cluster">
+                                        <span class="pf-c-accordion__toggle-text">장애조치 클러스터 설정</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-cloud-vm-failover-cluster">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">클러스터 멤버 수 </span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">3</div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Host #1 정보</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host1-name">ablestack1</span><br/>
+                                                        IP Address : <span id="span-cloud-vm-failover-cluster-host1-ipaddr">192.168.0.11</span>                                                   
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Host #2 정보</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host2-name">ablestack2</span><br/>
+                                                        IP Address : <span id="span-cloud-vm-failover-cluster-host2-ipaddr">192.168.0.12</span>                                                  
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Host #3 정보</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host3-name">ablestack3</span><br/>
+                                                        IP Address : <span id="span-cloud-vm-failover-cluster-host3-ipaddr">192.168.0.13</span>                                                   
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:10px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-cloud-vm-compute-network">
+                                        <span class="pf-c-accordion__toggle-text">클라우드센터 VM 설정</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-cloud-vm-compute-network">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">CPU Core</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-cpu-core">4 Cores</span>                                              
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Memory</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-memory">8 GiB</span>                                               
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">ROOT Disk Size</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-root-disk-size">70 GiB</span>                                                
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">네트워크 구성</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-network-config">관리네트워크, 서비스네트워크</span>                                                
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">관리용 Bridge</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-mgmt-nic-bridge">br0</span>                                                
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">서비스용 Bridge</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-svc-nic-bridge">br1</span>                                                
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:10px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-cloud-vm-additional">
+                                        <span class="pf-c-accordion__toggle-text">추가 네트워크 정보</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-cloud-vm-additional">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">정보 입력 소스</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-additional-hosts-source">직접 입력</span>                                              
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">호스트명</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-additional-hostname">ablestack-temis</span>                                              
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">관리 NIC 정보</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        IP Addr : <span id="span-cloud-vm-additional-mgmt-ipaddr">192.168.0.21/24</span><br/>      
+                                                        VLAN ID : <span id="span-cloud-vm-additional-mgmt-vlan-id">1001</span><br/>       
+                                                        Gateway : <span id="span-cloud-vm-additional-mgmt-gateway">192.168.0.1</span>                                           
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">서비스 NIC 정보</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        IP Addr : <span id="span-cloud-vm-additional-svc-ipaddr">172.16.0.21/24</span><br/>      
+                                                        VLAN ID : <span id="span-cloud-vm-additional-svc-vlan-id">1001</span><br/>       
+                                                        Gateway : <span id="span-cloud-vm-additional-svc-gateway">172.16.0.1</span>                                           
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:10px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-cloud-vm-ssh-key">
+                                        <span class="pf-c-accordion__toggle-text">SSH Key 정보</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-cloud-vm-ssh-key">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">SSH Key 파일</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-ssh-key-file">/Document/Files/ssh-key.key</span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-deploy">
+                            <p>
+                                클라우드센터 가상머신을 배포 중입니다. 전체 00단계 중 00단계 진행 중입니다.  
+                            </p>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span>준비중
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">가상머신 설정 파일 생성</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:15px;margin-left:15px">
+                                <span class="pf-c-label pf-m-green">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-check-circle" aria-hidden="true"></i>
+                                        </span>완료됨
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클라우드센터 가상머신 생성</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:15px;margin-left:15px">
+                                <span class="pf-c-label pf-m-orange">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-play" aria-hidden="true"></i>
+                                        </span>진행중
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클라우드센터 가상머신 시작</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:15px;margin-left:15px">
+                                <span class="pf-c-label pf-m-red">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-exclamation-circle" aria-hidden="true"></i>
+                                        </span>중단됨
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클라우드센터 가상머신 설정</span>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-finish">
+                            <div class="pf-c-content">
+                                <p>
+                                    클라우드센터 VM의 배포를 완료했습니다. 가상머신이 배포되면 다음의 작업을 수행해야 합니다. 
+                                </p>
+                                <ul>
+                                    <li>클라우드센터 VM의 웹관리콘솔에 접속</li>
+                                    <li>ABLESTACK에 대한 클라우드 Zone 구성</li>
+                                    <li>가상머신 생성을 위한 각종 정책 준비</li>
+                                </ul>
+                                <p>
+                                    위의 모든 작업은 클라우드센터 VM의 웹 관리콘솔을 이용해 진행합니다. 
                                 </p>
                             </div>
                         </div>
