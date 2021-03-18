@@ -40,13 +40,14 @@ def createArgumentParser():
 
     return tmp_parser
 
+
 def cloudCenterVmUrl(H=False):
 
     # ccvm cockpit 주소 생성
-    ip = check_output(['grep', '-', 'ablecloud', '/etc/hosts'], universal_newlines=True).split(' ')
+    # ccvm cockpit port fix 필요
+    ip = check_output(['grep', '-w', 'ablecloud', '/etc/hosts'], universal_newlines=True).split(' ')
     value = 'https://'+ip[0]+':9898'
-    ############## ccvm cockpit port fix 필요
-
+   
     if H: 
         return json.dumps(json.loads(createReturn(code=200, val=value)), indent=4) 
 
@@ -54,10 +55,10 @@ def cloudCenterVmUrl(H=False):
 
 def cloudCenterUrl(H=False):   
 
-    # ccvm cloudstack 주소 생성    
+    # ccvm cloudstack 주소 생성
+    # https 구성시 automatic redirect 설정  
     ip = check_output(['grep', '-w', 'ablecloud', '/etc/hosts'], universal_newlines=True).split(' ')
     value = 'http://'+ip[0]+':8080'
-    # https 구성 시 automatic redirect 설정 (web.xml)
 
     if H: 
         return json.dumps(json.loads(createReturn(code=200, val=value)), indent=4) 
@@ -67,7 +68,7 @@ def cloudCenterUrl(H=False):
 def storageCenterVmUrl(H=False):   
 
     # scvm cockpit 주소 생성
-    ############## 호스트의 scvm ip 조회
+    # 호스트의 scvm ip 조회
     ip = check_output(['grep', '-w', 'host', '/etc/hosts'], universal_newlines=True).split(' ')
     value = 'https://'+ip[0]+':9090'
 
@@ -79,7 +80,7 @@ def storageCenterVmUrl(H=False):
 def storageCenterUrl(H=False):  
      
     # scvm ceph 주소 생성
-    ############## Active MGR 조회 (ceph -s details -f pretty-json data.services.mgr 항목의 node명 확인하여 ip 조회)
+    # Active MGR 조회 (ceph -s details -f pretty-json data.services.mgr 항목의 node명 확인하여 ip 조회)
     ip = check_output(['grep', '-w', 'host', '/etc/hosts'], universal_newlines=True).split(' ')
     value = 'https://'+ip[0]+':8443'
 
