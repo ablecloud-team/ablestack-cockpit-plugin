@@ -6,11 +6,17 @@ import json
 import logging
 
 from ablestack import *
-import sh
 import os
+import sh
+import distro
 
 lsblk_cmd = sh.Command('/usr/bin/lsblk')
-lspci_cmd = sh.Command('/usr/bin/lspci')
+if distro.linux_distribution() == ('CentOS Linux', '8', ''):
+    print('centos8')
+    lspci_cmd = sh.Command('/usr/sbin/lspci')
+else:
+    print('other')
+    lspci_cmd = sh.Command('/usr/bin/lspci')
 
 env = os.environ.copy()
 env['LANG'] = "en_US.utf-8"
@@ -84,7 +90,7 @@ def listDiskInterface(H=False, classify=None):
     # for out in outputs:
     #    print(out.split())
 
-    item = json.loads(lsblk_cmd(J=True, o="name,path,rota,model,size,state,group,type,tran,subsystems").stdout.decode())
+    item = json.loads(lsblk_cmd(J=True, o="name,rota,model,size,state,group,type,tran,subsystems").stdout.decode())
     bd = item['blockdevices']
     newbd = []
     for dev in bd:
