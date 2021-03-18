@@ -1,5 +1,5 @@
 <domain type='kvm' id='1'>
-  <name>scvm</name>
+  <name>ccvm</name>
   <memory unit='GiB'><!--memory--></memory>
   <currentMemory unit='GiB'><!--memory--></currentMemory>
   <vcpu placement='static'><!--cpu--></vcpu>
@@ -31,15 +31,13 @@
     <emulator>/usr/libexec/qemu-kvm</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
-      <source file='/opt/scvm/scvm.qcow2'/>
+      <source file='/opt/ccvm/ccvm.qcow2'/>
       <backingStore/>
       <target dev='vda' bus='virtio'/>
       <boot order='1'/>
       <alias name='virtio-disk0'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
     </disk>
-    
-<!--lun_passthrough-->
     <controller type='usb' index='0' model='ich9-ehci1'>
       <alias name='usb'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x7'/>
@@ -88,8 +86,7 @@
     </controller>
     
 <!--management_network_bridge-->
-<!--server_network_bridge-->
-<!--replication_network_bridge-->
+<!--service_network_bridge-->
     <serial type='pty'>
       <source path='/dev/pts/0'/>/
       <target type='isa-serial' port='0'>
@@ -138,9 +135,6 @@
       <alias name='video0'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
     </video>
-    
-<!--raid_passthrough-->
-<!--nic_passthrough-->
     <redirdev bus='usb' type='spicevmc'>
       <alias name='redir0'/>
       <address type='usb' bus='0' port='2'/>
