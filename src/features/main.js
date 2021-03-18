@@ -21,6 +21,8 @@ $(document).ready(function(){
 
     $('#div-modal-wizard-cloud-vm').load("./src/features/cloud-vm-wizard.html");
     $('#div-modal-wizard-cloud-vm').hide();
+
+    new CloudCenterVirtualMachine().checkCCVM();
 });
 
 // document.ready 영역 끝
