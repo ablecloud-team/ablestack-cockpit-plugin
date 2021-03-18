@@ -14,7 +14,7 @@ def parseArgs():
     parser = argparse.ArgumentParser(description='Pacemaker cluster for Cloud Center VM',
                                      epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
     
-    parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status'], help='choose one of the actions')
+    parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status', 'remove'], help='choose one of the actions')
     parser.add_argument('--cluster', metavar='name', type=str, help='The name of the cluster to be created')
     parser.add_argument('--hosts', metavar='name', type=str, nargs='*', help='Hostnames to form a cluster')
     parser.add_argument('--resource', metavar='name', type=str, help='The name of the resource to be created')
@@ -52,9 +52,12 @@ class Pacemaker:
         self.resource_name = resource_name
         self.xml_path = xml_path
 
-        pcs('resource', 'create', self.resource_name, 'VirtualDomain', 'hypervisor="qemu:///system"', 
-        f'config={self.xml_path}', 'migration_transport=ssh', 'op', 'start', 'timeout="120s"', 'op', 'monitor', 'timeout="30"', 
-        'interval="10"', 'meta', 'allow-migrate="true"', 'priority="100"')
+        pcs('resource', 'create', self.resource_name, 'VirtualDomain', 'hypervisor=qemu:///system', 
+        f'config={self.xml_path}', 'migration_transport=ssh',
+        'meta', 'allow-migrate=true', 'priority=100',
+        'op', 'start', 'timeout=120s',
+        'op', 'stop', 'timeout=120s',
+        'op', 'monitor', 'timeout=30', 'interval=10')
         
         ret_val = {'resource name :':self.resource_name, 'hypervisor':'qemu:///system', 'config':self.xml_path, 'migration_transport':'ssh'}
         ret = createReturn(code=200, val=ret_val)
@@ -120,6 +123,21 @@ class Pacemaker:
         print(json.dumps(json.loads(ret), indent=4))
 
         return ret
+
+
+    def removeResource(self, resource_name):
+        self.resource_name = resource_name
+        
+        pcs('resource', 'cleanup', self.resource_name)
+        pcs('resource', 'disable', self.resource_name)
+        pcs('resource', 'remove', self.resource_name)
+        pcs('resource', 'refresh')
+        
+        ret = createReturn(code=200, val='remove')
+        print(json.dumps(json.loads(ret), indent=4))
+
+        return ret
+    
         
         
     def statusResource(self, resource_name):
@@ -133,6 +151,7 @@ class Pacemaker:
         resources = []
         nodes = []
         host_list = []
+        ret = None
         
         for soup_node in soup_nodes:
             node = {}
@@ -140,6 +159,7 @@ class Pacemaker:
             node['online'] = soup_node['online']
             node['resource_running'] = soup_node['resources_running']
             nodes.append(node)
+        print("1")
 
         for soup_res in soup_resource:
             res = {}
@@ -148,7 +168,7 @@ class Pacemaker:
             res['failed'] = soup_res['failed']
             res['resource'] = soup_res['id']
             resources.append(res)
-
+        print("2")
         for i in range(0, len(nodes)):
             clustered_hosts = nodes[i].get('host')
             host_list.append(clustered_hosts)
@@ -162,6 +182,7 @@ class Pacemaker:
                 res_active = resources[i].get('active')
                 res_blocked = resources[i].get('blocked')
                 res_failed = resources[i].get('failed')
+                print("1")
 
                 ret_val = {'clustered_host':host_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
                 ret = createReturn(code=200, val=ret_val)

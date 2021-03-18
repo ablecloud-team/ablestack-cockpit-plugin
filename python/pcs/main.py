@@ -21,8 +21,11 @@ def main():
         pcs.moveResource(args.resource, args.target)
     elif (args.action) == 'cleanup':
         pcs.cleanupResource(args.resource)
+    elif (args.action) == 'remove':
+        pcs.removeResource(args.resource)       
     elif (args.action) == 'status':
         pcs.statusResource(args.resource)
+
 
 if __name__ == "__main__":
     main()
