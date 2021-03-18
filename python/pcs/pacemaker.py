@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import sys
+import json
+import lxml
+
 from ablestack import *
 from sh import pcs
 from sh import systemctl
-import sys
-import json
 from bs4 import BeautifulSoup
-import lxml
+
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Pacemaker cluster for Cloud Center VM',
@@ -34,6 +36,7 @@ class Pacemaker:
         self.cluster_name = cluster_name
         self.hostnames = hostnames
 
+        #pcs cluster 구성 command
         pcs('host', 'auth', '-u', 'hacluster', '-p', 'password', *self.hostnames)
         pcs('cluster', 'setup', self.cluster_name, *self.hostnames)
         pcs('cluster', 'start', '--all')
@@ -52,6 +55,7 @@ class Pacemaker:
         self.resource_name = resource_name
         self.xml_path = xml_path
 
+        #pcs resource 생성 command
         pcs('resource', 'create', self.resource_name, 'VirtualDomain', 'hypervisor=qemu:///system', 
         f'config={self.xml_path}', 'migration_transport=ssh',
         'meta', 'allow-migrate=true', 'priority=100',
@@ -116,7 +120,6 @@ class Pacemaker:
 
             sys.exit(1)
 
-
         else:
             pcs('resource', 'move', self.resource_name, self.target_host)
         
@@ -152,14 +155,13 @@ class Pacemaker:
         return ret
     
         
-        
     def statusResource(self, resource_name):
         self.resource_name = resource_name
         
-        resources = []
+        resource = []
         res={}
         nodes = []
-        host_list = []
+        node_list = []
         current_host = None
 
         xml = pcs('status', 'xml').stdout.decode()
@@ -179,15 +181,15 @@ class Pacemaker:
 
         for i in range(0, len(nodes)):
             clustered_hosts = nodes[i].get('host')
-            host_list.append(clustered_hosts)
+            node_list.append(clustered_hosts)
 
         res_active = res['active'] = soup_resource['active']
         res_blocked = res['blocked'] = soup_resource['blocked']
         res_failed = res['failed'] = soup_resource['failed']
         res['resource'] = soup_resource['id']
-        resources.append(res)
+        resource.append(res)
 
-        ret_val = {'clustered_host':host_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
+        ret_val = {'clustered_host':node_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
         ret = createReturn(code=200, val=ret_val)
         print(json.dumps(json.loads(ret), indent=4))
 
