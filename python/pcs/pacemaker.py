@@ -92,17 +92,30 @@ class Pacemaker:
     def moveResource(self, resource_name, target_host):
         self.resource_name = resource_name
         self.target_host = target_host
-        res_output = pcs('status', 'resources').stdout.decode().splitlines()
-        for line in res_output:
-            if self.resource_name in line:
-                current_host = line.split(' ')[-1]
-        
+        current_host = None
+
+        xml = pcs('status', 'xml').stdout.decode()
+        soup = BeautifulSoup(xml, 'lxml')
+        soup_nodes = soup.find('nodes').select('node')
+        soup_resource = soup.select_one(f'#{self.resource_name}')
+
+        if soup_resource['nodes_running_on'] == '1':
+            current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
+
         if current_host == self.target_host:
             # print('현재 호스트로 마이그레이션 할 수 없습니다.')
-            ret = createReturn(code=500, val='FAIL')
+            ret = createReturn(code=500, val='cannot be migrated to the same host.')
             print(json.dumps(json.loads(ret), indent=4))
 
             sys.exit(1)
+
+        elif current_host == None:
+            # print('정지 상태에서는 다른 호스트로 마이그레이션 할 수 없습니다.')
+            ret = createReturn(code=501, val='Migration is not possible while stopped.')
+            print(json.dumps(json.loads(ret), indent=4))
+
+            sys.exit(1)
+
 
         else:
             pcs('resource', 'move', self.resource_name, self.target_host)
@@ -151,22 +164,11 @@ class Pacemaker:
 
         xml = pcs('status', 'xml').stdout.decode()
         soup = BeautifulSoup(xml, 'lxml')
-        # soup_resource = soup.select('resource')
-        # soup_tmp = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
-        # current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
-
         soup_nodes = soup.find('nodes').select('node')
-
         soup_resource = soup.select_one(f'#{self.resource_name}')
 
         if soup_resource['nodes_running_on'] == '1':
             current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
-
-        res_active = res['active'] = soup_resource['active']
-        res_blocked = res['blocked'] = soup_resource['blocked']
-        res_failed = res['failed'] = soup_resource['failed']
-        res['resource'] = soup_resource['id']
-        resources.append(res)
  
         for soup_node in soup_nodes:
             node = {}
@@ -179,59 +181,14 @@ class Pacemaker:
             clustered_hosts = nodes[i].get('host')
             host_list.append(clustered_hosts)
 
+        res_active = res['active'] = soup_resource['active']
+        res_blocked = res['blocked'] = soup_resource['blocked']
+        res_failed = res['failed'] = soup_resource['failed']
+        res['resource'] = soup_resource['id']
+        resources.append(res)
+
         ret_val = {'clustered_host':host_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
         ret = createReturn(code=200, val=ret_val)
         print(json.dumps(json.loads(ret), indent=4))
 
-
-
-        # for soup_res in soup_resource:
-        #     res = {}
-        #     print(soup_resource)
-        #     res['active'] = soup_resource['active']
-        #     res['blocked'] = soup_resource['blocked']
-        #     res['failed'] = soup_resource['failed']
-        #     res['resource'] = soup_resource['id']
-        #     resources.append(res)
-
-
-
-        # for i in range(0, len(resources)):
-        #     if resources[i].get('resource') == self.resource_name:
-        #         res_active = resources[i].get('active')
-        #         res_blocked = resources[i].get('blocked')
-        #         res_failed = resources[i].get('failed')
-
-        #         ret_val = {'clustered_host':host_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
-        #         ret = createReturn(code=200, val=ret_val)
-        #         print(json.dumps(json.loads(ret), indent=4))
-
-        # return ret
-
-        """
-        기존 코드
-
-        # self.resource_name = resource_name
-        # status_list = {'Starting':'200', 'Started':'200', 'Stopping':'201', 'Stopped':'201', 'FAILED':'500'}
-        # status_output = pcs('status').stdout.decode().splitlines()
-        # nodes_output = pcs('status', 'nodes', 'corosync').stdout.decode().splitlines()
-        # for line in status_output:
-        #     if self.resource_name in line:
-        #         current_host = line.split(' ')[-1]
-        #         status_pcs = line.split(' ')[-2]
-        # for line in nodes_output:
-        #     if "Online" in line:
-        #         online_host = line.split(':')[-1]
-        #     if "Offline" in line:
-        #         offline_host = line.split(':')[-1]
-        # clustered_hosts = (online_host + offline_host).strip()
-        # if status_pcs in status_list.keys():
-        #     ret_val = {'status':status_pcs, 'started':current_host.strip('()'), 'hosts': corosync_hosts}
-        #     ret = createReturn(code=status_list.get(status_pcs), val=ret_val)
-        #     print(json.dumps(json.loads(ret), indent=4))
-        # elif status_pcs not in status_list.keys():   
-        #     ret_val = {'status':'Error', 'started':'Unknown', 'hosts': 'Unknown'}
-        #     ret = createReturn(code=500, val=ret_val)
-        #     print(json.dumps(json.loads(ret), indent=4))
-        # return ret
-        """
+        return ret
