@@ -26,20 +26,67 @@ def parseArgs():
 
 def statusDeteil():        
     try:
-        #res_output = check_output(['ceph', '-s'], universal_newlines=True)
-    
-
         
+        output = check_output(['cat /usr/share/cockpit/ablestack-jsdev/python/storage_center_cluster_status/ceph_status_sample | grep health'], universal_newlines=True, shell=True)
+        cluster_status = output.split(':')[1].strip()
+        #print(output)
+        
+        output = check_output(['cat /usr/share/cockpit/ablestack-jsdev/python/storage_center_cluster_status/ceph_status_sample | grep mon'], universal_newlines=True, shell=True)
+        output = output.split(':')[1].strip().split(' daemons, ')
+        mon_gw1 = output[0]
+        mon_gw2 = output[1]
+        #print(mon_gw1)
+        #print(mon_gw2)
+
+        output = check_output(['cat /usr/share/cockpit/ablestack-jsdev/python/storage_center_cluster_status/ceph_status_sample | grep mgr'], universal_newlines=True, shell=True)
+        mgr = output.split('mgr: ')[1].strip()        
+        mgr_cnt = mgr.count('scvm')      
+        #print(mgr)
+
+        output = check_output(['cat /usr/share/cockpit/ablestack-jsdev/python/storage_center_cluster_status/ceph_status_sample | grep osd'], universal_newlines=True, shell=True)
+        osd = output.split(' ')[3].strip()
+        osd_up = output.split(' ')[5].strip()
+        #print(osd)
+        #print(osd_up)
+
+        output = check_output(['cat /usr/share/cockpit/ablestack-jsdev/python/storage_center_cluster_status/ceph_status_sample | grep pools'], universal_newlines=True, shell=True)
+        pools = output.split('pools:  ')[1].strip()   
+        #print(pools)
+
+        output = check_output(['cat /usr/share/cockpit/ablestack-jsdev/python/storage_center_cluster_status/ceph_status_sample | grep usage'], universal_newlines=True, shell=True)
+        output = output.split('usage:  ')[1].strip().split(' ')
+        
+        used = output[0] +' '+ output[1]
+        available = output[-3] + ' ' + output[-2]
+        usage_percentage = round(float(output[0]) / float(output[-3]) * 100.0 , 2)
+        usage_percentage = str(usage_percentage) + '%'
+        #print(used)
+        #print(available)
+        #print(usage_percentage)
+        
+
+
+
+
+
+
+
+        #output = check_output(['ceph -s'], universal_newlines=True, shell=True)
+        
+
+
+
         ################################################임시데이터
-        cluster_status = "HEALTH_WARN"
-        osd =16
-        osd_up = 12
-        mgr = "SCVM1"
-        mgr_cnt= "3"
-        pools = 12
-        available = "4.4TB"
-        used = "150GB"
-        usage_percentage = 12
+        #cluster_status = "HEALTH_WARN"
+        #osd =16
+        #osd_up = 12
+        #mon_gw = 11
+        #mgr = "SCVM1"
+        #mgr_cnt= "3"
+        #pools = 12
+        #available = "4.4TB"
+        #used = "150GB"
+        #usage_percentage = 12
         ################################################
         
         # 실제 데이터 세팅
@@ -47,7 +94,9 @@ def statusDeteil():
             'cluster_status': cluster_status, 
             'osd': osd, 
             'osd_up': osd_up, 
-            'mgr': mgr,
+            'mon_gw1' : mon_gw1,
+            'mon_gw2' : mon_gw2,
+            'mgr': mgr,            
             'mgr_cnt': mgr_cnt,
             'pools': pools,
             'avail': available,

@@ -2,10 +2,12 @@ import sys
 import argparse
 import json
 import logging
+import re
 
 from subprocess import check_output
 from subprocess import Popen
 from ablestack import *
+
 
 
 def parseArgs():
@@ -27,23 +29,33 @@ def parseArgs():
 
 def statusDeteil():        
     
-
-    #run("ls | grep ablestack", universal_newlines=True,  shell=True)
-    
-    stat = check_output(['virsh list | grep jschoi-dev'], universal_newlines=True, shell=True )
-    
     try:
-        
-        #res_output = check_output(['ceph', '-s'], universal_newlines=True)
+        #run("ls | grep ablestack", universal_newlines=True,  shell=True)
     
+        # vm 상태조회
+        output = check_output(["virsh dominfo scvm | sed -n 5p | cut -f 2 -d ':' "], universal_newlines=True, shell=True )    
+        scvm_status = output.strip()
+        #print(scvm_status)
+
+        output = check_output(["virsh dominfo scvm | sed -n 6p | cut -f 2 -d ':' "], universal_newlines=True, shell=True )    
+        vcpu = output.strip()
+        #print(vcpu)
+        
+        output = check_output(["virsh dominfo scvm | sed -n 8p | cut -f 2 -d ':' | sed 's/ KiB//g'"], universal_newlines=True, shell=True )    
+        memory = output.strip()
+        memory_mib = int(memory) / 1024  #KiB => MiB
+        if memory_mib < 1024:
+            memory = str(memory_mib) + " MiB"
+        elif memory_mib >1024:
+            memory = str(memory_mib / 1024) + " GiB"
        
         ################################################임시데이터
-        scvm_status = "Running"
-        vcpu = 8
+        #scvm_status = "Running"
+        #vcpu = 8
         socket = 1
         core = 4
 
-        memory= "16GB"
+        #memory= "16GB"
         rdisk = "128GB"
 
         manageNicType = "VirtIO"
