@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>ABLESTACK1</title>
+        <title>ABLESTACK</title>
 
         <!-- 공통 필요 스타일 및 자바스크립트 영역 시작 -->
         <meta charset="utf-8">
@@ -89,10 +89,10 @@
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
                                                             <div class="pf-c-description-list__text">
-                                                                <span class="pf-c-label pf-m-red" id="scc_span_css">
+                                                                <span class="pf-c-label pf-m-red" id="scc_cluster_css">
                                                                     <span class="pf-c-label__content">
                                                                         <span class="pf-c-label__icon">
-                                                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true" id="scc_cluster_icon"></i>
                                                                         </span><div id="scc_status"></div>
                                                                     </span>
                                                                 </span>
@@ -196,7 +196,7 @@
                                                                     <span class="pf-c-label__content">
                                                                         <span class="pf-c-label__icon">
                                                                             <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
-                                                                        </span>Health Err
+                                                                        </span><div id="ccc_status"></div>
                                                                     </span>
                                                                 </span>
                                                             </div>
@@ -265,17 +265,17 @@
                                                     </button>
                                                     <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-vm-status" id="dropdown-menu-storage-vm-status">
                                                         <li>
-                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>스토리지센터VM 시작</button>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-set-storage-center-vm-start" >스토리지센터VM 시작</button>
                                                         </li>
                                                         <li>
-                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>스토리지센터VM 정지</button>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-set-storage-center-vm-stop" >스토리지센터VM 정지</button>
                                                         </li>
                                                         <li class="pf-c-divider" role="separator"></li>
                                                         <li>
-                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>스토리지센터VM 삭제</button>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-set-storage-center-vm-delete" >스토리지센터VM 삭제</button>
                                                         </li>
                                                         <li>
-                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>스토리지센터VM 자원변경</button>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-set-storage-center-vm-resource-update" >스토리지센터VM 자원변경</button>
                                                         </li>
                                                         <li class="pf-c-divider" role="separator"></li>
                                                         <li>
@@ -295,11 +295,11 @@
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
                                                             <div class="pf-c-description-list__text">
-                                                                <span class="pf-c-label pf-m-red">
+                                                                <span class="pf-c-label pf-m-red" id="scvm_css">
                                                                     <span class="pf-c-label__content">
-                                                                        <span class="pf-c-label__icon">
-                                                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
-                                                                        </span>Status Err
+                                                                        <span class="pf-c-label__icon" >
+                                                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true" id="scvm_icon"></i>
+                                                                        </span><div id="scvm_status"></div>
                                                                     </span>
                                                                 </span>
                                                             </div>
@@ -310,7 +310,7 @@
                                                             <span class="pf-c-description-list__text">CPU</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">N/A vCore(N/A Socket, N/A Core)</div>
+                                                            <div class="pf-c-description-list__text" id="scvm_cpu">N/A vCore(N/A Socket, N/A Core)</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -318,7 +318,7 @@
                                                             <span class="pf-c-description-list__text">Memory</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">N/A GiB</div>
+                                                            <div class="pf-c-description-list__text" id="scvm_memory">N/A GiB</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -326,7 +326,7 @@
                                                             <span class="pf-c-description-list__text">ROOT Disk 크기</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">N/A GiB</div>
+                                                            <div class="pf-c-description-list__text" id="scvm_rdisk">N/A GiB</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -334,7 +334,7 @@
                                                             <span class="pf-c-description-list__text">관리 NIC</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">NIC Type : N/A (Parent : N/A)</div>
+                                                            <div class="pf-c-description-list__text" id="scvm_manage_nic_type">NIC Type : N/A (Parent : N/A)</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -342,7 +342,7 @@
                                                             <span class="pf-c-description-list__text">&nbsp;</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">IP : N/A</div>
+                                                            <div class="pf-c-description-list__text" id="scvm_manage_nic_ip">IP : N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -350,7 +350,7 @@
                                                             <span class="pf-c-description-list__text">&nbsp;</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">GW : N/A</div>
+                                                            <div class="pf-c-description-list__text" id="scvm_manage_nic_gw">GW : N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -358,7 +358,7 @@
                                                             <span class="pf-c-description-list__text">스토리지 NIC</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">NIC Type : N/A (Parent : N/A)</div>
+                                                            <div class="pf-c-description-list__text" id="scvm_storage_nic_type">NIC Type : N/A (Parent : N/A)</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -366,7 +366,7 @@
                                                             <span class="pf-c-description-list__text">&nbsp;</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">서버용 IP : N/A</div>
+                                                            <div class="pf-c-description-list__text" id="scvm_storage_nic_server_ip">서버용 IP : N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -374,7 +374,7 @@
                                                             <span class="pf-c-description-list__text">&nbsp;</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">복제용 IP : N/A</div>
+                                                            <div class="pf-c-description-list__text" id="scvm_storage_nic_replication_ip">복제용 IP : N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -382,7 +382,7 @@
                                                             <span class="pf-c-description-list__text">Data 디스크</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">Disk Type : N/A (Parent : N/A)</div>
+                                                            <div class="pf-c-description-list__text" id="scvm_storage_datadisk_type">Disk Type : N/A (Parent : N/A)</div>
                                                         </dd>
                                                     </div>
                                                 </dl>
@@ -545,15 +545,16 @@
         <!-- 클라우드센터VM 배포 마법사 : ./src/features/cloud-vm-wizard.html을 내용으로 load -->
         <div class="pf-c-backdrop" id="div-modal-wizard-cloud-vm"></div>
 
+        <!-- 스토리지센터 VM 자원변경 : ./src/features/storage-vm-resource-update.html을 내용으로 load -->
+        <div class="pf-c-backdrop" id="div-modal-storage-center-vm-resource-update"></div>
+
         <!-- 모달 영역 끝  -->
 
         <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
-        <!-- <script src="./src/features/main.js"></script> -->
+        <script src="./src/features/main.js"></script>
         <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
 
 
-        <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
-        <script src="./src/features/main_js.js"></script>
-        <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
+        
     </body>
 </html>
