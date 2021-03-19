@@ -14,7 +14,7 @@ class CloudCenterVirtualMachine
     createDescriptionListText(id='span-cloud-vm-status', status='red', description='N/A'){
         let description_list__text = $("<div />").addClass('pf-c-description-list__text')
         let span_cloud_vm_status = $("<span></span>").attr('id', id).addClass('pf-c-label').addClass('pf-m-' + status);
-        let span_content = $("<span></span>").addClass("pf-c-label__content");
+        let span_content = $("<span></span>").addClass("pf-c-label__content").attr('id',"span-cloud-vm-status-content");
         let span_icon = $("<span />").addClass("pf-c-label__icon").prepend($('<i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>'));
         description_list__text.prepend(span_cloud_vm_status.prepend(span_content.prepend(span_icon).append(description)))
         return description_list__text[0]
@@ -45,6 +45,24 @@ class CloudCenterVirtualMachine
         let vms = obj
         vms.forEach(function(vm){
             if(vm.Name=="djpark-dev-2") {
+                $("#div-cloud-vm-cpu-text").text(
+                    vm['CPU(s)']+" vCore(N/A Socket, N/A Core)"
+                );
+                $("#div-cloud-vm-memory-text").text(
+                    vm['Max memory']
+                );
+                $("#div-cloud-vm-disk-text").text(
+                    vm['DISK_CAP'] + " bytes (" + vm['DISK_PHY'] + " bytes used)"
+                );
+                $("#div-cloud-vm-nic-type-text").text(
+                    "NIC Type : " + "N/A (Parent : N/A)"
+                );
+                $("#div-cloud-vm-nic-ip-text").text(
+                    "IP : " + vm['ip']
+                );
+                $("#div-cloud-vm-nic-gw-text").text(
+                    "GW : " + "N/A"
+                );
                 if (vm.State == "running") {
                     let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'green', 'running');
                     status_span[0].children[0].replaceWith(a)
