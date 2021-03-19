@@ -6,7 +6,6 @@
 **/
 
 // document.ready 영역 시작
-
 $(document).ready(function(){
     $('#dropdown-menu-storage-cluster-status').hide();
     $('#dropdown-menu-cloud-cluster-status').hide();
@@ -21,6 +20,11 @@ $(document).ready(function(){
 
     $('#div-modal-wizard-cloud-vm').load("./src/features/cloud-vm-wizard.html");
     $('#div-modal-wizard-cloud-vm').hide();
+
+    $('#dev-modal-migration-cloud-vm').hide();
+    $('#dev-modal-stop-cloud-vm').hide();
+
+    CardCloudClusterStatus();
 });
 
 // document.ready 영역 끝
