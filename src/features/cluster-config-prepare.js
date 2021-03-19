@@ -323,9 +323,6 @@ $('#button-accordion-timeserver').on('click', function(){
     }
 });
 
-// 업로드 및 다운로드에 필요한 폴더 생성
-mkdirShareFolder();
-
 // 파일 선택 시 sshkey 생성 및 업로드 실행
 let input_pri = document.querySelector('#form-input-cluster-config-ssh-key-pri-file');
 let input_pub = document.querySelector('#form-input-cluster-config-ssh-key-pub-file');
@@ -336,7 +333,7 @@ fileReaderFunc(input_pub);
 // 파일 보여주기
 // SSH KEY 보여주기
 
-// 버튼 클릭 시 파일 읽어오기
+// 설정확인에서 버튼 클릭 시 파일 읽어오기
 $('#button-accordion-ssh-key').on('click', function(){
     readFile();
 });
@@ -456,34 +453,57 @@ function readFile() {
 function fileReaderFunc(input) {
     input.addEventListener('change', function (event) {
         try {
-            // FileList
             let fileList = input.files || event.target.files;
-            // File
             let file = fileList[0];
-            let reader = new FileReader();
-            reader.onload = function (progressEvent) {
-                console.log(progressEvent.target.result);
-                let result = progressEvent.target.result;
-                let ssh_key_type = input.getAttribute('id');
-                writeFile(result, ssh_key_type);
-            };
-            reader.readAsText(file);
+            // 파일 확장자 체크 (이미지 파일 업로드 제한)
+            let fileName = fileList[0].name;
+            fileExpentionChecker(fileName);
+
+            if ($(input).val() != "") {
+                // FileList
+                let reader = new FileReader();
+                reader.onload = function (progressEvent) {
+                    console.log(progressEvent.target.result);
+                    let result = progressEvent.target.result;
+                    let ssh_key_type = input.getAttribute('id');
+                    writeFile(result, ssh_key_type);
+                };
+                reader.readAsText(file);
+            }
         } catch (err) {
             console.error(err);
         }
     });
 }
 
-/**
- * Meathod Name : mkdirShareFolder
- * Date Created : 2021.03.17
- * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 필요한 /home/share 폴더를 생성하는 함수
- * Parameter : 없음
- * Return  : 없음
- * History  : 2021.03.17 최초 작성
-**/
 
-function mkdirShareFolder() {
-    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "makeShare"])
+/**
+ * Meathod Name : fileReaderFunc
+ * Date Created : 2021.03.19
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 파일을 선택할 때 선택자(ID)로 확장자를 체크하는 함수
+ * Parameter : id
+ * Return  : 없음
+ * History  : 2021.03.19 최초 작성
+**/
+async function fileNameExtensionChecker(id) {
+    // 파일 업로드 확장자 체크
+    alert("wwwwwww");
+    if ($('#'+id).val() != "") {
+        var ext = $('#docufile').val().split('.').pop().toLowerCase();
+        if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'doc', 'docx', 'xls', 'xlsx', 'hwp', 'pub']) == -1) {
+            alert('등록 할수 없는 파일명입니다.');
+            $("#file_text").val(""); // input file 파일명을 다시 지워준다.
+            return;
+        }
+    }
+}
+
+
+function fileExpentionChecker(fileName){
+    let ext = fileName.split('.').pop().toLowerCase();
+    if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+        alert('gif,png,jpg,jpeg 파일만 업로드 할수 있습니다.');
+        return false;
+    }
 }

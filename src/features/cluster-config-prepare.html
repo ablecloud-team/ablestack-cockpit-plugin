@@ -85,11 +85,20 @@
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-file">
-                                                <span class="pf-c-form__label-text">SSH Key 파일</span>
+                                                <span class="pf-c-form__label-text">SSH Key 개인키 파일</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline">
                                             <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cluster-config-ssh-key-pri-file" name="form-input-cluster-config-ssh-key-file" placeholder="개인키를 선택하세요." disabled/>
+                                        </div>
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-file">
+                                                <span class="pf-c-form__label-text">SSH Key 공개키 파일</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline">
                                             <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cluster-config-ssh-key-pub-file" name="form-input-cluster-config-ssh-key-file" placeholder="공개키를 선택하세요." disabled/>
                                         </div>
                                     </div>
