@@ -1,3 +1,10 @@
+'''
+Copyright (c) 2021 ABLECLOUD Co. Ltd
+
+이 파일은 pcs를 구성하고 시작, 정지 등의 기능을 수행할 수 있는 함수를 정의합니다.
+최초 작성일 : 2021. 03. 19
+'''
+
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
@@ -11,6 +18,11 @@ from sh import pcs
 from sh import systemctl
 from bs4 import BeautifulSoup
 
+'''
+함수명 : parseArgs
+이 함수는 python library argparse를 시용하여 함수를 실행될 때 필요한 파라미터를 입력받고 파싱하는 역할을 수행합니다.
+예를들어 action을 요청하면 해당 action일 때 요구되는 파라미터를 입력받고 해당 코드를 수행합니다.
+'''
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Pacemaker cluster for Cloud Center VM',
@@ -24,7 +36,13 @@ def parseArgs():
     parser.add_argument('--target', metavar='name', type=str, help='Target hostname to migrate Cloud Center VM')
     return parser.parse_args()
 
+'''
+클래스명 : Pacemaker
+이 클래스에는 pcs를 구성하거나 조작하기 위한 기능이 함수별로 정의되어 있습니다.
+'''
 class Pacemaker:
+    # 함수명 : __init__
+    # 주요 기능 : 클래스에서 사용하는 변수 초기화
     def __init__(self):
         self.cluster_name = None
         self.hostnames = []
@@ -32,6 +50,8 @@ class Pacemaker:
         self.xml_path = None
         self.target_host = None
     
+    # 함수명 : configCluster
+    # 주요 기능 : pcs cluster 구성
     def configCluster(self, cluster_name, *hostnames):
         self.cluster_name = cluster_name
         self.hostnames = hostnames
@@ -50,7 +70,8 @@ class Pacemaker:
 
         return ret       
 
-
+    # 함수명 : createResource
+    # 주요 기능 : pcs resource 생성
     def createResource(self, resource_name, xml_path):
         self.resource_name = resource_name
         self.xml_path = xml_path
@@ -69,7 +90,8 @@ class Pacemaker:
 
         return ret
 
-
+    # 함수명 : enableResource
+    # 주요 기능 : pcs resource 시작
     def enableResource(self, resource_name):
         self.resource_name = resource_name
         
@@ -81,7 +103,8 @@ class Pacemaker:
 
         return ret
 
-
+    # 함수명 : disableResource
+    # 주요 기능 : pcs resource 정지
     def disableResource(self, resource_name):
         self.resource_name = resource_name
         
@@ -92,7 +115,8 @@ class Pacemaker:
 
         return ret
 
-
+    # 함수명 : moveResource
+    # 주요 기능 : pcs resource 이동(마이그레이션)
     def moveResource(self, resource_name, target_host):
         self.resource_name = resource_name
         self.target_host = target_host
@@ -102,7 +126,8 @@ class Pacemaker:
         soup = BeautifulSoup(xml, 'lxml')
         soup_nodes = soup.find('nodes').select('node')
         soup_resource = soup.select_one(f'#{self.resource_name}')
-
+        
+        # pcs resource가 실행 중인 경우
         if soup_resource['nodes_running_on'] == '1':
             current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
 
@@ -129,7 +154,8 @@ class Pacemaker:
 
         return ret
 
-
+    # 함수명 : clenaupResource
+    # 주요 기능 : pcs resource를 클린업 하는 기능 (pcs resoure 상태를 초기화)
     def cleanupResource(self, resource_name):
         self.resource_name = resource_name
         
@@ -140,7 +166,8 @@ class Pacemaker:
 
         return ret
 
-
+    # 함수명 : removeResource
+    # 주요 기능 : 현재 resource를 삭제하는 기능
     def removeResource(self, resource_name):
         self.resource_name = resource_name
         
@@ -154,7 +181,9 @@ class Pacemaker:
 
         return ret
     
-        
+    # 함수명 : statusResource
+    # 주요 기능 : 현재 resource의 클러스터 호스트 정보, resource 리소스 실행 여부, block이나 fail 상태 여부 등을 조회하는 기능
+    #          이 기능은 두개 이상의 리소스를 가진 클러스터에서도 조회 할 수 있음
     def statusResource(self, resource_name):
         self.resource_name = resource_name
         
