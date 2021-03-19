@@ -29,7 +29,7 @@ for vm in vms:
         k = items[0].strip()
         v = items[1].strip()
         vm[k] = v
-    ret = virsh_cmd("domblkinfo", domain="djpark-dev-2", all=True, _env=env).stdout.decode().splitlines()
+    ret = virsh_cmd("domblkinfo", domain=vm['Name'], all=True, _env=env).stdout.decode().splitlines()
     for line in ret[:-1]:
         if 'vda' in line:
             items = line.split(maxsplit=4)
