@@ -15,20 +15,20 @@ type = sys.argv[1]
 
 
 def generateSshkey():
-    os.system("ssh-keygen -t rsa -b 2048 -f $HOME/share/ablecloud -N '' <<<y 2>&1 >/dev/null")
+    os.system("ssh-keygen -t rsa -b 2048 -f $HOME/.ssh/ablecloud -N '' <<<y 2>&1 >/dev/null")
     print("end")
 
 
 def makePri():
-    os.system("touch $HOME/share/ablecloud")
+    os.system("touch $HOME/.ssh/ablecloud")
     print("end")
 
 def makePub():
-    os.system("touch $HOME/share/ablecloud.pub")
+    os.system("touch $HOME/.ssh/ablecloud.pub")
     print("end")
 
 def makeShareFolder():
-    os.system("mkdir -p $HOME/share")
+    os.system("mkdir -p $HOME/.ssh")
     print("end")
 
 

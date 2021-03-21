@@ -158,6 +158,14 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
         $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
         cur_step_wizard_cluster_config_prepare = "5";
+
+        // SSH KEY 준비 방법 표시
+        let radio_value = $('input[name=radio-ssh-key]:checked').val();
+        if (radio_value == "new") {
+            $('#div-accordion-ssh-key-description-pri').text("새로운 파일 사용");
+        }else {
+            $('#div-accordion-ssh-key-description-pub').text("기존 파일 사용");
+        }
     }
     else if(cur_step_wizard_cluster_config_prepare == "5") {
         $('#div-modal-wizard-cluster-config-finish').show();
@@ -248,10 +256,25 @@ $('#form-radio-ssh-key-new').on('click', function(){
 });
 
 // SSH Key 준비 방법 중 기존 파일 사용을 클릭하는 경우 SSH Key 파일 항목을 활성화함
-$('#form-radio-ssh-key-file').on('click', function(){
+$('#form-radio-ssh-key-file').on('click', function () {
     $('#form-input-cluster-config-ssh-key-pri-file').attr('disabled', false);
     $('#form-input-cluster-config-ssh-key-pub-file').attr('disabled', false);
+    $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', true);
 });
+
+/*
+// validation
+// SSH Key 준비 방법 중 기존 파일을 사용하는 경우 파일 선택이 완료되어야 다음 버튼 활성화
+$('input[name=form-input-cluster-config-ssh-key-file]').change(function(){
+    let ssh_key_input_pri = $('#form-input-cluster-config-ssh-key-pri-file').val();
+    let ssh_key_input_pub = $('#form-input-cluster-config-ssh-key-pub-file').val();
+    if (ssh_key_input_pri == "" || ssh_key_input_pub == "") {
+        $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', true);
+    } else {
+        $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
+    }
+});
+*/
 
 // Host 파일 준비 방법 중 신규생성을 클릭하는 경우 Host 프로파일 디비전을 보여주고 Hosts 파일 디비전은 숨긴다.
 $('#form-radio-hosts-new').on('click', function(){
@@ -324,18 +347,26 @@ $('#button-accordion-timeserver').on('click', function(){
 });
 
 // 파일 선택 시 sshkey 생성 및 업로드 실행
-let input_pri = document.querySelector('#form-input-cluster-config-ssh-key-pri-file');
-let input_pub = document.querySelector('#form-input-cluster-config-ssh-key-pub-file');
-fileReaderFunc(input_pri);
-fileReaderFunc(input_pub);
+let ssh_key_input_pri = document.querySelector('#form-input-cluster-config-ssh-key-pri-file');
+let ssh_key_input_pub = document.querySelector('#form-input-cluster-config-ssh-key-pub-file');
+fileReaderFunc(ssh_key_input_pri);
+fileReaderFunc(ssh_key_input_pub);
 
-
-// 파일 보여주기
-// SSH KEY 보여주기
 
 // 설정확인에서 버튼 클릭 시 파일 읽어오기
+// SSH KEY 보여주기
 $('#button-accordion-ssh-key').on('click', function(){
     readFile();
+});
+
+// 완료 단계에서 파일 다운로드 링크 생성
+$('a[name=span-modal-wizard-cluster-config-finish-sshkey-download]').on('click', function (){
+    let pri_ssh_key_text = $('#div-textarea-cluster-config-ssh-key-pri-file').text();
+    let pub_ssh_key_text = $('#div-textarea-cluster-config-ssh-key-pub-file').text();
+    let pri_ssh_key_download_link_id = 'span-modal-wizard-cluster-config-finish-pri-sshkey-download';
+    let pub_ssh_key_download_link_id = 'span-modal-wizard-cluster-config-finish-pub-sshkey-download';
+    $.when(readFile()).done(saveAsFile(pri_ssh_key_download_link_id, pri_ssh_key_text, "ablecloud"),
+        saveAsFile(pub_ssh_key_download_link_id, pub_ssh_key_text, "ablecloud.pub"))
 });
 
 
@@ -420,23 +451,31 @@ function writeFile(result, ssh_key_type) {
  * Meathod Name : readFile
  * Date Created : 2021.03.17
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 SSHKey를 업로드하는 함수
+ * Description : 클러스터 준비 마법사에서 설정확인을 위해 로컬에 존재하는 SSHKey를 읽어오는 함수
  * Parameter : 없음
  * Return  : 없음
  * History  : 2021.03.11 최초 작성
 **/
 
 function readFile() {
-        cockpit.file("/root/share/ablecloud").read()
-            .done(function (tag) {
-                console.log(tag);
-                $('#div-textarea-cluster-config-ssh-key-pri-file').text(tag);
-            })
-            .fail(function (error) {});
-        /*cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "readPub"])
-        cockpit.file("/root/.ssh/ablecloud.pub").read()
-            .done(function (tag) {})
-            .fail(function (error) {});*/
+    // 개인키 읽어오기
+    cockpit.file("/root/.ssh/ablecloud").read()
+        .done(function (tag) {
+            console.log(tag);
+            // ssh_key_textarea에 텍스트 삽입
+            $('#div-textarea-cluster-config-ssh-key-pri-file').text(tag);
+        })
+        .fail(function (error) {
+        });
+    // 공개키 읽어오기
+    cockpit.file("/root/.ssh/ablecloud.pub").read()
+        .done(function (tag) {
+            console.log(tag);
+            // ssh_key_textarea에 텍스트 삽입
+            $('#div-textarea-cluster-config-ssh-key-pub-file').text(tag);
+        })
+        .fail(function (error) {
+        });
 }
 
 
@@ -455,20 +494,24 @@ function fileReaderFunc(input) {
         try {
             let fileList = input.files || event.target.files;
             let file = fileList[0];
-            // 파일 확장자 체크 (이미지 파일 업로드 제한)
-            let fileName = fileList[0].name;
-            fileExpentionChecker(fileName);
-
+            // id
+            let ssh_key_type = input.getAttribute('id');
             if ($(input).val() != "") {
-                // FileList
-                let reader = new FileReader();
-                reader.onload = function (progressEvent) {
-                    console.log(progressEvent.target.result);
-                    let result = progressEvent.target.result;
-                    let ssh_key_type = input.getAttribute('id');
-                    writeFile(result, ssh_key_type);
-                };
-                reader.readAsText(file);
+                let fileName = fileList[0].name;
+                // 파일 확장자 체크
+                if (fileExtensionChecker(fileName) != false) {
+                    // FileList
+                    let reader = new FileReader();
+                    reader.onload = function (progressEvent) {
+                        console.log(progressEvent.target.result);
+                        let result = progressEvent.target.result;
+                        writeFile(result, ssh_key_type);
+                    };
+                    reader.readAsText(file);
+                } else {
+                    // 내용 초기화
+                    $("#" + ssh_key_type).val("");
+                }
             }
         } catch (err) {
             console.error(err);
@@ -478,32 +521,37 @@ function fileReaderFunc(input) {
 
 
 /**
- * Meathod Name : fileReaderFunc
+ * Meathod Name : fileExtensionChecker
  * Date Created : 2021.03.19
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 파일을 선택할 때 선택자(ID)로 확장자를 체크하는 함수
- * Parameter : id
- * Return  : 없음
+ * Description : 클러스터 준비 마법사에서 파일을 선택할 때 확장자를 체크하는 함수
+ * Parameter : fileName
+ * Return  : true, false
  * History  : 2021.03.19 최초 작성
 **/
-async function fileNameExtensionChecker(id) {
-    // 파일 업로드 확장자 체크
-    alert("wwwwwww");
-    if ($('#'+id).val() != "") {
-        var ext = $('#docufile').val().split('.').pop().toLowerCase();
-        if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'doc', 'docx', 'xls', 'xlsx', 'hwp', 'pub']) == -1) {
-            alert('등록 할수 없는 파일명입니다.');
-            $("#file_text").val(""); // input file 파일명을 다시 지워준다.
-            return;
-        }
-    }
+
+function fileExtensionChecker(fileName){
+    let ext = fileName.split('.').pop().toLowerCase();
+    if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'doc', 'docx', 'xls', 'xlsx', 'hwp']) != -1) {
+        alert('키 파일만 업로드할 수 있습니다.');
+        return false;
+    };
 }
 
+/**
+ * Meathod Name : saveAsFile
+ * Date Created : 2021.03.21
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 파일을 저장할 때 사용하는 함수
+ * Parameter : id, str, filename
+ * Return  : 없음
+ * History  : 2021.03.21 최초 작성
+**/
 
-function fileExpentionChecker(fileName){
-    let ext = fileName.split('.').pop().toLowerCase();
-    if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
-        alert('gif,png,jpg,jpeg 파일만 업로드 할수 있습니다.');
-        return false;
-    }
+function saveAsFile(id, str, filename) {
+    $('#'+id).attr({
+        target: '_blank',
+        href: 'data:attachment/text,' + encodeURI(str),
+        download: filename
+    });
 }
