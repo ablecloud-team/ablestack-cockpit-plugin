@@ -8,15 +8,14 @@ Copyright (c) 2021 ABLECLOUD Co. Ltd
 # -*- coding: utf-8 -*-
 
 import os
+import re
 import json
 import socket
 import logging
 import argparse
+from subprocess import check_output
 from ablestack import *
 
-env = os.environ.copy()
-env['LANG'] = "en_US.utf-8"
-env['LANGUAGE'] = "en"
 
 # 함수명 : createArgumentParser
 # 주요 기능 : 입력된 argument를 파싱하여 dictionary 처럼 사용하게 만들어 주는 parser 생성
@@ -25,7 +24,7 @@ def createArgumentParser():
     tmp_parser = argparse.ArgumentParser(description='스토리지 및 클라우드 관련 연결 주소를 생성하는 프로그램',
                                          epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
 
-    tmp_parser.add_argument('action', choices=['cloudCenterVm', 'cloudCenter', 'storageCenterVm', 'storageCenter'], help="Create storage and cloud related connection addresses")
+    tmp_parser.add_argument('action', choices=['cloudCenterVm', 'cloudCenter', 'storageCenterVm', 'storageCenter'], help="Create storage and cloud center related connection addresses")
     tmp_parser.add_argument("-v", "--verbose", action='count', default=0, help="increase output verbosity")
     tmp_parser.add_argument("-H", "--Human", action='store_const', dest='H', const=True, help="Human readable")
     tmp_parser.add_argument("-V", "--Version", action='version', version="%(prog)s 1.0")
@@ -36,12 +35,13 @@ def createArgumentParser():
 # 함수명 : cloudCenter
 # 주요 기능 : 클라우드센터 및 가상머신 연결 주소 생성 
 def cloudCenter(action, H=False):
-    
+
     ip = socket.gethostbyname('ccvm-mngt')
 
     if action == 'cloudCenter':
         # 클라우드센터 가상머신 
         value = 'http://'+ip+':8080'
+
     else:
         # 클라우드센터 (port fix 필요)
         value = 'https://'+ip+':9090'
@@ -58,15 +58,18 @@ def storageCenter(action, H=False):
 
     if action == 'storageCenter':
         # 스토리지센터 가상머신
-        # ceph -s details -f pretty-json 명령어 테스트 예정 (data.services.mgr 항목의 node명 으로 scvm의 ip 조회)
-        # ceph mgr services 명령어 테스트 예정 
-        node = "scvm1"
-        ip = socket.gethostbyname(node+'-pn')
-        value = 'https://'+ip+':8443'
+        mgr = check_output(['ceph', 'mgr', 'services'], universal_newlines=True)
+        mgr_json = json.loads(mgr)
+        mgr_re = re.compile('{}(.*){}'.format(re.escape('//'), re.escape(':')))
+        mgr_name = mgr_re.findall(mgr)
+        
+        ip = socket.gethostbyname(mgr_name[0])
+        value = mgr_json['dashboard'].replace(mgr_name[0], ip)
+
     else:
         # 스토리지센터
         num = socket.gethostname()[-1:]
-        ip = socket.gethostbyname('scvm'+num+'-pn')
+        ip = socket.gethostbyname('scvm'+num)
         value = 'https://'+ip+':9090'
 
     if H: 
@@ -79,7 +82,7 @@ def storageCenter(action, H=False):
 # 주요 기능 : 파라미터에 따른 함수 호출 
 def createAddressAction(action, H):
 
-    if action == 'cloudCenterVm' or action == 'cloudCenter':
+    if action == 'cloudCenterVm' or 'cloudCenter':
         return cloudCenter(action, H=H)
 
     else:
