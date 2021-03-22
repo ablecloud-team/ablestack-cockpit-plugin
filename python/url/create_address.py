@@ -82,12 +82,18 @@ def storageCenter(action, H=False):
 # 주요 기능 : 파라미터에 따른 함수 호출 
 def createAddressAction(action, H):
 
-    if action == 'cloudCenterVm' or 'cloudCenter':
+    if action == 'cloudCenterVm':
         return cloudCenter(action, H=H)
+
+    elif action == 'cloudCenter':
+        return cloudCenter(action, H=H)
+
+    elif action == 'stoargeCenter':
+        return storageCenter(action, H=H)
 
     else:
         return storageCenter(action, H=H)
-    
+
 
 if __name__ == '__main__':
 
