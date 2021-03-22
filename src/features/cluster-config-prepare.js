@@ -94,6 +94,13 @@ $('#nav-button-cluster-config-review').on('click', function(){
     $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
     cur_step_wizard_cluster_config_prepare = "5";
+
+    // 변경된 키 내용을 설정 확인에 반영
+    let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
+    putTextIntoTextarea(ssh_key_type);
+    // 변경된 hosts file 내용을 설정 확인에 반영
+    let host_file_type = $('input[name=radio-hosts-file]:checked').val();
+    putTextIntoTextarea(host_file_type);
 });
 
 $('#nav-button-cluster-config-finish').on('click', function(){
@@ -143,6 +150,14 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
         $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
         cur_step_wizard_cluster_config_prepare = "4";
+
+        // 변경된 키 내용을 설정 확인에 반영
+        let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
+        putTextIntoTextarea(ssh_key_type);
+        // 변경된 hosts file 내용을 설정 확인에 반영
+        let host_file_type = $('input[name=radio-hosts-file]:checked').val();
+        putTextIntoTextarea(host_file_type);
+
     }
     else if(cur_step_wizard_cluster_config_prepare == "4") {
         $('#div-modal-wizard-cluster-config-review').show();
@@ -176,7 +191,7 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
 
         // 완료 버튼을 누르면 선택한 내용대로 파일이 서버에 저장
         let radio_value = $('input[name=radio-ssh-key]:checked').val();
-        putTextIntoTextareaSshKey(radio_value);
+        putTextIntoTextarea(radio_value);
 
         let pri_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').text();
         let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').text();
@@ -342,37 +357,73 @@ $('#button-accordion-timeserver').on('click', function(){
     }
 });
 
-// ssh-key 클러스터 구성 준비 마법사가 시작되면 키를 생성하고 읽어와 hidden 처리된 textarea에 저장
+// ssh-key 클러스터 구성 준비 마법사가 시작되면 ssh key키를 생성하고 읽어와 hidden 처리된 textarea에 저장
 $('#button-open-modal-wizard-storage-cluster').on('click', function(){
     generateSshkey();
     readSshKeyFile();
 });
 
 // ssh-key 기존 파일 선택 시 hidden textarea 내용을 선택한 파일의 내용으로 변경
-$('input[name=form-input-cluster-config-ssh-key-file]').on('change', function(){
-    alert("asdasdasd");
+$('#form-input-cluster-config-ssh-key-pri-file').on('click', function(){
     let ssh_key_input_pri = document.querySelector('#form-input-cluster-config-ssh-key-pri-file');
-    let ssh_key_input_pub = document.querySelector('#form-input-cluster-config-ssh-key-pub-file');
     let ssh_key_textarea_existing_pri = "div-textarea-cluster-config-temp-existing-ssh-key-pri-file";
-    let ssh_key_textarea_existing_pub = "div-textarea-cluster-config-temp-existing-ssh-key-pub-file";
     fileReaderFunc(ssh_key_input_pri, ssh_key_textarea_existing_pri);
+});
+$('#form-input-cluster-config-ssh-key-pub-file').on('click', function(){
+    let ssh_key_input_pub = document.querySelector('#form-input-cluster-config-ssh-key-pub-file');
+    let ssh_key_textarea_existing_pub = "div-textarea-cluster-config-temp-existing-ssh-key-pub-file";
     fileReaderFunc(ssh_key_input_pub, ssh_key_textarea_existing_pub);
-
-
+});
+// ssh-key 기존 파일 선택 시 파일 선택 취소 시 hidden textarea 초기화
+$('#form-input-cluster-config-ssh-key-pri-file').on('change', function(){
+    if($(this).val() == ""){
+        $('#div-textarea-cluster-config-temp-existing-ssh-key-pri-file').text("");
+    }
+});
+$('#form-input-cluster-config-ssh-key-pub-file').on('change', function(){
+    if($(this).val() == ""){
+        $('#div-textarea-cluster-config-temp-existing-ssh-key-pub-file').text("");
+    }
+});
+// ssh-key input, hidden textarea 초기화
+$('input[name=radio-ssh-key]').on('click', function() {
+    if ($(this).val() == "new") {
+        $('#form-input-cluster-config-ssh-key-pri-file').val("");
+        $('#form-input-cluster-config-ssh-key-pub-file').val("");
+        $('#div-textarea-cluster-config-temp-existing-ssh-key-pri-file').text("");
+        $('#div-textarea-cluster-config-temp-existing-ssh-key-pub-file').text("");
+    }
 });
 
+// Hosts 기존 파일 선택 시 hidden textarea 내용을 선택한 파일의 내용으로 변경
+$('#form-input-cluster-config-hosts-file').on('click', function(){
+    let hosts_input = document.querySelector('#form-input-cluster-config-hosts-file');
+    let hosts_textarea_existing = "form-textarea-cluster-config-existing-host-profile";
+    fileReaderFunc(hosts_input, hosts_textarea_existing);
+});
+// Hosts 기존 파일 선택 시 파일 선택 취소 시 hidden textarea 초기화
+$('#form-input-cluster-config-hosts-file').on('change', function(){
+    if($(this).val() == ""){
+        $('#form-textarea-cluster-config-existing-host-profile').text("");
+    }
+});
 
 // 설정확인에서 버튼 클릭 시 파일 읽어오기
 // SSH KEY 준비 방식에 따라 키 내용 보여주기
 $('#button-accordion-ssh-key').on('click', function(){
     let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
-    putTextIntoTextareaSshKey(ssh_key_type);
+    putTextIntoTextarea(ssh_key_type);
+});
+// hosts 파일 준비 방식에 따라 내용 보여주기
+$('#button-accordion-hosts-file').on('click', function(){
+    let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
+    putTextIntoTextarea(hosts_file_type);
 });
 
 // 완료 단계에서 파일 다운로드 링크 생성
 $('a[name=span-modal-wizard-cluster-config-finish-sshkey-download]').on('click', function (){
     let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
-    putTextIntoTextareaSshKey(ssh_key_type);
+    putTextIntoTextarea(ssh_key_type);
 
     let pri_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').text();
     let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').text();
@@ -422,12 +473,29 @@ function resetClusterConfigWizard(){
  * Date Created : 2021.03.11
  * Writer  : 류홍욱
  * Description : 클러스터 준비 마법사에서 SSHKey를 생성하는 함수
- * Parameter : reader
+ * Parameter : 없음
  * Return  : 없음
  * History  : 2021.03.11 최초 작성
 **/
 
 function generateSshkey() {
+    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "geneSsh"])
+        .stream(console.log)
+        .then(console.log)
+        .catch(console.log);
+}
+
+/**
+ * Meathod Name : generateHostsFile
+ * Date Created : 2021.03.23
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 hosts 파일을 생성하는 함수
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.03.23 최초 작성
+**/
+
+function generateHostsFile() {
     cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "geneSsh"])
         .stream(console.log)
         .then(console.log)
@@ -463,6 +531,15 @@ function readSshKeyFile() {
         })
         .fail(function (error) {
         });
+/*    // hosts 읽어오기
+    cockpit.file("/etc/hosts").read()
+        .done(function (tag) {
+            console.log(tag);
+            // ssh_key_textarea에 텍스트 삽입
+            $('#div-textarea-cluster-config-temp-new-hosts-file').text(tag);
+        })
+        .fail(function (error) {
+        });*/
 }
 
 
@@ -482,7 +559,7 @@ function fileReaderFunc(input, textarea_type) {
             let fileList = input.files || event.target.files;
             let file = fileList[0];
             // id
-            let ssh_key_type = input.getAttribute('id');
+            let id = input.getAttribute('id');
             if ($(input).val() != "") {
                 let fileName = fileList[0].name;
                 // 파일 확장자 체크
@@ -497,7 +574,7 @@ function fileReaderFunc(input, textarea_type) {
                     reader.readAsText(file);
                 } else {
                     // input 박스 초기화
-                    $('#'+ssh_key_type).val("");
+                    $('#'+id).val("");
                 }
             }
         } catch (err) {
@@ -526,7 +603,7 @@ function fileExtensionChecker(fileName){
 }
 
 /**
- * Meathod Name : putTextIntoTextareaSshKey
+ * Meathod Name : putTextIntoTextarea
  * Date Created : 2021.03.22
  * Writer  : 류홍욱
  * Description : 클러스터 준비 마법사에서 설정에 따라 설정확인에 위치한 textarea에 text값을 넣는 함수
@@ -535,18 +612,25 @@ function fileExtensionChecker(fileName){
  * History  : 2021.03.22 최초 작성
 **/
 
-function putTextIntoTextareaSshKey(radio_value) {
+function putTextIntoTextarea(radio_value) {
     if (radio_value == "new") {
-        // SSH KEY 준비 방법 표시
-        $('#div-accordion-ssh-key-description-pri').text("새로운 파일 사용");
-
+        // SSH KEY 준비 방법 표시 및 값 설정
+        $('#div-accordion-ssh-key-description').text("새로운 파일 사용");
         $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').text($('#div-textarea-cluster-config-temp-new-ssh-key-pri-file').text());
         $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').text($('#div-textarea-cluster-config-temp-new-ssh-key-pub-file').text());
-    } else {
-        $('#div-accordion-ssh-key-description-pub').text("기존 파일 사용");
-
+        
+        // hosts file 준비 방법 표시 및 값 설정
+        $('#div-accordion-hosts-file-description').text("새로운 파일 사용");
+        $('#div-textarea-cluster-config-confirm-hosts-file').text($('#form-textarea-cluster-config-new-host-profile').text());
+    } else if (radio_value == "existing") {
+        // SSH KEY 준비 방법 표시 및 값 설정
+        $('#div-accordion-ssh-key-description').text("기존 파일 사용");
         $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').text($('#div-textarea-cluster-config-temp-existing-ssh-key-pri-file').text());
         $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').text($('#div-textarea-cluster-config-temp-existing-ssh-key-pub-file').text());
+
+        // hosts file 준비 방법 표시 및 값 설정
+        $('#div-accordion-hosts-file-description').text("기존 파일 사용");
+        $('#div-textarea-cluster-config-confirm-hosts-file').text($('#form-textarea-cluster-config-existing-host-profile').text());
     }
 }
 

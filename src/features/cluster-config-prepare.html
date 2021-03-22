@@ -140,11 +140,11 @@
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-new" name="radio-hosts-file" checked/>
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-new" name="radio-hosts-file" value="new" checked/>
                                                 <label class="pf-c-radio__label" for="form-radio-hosts-new">신규 생성</label>
                                             </div>
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-file" name="radio-hosts-file" />
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-file" name="radio-hosts-file" value="existing" />
                                                 <label class="pf-c-radio__label" for="form-radio-hosts-file">기존 파일 사용</label>
                                             </div>
                                         </div>
@@ -156,7 +156,7 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-host-profile" readonly></textarea>
+                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-new-host-profile" readonly></textarea>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-file">
@@ -167,6 +167,9 @@
                                         </div>
                                         <div class="pf-c-form__group-control">
                                             <input class="pf-c-form-control" style="width:60%" type="file" id="form-input-cluster-config-hosts-file" name="form-input-cluster-config-hosts-file"/>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-existing-host-profile" readonly></textarea>
                                         </div>
                                     </div>
                                 </section>
@@ -258,7 +261,7 @@
                                                     <span class="pf-c-description-list__text">SSH Key 준비 방법</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text" id="div-accordion-ssh-key-description-pri"></div>
+                                                    <div class="pf-c-description-list__text" id="div-accordion-ssh-key-description"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
@@ -298,7 +301,7 @@
                                                     <span class="pf-c-description-list__text">Hosts 파일 준비 방법</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">기존 파일 사용 (파일명 : hosts)</div>
+                                                    <div class="pf-c-description-list__text" id="div-accordion-hosts-file-description"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
@@ -307,7 +310,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text">Host 프로파일 내용</textarea>                                                     
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-hosts-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text">Host 프로파일 내용</textarea>
                                                     </div>
                                                 </dd>
                                             </div>
