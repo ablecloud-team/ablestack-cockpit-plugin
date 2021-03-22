@@ -215,10 +215,11 @@ class Pacemaker:
         res_active = res['active'] = soup_resource['active']
         res_blocked = res['blocked'] = soup_resource['blocked']
         res_failed = res['failed'] = soup_resource['failed']
+        res_role = res['role'] = soup_resource['role']
         res['resource'] = soup_resource['id']
         resource.append(res)
 
-        ret_val = {'clustered_host':node_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
+        ret_val = {'clustered_host':node_list, 'started':current_host, 'role':res_role, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
         ret = createReturn(code=200, val=ret_val)
         print(json.dumps(json.loads(ret), indent=4))
 
