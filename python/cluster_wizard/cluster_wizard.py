@@ -27,9 +27,9 @@ def makePub():
     os.system("touch $HOME/.ssh/ablecloud.pub")
     print("end")
 
-def makeShareFolder():
-    os.system("mkdir -p $HOME/.ssh")
-    print("end")
+# def makeShareFolder():
+#     os.system("mkdir -p $HOME/.ssh")
+#     print("end")
 
 
 if type == 'geneSsh':
@@ -37,8 +37,8 @@ if type == 'geneSsh':
 elif type == 'makePri':
     makePri()
 elif type == 'makePub':
-    makePri()
-elif type == 'makeShare':
-    makeShareFolder()
+    makePub()
+# elif type == 'makeShare':
+#     makeShareFolder()
 
 

@@ -91,6 +91,7 @@
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline">
                                             <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cluster-config-ssh-key-pri-file" name="form-input-cluster-config-ssh-key-file" disabled/>
+
                                         </div>
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-file">
@@ -101,6 +102,10 @@
                                         <div class="pf-c-form__group-control pf-m-inline">
                                             <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cluster-config-ssh-key-pub-file" name="form-input-cluster-config-ssh-key-file" disabled/>
                                         </div>
+                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-temp-new-ssh-key-pri-file" name="div-textarea-cluster-config-temp-new-ssh-key-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" ></textarea>
+                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-temp-new-ssh-key-pub-file" name="div-textarea-cluster-config-temp-new-ssh-key-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" ></textarea>
+                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-temp-existing-ssh-key-pri-file" name="div-textarea-cluster-config-temp-existing-ssh-key-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" ></textarea>
+                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-temp-existing-ssh-key-pub-file" name="div-textarea-cluster-config-temp-existing-ssh-key-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" ></textarea>
                                     </div>
                                 </section>
                             </form>
@@ -151,7 +156,7 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-host-profile"></textarea>
+                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-host-profile" readonly></textarea>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-file">
@@ -262,7 +267,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-ssh-key-pri-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text">SSH Key 내용</textarea>
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pri-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
                                                     </div>
                                                 </dd>
                                                 <dt class="pf-c-description-list__term">
@@ -270,7 +275,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-ssh-key-pub-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text">SSH Key 내용</textarea>
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pub-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -366,12 +371,12 @@
                             <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
                                 <span>
                                     -Private SSH Key 다운로드 :
-                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pri-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download" href="">파일을 재사용 하려면 클릭하십시오</a>
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pri-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                                 <br/>
                                 <span>
                                     -Public SSH Key 다운로드 :
-                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pub-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download" href="">파일을 재사용 하려면 클릭하십시오</a>
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pub-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                                 <br/>
                                 <span>
