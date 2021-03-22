@@ -23,6 +23,10 @@ for line in ret[2:-1]:
     }
     vms.append(vm)
 for vm in vms:
+    vm['ip'] = "Unknown"
+    vm['mac'] = "Unknown"
+    vm['nictype'] = "Unknown"
+    vm['nicbridge'] = "Unknown"
     ret = virsh_cmd('dominfo', domain=vm['Name'], _env=env).stdout.decode().splitlines()
     for line in ret[:-1]:
         items = line.split(":", maxsplit=1)
@@ -40,11 +44,16 @@ for vm in vms:
         ret = virsh_cmd('domifaddr', domain=vm['Name'], source='agent', interface='enp1s0',
                         full=True).stdout.decode().splitlines()
         for line in ret[:-1]:
-            if 'ipv4' in line:
+            if 'ipv4' in line and 'enp1s0' in line:
                 items = line.split(maxsplit=4)
                 vm['ip'] = items[3]
-    else:
-        vm['ip'] = "Unknown"
+                vm['mac'] = items[1]
+        ret = virsh_cmd('domiflist', domain=vm['Name']).stdout.decode().splitlines()
+        for line in ret[:-1]:
+            if vm['mac'] in line:
+                items = line.split()
+                vm['nictype'] = items[1]
+                vm['nicbridge'] = items[2]
 
 # virsh dominfo --domain djpark-dev-1
 # Id:             -

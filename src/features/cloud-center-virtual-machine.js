@@ -12,18 +12,16 @@ class CloudCenterVirtualMachine {
 
     }
     toBytes(size){
-        var s = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
-        var si = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
-        if(size.search('KB')) return parseFloat(size)*1000
-        else if(size.search('KiB')) return parseFloat(size)*1024
-        else if(size.search('MB')) return parseFloat(size)*1000*1000
-        else if(size.search('MiB')) return parseFloat(size)*1024*1024
-        else if(size.search('GB')) return parseFloat(size)*1000*1000*1000
-        else if(size.search('GiB')) return parseFloat(size)*1024*1024*1024
-        else if(size.search('TB')) return parseFloat(size)*1000*1000*1000*1000
-        else if(size.search('TiB')) return parseFloat(size)*1024*1024*1024*1024
-        else if(size.search('PB')) return parseFloat(size)*1000*1000*1000*1000*1000
-        else if(size.search('PiB')) return parseFloat(size)*1024*1024*1024*1024*1024
+        if( size.search('KB') >= 0) return parseFloat(size)*1000
+        else if( size.search('KiB') >= 0) return parseFloat(size)*1024
+        else if( size.search('MB') >= 0) return parseFloat(size)*1000*1000
+        else if( size.search('MiB') >= 0) return parseFloat(size)*1024*1024
+        else if( size.search('GB') >= 0) return parseFloat(size)*1000*1000*1000
+        else if( size.search('GiB') >= 0) return parseFloat(size)*1024*1024*1024
+        else if( size.search('TB') >= 0) return parseFloat(size)*1000*1000*1000*1000
+        else if( size.search('TiB') >= 0) return parseFloat(size)*1024*1024*1024*1024
+        else if( size.search('PB') >= 0) return parseFloat(size)*1000*1000*1000*1000*1000
+        else if( size.search('PiB') >= 0) return parseFloat(size)*1024*1024*1024*1024*1024
 
     }
     byteCalculation(bytes) {
@@ -80,7 +78,7 @@ class CloudCenterVirtualMachine {
         vms.forEach(function (vm) {
             if (vm.Name == ccvm_instance.Name) {
                 $("#div-cloud-vm-cpu-text").text(
-                    vm['CPU(s)'] + " vCore(N/A Socket, N/A Core)"
+                    vm['CPU(s)'] + " vCore"
                 );
                 $("#div-cloud-vm-memory-text").text(
                     ccvm_instance.byteCalculation(ccvm_instance.toBytes(vm['Max memory']))
@@ -89,7 +87,7 @@ class CloudCenterVirtualMachine {
                     ccvm_instance.byteCalculation(vm['DISK_CAP']) +" (" + ccvm_instance.byteCalculation(vm['DISK_PHY']) + " used)"
                 );
                 $("#div-cloud-vm-nic-type-text").text(
-                    "NIC Type : " + "N/A (Parent : N/A)"
+                    "NIC Type : " + vm['nictype'] + " (Parent : " + vm['nicbridge'] + ")"
                 );
                 $("#div-cloud-vm-nic-ip-text").text(
                     "IP : " + vm['ip']
