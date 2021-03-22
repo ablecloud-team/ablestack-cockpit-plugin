@@ -1,15 +1,18 @@
 // import spawn from "../../../base1/cockpit.js"
 
-let ccvm_instance = null
-
+var ccvm_instance;
 class CloudCenterVirtualMachine {
-
+    clusterdHost
+    runningHost
+    Name
     constructor() {
-        if (ccvm_instance) return ccvm_instance;
-        ccvm_instance = this;
-        ccvm_instance.runningHost = '10.10.1.1'
-        ccvm_instance.Name = 'centos8-ycyun-1'
-
+        if (ccvm_instance !== undefined) return ccvm_instance;
+        else {
+            ccvm_instance = this;
+            ccvm_instance.runningHost = '10.10.1.1'
+            ccvm_instance.clusterdHost = []
+            ccvm_instance.Name = 'centos8-ycyun-1'
+        }
     }
     toBytes(size){
         if( size.search('KB') >= 0) return parseFloat(size)*1000
@@ -72,7 +75,6 @@ class CloudCenterVirtualMachine {
                 "type": "dict"
             }
          */
-        console.log(obj)
         let status_span = $("#description-cloud-vm-status");
         let vms = obj
         vms.forEach(function (vm) {
@@ -102,6 +104,13 @@ class CloudCenterVirtualMachine {
                     let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'red', 'shut down');
                     status_span[0].children[0].replaceWith(a)
                 }
+                ccvm_instance.cpus=vm['CPU(s)']
+                ccvm_instance.mem=vm['Max memory']
+                ccvm_instance.disk_cap=vm['DISK_CAP']
+                ccvm_instance.disk_phy=vm['DISK_PHY']
+                ccvm_instance.ip=vm['ip'].split('/')[0]
+                $('#card-action-cloud-vm-change').attr('disabled', false);
+                $('#card-action-cloud-vm-connect').removeClass('pf-m-disabled')
             }
         })
     }
@@ -110,33 +119,15 @@ class CloudCenterVirtualMachine {
 
         console.log("ok: " + data)
         console.log("ok: " + message)
-        const obj = JSON.parse(data)
-        /*
-           {
-                "code": 200,
-                "val": {
-                    "clustered_host": [
-                        "ycyun-1"
-                    ],
-                    "started": "false",
-                    "active": "false",
-                    "blocked": "false",
-                    "failed": "false"
-                },
-                "name": "statusResource",
-                "type": "dict"
-            }
-         */
-        console.log(obj)
+        // if(data.search('Untrusted'))
         let status_span = $("#description-cloud-vm-status");
-        if (obj.code == 200) {
-            let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'green', 'test');
-            status_span[0].children[0].replaceWith(a)
-        }
+        let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', 'Disabled');
+        status_span[0].children[0].replaceWith(a)
+
     }
 
     checkPCSOK(data, message) {
-
+        ccvm_instance= new CloudCenterVirtualMachine()
         console.log("ok: " + data)
         console.log("ok: " + message)
         const obj = JSON.parse(data)
@@ -160,9 +151,13 @@ class CloudCenterVirtualMachine {
         if (obj.code == 200) {
             let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'green', 'test');
             status_span[0].children[0].replaceWith(a)
-            if (obj['started'] != undefined ){
-                ccvm_instance.runningHost = obj['started']
+            if (obj['val']['started'] != undefined ){
+                ccvm_instance.runningHost = obj['val']['started']
+                ccvm_instance.clusterdHost = obj['val']['clustered_host']
+                console.log(ccvm_instance)
             }
+        //for test
+            ccvm_instance.runningHost='10.10.1.1'
             cockpit.spawn([
                 '/root/virshlist.py',
                 // '/usr/sbin/ip', 'a'
@@ -205,4 +200,15 @@ class CloudCenterVirtualMachine {
         //  .stream(ccvm_instance.checkPCSStream)
 
     }
+
+    changeOffering(cpu, memory) {
+        ccvm_instance.clusterdHost.forEach(function (host){
+        cockpit.spawn(['/usr/bin/python3',
+            '/usr/share/cockpit/cockpit-plugin-ablestack/python/host/virshedit.py',
+            'edit', '--cpu', cpu, '--memory', memory, '--xml', '/root/test.xml'], {'host': host})
+            .then(ccvm_instance.checkPCSOK)
+        })
+    }
 }
+this.ccvm_instance = new CloudCenterVirtualMachine()
+ccvm_instance = this.ccvm_instance

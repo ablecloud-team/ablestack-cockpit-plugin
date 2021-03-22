@@ -9,8 +9,7 @@ import sys
 from ablestack import *
 import sh
 import os
-nmcli_cmd=sh.Command('/usr/bin/nmcli')
-ethtool=sh.Command('/usr/sbin/ethtool')
+import bs4
 
 env=os.environ.copy()
 env['LANG']="en_US.utf-8"
@@ -23,13 +22,16 @@ def createArgumentParser():
     """
     # 참조: https://docs.python.org/ko/3/library/argparse.html
     # 프로그램 설명
-    tmp_parser = argparse.ArgumentParser(description='NIC 목록을 출력하는 프로그',
+    tmp_parser = argparse.ArgumentParser(description='VM의 CPU와 Memory를 변경하는 프로그램',
                                          epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
 
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
 
     # 선택지 추가(동작 선택)
-    tmp_parser.add_argument('action', choices=['list', ], help="nic action")
+    tmp_parser.add_argument('action', choices=['edit', ], help="action")
+    tmp_parser.add_argument('--cpu', help="Number of vCPU")
+    tmp_parser.add_argument('--memory', help="Size of Memory")
+    tmp_parser.add_argument('--xml', help="xml file path")
 
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐)
@@ -47,50 +49,32 @@ def createArgumentParser():
     return tmp_parser
 
 
-def listNetworkInterface(H=False):
-    # output = nmcli_cmd('-c', 'no', '-f', 'TYPE,ACTIVE,DEVICE,STATE,SLAVE', 'con', 'show')
-    # output = nmcli_cmd('-c', 'no', '-f', 'ALL', 'con', 'show')
-    # outputs = output.splitlines()
-    #for out in outputs:
-    #    print(out.split())
+def editVMOffering(cpu, memory, xml='/root/text.xml', H=False):
+    soup = ""
+    with open(xml, 'rt') as fp:
+        soup = bs4.BeautifulSoup(fp, features='xml')
+    cpuitem = soup.select_one('vcpu')
+    memitem = soup.select_one('memory')
+    cmemitem = soup.select_one('currentMemory')
 
-    output = nmcli_cmd('-c', 'no', '-f', 'DEVICE,TYPE,STATE,CON-PATH', 'device', _env=env)
-    logger.debug(output.stdout.decode())
-    outputs = output.splitlines()
-    fields = outputs[0].split()
-    bridges=[]
-    others=[]
-    ethernets = []
-    for out in outputs[1:]:
-        fs = out.split()
-        item={}
-        for i in range(0,len(fs)-1):
-            item[fields[i]] = fs[i]
-        if 'bridge' in item['TYPE']:
-            bridges.append(item)
-        elif 'ether' in item['TYPE']:
-            fin = ethtool(i=item['DEVICE']).stdout.decode().splitlines()
-            for line in fin:
-                if "bus-info" in line:
-                    item['PCI']=line.split(' ')[1]
-                elif "driver" in line:
-                    item['DRIVER']=line.split(' ')[1]
-            ethernets.append(item)
-        else:
-            others.append(item)
+
+    cpuitem.string.replace_with(cpu)
+    memitem.string.replace_with(memory)
+    memitem['unit'] = 'GiB'
+    cmemitem.string.replace_with(memory)
+    cmemitem['unit'] = 'GiB'
+    logger.debug(soup.prettify())
+    with open(xml, "w", encoding='utf-8') as file:
+        file.write(soup.decode())
     item = {
-        'bridges': bridges,
-        'ethernets': ethernets,
-        'others': others
+        'cpu': cpu,
+        'memory': memory,
+        'xml': xml
     }
     if H:
         return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=item)))
     return createReturn(code=200, val=item)
 
-
-def nicAction(action, H):
-    if action == 'list':
-        return listNetworkInterface(H=H)
 
 
 if __name__ == '__main__':
@@ -99,8 +83,10 @@ if __name__ == '__main__':
     verbose = (5 - args.verbose) * 10
 
     # 로깅을 위한 logger 생성, 모든 인자에 default 인자가 있음.
-    logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR)
+    fverbose = verbose-40
+    if fverbose < 10: fverbose=10
+    logger = createLogger(verbosity=verbose, file_log_level=fverbose)
 
     # 실제 로직 부분 호출 및 결과 출력
-    ret = nicAction(args.action, H=args.H)
-    print(ret)
+    if args.action == 'edit':
+        print(editVMOffering(cpu=args.cpu, memory=args.memory, xml=args.xml, H=args.H))

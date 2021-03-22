@@ -408,11 +408,11 @@
                                                     </button>
                                                     <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-cloud-vm-status" id="dropdown-menu-cloud-vm-status">
                                                         <li>
-                                                            <button class="pf-c-dropdown__menu-item" type="button" disabled>클라우드센터VM 자원변경</button>
+                                                            <button class="pf-c-dropdown__menu-item" id="card-action-cloud-vm-change" type="button" disabled>클라우드센터VM 자원변경</button>
                                                         </li>
                                                         <li class="pf-c-divider" role="separator"></li>
                                                         <li>
-                                                            <a class="pf-c-dropdown__menu-item pf-m-disabled" href="#" aria-disabled="true" tabindex="-1">클라우드센터VM 연결</a>
+                                                            <a class="pf-c-dropdown__menu-item pf-m-disabled" id="card-action-cloud-vm-connect" href="#" aria-disabled="true" tabindex="-1">클라우드센터VM 연결</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -546,7 +546,7 @@
         <div class="pf-c-backdrop" id="div-modal-wizard-cloud-vm"></div>
 
         <!-- 모달 영역 끝  -->
-
+        <div class="pf-c-backdrop" id="div-change-modal-cloud-vm"></div>
         <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
         <script src="./src/features/cloud-center-virtual-machine.js"></script>
         <script src="./src/features/main.js"></script>
