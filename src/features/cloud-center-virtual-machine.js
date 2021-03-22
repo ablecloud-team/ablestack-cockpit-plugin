@@ -205,7 +205,7 @@ class CloudCenterVirtualMachine {
         ccvm_instance.clusterdHost.forEach(function (host){
         cockpit.spawn(['/usr/bin/python3',
             '/usr/share/cockpit/cockpit-plugin-ablestack/python/host/virshedit.py',
-            'edit', '--cpu', cpu, '--memory', memory, '--xml', '/root/test.xml'], {'host': host})
+            'edit', '--cpu', cpu.val(), '--memory', memory.val(), '--xml', '/root/test.xml'], {'host': host})
             .then(ccvm_instance.checkPCSOK)
         })
     }
