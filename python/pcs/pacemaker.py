@@ -171,25 +171,33 @@ class Pacemaker:
     def removeResource(self, resource_name):
         self.resource_name = resource_name
         
-        pcs('resource', 'cleanup', self.resource_name)
-        pcs('resource', 'disable', self.resource_name)
-        pcs('resource', 'remove', self.resource_name)
-        pcs('resource', 'refresh')
-        
-        ret = createReturn(code=200, val='remove')
-        print(json.dumps(json.loads(ret), indent=4))
+        try:
+            pcs('resource', 'cleanup', self.resource_name)
+            pcs('resource', 'disable', self.resource_name)
+            pcs('resource', 'remove', self.resource_name)
+            pcs('resource', 'refresh')
+            
+            ret = createReturn(code=200, val='remove')
+            print(json.dumps(json.loads(ret), indent=4))
+            
+        except:
+            ret = createReturn(code=400, val='resource not found.')
+            print(json.dumps(json.loads(ret), indent=4))
 
         return ret
     
     # 함수명 : destroyCluster
     # 주요 기능 : 현재 cluster를 삭제하는 기능
     def destroyCluster(self):
-        
-        pcs('cluster', 'destroy', '--all')
-        
-        ret = createReturn(code=200, val='destroy')
-        print(json.dumps(json.loads(ret), indent=4))
-
+        try:
+            pcs('cluster', 'destroy', '--all')
+            
+            ret = createReturn(code=200, val='destroy')
+            print(json.dumps(json.loads(ret), indent=4))
+        except:
+            ret = createReturn(code=400, val='cluster not found.')
+            print(json.dumps(json.loads(ret), indent=4))
+            
         return ret
     
     # 함수명 : statusResource
@@ -203,14 +211,24 @@ class Pacemaker:
         nodes = []
         node_list = []
         current_host = None
-
-        xml = pcs('status', 'xml').stdout.decode()
-        soup = BeautifulSoup(xml, 'lxml')
-        soup_nodes = soup.find('nodes').select('node')
-        soup_resource = soup.select_one(f'#{self.resource_name}')
-
-        if soup_resource['nodes_running_on'] == '1':
-            current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
+        
+        try:
+            xml = pcs('status', 'xml').stdout.decode()
+            soup = BeautifulSoup(xml, 'lxml')
+            soup_nodes = soup.find('nodes').select('node')
+            soup_resource = soup.select_one(f'#{self.resource_name}')
+        except:
+            ret = createReturn(code=400, val='cluster is not configured.')
+            print(json.dumps(json.loads(ret), indent=4))
+            sys.exit(1)
+            
+        try:
+            if soup_resource['nodes_running_on'] == '1':
+                current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
+        except:
+            ret = createReturn(code=400, val='resource not found.')
+            print(json.dumps(json.loads(ret), indent=4))
+            sys.exit(1)
  
         for soup_node in soup_nodes:
             node = {}
