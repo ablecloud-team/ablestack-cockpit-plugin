@@ -60,11 +60,16 @@ def storageCenter(action, H=False):
         # 스토리지센터
         mgr = check_output(['ceph', 'mgr', 'services'], universal_newlines=True)
         mgr_json = json.loads(mgr)
-        mgr_re = re.compile('{}(.*){}'.format(re.escape('//'), re.escape(':')))
-        mgr_name = mgr_re.findall(mgr)
         
-        ip = socket.gethostbyname(mgr_name[0])
-        value = mgr_json['dashboard'].replace(mgr_name[0], ip)
+        if "dashboard" in mgr_json:
+            mgr_re = re.compile('{}(.*){}'.format(re.escape('//'), re.escape(':')))
+            mgr_name = mgr_re.findall(mgr)
+        
+            ip = socket.gethostbyname(mgr_name[0])
+            value = mgr_json['dashboard'].replace(mgr_name[0], ip)
+
+        else: 
+            return createReturn(code=500, val="ceph mgr module is not activated.")
 
     else:
         # 스토리지센터 가상머신

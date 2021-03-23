@@ -19,5 +19,17 @@ python3 python/url/create_address.py storageCenterVm
 }
 ```
 
+python3 python/url/create_address.py storageCenter
+
+```json
+{
+  "code": 500,
+  "val": "ceph mgr module is not activated.",
+  "name": "storageCenter",
+  "type": "str"
+}
+```
+
+
 ##기타
 CCVM 의 cloudstack 포트는 8080으로 고정하며, https 로 구성한 경우에는 web.xml 파일에 automatic redirect 설정해야 함
