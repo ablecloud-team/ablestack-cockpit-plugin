@@ -39,12 +39,12 @@ def cloudCenter(action, H=False):
     ip = socket.gethostbyname('ccvm-mngt')
 
     if action == 'cloudCenter':
-        # 클라우드센터 가상머신 
+        # 클라우드센터 
         value = 'http://'+ip+':8080'
 
     else:
-        # 클라우드센터 (port fix 필요)
-        value = 'https://'+ip+':9090'
+        # 클라우드센터 가상머신
+        value = 'https://'+ip+':9000'
 
     if H: 
         return json.dumps(json.loads(createReturn(code=200, val=value, retname=action)), indent=4) 
