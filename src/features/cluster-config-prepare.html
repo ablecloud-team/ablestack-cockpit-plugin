@@ -84,7 +84,7 @@
                                     </div>
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-file">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-pub-file">
                                                 <span class="pf-c-form__label-text">SSH Key 개인키 파일</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
@@ -94,7 +94,7 @@
 
                                         </div>
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-file">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-pub-file">
                                                 <span class="pf-c-form__label-text">SSH Key 공개키 파일</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
@@ -165,7 +165,7 @@
                                     </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-profile">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-hosts-profile">
+                                            <label class="pf-c-form__label" for="form-textarea-cluster-config-new-host-profile">
                                                 <span class="pf-c-form__label-text">Hosts 프로파일</span>
                                             </label>
                                         </div>
@@ -208,46 +208,46 @@
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-ext" name="radio-timeserver" checked/>
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-ext" name="radio-timeserver" value="external" checked/>
                                                 <label class="pf-c-radio__label" for="form-radio-timeserver-ext">외부 시간서버</label>
                                             </div>
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-int" name="radio-timeserver" />
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-int" name="radio-timeserver" value="internal" />
                                                 <label class="pf-c-radio__label" for="form-radio-timeserver-int">로컬 시간서버</label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-timeserver1">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-time-server-ip-1">
                                                 <span class="pf-c-form__label-text">시간서버 #1</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-timeserver1" name="form-input-cluster-config-timeserver1"/>
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-1" name="form-input-cluster-config-timeserver1"/>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-timeserver2">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-time-server-ip-2">
                                                 <span class="pf-c-form__label-text">시간서버 #2</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true" id="span-timeserver2-required">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-timeserver1" name="form-input-cluster-config-timeserver1"/>
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-2" name="form-input-cluster-config-timeserver1"/>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-timeserver3">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-time-server-ip-3">
                                                 <span class="pf-c-form__label-text">시간서버 #3</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true" id="span-timeserver3-required">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-timeserver1" name="form-input-cluster-config-timeserver1"/>
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-3" name="form-input-cluster-config-timeserver1"/>
                                         </div>
                                     </div>
                                 </section>
@@ -276,7 +276,7 @@
                                                     <span class="pf-c-description-list__text">SSH Key 준비 방법</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text" id="div-accordion-ssh-key-description"></div>
+                                                    <div class="pf-c-description-list__text" id="div-accordion-ssh-key-type"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
@@ -316,12 +316,12 @@
                                                     <span class="pf-c-description-list__text">Hosts 파일 준비 방법</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text" id="div-accordion-hosts-file-description"></div>
+                                                    <div class="pf-c-description-list__text" id="div-accordion-hosts-file-type"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text" id="span-accordion-hosts-file-description">Hosts 프로파일</span>
+                                                    <span class="pf-c-description-list__text">Hosts 프로파일</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
@@ -348,7 +348,7 @@
                                                     <span class="pf-c-description-list__text">시간서버 종류</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">로컬 시간 서버</div>
+                                                    <div class="pf-c-description-list__text" id="div-accordion-timeserver-type"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
@@ -356,7 +356,7 @@
                                                     <span class="pf-c-description-list__text">시간서버 #1</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">192.168.0.11</div>
+                                                    <div class="pf-c-description-list__text" id="div-cluster-config-confirm-time-server-1"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
@@ -364,7 +364,7 @@
                                                     <span class="pf-c-description-list__text">시간서버 #2</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">192.168.0.12</div>
+                                                    <div class="pf-c-description-list__text" id="div-cluster-config-confirm-time-server-2"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
@@ -372,7 +372,7 @@
                                                     <span class="pf-c-description-list__text">시간서버 #3</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">192.168.0.13</div>
+                                                    <div class="pf-c-description-list__text" id="div-cluster-config-confirm-time-server-3"></div>
                                                 </dd>
                                             </div>
                                         </dl>

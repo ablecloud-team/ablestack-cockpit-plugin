@@ -101,6 +101,9 @@ $('#nav-button-cluster-config-review').on('click', function(){
     // 변경된 hosts file 내용을 설정 확인에 반영
     let host_file_type = $('input[name=radio-hosts-file]:checked').val();
     putHostsValueIntoTextarea(host_file_type);
+    // time server 내용을 설정 확인에 반영
+    let timeserver_type = $('input[name=radio-hosts-file]:checked').val();
+    putTimeServerValueIntoTextarea(timeserver_type);
 });
 
 $('#nav-button-cluster-config-finish').on('click', function(){
@@ -122,6 +125,9 @@ $('#nav-button-cluster-config-finish').on('click', function(){
     // 변경된 hosts file 내용을 설정 확인에 반영
     let host_file_type = $('input[name=radio-hosts-file]:checked').val();
     putHostsValueIntoTextarea(host_file_type);
+    // time server 내용을 설정 확인에 반영
+    let ntp_timeserver_type = $('input[name=radio-timeserver]:checked').val();
+    putTimeServerValueIntoTextarea(ntp_timeserver_type);
 });
 
 /* 마법사 사이드 메뉴 버튼 클릭 이벤트 처리 끝 */
@@ -164,6 +170,9 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
         // 변경된 hosts file 내용을 설정 확인에 반영
         let host_file_type = $('input[name=radio-hosts-file]:checked').val();
         putHostsValueIntoTextarea(host_file_type);
+        // time server 내용을 설정 확인에 반영
+        let timeserver_type = $('input[name=radio-timeserver]:checked').val();
+        putTimeServerValueIntoTextarea(timeserver_type);
 
     }
     else if(cur_step_wizard_cluster_config_prepare == "4") {
@@ -444,6 +453,7 @@ $('#form-input-cluster-config-hosts-file').on('change', function(){
     }
 });
 
+
 // 설정확인에서 버튼 클릭 시 파일 읽어오기
 // SSH KEY 준비 방식에 따라 키 내용 보여주기
 $('#button-accordion-ssh-key').on('click change', function(){
@@ -455,10 +465,10 @@ $('#button-accordion-hosts-file').on('click change', function(){
     let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
     putHostsValueIntoTextarea(hosts_file_type);
 });
-// npt 서버 종에 따라 내용 보여주기
-$('#button-accordion-hosts-file').on('click change', function(){
-    let ntp_type = $('input[name=form-radio-timeserver-ext]:checked').val();
-    putNtpValueIntoTextarea(ntp_type);
+// time server 종류에 따라 내용 보여주기
+$('#button-accordion-timeserver').on('click change', function(){
+    let timeserver_type = $('input[name=radio-timeserver]:checked').val();
+    putTimeServerValueIntoTextarea(timeserver_type);
 });
 
 // 완료 단계에서 파일 다운로드 링크 생성
@@ -658,12 +668,12 @@ function fileExtensionChecker(fileName){
 function putSshKeyValueIntoTextarea(radio_value) {
     if (radio_value == "new") {
         // SSH KEY 준비 방법 표시 및 값 설정
-        $('#div-accordion-ssh-key-description').text("새로운 파일 사용");
+        $('#div-accordion-ssh-key-type').text("신규 생성");
         $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val($('#div-textarea-cluster-config-temp-new-ssh-key-pri-file').val());
         $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val($('#div-textarea-cluster-config-temp-new-ssh-key-pub-file').val());
     } else if (radio_value == "existing") {
         // SSH KEY 준비 방법 표시 및 값 설정
-        $('#div-accordion-ssh-key-description').text("기존 파일 사용");
+        $('#div-accordion-ssh-key-type').text("기존 파일 사용");
         $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val($('#div-textarea-cluster-config-temp-existing-ssh-key-pri-file').val());
         $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val($('#div-textarea-cluster-config-temp-existing-ssh-key-pub-file').val());
     }
@@ -682,13 +692,36 @@ function putSshKeyValueIntoTextarea(radio_value) {
 function putHostsValueIntoTextarea(radio_value) {
     if (radio_value == "new") {
         // hosts file 준비 방법 표시 및 값 설정
-        $('#span-accordion-hosts-file-description').val("새로운 파일 사용");
+        $('#div-accordion-hosts-file-type').text("신규 생성");
         $('#div-textarea-cluster-config-confirm-hosts-file').val($('#form-textarea-cluster-config-new-host-profile').val());
     } else if (radio_value == "existing") {
         // hosts file 준비 방법 표시 및 값 설정
-        $('#span-accordion-hosts-file-description').val("기존 파일 사용");
+        $('#div-accordion-hosts-file-type').text("기존 파일 사용");
         $('#div-textarea-cluster-config-confirm-hosts-file').val($('#form-textarea-cluster-config-existing-host-profile').val());
     }
+}
+
+/**
+ * Meathod Name : putTimeServerValueIntoTextarea
+ * Date Created : 2021.03.24
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 설정에 따라 설정확인에 위치한 구역에 time server 내용을 넣는 함수
+ * Parameter : radio_value
+ * Return  : 없음
+ * History  : 2021.03.24 최초 작성
+**/
+
+function putTimeServerValueIntoTextarea(radio_value) {
+    if (radio_value == "external") {
+        // time server 준비 방법 표시 및 값 설정
+        $('#div-accordion-timeserver-type').text("외부 시간서버");
+    } else if (radio_value == "internal") {
+        // time server 준비 방법 표시 및 값 설정
+        $('#div-accordion-timeserver-type').text("로컬 시간서버");
+    }
+    $('#div-cluster-config-confirm-time-server-1').text($('#form-input-cluster-config-time-server-ip-1').val());
+    $('#div-cluster-config-confirm-time-server-2').text($('#form-input-cluster-config-time-server-ip-2').val());
+    $('#div-cluster-config-confirm-time-server-3').text($('#form-input-cluster-config-time-server-ip-3').val());
 }
 
 /**
