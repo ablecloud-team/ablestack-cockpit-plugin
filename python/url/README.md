@@ -7,7 +7,9 @@
 -H 옵션: 줄바꿈이 된 사람이 읽기 편한 json으로 출력
 ```
 
-##출력 예시
+##예시
+python3 python/url/create_address.py storageCenterVm
+
 ```json
 {
   "code": 200,
@@ -16,3 +18,6 @@
   "type": "str"
 }
 ```
+
+##기타
+CCVM 의 cloudstack 포트는 8080으로 고정하며, https 로 구성한 경우에는 web.xml 파일에 automatic redirect 설정해야 함
