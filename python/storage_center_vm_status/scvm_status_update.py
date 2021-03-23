@@ -27,10 +27,10 @@ def parseArgs():
     return parser.parse_args()
 
 #스토리지 VM 시작 
-def StartStroageVM():
+def startStroageVM():
         
     try:        
-        #run(['virsh', 'start', 'scvm1'], universal_newlines=True)
+        run(['virsh', 'start', 'jsdev'], universal_newlines=True)
 
         ret = createReturn(code=200, val='success', retname='Storage Center VM Start')
 
@@ -42,10 +42,10 @@ def StartStroageVM():
 
 
 #스토리지 VM 정지
-def StopStroageVM():  
+def stopStroageVM():  
         
     try:
-        #run(['virsh', 'start', 'scvm1'], universal_newlines=True)  
+        run(['virsh', 'start', 'jsdev'], universal_newlines=True)  
         
         ret = createReturn(code=200, val='success', retname='Storage Center VM Stop')
 
@@ -56,10 +56,10 @@ def StopStroageVM():
     return print(json.dumps(json.loads(ret), indent=4))
     
 #스토리지 VM 삭제
-def DeleteStroageVM():  
+def deleteStroageVM():  
         
     try:
-        #run(['virsh', 'destroy', 'scvm1'], universal_newlines=True)
+        run(['virsh', 'destroy', 'jsdev'], universal_newlines=True)
         
         ret = createReturn(code=200, val='success', retname='Storage Center VM Delete')
 
@@ -82,13 +82,13 @@ if __name__ == '__main__':
     #logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
     if args.action == 'start':        
-        ret = StartStroageVM();    
+        ret = startStroageVM();    
     
-    elif args.action == 'stop':
-        ret = StopStroageVM();    
+    elif args.action == 'shutdown':
+        ret = stopStroageVM();    
     
     elif args.action == 'delete':
-        ret = DeleteStroageVM();    
+        ret = deleteStroageVM();    
         
 
     #print(ret)
