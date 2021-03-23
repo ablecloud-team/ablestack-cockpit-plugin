@@ -84,7 +84,7 @@ $('#card-action-cloud-vm-change').on('click', function(){
 
 $('#card-action-cloud-vm-connect').on('click', function(){
     // 클라우드센터VM 연결
-    console.log('http://' + ccvm_instance.ip + ":9090");
+    window.open('http://' + ccvm_instance.ip + ":9090");
 });
 
 
