@@ -287,20 +287,6 @@ $('#form-radio-ssh-key-file').on('click', function () {
     $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 });
 
-/*
-// validation
-// SSH Key 준비 방법 중 기존 파일을 사용하는 경우 파일 선택이 완료되어야 다음 버튼 활성화
-$('input[name=form-input-cluster-config-ssh-key-file]').change(function(){
-    let ssh_key_input_pri = $('#form-input-cluster-config-ssh-key-pri-file').val();
-    let ssh_key_input_pub = $('#form-input-cluster-config-ssh-key-pub-file').val();
-    if (ssh_key_input_pri == "" || ssh_key_input_pub == "") {
-        $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', true);
-    } else {
-        $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
-    }
-});
-*/
-
 // Host 파일 준비 방법 중 신규생성을 클릭하는 경우 Host 프로파일 디비전을 보여주고 Hosts 파일 디비전은 숨긴다.
 $('#form-radio-hosts-new').on('click', function(){
     $('#div-form-hosts-profile').show();
@@ -592,15 +578,6 @@ function readSshKeyFile() {
         })
         .fail(function (error) {
         });
-/*    // hosts 읽어오기
-    cockpit.file("/etc/hosts").read()
-        .done(function (tag) {
-            console.log(tag);
-            // ssh_key_textarea에 텍스트 삽입
-            $('#div-textarea-cluster-config-temp-new-hosts-file').val(tag);
-        })
-        .fail(function (error) {
-        });*/
 }
 
 
