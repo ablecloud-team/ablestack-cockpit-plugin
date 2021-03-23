@@ -181,6 +181,17 @@ class Pacemaker:
 
         return ret
     
+    # 함수명 : destroyCluster
+    # 주요 기능 : 현재 cluster를 삭제하는 기능
+    def destroyCluster(self):
+                
+        pcs('cluster', 'destroy', '--all')
+        
+        ret = createReturn(code=200, val='destroy')
+        print(json.dumps(json.loads(ret), indent=4))
+
+        return ret
+    
     # 함수명 : statusResource
     # 주요 기능 : 현재 resource의 클러스터 호스트 정보, resource 리소스 실행 여부, block이나 fail 상태 여부 등을 조회하는 기능
     #          이 기능은 두개 이상의 리소스를 가진 클러스터에서도 조회 할 수 있음
