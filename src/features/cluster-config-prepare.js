@@ -97,10 +97,10 @@ $('#nav-button-cluster-config-review').on('click', function(){
 
     // 변경된 키 내용을 설정 확인에 반영
     let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
-    putTextIntoTextarea(ssh_key_type);
+    putSshKeyValueIntoTextarea(ssh_key_type);
     // 변경된 hosts file 내용을 설정 확인에 반영
     let host_file_type = $('input[name=radio-hosts-file]:checked').val();
-    putTextIntoTextarea(host_file_type);
+    putHostsValueIntoTextarea(host_file_type);
 });
 
 $('#nav-button-cluster-config-finish').on('click', function(){
@@ -115,6 +115,13 @@ $('#nav-button-cluster-config-finish').on('click', function(){
     $('#button-next-step-modal-wizard-cluster-config-prepare').html('완료');
 
     cur_step_wizard_cluster_config_prepare = "6";
+
+    // 변경된 키 내용을 설정 확인에 반영
+    let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
+    putSshKeyValueIntoTextarea(ssh_key_type);
+    // 변경된 hosts file 내용을 설정 확인에 반영
+    let host_file_type = $('input[name=radio-hosts-file]:checked').val();
+    putHostsValueIntoTextarea(host_file_type);
 });
 
 /* 마법사 사이드 메뉴 버튼 클릭 이벤트 처리 끝 */
@@ -153,10 +160,10 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
 
         // 변경된 키 내용을 설정 확인에 반영
         let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
-        putTextIntoTextarea(ssh_key_type);
+        putSshKeyValueIntoTextarea(ssh_key_type);
         // 변경된 hosts file 내용을 설정 확인에 반영
         let host_file_type = $('input[name=radio-hosts-file]:checked').val();
-        putTextIntoTextarea(host_file_type);
+        putHostsValueIntoTextarea(host_file_type);
 
     }
     else if(cur_step_wizard_cluster_config_prepare == "4") {
@@ -190,13 +197,20 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
         cur_step_wizard_cluster_config_prepare = "1";
 
         // 완료 버튼을 누르면 선택한 내용대로 파일이 서버에 저장
+        // SSH Key 파일
         let radio_value = $('input[name=radio-ssh-key]:checked').val();
-        putTextIntoTextarea(radio_value);
-
-        let pri_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').text();
-        let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').text();
+        putSshKeyValueIntoTextarea(radio_value);
+        let pri_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val();
+        let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val();
         let file_type = "ssh_key";
         writeFile(pri_ssh_key_text, pub_ssh_key_text, file_type);
+
+        // hosts 파일
+        radio_value = $('input[name=radio-hosts-file]:checked').val();
+        putSshKeyValueIntoTextarea(radio_value);
+        let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
+        file_type = "hosts_file";
+        writeFile(hosts_file_text, "", file_type);
     }
 });
 
@@ -292,11 +306,46 @@ $('#form-radio-hosts-new').on('click', function(){
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
 });
-
 // Host 파일 준비 방법 중 기존 파일 사용을 클릭하는 경우 Host 프로파일 디비전을 숨기고 Hosts 파일 디비전은 보여준다.
 $('#form-radio-hosts-file').on('click', function(){
     $('#div-form-hosts-profile').hide();
     $('#div-form-hosts-file').show();
+});
+// Host 파일 준비 중 Host 수를 편집하고 제한하는 기능
+$('#form-input-cluster-config-host-number-plus').on('click', function () {
+    let n = $('.bt_up').index(this);
+    let num = $("#form-input-cluster-config-host-number:eq(" + n + ")").val();
+    num = $("#form-input-cluster-config-host-number:eq(" + n + ")").val(num * 1 + 1);
+});
+$('#form-input-cluster-config-host-number-minus').on('click', function () {
+    let n = $('.bt_down').index(this);
+    let num = $("#form-input-cluster-config-host-number:eq(" + n + ")").val();
+    if (num > 1) {
+        num = $("#form-input-cluster-config-host-number:eq(" + n + ")").val(num * 1 - 1);
+        return;
+    }
+});
+$('#form-input-cluster-config-host-number').on('keyup', function () {
+    if(this.value <= 0){
+        this.value = 1;
+    }
+});
+// Host 파일 준비 중 신규생성을 선택한 경우 Host 수에 따라 텍스트 값 변경
+$('#form-input-cluster-config-host-number, #form-input-cluster-config-host-number-plus, #form-input-cluster-config-host-number-minus').on('change click', function () {
+    let current_val = $('#form-input-cluster-config-host-number').val();
+    let target_textarea = $('#form-textarea-cluster-config-new-host-profile');
+
+    target_textarea.text("");
+    target_textarea.append("10.10.0.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n");
+    for(let i=1; i<=current_val; i++){
+        target_textarea.append("10.10.0.1"+i+"\tablestack"+i+"\n");
+    }
+    for(let i=1; i<=current_val; i++){
+        target_textarea.append("10.10.0.10"+i+"\tscvm"+i+"-pn\n");
+    }
+    for(let i=1; i<=current_val; i++){
+        target_textarea.append("100.100.0.10"+i+"\tscvm"+i+"-cn\n");
+    }
 });
 
 // 외부 시간서버를 시간서버로 선택하면 시간서버 2, 3은 선택 입력으로 전환한다.
@@ -374,15 +423,16 @@ $('#form-input-cluster-config-ssh-key-pub-file').on('click', function(){
     let ssh_key_textarea_existing_pub = "div-textarea-cluster-config-temp-existing-ssh-key-pub-file";
     fileReaderFunc(ssh_key_input_pub, ssh_key_textarea_existing_pub);
 });
+
 // ssh-key 기존 파일 선택 시 파일 선택 취소 시 hidden textarea 초기화
 $('#form-input-cluster-config-ssh-key-pri-file').on('change', function(){
     if($(this).val() == ""){
-        $('#div-textarea-cluster-config-temp-existing-ssh-key-pri-file').text("");
+        $('#div-textarea-cluster-config-temp-existing-ssh-key-pri-file').val("");
     }
 });
 $('#form-input-cluster-config-ssh-key-pub-file').on('change', function(){
     if($(this).val() == ""){
-        $('#div-textarea-cluster-config-temp-existing-ssh-key-pub-file').text("");
+        $('#div-textarea-cluster-config-temp-existing-ssh-key-pub-file').val("");
     }
 });
 // ssh-key input, hidden textarea 초기화
@@ -390,8 +440,8 @@ $('input[name=radio-ssh-key]').on('click', function() {
     if ($(this).val() == "new") {
         $('#form-input-cluster-config-ssh-key-pri-file').val("");
         $('#form-input-cluster-config-ssh-key-pub-file').val("");
-        $('#div-textarea-cluster-config-temp-existing-ssh-key-pri-file').text("");
-        $('#div-textarea-cluster-config-temp-existing-ssh-key-pub-file').text("");
+        $('#div-textarea-cluster-config-temp-existing-ssh-key-pri-file').val("");
+        $('#div-textarea-cluster-config-temp-existing-ssh-key-pub-file').val("");
     }
 });
 
@@ -404,34 +454,45 @@ $('#form-input-cluster-config-hosts-file').on('click', function(){
 // Hosts 기존 파일 선택 시 파일 선택 취소 시 hidden textarea 초기화
 $('#form-input-cluster-config-hosts-file').on('change', function(){
     if($(this).val() == ""){
-        $('#form-textarea-cluster-config-existing-host-profile').text("");
+        $('#form-textarea-cluster-config-existing-host-profile').val("");
     }
 });
 
 // 설정확인에서 버튼 클릭 시 파일 읽어오기
 // SSH KEY 준비 방식에 따라 키 내용 보여주기
-$('#button-accordion-ssh-key').on('click', function(){
+$('#button-accordion-ssh-key').on('click change', function(){
     let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
-    putTextIntoTextarea(ssh_key_type);
+    putSshKeyValueIntoTextarea(ssh_key_type);
 });
 // hosts 파일 준비 방식에 따라 내용 보여주기
-$('#button-accordion-hosts-file').on('click', function(){
+$('#button-accordion-hosts-file').on('click change', function(){
     let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
-    putTextIntoTextarea(hosts_file_type);
+    putHostsValueIntoTextarea(hosts_file_type);
 });
 
 // 완료 단계에서 파일 다운로드 링크 생성
+// SSH Key 다운로드 링크 생성
 $('a[name=span-modal-wizard-cluster-config-finish-sshkey-download]').on('click', function (){
     let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
-    putTextIntoTextarea(ssh_key_type);
+    putSshKeyValueIntoTextarea(ssh_key_type);
 
-    let pri_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').text();
-    let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').text();
+    let pri_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val();
+    let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val();
     let pri_ssh_key_download_link_id = 'span-modal-wizard-cluster-config-finish-pri-sshkey-download';
     let pub_ssh_key_download_link_id = 'span-modal-wizard-cluster-config-finish-pub-sshkey-download';
 
     saveAsFile(pri_ssh_key_download_link_id, pri_ssh_key_text, "ablecloud");
     saveAsFile(pub_ssh_key_download_link_id, pub_ssh_key_text, "ablecloud.pub");
+});
+// Host File 다운로드 링크 생성
+$('#span-modal-wizard-cluster-config-finish-hosts-file-download').on('click', function (){
+    let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
+    putSshKeyValueIntoTextarea(hosts_file_type);
+
+    let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
+    let hosts_file_download_link_id = 'span-modal-wizard-cluster-config-finish-hosts-file-download';
+
+    saveAsFile(hosts_file_download_link_id, hosts_file_text, "hosts");
 });
 
 
@@ -518,7 +579,7 @@ function readSshKeyFile() {
         .done(function (tag) {
             console.log(tag);
             // ssh_key_textarea에 텍스트 삽입
-            $('#div-textarea-cluster-config-temp-new-ssh-key-pri-file').text(tag);
+            $('#div-textarea-cluster-config-temp-new-ssh-key-pri-file').val(tag);
         })
         .fail(function (error) {
         });
@@ -527,7 +588,7 @@ function readSshKeyFile() {
         .done(function (tag) {
             console.log(tag);
             // ssh_key_textarea에 텍스트 삽입
-            $('#div-textarea-cluster-config-temp-new-ssh-key-pub-file').text(tag);
+            $('#div-textarea-cluster-config-temp-new-ssh-key-pub-file').val(tag);
         })
         .fail(function (error) {
         });
@@ -536,7 +597,7 @@ function readSshKeyFile() {
         .done(function (tag) {
             console.log(tag);
             // ssh_key_textarea에 텍스트 삽입
-            $('#div-textarea-cluster-config-temp-new-hosts-file').text(tag);
+            $('#div-textarea-cluster-config-temp-new-hosts-file').val(tag);
         })
         .fail(function (error) {
         });*/
@@ -569,7 +630,7 @@ function fileReaderFunc(input, textarea_type) {
                     reader.onload = function (progressEvent) {
                         console.log(progressEvent.target.result);
                         let result = progressEvent.target.result;
-                        $('#'+textarea_type).text(result);
+                        $('#'+textarea_type).val(result);
                     };
                     reader.readAsText(file);
                 } else {
@@ -603,37 +664,50 @@ function fileExtensionChecker(fileName){
 }
 
 /**
- * Meathod Name : putTextIntoTextarea
+ * Meathod Name : putSshKeyValueIntoTextarea
  * Date Created : 2021.03.22
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 설정에 따라 설정확인에 위치한 textarea에 text값을 넣는 함수
+ * Description : 클러스터 준비 마법사에서 설정에 따라 설정확인에 위치한 textarea에 ssh-key 값을 넣는 함수
  * Parameter : radio_value
  * Return  : 없음
  * History  : 2021.03.22 최초 작성
 **/
 
-function putTextIntoTextarea(radio_value) {
+function putSshKeyValueIntoTextarea(radio_value) {
     if (radio_value == "new") {
         // SSH KEY 준비 방법 표시 및 값 설정
         $('#div-accordion-ssh-key-description').text("새로운 파일 사용");
-        $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').text($('#div-textarea-cluster-config-temp-new-ssh-key-pri-file').text());
-        $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').text($('#div-textarea-cluster-config-temp-new-ssh-key-pub-file').text());
-        
-        // hosts file 준비 방법 표시 및 값 설정
-        $('#div-accordion-hosts-file-description').text("새로운 파일 사용");
-        $('#div-textarea-cluster-config-confirm-hosts-file').text($('#form-textarea-cluster-config-new-host-profile').text());
+        $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val($('#div-textarea-cluster-config-temp-new-ssh-key-pri-file').val());
+        $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val($('#div-textarea-cluster-config-temp-new-ssh-key-pub-file').val());
     } else if (radio_value == "existing") {
         // SSH KEY 준비 방법 표시 및 값 설정
         $('#div-accordion-ssh-key-description').text("기존 파일 사용");
-        $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').text($('#div-textarea-cluster-config-temp-existing-ssh-key-pri-file').text());
-        $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').text($('#div-textarea-cluster-config-temp-existing-ssh-key-pub-file').text());
-
-        // hosts file 준비 방법 표시 및 값 설정
-        $('#div-accordion-hosts-file-description').text("기존 파일 사용");
-        $('#div-textarea-cluster-config-confirm-hosts-file').text($('#form-textarea-cluster-config-existing-host-profile').text());
+        $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val($('#div-textarea-cluster-config-temp-existing-ssh-key-pri-file').val());
+        $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val($('#div-textarea-cluster-config-temp-existing-ssh-key-pub-file').val());
     }
 }
 
+/**
+ * Meathod Name : putHostsValueIntoTextarea
+ * Date Created : 2021.03.22
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 설정에 따라 설정확인에 위치한 textarea에 hosts 값을 넣는 함수
+ * Parameter : radio_value
+ * Return  : 없음
+ * History  : 2021.03.22 최초 작성
+**/
+
+function putHostsValueIntoTextarea(radio_value) {
+    if (radio_value == "new") {
+        // hosts file 준비 방법 표시 및 값 설정
+        $('#span-accordion-hosts-file-description').val("새로운 파일 사용");
+        $('#div-textarea-cluster-config-confirm-hosts-file').val($('#form-textarea-cluster-config-new-host-profile').val());
+    } else if (radio_value == "existing") {
+        // hosts file 준비 방법 표시 및 값 설정
+        $('#span-accordion-hosts-file-description').val("기존 파일 사용");
+        $('#div-textarea-cluster-config-confirm-hosts-file').val($('#form-textarea-cluster-config-existing-host-profile').val());
+    }
+}
 
 /**
  * Meathod Name : saveAsFile
@@ -675,5 +749,11 @@ function writeFile(text1, text2, file_type) {
         cockpit.file("/root/.ssh/ablecloud.pub").replace(text2)
             .done(function (tag) {})
             .fail(function (error) {});
-        }
+    }else if (file_type == 'hosts_file'){
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "makeHosts"])
+        cockpit.file("/etc/hosts").replace(text1)
+            .done(function (tag) {})
+            .fail(function (error) {});
+    }
 }
+

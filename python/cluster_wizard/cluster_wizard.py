@@ -10,7 +10,6 @@
 import sys
 import os
 
-
 type = sys.argv[1]
 
 
@@ -23,13 +22,15 @@ def makePri():
     os.system("touch $HOME/.ssh/ablecloud")
     print("end")
 
+
 def makePub():
     os.system("touch $HOME/.ssh/ablecloud.pub")
     print("end")
 
-# def makeShareFolder():
-#     os.system("mkdir -p $HOME/.ssh")
-#     print("end")
+
+def makeHosts():
+    os.system("touch /etc/hosts")
+    print("end")
 
 
 if type == 'geneSsh':
@@ -38,7 +39,5 @@ elif type == 'makePri':
     makePri()
 elif type == 'makePub':
     makePub()
-# elif type == 'makeShare':
-#     makeShareFolder()
-
-
+elif type == 'makeHosts':
+    makeHosts()

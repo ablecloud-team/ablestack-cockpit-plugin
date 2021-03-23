@@ -43,7 +43,7 @@
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cluster-config-overview">
                             <div class="pf-c-content">
                                 <p>
-                                    ABLESTACK 클러스터 구성 준비 마법사는 클러스터를 자동으로 구성하고, 스토리지센터 및 클라우드센터를 구성하기 위해 필요한 다음의 정보를 입력받아 준비합니다.  
+                                    ABLESTACK 클러스터 구성 준비 마법사는 클러스터를 자동으로 구성하고, 스토리지센터 및 클라우드센터를 구성하기 위해 필요한 다음의 정보를 입력받아 준비합니다.
                                 </p>
                                 <ul>
                                     <li>모든 호스트 및 가상머신에서 사용자 인증을 위해 공통으로 사용할 SSH Key 정보</li>
@@ -51,7 +51,7 @@
                                     <li>호스트 및 가상머신의 시간 동기화를 위한 시간서버</li>
                                 </ul>
                                 <p>
-                                    필요한 정보를 먼저 준비하십시오. 정보가 준비되었다면 "다음" 버튼을 눌러 클러스터 구성 준비를 시작합니다.  
+                                    필요한 정보를 먼저 준비하십시오. 정보가 준비되었다면 "다음" 버튼을 눌러 클러스터 구성 준비를 시작합니다.
                                 </p>
                             </div>
                         </div>
@@ -59,8 +59,8 @@
                             <p>
                                 ABLESTACK의 클러스터를 구성하는 호스트 및 가상머신은 모든 명령을 SSH를 이용해 암호화 하여 전달합니다. <br/>
                                 <br/>
-                                원활한 SSH 연결 및 상호 인증을 위해 동일한 SSH Key 설정이 필요합니다. 
-                                마법사를 통해 새로운 SSH Key를 생성하여 사용하거나 기존의 SSH Key 파일을 사용하도록 설정할 수 있습니다. 
+                                원활한 SSH 연결 및 상호 인증을 위해 동일한 SSH Key 설정이 필요합니다.
+                                마법사를 통해 새로운 SSH Key를 생성하여 사용하거나 기존의 SSH Key 파일을 사용하도록 설정할 수 있습니다.
                             </p>
                             <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
                                 <section class="pf-c-form__section">
@@ -114,7 +114,7 @@
                             <p>
                                 클러스터를 구성하는 호스트 및 가상머신은 SSH 연결 및 고가용성 구성 등을 위해 호스트 프로파일을 생성하여 사용합니다. <br/>
                                 <br/>
-                                호스트 프로파일을 생성하기 위해서는 클러스터를 구성하는 호스트 및 가상머신에 대한 호스트명과 IP 정보를 미리 정의해야 합니다. 
+                                호스트 프로파일을 생성하기 위해서는 클러스터를 구성하는 호스트 및 가상머신에 대한 호스트명과 IP 정보를 미리 정의해야 합니다.
                                 호스트명 및 IP정보를 모두 사전 준비한 후 아래의 정보를 구성하십시오.
                             </p>
                             <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
@@ -127,7 +127,21 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline">
-                                            <input class="pf-c-form-control" style="width:15%" type="text" id="form-input-cluster-config-host-number" name="form-input-cluster-config-host-number"/>
+                                            <div class="pf-c-number-input">
+                                              <div class="pf-c-input-group">
+                                                <button class="pf-c-button pf-m-control" id="form-input-cluster-config-host-number-minus" type="button" aria-label="Minus">
+                                                  <span class="pf-c-number-input__icon">
+                                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                                  </span>
+                                                </button>
+                                                <input class="pf-c-form-control" type="number" value="1" id="form-input-cluster-config-host-number" name="form-input-cluster-config-host-number" aria-label="Number input" />
+                                                <button class="pf-c-button pf-m-control" id="form-input-cluster-config-host-number-plus" type="button" aria-label="Plus">
+                                                  <span class="pf-c-number-input__icon">
+                                                    <i class="fas fa-plus" aria-hidden="true"></i>
+                                                  </span>
+                                                </button>
+                                              </div>
+                                            </div>
                                             <span style="margin-top:10px">대</span>
                                         </div>
                                     </div>
@@ -156,7 +170,8 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-new-host-profile" readonly></textarea>
+                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-new-host-profile">10.10.0.10	ccvm-mngt&#10;192.168.0.10    ccvm-svc&#10;10.10.0.11	ablestack1&#10;10.10.0.101	scvm1-pn&#10;100.100.0.101	scvm1-cn&#10;
+                                            </textarea>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-file">
@@ -306,7 +321,7 @@
                                             </div>
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text">Hosts 프로파일</span>
+                                                    <span class="pf-c-description-list__text" id="span-accordion-hosts-file-description">Hosts 프로파일</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
@@ -384,7 +399,7 @@
                                 <br/>
                                 <span>
                                     - Hosts 프로파일 다운로드 : 
-                                    <a class="pf-c-button pf-m-link" href="https://172.16.0.30:9090/ablestack/hosts.in">파일을 재사용 하려면 클릭하십시오</a>
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-hosts-file-download" href="https://172.16.0.30:9090/ablestack/hosts.in">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                             </div>
                         </div>
