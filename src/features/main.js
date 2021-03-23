@@ -143,7 +143,7 @@ $('#button-open-modal-wizard-cloud-vm').on('click', function(){
                         //운영 상태조회
                         var msg ="";
                         if(step2!="running"){
-                            msg += 'warning','스토리지센터 VM 이 '+step2+' 상태입니다.\n'
+                            msg += 'warning','스토리지센터 가상머신이 '+step2+' 상태입니다.\n'
                             showRibbon('warning', msg);
                         }
                         if(step3!="HEALTH_OK"){
@@ -151,7 +151,7 @@ $('#button-open-modal-wizard-cloud-vm').on('click', function(){
                             showRibbon('warning', msg);
                         }
                         if(step4!="running"){
-                            msg += '클라우드센터 VM 이 '+step4+' 상태입니다.\n'
+                            msg += '클라우드센터 가상머신이 '+step4+' 상태입니다.\n'
                             showRibbon('warning', msg);
                         }
                         if(step5!="HEALTH_OK"){
