@@ -100,12 +100,10 @@ $(document).ready(function(){
 
         if(retVal.val.scvm_status == "running"){
             $("#scvm_css").attr('class','pf-c-label pf-m-green');
-            $("#scvm_icon").attr('class','fas fa-fw fa-check-circle');
-            
+            $("#scvm_icon").attr('class','fas fa-fw fa-check-circle');            
         }else{
             $("#scvm_css").attr('class','pf-c-label');
-            $("#scvm_icon").attr('class','fas fa-fw fa-times-circle');
-            
+            $("#scvm_icon").attr('class','fas fa-fw fa-times-circle');            
         }
 
         
@@ -138,8 +136,6 @@ $(document).ready(function(){
         $('#scvm_deploy_status_check').text("스토리지센터 가상머신이 배포되지 않았습니다.");
         $('#scvm_deploy_status_check').attr("style","color: var(--pf-global--danger-color--100)");
     });
-
-
 
 });
 
@@ -189,6 +185,13 @@ $('#menu-item-set-storage-center-vm-resource-update').on('click', function(){
 
 // 스토리지센터 클러스터 유지보수모드 설정 
 $('#menu-item-set-maintenance-mode, #menu-item-unset-maintenance-mode').on('click',function(){
+    //console.log(typeof sessionStorage.getItem("storage_cluster_maintenance_status"))
+    if(sessionStorage.getItem("storage_cluster_maintenance_status") == "true"){
+        $('#modal-description').html("<p>스토리지 클러스터를 유지보수 모드 해제 하시겠습니까?</p>");
+    }else{
+        $('#modal-description').html("<p>스토리지 클러스터를 유지보수 모드로 설정하시겠습니까?</p>");
+    }
+
     $('#div-modal-storage-cluster-maintenance-update').show();  
 
 });
