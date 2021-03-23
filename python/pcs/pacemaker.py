@@ -28,7 +28,7 @@ def parseArgs():
     parser = argparse.ArgumentParser(description='Pacemaker cluster for Cloud Center VM',
                                      epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
     
-    parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status', 'remove'], help='choose one of the actions')
+    parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status', 'remove', 'destroy'], help='choose one of the actions')
     parser.add_argument('--cluster', metavar='name', type=str, help='The name of the cluster to be created')
     parser.add_argument('--hosts', metavar='name', type=str, nargs='*', help='Hostnames to form a cluster')
     parser.add_argument('--resource', metavar='name', type=str, help='The name of the resource to be created')
@@ -181,6 +181,17 @@ class Pacemaker:
 
         return ret
     
+    # 함수명 : destroyCluster
+    # 주요 기능 : 현재 cluster를 삭제하는 기능
+    def destroyCluster(self):
+        
+        pcs('cluster', 'destroy', '--all')
+        
+        ret = createReturn(code=200, val='destroy')
+        print(json.dumps(json.loads(ret), indent=4))
+
+        return ret
+    
     # 함수명 : statusResource
     # 주요 기능 : 현재 resource의 클러스터 호스트 정보, resource 리소스 실행 여부, block이나 fail 상태 여부 등을 조회하는 기능
     #          이 기능은 두개 이상의 리소스를 가진 클러스터에서도 조회 할 수 있음
@@ -215,10 +226,11 @@ class Pacemaker:
         res_active = res['active'] = soup_resource['active']
         res_blocked = res['blocked'] = soup_resource['blocked']
         res_failed = res['failed'] = soup_resource['failed']
+        res_role = res['role'] = soup_resource['role']
         res['resource'] = soup_resource['id']
         resource.append(res)
 
-        ret_val = {'clustered_host':node_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
+        ret_val = {'clustered_host':node_list, 'started':current_host, 'role':res_role, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
         ret = createReturn(code=200, val=ret_val)
         print(json.dumps(json.loads(ret), indent=4))
 
