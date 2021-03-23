@@ -455,6 +455,11 @@ $('#button-accordion-hosts-file').on('click change', function(){
     let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
     putHostsValueIntoTextarea(hosts_file_type);
 });
+// npt 서버 종에 따라 내용 보여주기
+$('#button-accordion-hosts-file').on('click change', function(){
+    let ntp_type = $('input[name=form-radio-timeserver-ext]:checked').val();
+    putNtpValueIntoTextarea(ntp_type);
+});
 
 // 완료 단계에서 파일 다운로드 링크 생성
 // SSH Key 다운로드 링크 생성
