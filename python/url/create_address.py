@@ -57,7 +57,7 @@ def cloudCenter(action, H=False):
 def storageCenter(action, H=False):
 
     if action == 'storageCenter':
-        # 스토리지센터 가상머신
+        # 스토리지센터
         mgr = check_output(['ceph', 'mgr', 'services'], universal_newlines=True)
         mgr_json = json.loads(mgr)
         mgr_re = re.compile('{}(.*){}'.format(re.escape('//'), re.escape(':')))
@@ -67,7 +67,7 @@ def storageCenter(action, H=False):
         value = mgr_json['dashboard'].replace(mgr_name[0], ip)
 
     else:
-        # 스토리지센터
+        # 스토리지센터 가상머신
         num = socket.gethostname()[-1:]
         ip = socket.gethostbyname('scvm'+num)
         value = 'https://'+ip+':9090'
