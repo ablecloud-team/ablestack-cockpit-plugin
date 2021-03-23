@@ -32,9 +32,9 @@ def onMaintenance():
         
     try:
         
-        #run(['ceph', 'osd', 'set', 'noout'], universal_newlines=True)
-        #run(['ceph', 'osd', 'set', 'nobackfill'], universal_newlines=True)
-        #run(['ceph', 'osd', 'set', 'norecover'], universal_newlines=True)
+        run(['ceph', 'osd', 'set', 'noout'], universal_newlines=True)
+        run(['ceph', 'osd', 'set', 'nobackfill'], universal_newlines=True)
+        run(['ceph', 'osd', 'set', 'norecover'], universal_newlines=True)
 
         ret = createReturn(code=200, val='success', retname='Maintenance Mode On')         
 
@@ -50,9 +50,9 @@ def onMaintenance():
 def offMaintenance():  
         
     try:
-        #run(['ceph', 'osd', 'unset', 'noout'], universal_newlines=True)
-        #run(['ceph', 'osd', 'unset', 'nobackfill'], universal_newlines=True)
-        #run(['ceph', 'osd', 'unset', 'norecover'], universal_newlines=True)    
+        run(['ceph', 'osd', 'unset', 'noout'], universal_newlines=True)
+        run(['ceph', 'osd', 'unset', 'nobackfill'], universal_newlines=True)
+        run(['ceph', 'osd', 'unset', 'norecover'], universal_newlines=True)    
         
         ret = createReturn(code=200, val='success', retname='Maintenance Mode Off')
 
