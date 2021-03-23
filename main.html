@@ -24,7 +24,7 @@
                 <!-- ui 영역 시작 -->
                 <!-- ABLESTACK 상태 요약 및 바로가기 ALERT Ribbon 영역 시작 -->
                 <section class="pf-c-page__main-section pf-m-no-padding">
-                    <div class="pf-c-alert pf-m-warning" aria-label="Warning alert">
+                    <div class="pf-c-alert pf-m-warning" aria-label="Warning alert" id ="ribbon">
                         <div class="pf-c-alert__icon">
                             <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
                         </div>
@@ -33,7 +33,7 @@
                             <span class="pf-screen-reader">Warning alert:</span>ABLESTACK 가상어플라이언스 상태</strong>
                         </p>
                         <div class="pf-c-alert__description">
-                            <p id="vmStatus"></p>
+                            <p>ABLESTACK 스토리지센터 및 클라우드센터 VM이 배포되지 않았습니다.</p>
                         </div>
                         <div class="pf-c-alert__action-group">
                             <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-open-modal-wizard-storage-cluster">클러스터 구성 준비</button>
@@ -41,7 +41,7 @@
                             <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-open-modal-wizard-cloud-vm">클라우드센터 VM 배포</button>
                             <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-storage-center-dashboard">스토리지센터 대시보드 연결</button>
                             <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-cloud-center">클라우드센터 연결</button>
-                            <!-- <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-monitoring-center">모니터링센터 연결</button> -->
+                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-monitoring-center">모니터링센터 연결</button>
                         </div>
                         <button class="pf-c-button pf-m-plain" type="button" aria-label="Close" id="button-close">
                             <i class="fas fa-times" aria-hidden="true"></i>
