@@ -4,10 +4,16 @@ import sys
 import argparse
 import json
 import logging
+import os
 
+import subprocess
 from subprocess import check_output
-from subprocess import run
+from subprocess import call
 from ablestack import *
+
+env=os.environ.copy()
+env['LANG']="en_US.utf-8"
+env['LANGUAGE']="en"
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Storage Center VM action ',
@@ -28,14 +34,21 @@ def parseArgs():
 
 #스토리지 VM 시작 
 def startStroageVM():
-        
-    try:        
-        run(['virsh', 'start', 'jsdev'], universal_newlines=True)
 
-        ret = createReturn(code=200, val='success', retname='Storage Center VM Start')
+    try:
+        rc = call(['virsh start jsdev'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        
+        if rc == 0: # ok
+            retVal = True
+            retCode = 200
+        elif rc == 1: # not ok
+            retVal = False
+            retCode = 500
+
+        ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM Start')
 
     except Exception as e:
-        ret = createReturn(code=500, val='ERROR', retname='Storage Center VM Start Error')
+        ret = createReturn(code=500, val='virsh start error', retname='Storage Center VM Start Error')
         #print ('EXCEPTION : ',e)
                 
     return print(json.dumps(json.loads(ret), indent=4))
@@ -45,26 +58,48 @@ def startStroageVM():
 def stopStroageVM():  
         
     try:
-        run(['virsh', 'start', 'jsdev'], universal_newlines=True)  
+        rc = call(['virsh shutdown jsdev'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
         
-        ret = createReturn(code=200, val='success', retname='Storage Center VM Stop')
+        if rc == 0: # ok
+            retVal = True
+            retCode = 200
+        elif rc == 1: # not ok
+            retVal = False
+            retCode = 500
+         
+        
+        ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM Stop')
 
     except Exception as e:
-        ret = createReturn(code=500, val='ERROR', retname='Storage Center VM Stop Error')
+        ret = createReturn(code=retCode, val='virsh shutdown error', retname='Storage Center VM Stop Error')
         #print ('EXCEPTION : ',e)
     
     return print(json.dumps(json.loads(ret), indent=4))
     
 #스토리지 VM 삭제
-def deleteStroageVM():  
-        
+def deleteStroageVM():   
+
     try:
-        run(['virsh', 'destroy', 'jsdev'], universal_newlines=True)
+
+        rc = call(['virsh destroy jsdev'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        if rc == 0: # 
+            rc = call(['virsh undefine jsdev'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
+            if rc == 0: # ok
+                retVal = True
+                retCode = 200
+            elif rc == 1: # not ok
+                retVal = False
+                retCode = 500
+
+        elif rc == 1: # not ok
+            retVal = False
+            retCode = 500
+
         
-        ret = createReturn(code=200, val='success', retname='Storage Center VM Delete')
+        ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM Delete')
 
     except Exception as e:
-        ret = createReturn(code=500, val='ERROR', retname='Storage Center VM Delete Error')
+        ret = createReturn(code=500, val='virsh destroy, undefine error', retname='Storage Center VM Delete Error')
         #print ('EXCEPTION : ',e)
     
     return print(json.dumps(json.loads(ret), indent=4))
@@ -84,7 +119,7 @@ if __name__ == '__main__':
     if args.action == 'start':        
         ret = startStroageVM();    
     
-    elif args.action == 'shutdown':
+    elif args.action == 'stop':
         ret = stopStroageVM();    
     
     elif args.action == 'delete':
