@@ -7,6 +7,7 @@
 
 // 변수 선언
 var cur_step_wizard_cloud_vm = "1";
+var xml_create_cmd;
 
 var nic_json_string='{';
 nic_json_string += '  "code": 200,';
@@ -354,7 +355,7 @@ $('#button-next-step-modal-wizard-cloud-vm').on('click', function(){
         cur_step_wizard_cloud_vm = "7";
     }
     else if (cur_step_wizard_cloud_vm == "7") {
-        if(validateCloudCenterVm()){
+        if(true||validateCloudCenterVm()){
             deployCloudCenterVM();
     
             cur_step_wizard_cloud_vm = "8";
@@ -611,7 +612,166 @@ function deployCloudCenterVM() {
     $('#button-before-step-modal-wizard-cloud-vm').attr('disabled', true);
     $('#button-cancel-config-modal-wizard-cloud-vm').attr('disabled', false);
 
-    setTimeout(showDivisionCloudVMConfigFinish, 5000);
+
+    var host1_name = $('#form-input-cloud-vm-failover-cluster-host1-name').val();
+    var host2_name = $('#form-input-cloud-vm-failover-cluster-host2-name').val();
+    var host3_name = $('#form-input-cloud-vm-failover-cluster-host3-name').val();
+    var host_array = [host1_name,host2_name,host3_name];
+
+    //=========== 1. 클러스터 구성 host 네트워크 연결 테스트 ===========
+    var host_ping_test_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/host_ping_test.py', '-hns', host1_name, host2_name, host3_name];
+    cockpit.spawn(host_ping_test_cmd)
+        .then(function(data){
+            //결과 값 json으로 return
+            var ping_test_result = JSON.parse(data);
+            if(ping_test_result.code=="200"){ //정상
+
+                //=========== 2. 클러스터 구성 설정 초기화 작업 ===========
+                // 설정 초기화 ( 필요시 python까지 종료 )
+                // 클러스터 리소스 초기화
+                var reset_cloud_center_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/reset_cloud_center.py', '-hns', host1_name, host2_name, host3_name];
+                cockpit.spawn(reset_cloud_center_cmd)
+                    .then(function(data){
+                        //결과 값 json으로 return
+                        var result = JSON.parse(data);
+
+                        
+                    })
+                    .catch(function(data){
+                        alert("클러스터 리소스 삭제 실패 : "+data);
+                    });
+
+            } else {
+                alert(ping_test_result.val);
+            }
+        })
+        .catch(function(data){
+            alert("클러스터 구성할 host 연결 상태 확인 실패 : "+data);
+        });
+
+    //=========== 2. 클러스터 구성 설정 초기화 작업 ===========
+    // 설정 초기화 ( 필요시 python까지 종료 )
+    // 클러스터 리소스 초기화
+    /*
+    var pcs_resource_remove = ['python3', '/root/cockpit-smlee/python/pcs/main.py', 'status', '--resource', 'cloudcenter_res'];
+    cockpit.spawn(pcs_resource_remove)
+        .then(function(data){
+            //결과 값 json으로 return
+            var result = JSON.parse(data);
+            if(result.code=="200" || result.code=="400" ){
+                
+            }
+        })
+        .catch(function(data){
+            alert("클러스터 리소스 삭제 실패 : "+data);
+        });
+    
+    // 클러스터 초기화
+    var pcs_cluster_remove = ['python3','/root/cockpit-smlee/python/pcs/main.py', 'status', '--resource', 'cloudcenter_res'];
+    cockpit.spawn(pcs_cluster_remove)
+        .then(function(data){
+            //결과 값 json으로 return
+            var result = JSON.parse(data);
+            if(result.code=="200" || result.code=="400" ){
+                
+            }
+        })
+        .catch(function(data){
+            alert("클러스터 삭제 실패 : "+data);
+        });
+        */
+    
+    // ceph rbd 이미지 삭제
+
+    // cloudinit iso 삭제 (필요 여부 확인? 복제하면 됨?)
+
+    // vm xml 템플릿 삭제 (필요 여부 확인? 복제하면 됨?)
+
+    //=========== 3. cloudinit iso 파일 생성 ===========
+    // host 파일 /opt/ablestack/vm/ccvm/cloudinit 경로에 hosts, ssh key 파일 저장
+    for(var i = 0 ; i < host_array.length ; i++){
+        
+        //var create_hosts_file_cmd = ["touch /opt/ablestack/vm/ccvm/cloudinit/hosts"];
+        cockpit.file("/opt/ablestack/vm/ccvm/cloudinit/hosts",{host:host_array[i]}).replace("my new content\n")
+        //cockpit.spawn(create_hosts_file_cmd)
+        .then(function(data){
+            alert();
+
+        })
+        .catch(function(data){
+            alert(host_array[i]+" hosts 파일 저장 실패 : "+data);
+        });
+
+        /*
+        cockpit.spawn(xml_create_cmd)
+        .then(function(data){
+
+        })
+        .catch(function(data){
+            alert(host_array[i]+" ssh key 파일 저장 실패 : "+data);
+        });
+    */
+    }
+
+
+    // cloudinit iso 생성
+    
+
+    //=========== 4. 클라우드 센터 가상머신 구성 ===========
+    setProgressStep("span-progress-step4",1);
+    cockpit.spawn(xml_create_cmd)
+        .then(function(data){
+            //결과 값 json으로 return
+            var result = JSON.parse(data);
+            if(result.code=="200"){
+                setProgressStep("span-progress-step4",2);
+            }
+        })
+        .catch(function(data){
+            setProgressStep("span-progress-step4",3);
+            alert("클라우드센터 가상머신 XML 생성 실패 : "+data);
+        });
+
+    //secret key는 미리 호스트 /opt/ablestack/vm/secretkey에 secret.xml로 저장한다고 가정하고 생략
+
+    //secret key 명령 수행
+
+    //=========== 5. 클러스터 구성 ===========
+    //클러스터 생성
+    var pcs_config = ['python3', '/root/cockpit-smlee/python/pcs/main.py', 'config', '--cluster', 'cloudcenter_cluster', '--hosts', host1_name, host2_name, host3_name ];
+    cockpit.spawn(pcs_config)
+        .then(function(data){
+            //결과 값 json으로 return
+            var result = JSON.parse(data);
+            if(result.code=="200"){
+                
+            }
+        })
+        .catch(function(data){
+            alert("클러스터 생성 실패 : "+data);
+        });
+
+    //=========== 6. 클라우드 센터 가상머신 배포 =========== 
+    //리소스 생성
+    var pcs_create = ['python3', '/root/cockpit-smlee/python/pcs/main.py', 'create', '--resource', 'cloudcenter_res', '--xml', '/opt/ablestack/vm/ccvm/ccvm.xml'];
+    cockpit.spawn(pcs_create)
+        .then(function(data){
+            //결과 값 json으로 return
+            var result = JSON.parse(data);
+            if(result.code=="200"){
+                
+            }
+        })
+        .catch(function(data){
+            alert("클러스터 리소스 생성 실패 : "+data);
+        });
+    
+    // 3대의 host의 '/opt/ablestack/vm/ccvm/ccvm.xml'에 cloudinit 부분 삭제 또는 동일한 iso 복제
+
+    // 클라우드센터 가상머신 mngt ip로 ping 테스트 작업 완료여부 판단.
+
+    // showDivisionCloudVMConfigFinish();
+    
 }
 
 /**
@@ -758,6 +918,9 @@ function setCcvmSshKeyInfo(ssh_key){
  * History  : 2021.03.18 최초 작성
  */
 function setCcvmReviewInfo(){
+
+    //클라우드센터 가상머신 XML 생성 커맨드 기본 텍스트
+    xml_create_cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/create_ccvm_xml.py"];
     
     //-----장애조치 클러스터 설정-----
     //클러스터 호스트1, 호스트2, 호스트3 이름
@@ -790,6 +953,7 @@ function setCcvmReviewInfo(){
     if(cpu == '') {
         $('#span-cloud-vm-cpu-core').text("미입력");
     } else {
+        xml_create_cmd.push("-c",cpu);
         $('#span-cloud-vm-cpu-core').text(cpu_text);
     }
 
@@ -800,6 +964,7 @@ function setCcvmReviewInfo(){
     if(memory == '') {
         $('#span-cloud-vm-memory').text("미입력");
     } else {
+        xml_create_cmd.push("-m",memory);
         $('#span-cloud-vm-memory').text(memory_txt);
     }
     
@@ -820,6 +985,7 @@ function setCcvmReviewInfo(){
     if(mngt_nic == '') {
         $('#span-cloud-vm-mgmt-nic-bridge').text("미입력");
     } else {
+        xml_create_cmd.push("-mnb",mngt_nic);
         $('#span-cloud-vm-mgmt-nic-bridge').text(mngt_nic_txt);
     }
 
@@ -830,6 +996,7 @@ function setCcvmReviewInfo(){
         if(svc_nic == '') {
             $('#span-cloud-vm-svc-nic-bridge').text("미입력");
         } else {
+            xml_create_cmd.push("-snb",svc_nic);
             $('#span-cloud-vm-svc-nic-bridge').text(svc_nic_txt);
         }   
     } else {
@@ -984,7 +1151,6 @@ function validateCloudCenterVm(){
 
     return valicateCheck;
 }
-
 
 /**
  * Meathod Name : checkValueNull

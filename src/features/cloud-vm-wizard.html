@@ -228,9 +228,9 @@
                                             <div class="pf-c-form__group-control">
                                                 <select class="pf-c-form-control" id="form-select-cloud-vm-compute-memory" name="form-select-cloud-vm-compute-memory" style="width:40%;">
                                                     <option value="" selected>선택하십시오</option>
-                                                    <option value="16">8 GiB</option>
-                                                    <option value="32">16 GiB</option>
-                                                    <option value="64">32 GiB</option>
+                                                    <option value="8">8 GiB</option>
+                                                    <option value="16">16 GiB</option>
+                                                    <option value="32">32 GiB</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -717,16 +717,71 @@
                             <p>
                                 클라우드센터 가상머신을 배포 중입니다. 전체 00단계 중 00단계 진행 중입니다.  
                             </p>
+
                             <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
-                                <span class="pf-c-label pf-m-blue">
+                                <span class="pf-c-label pf-m-blue" id="span-progress-step1">
                                     <span class="pf-c-label__content">
                                         <span class="pf-c-label__icon">
                                             <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
-                                        </span>준비중
+                                        </span><p>준비중</p>
                                     </span>
                                 </span>
-                                <span class="pf-c-label__content" style="margin-left:4px">가상머신 설정 파일 생성</span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성 host 네트워크 연결 테스트</span>
                             </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-progress-step2">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성 설정 초기화 작업</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-progress-step3">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">cloudinit iso 파일 생성</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-progress-step4">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클라우드 센터 가상머신 구성</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-progress-step5">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-progress-step6">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클라우드 센터 가상머신 배포</span>
+                            </div>
+
+
+
+                            <!--
                             <div class="pf-c-content" style="margin-top:15px;margin-left:15px">
                                 <span class="pf-c-label pf-m-green">
                                     <span class="pf-c-label__content">
@@ -758,6 +813,10 @@
                                 <span class="pf-c-label__content" style="margin-left:4px">클라우드센터 가상머신 설정</span>
                             </div>
                         </div>
+                        -->
+
+
+
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-finish">
                             <div class="pf-c-content">
                                 <p>

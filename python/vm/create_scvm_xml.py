@@ -113,10 +113,9 @@ def createScvmXml(args):
                         lpl_txt = ""
                         num = 0
                         for lun in args.lun_passthrough_list:
-                            lpl_txt += "\t\t<disk type='file' device='disk'>\n"
+                            lpl_txt += "\t\t<disk type='block' device='lun'>\n"
                             lpl_txt += "\t\t\t<driver name='qemu' type='raw'/>\n"
                             lpl_txt += "\t\t\t<source file='" + lun + "'/>\n"
-                            lpl_txt += "\t\t\t<backingStore/>\n"
                             lpl_txt += "\t\t\t<target dev='sd"+ alphabet[num] +"' bus='scsi'/>\n"
                             lpl_txt += "\t\t\t<alias name='scsi0-0-0-"+ str(num) +"'/>\n"
                             lpl_txt += "\t\t\t<address type='drive' controller='0' bus='0' target='0' unit='"+ str(num) +"'/>\n"
