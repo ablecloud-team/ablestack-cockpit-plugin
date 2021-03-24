@@ -170,7 +170,7 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-new-host-profile">10.10.0.10	ccvm-mngt&#10;192.168.0.10	ccvm-svc&#10;10.10.0.11	ablestack1&#10;10.10.0.101	scvm1-pn&#10;100.100.0.101	scvm1-cn&#10;
+                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-new-host-profile">10.10.0.10&#9;ccvm-mngt&#10;192.168.0.10&#9;ccvm-svc&#10;10.10.0.11&#9;ablestack1&#10;10.10.0.101&#9;cvm1-pn&#10;100.100.0.101&#9;scvm1-cn&#10;
                                             </textarea>
                                         </div>
                                     </div>
@@ -214,6 +214,28 @@
                                             <div class="pf-c-radio">
                                                 <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-int" name="radio-timeserver" value="internal" />
                                                 <label class="pf-c-radio__label" for="form-radio-timeserver-int">로컬 시간서버</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-timeserver-host-num" style="display:none">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label">
+                                                <span class="pf-c-form__label-text">현재 Host</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-host-num-1" name="radio-timeserver_host_num" value="1" checked/>
+                                                <label class="pf-c-radio__label" for="form-radio-timeserver-host-num-1">Host 1</label>
+                                            </div>
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-host-num-2" name="radio-timeserver_host_num" value="2" />
+                                                <label class="pf-c-radio__label" for="form-radio-timeserver-host-num-2">Host 2</label>
+                                            </div>
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-host-num-3" name="radio-timeserver_host_num" value="3" />
+                                                <label class="pf-c-radio__label" for="form-radio-timeserver-host-num-3">Host 3</label>
                                             </div>
                                         </div>
                                     </div>

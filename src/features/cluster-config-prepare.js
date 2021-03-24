@@ -216,12 +216,28 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
 
         // hosts 파일
         radio_value = $('input[name=radio-hosts-file]:checked').val();
-        putSshKeyValueIntoTextarea(radio_value);
+        putHostsValueIntoTextarea(radio_value);
         let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
         file_type = "hosts_file";
         writeFile(hosts_file_text, "", file_type);
+
+        // time server 파일
+        let timeserver_type = $('input[name=radio-timeserver]:checked').val();
+        let timeserver_host_num = $('input[name=radio-timeserver_host_num]:checked').val();
+        let timeserver_confirm_current_ip_text = $('#div-cluster-config-confirm-time-server-'+timeserver_host_num).text();
+        let timeserver_confirm_ip_list = new Array();
+        for (let i=1; i<=3; i++){
+            timeserver_confirm_ip_list.push($('#form-input-cluster-config-time-server-ip-'+i).val());
+        }
+        timeserver_confirm_ip_list  = timeserver_confirm_ip_list.filter(function(item) {
+          return item !== null && item !== undefined && item !== '';
+        });
+        modifyTimeServer(timeserver_confirm_ip_list, timeserver_type, timeserver_host_num);
     }
 });
+        $('#button-test').on('click', function (){
+            
+        })
 
 $('#button-before-step-modal-wizard-cluster-config-prepare').on('click', function(){
     resetClusterConfigWizard();
@@ -333,13 +349,16 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
     target_textarea.text("");
     target_textarea.append("10.10.0.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n");
     for(let i=1; i<=current_val; i++){
-        target_textarea.append("10.10.0.1"+i+"\tablestack"+i+"\n");
+        let sum = 10+i;
+        target_textarea.append("10.10.0."+sum+"\tablestack"+i+"\n");
     }
     for(let i=1; i<=current_val; i++){
-        target_textarea.append("10.10.0.10"+i+"\tscvm"+i+"-pn\n");
+        let sum = 100+i;
+        target_textarea.append("10.10.0."+sum+"\tscvm"+i+"-pn\n");
     }
     for(let i=1; i<=current_val; i++){
-        target_textarea.append("100.100.0.10"+i+"\tscvm"+i+"-cn\n");
+        let sum = 100+i;
+        target_textarea.append("100.100.0."+sum+"\tscvm"+i+"-cn\n");
     }
 });
 
@@ -347,12 +366,16 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
 $('#form-radio-timeserver-ext').on('click', function(){
     $('#span-timeserver2-required').hide();
     $('#span-timeserver3-required').hide();
+
+    $('#div-timeserver-host-num').hide();
 });
 
 // 로컬 시간서버를 시간서버로 선택하면 시간서버 2, 3은 필수 입력으로 전환한다.
 $('#form-radio-timeserver-int').on('click', function(){
     $('#span-timeserver2-required').show();
     $('#span-timeserver3-required').show();
+
+    $('#div-timeserver-host-num').show();
 });
 
 // 아코디언 개체의 버튼 클릭 이벤트 처리
@@ -547,22 +570,6 @@ function generateSshkey() {
         .catch(console.log);
 }
 
-/**
- * Meathod Name : generateHostsFile
- * Date Created : 2021.03.23
- * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 hosts 파일을 생성하는 함수
- * Parameter : 없음
- * Return  : 없음
- * History  : 2021.03.23 최초 작성
-**/
-
-function generateHostsFile() {
-    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "geneSsh"])
-        .stream(console.log)
-        .then(console.log)
-        .catch(console.log);
-}
 
 /**
  * Meathod Name : readSshKeyFile
@@ -748,7 +755,7 @@ function saveAsFile(id, str, filename) {
  * Meathod Name : writeFile
  * Date Created : 2021.03.17
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 완료를 누를 때 기존 키 선택했을 경우 파일을 host에 업로드하는 함수
+ * Description : 클러스터 준비 마법사에서 완료를 누를 때 설정확인의 정보대로 파일을 host에 업로드하거나 수정하는 함수
  * Parameter : text1, text2, file_type
  * Return  : 없음
  * History  : 2021.03.11 최초 작성
@@ -769,6 +776,68 @@ function writeFile(text1, text2, file_type) {
         cockpit.file("/etc/hosts").replace(text1)
             .done(function (tag) {})
             .fail(function (error) {});
+    }else if (file_type == 'timeserver_type'){
+        cockpit.spawn(["sed", "-i", "'/^server /d'", "/root/test.txt"])
+        .stream(console.log)
+        .then(console.log)
+        .catch(console.log);
     }
+}
+
+
+/**
+ * Meathod Name : modifyTimeServer
+ * Date Created : 2021.03.24
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 완료를 누를 때 설정확인의 time server 정보대로 host에 업데이하는 함수트
+ * Parameter : timeserver_confirm_ip_text, file_type, timeserver_host_num
+ * Return  : 없음
+ * History  : 2021.03.24 최초 작성
+**/
+
+function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserver_host_num) {
+    let chrony_file_root = "root/test.txt"
+    // chrony.conf 파일 서버 리스트 부분 초기화
+    cockpit.script(["sed -i '/^server /d' /"+chrony_file_root+""])
+    cockpit.script(["sed -i '/^pool /d' /"+chrony_file_root+""])
+    // chrony.conf 파일에서 서버 추가하는 부분
+    // 외부 시간 서버
+    if(file_type == "external"){
+        // chrony.conf 파일 서버 리스트 부분 초기화
+        cockpit.script(["sed -i '/^allow /d' /"+chrony_file_root+""])
+        cockpit.script(["sed -i '/^local stratum /d' /"+chrony_file_root+""])
+        cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\#allow 192.168.0.0/16\" /"+chrony_file_root+""])
+        cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\#local stratum 10\" /"+chrony_file_root+""])
+        for (let i in timeserver_confirm_ip_text){
+            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server "+timeserver_confirm_ip_text[i]+" iburst minpoll 0 maxpoll 0\" /"+chrony_file_root+""])
+        }
+    }
+    // 로컬 시간 서버
+    if(file_type == "internal"){
+        // chrony.conf 파일 서버 리스트 부분 초기화
+        cockpit.script(["sed -i '/^#allow /d' /"+chrony_file_root+""])
+        cockpit.script(["sed -i '/^allow /d' /"+chrony_file_root+""])
+        cockpit.script(["sed -i '/^#local stratum /d' /"+chrony_file_root+""])
+        cockpit.script(["sed -i '/^local stratum /d' /"+chrony_file_root+""])
+        if (timeserver_host_num == 1){
+            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server "+timeserver_confirm_ip_text[0]+" iburst minpoll 0 maxpoll 0\" /"+chrony_file_root+""])
+        }
+        if (timeserver_host_num == 2){
+            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server "+timeserver_confirm_ip_text[0]+" prefer iburst minpoll 0 maxpoll 0\" /"+chrony_file_root+""])
+            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server "+timeserver_confirm_ip_text[1]+" minpoll 0 maxpoll 0\" /"+chrony_file_root+""])
+        }
+        if (timeserver_host_num == 3){
+            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server "+timeserver_confirm_ip_text[1]+" prefer iburst minpoll 0 maxpoll 0\" /"+chrony_file_root+""])
+            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server "+timeserver_confirm_ip_text[0]+" iburst minpoll 0 maxpoll 0\" /"+chrony_file_root+""])
+        }
+        // 공통 수정 부분
+        let allow_ip = timeserver_confirm_ip_text[0];
+        allow_ip = allow_ip.split('.');
+        allow_ip = allow_ip[0]+"."+allow_ip[1]+".0.0/24";
+        cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow "+allow_ip+"\" /"+chrony_file_root+""])
+        cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\local stratum 10\" /"+chrony_file_root+""])
+    }
+
+
 }
 
