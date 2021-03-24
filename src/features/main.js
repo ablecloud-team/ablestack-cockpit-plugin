@@ -29,7 +29,7 @@ $(document).ready(function(){
     $('#div-modal-storage-vm-resource-update').hide();
     
     //스토리지 센터 가상머신 상태변경 페이지 로드
-    $('#div-modal-storage-vm-status-update').load("./src/features/div-modal-storage-vm-status-update.html");
+    $('#div-modal-storage-vm-status-update').load("./src/features/storage-vm-status-update.html");
     $('#div-modal-storage-vm-status-update').hide();   
 
     //스토리지 클러스터 유지보수 모드 변경 페이지 로드
@@ -104,13 +104,13 @@ $(document).ready(function(){
 
         sessionStorage.setItem("scvm_status", retVal.val.scvm_status);
 
-        if(retVal.val.maintenance_status){            
-            $("#menu-item-set-maintenance-mode").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-            $("#menu-item-unset-maintenance-mode").attr('class','pf-c-dropdown__menu-item');
+        if(retVal.val.scvm_status == "running"){            
+            $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item');
             
         }else{            
-            $("#menu-item-set-maintenance-mode").attr('class','pf-c-dropdown__menu-item');
-            $("#menu-item-unset-maintenance-mode").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item');
+            $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
         }
 
 
@@ -141,13 +141,24 @@ $(document).ready(function(){
             $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되었습니다.");
             $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--success-color--100)");
         }else{
+            $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            
+
             $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되지 않았습니다.");            
             $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--danger-color--100)");
         }
 
     })
     .catch(function(data){
-        console.log(":::Error:::");
+        //console.log(":::Error:::");        
+        $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+        $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+        $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+        $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+
         $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되지 않았습니다.");
         $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--danger-color--100)");
     });
@@ -189,78 +200,44 @@ $('#card-action-cloud-vm-status').on('click', function(){
     $('#dropdown-menu-cloud-vm-status').toggle();
 });
 
-// 스토리지센터 VM 자원변경
+// 스토리지센터 VM 자원 변경
 $('#menu-item-set-storage-vm-resource-update').on('click', function(){
     $('#div-modal-storage-vm-resource-update').show();
 });
 
-// 스토리지센터 VM 자원변경
-$('#menu-item-set-storage-vm-status-update').on('click', function(){
-    if(sessionStorage.getItem("scvm_status") == "running"){
-        $('#modal-description-scvm-status').html("<p>스토리지 센터 가상머신을 '정지' 하시겠습니까?</p>");
-    }else{
-        $('#modal-description-scvm-status').html("<p>스토리지 센터 가상머신을 '시작' 하시겠습니까?</p>");
-    }
+// 스토리지센터 클러스터 유지보수모드 설정 
+$('#menu-item-set-maintenance-mode').on('click',function(){
+    $('#modal-description-maintenance-status').html("<p>스토리지 클러스터를 유지보수 모드를 '설정' 하시겠습니까?</p>");
+    $('#scc-maintenance-update-cmd').val("set");
+    $('#div-modal-storage-cluster-maintenance-update').show();
+});
+
+// 스토리지센터 클러스터 유지보수모드 설정 
+$('#menu-item-unset-maintenance-mode').on('click',function(){
+    $('#modal-description-maintenance-status').html("<p>스토리지 클러스터를 유지보수 모드를 '해제' 하시겠습니까?</p>");
+    $('#scc-maintenance-update-cmd').val("unset");
+    $('#div-modal-storage-cluster-maintenance-update').show();  
+});
+
+// 스토리지센터 VM 상태 변경(시작) 
+$('#menu-item-set-storage-center-vm-start').on('click',function(){  
+    $('#modal-description-scvm-status').html("<p>스토리지 센터 가상머신을 '시작' 하시겠습니까?</p>");
+    $('#scvm-status-update-cmd').val("start");
     $('#div-modal-storage-vm-status-update').show();
 });
 
-
-// 스토리지센터 클러스터 유지보수모드 설정 
-$('#menu-item-set-maintenance-mode, #menu-item-unset-maintenance-mode').on('click',function(){
-    //console.log(typeof sessionStorage.getItem("storage_cluster_maintenance_status"))
-    if(sessionStorage.getItem("storage_cluster_maintenance_status") == "true"){
-        $('#modal-description-maintenance-status').html("<p>스토리지 클러스터를 유지보수 모드를 '해제' 하시겠습니까?</p>");
-    }else{
-        $('#modal-description-maintenance-status').html("<p>스토리지 클러스터를 유지보수 모드를 '설정' 하시겠습니까?</p>");
-    }
-
-    $('#div-modal-storage-cluster-maintenance-update').show();  
-
-});
-
-
-// 스토리지센터 가상머신 시작 설정 
-$('#menu-item-set-storage-center-vm-start').on('click',function(){    
-    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_vm_status/scvm_status_update.py", "start" ])
-    .then(function(data){  
-        
-        var retVal = JSON.parse(data);  
-        console.log(retVal);
-
-    })
-    .catch(function(data){        
-        console.log(":::Error:::"+data);
-
-    });
-
-});
-
-// 스토리지센터 가상머신 정지 설정 
+// 스토리지센터 VM 상태 변경(정지) 
 $('#menu-item-set-storage-center-vm-stop').on('click',function(){
-     cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_vm_status/scvm_status_update.py", "stop" ])
-    .then(function(data){  
-        console.log(data);
-        var retVal = JSON.parse(data);        
-        
-    })
-    .catch(function(data){        
-        console.log(":::Error:::"+data);
-        
-    });
+    $('#modal-description-scvm-status').html("<p>스토리지 센터 가상머신을 '정지' 하시겠습니까?</p>");
+    $('#scvm-status-update-cmd').val("stop");
+    $('#div-modal-storage-vm-status-update').show();
 });
 
-// 스토리지센터 가상머신 삭제 설정 
+// 스토리지센터 VM 상태 변경(삭제) 
 $('#menu-item-set-storage-center-vm-delete').on('click',function(){
-    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_vm_status/scvm_status_update.py", "delete" ])
-   .then(function(data){  
-       console.log(data);
-       var retVal = JSON.parse(data);        
-       
-   })
-   .catch(function(data){        
-       console.log(":::Error:::"+data);
-       
-   });
+    $('#modal-description-scvm-status').html("<p>스토리지 센터 가상머신을 '삭제' 하시겠습니까?</p>");
+    $('#scvm-status-update-cmd').val("delete");
+    $('#div-modal-storage-vm-status-update').show();    
 });
 
 
