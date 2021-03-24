@@ -26,6 +26,8 @@ $(document).ready(function(){
 
     $('#div-change-modal-cloud-vm').load("./src/features/cloud-vm-change.html");
     $('#div-change-modal-cloud-vm').hide();
+    $('#div-change-alert-cloud-vm').load("./src/features/cloud-vm-change-alert.html");
+    $('#div-change-alert-cloud-vm').hide();
     new CloudCenterVirtualMachine().checkCCVM();
 });
 
@@ -48,38 +50,10 @@ $('#card-action-cloud-vm-status').on('click', function(){
     $('#dropdown-menu-cloud-vm-status').toggle();
 });
 
-var firstRun
-var cpu
-var memory
+var cpu=0;
+var memory=0;
 $('#card-action-cloud-vm-change').on('click', function(){
-    // 클라우드센터VM 자원변경
-    $('#div-change-modal-cloud-vm').show();
-    if(firstRun===undefined) {
-        $('#button-execution-modal-cloud-vm-change').on('click', function () {
-            // 클라우드센터VM 자원변경 실행
-            console.log('http://' + new CloudCenterVirtualMachine().ip + ":9090");
-            cpu=$('#form-select-cloud-vm-compute-cpu-core');
-            memory=$('#form-select-cloud-vm-compute-memory');
-            new CloudCenterVirtualMachine().changeOffering(cpu, memory);
-            $('#div-change-modal-cloud-vm').hide();
-        });
-
-        $('#button-cancel-modal-cloud-vm-change').on('click', function () {
-            // 클라우드센터VM 자원변경 취소
-            cpu=$('#form-select-cloud-vm-compute-cpu-core');
-            memory=$('#form-select-cloud-vm-compute-memory');
-            memory.val(0);
-            cpu.val(0);
-
-            $('#div-change-modal-cloud-vm').hide();
-        });
-
-        $('#button-close-modal-cloud-vm-change').on('click', function () {
-            // 클라우드센터VM 자원변경 취소
-            $('#div-change-modal-cloud-vm').hide();
-        });
-        firstRun=false
-    }
+    ccvm_instance.createChangeModal();
 });
 
 $('#card-action-cloud-vm-connect').on('click', function(){

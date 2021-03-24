@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+'''
+Copyright (c) 2021 ABLECLOUD Co. Ltd.
+
+libvirt domain 용으로 작성된 xml 파일을 수정하는 스크립트입니다.
+인자로 cpu, memory, xml 파일명을 받아 수정합니다.
+
+최초작성일 : 2021-03-22
+'''
 
 import argparse
 import json
@@ -14,13 +22,14 @@ import bs4
 env=os.environ.copy()
 env['LANG']="en_US.utf-8"
 env['LANGUAGE']="en"
-def createArgumentParser():
-    """
-    입력된 argument를 파싱하여 dictionary 처럼 사용하게 만들어 주는 parser를 생성하는 함수
 
-    :return: argparse.ArgumentParser
-    """
-    # 참조: https://docs.python.org/ko/3/library/argparse.html
+'''
+입력된 argument를 파싱하여 dictionary 처럼 사용하게 만들어 주는 parser를 생성하는 함수
+Parameter: None
+참조: https://docs.python.org/ko/3/library/argparse.html
+:return: argparse.ArgumentParser
+'''
+def createArgumentParser():
     # 프로그램 설명
     tmp_parser = argparse.ArgumentParser(description='VM의 CPU와 Memory를 변경하는 프로그램',
                                          epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
@@ -32,7 +41,7 @@ def createArgumentParser():
     tmp_parser.add_argument('--cpu', help="Number of vCPU")
     tmp_parser.add_argument('--memory', help="Size of Memory")
     tmp_parser.add_argument('--xml', help="xml file path")
-
+    
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐)
     tmp_parser.add_argument("-v", "--verbose", action='count', default=0,
@@ -49,6 +58,13 @@ def createArgumentParser():
     return tmp_parser
 
 
+'''
+cpu, memory, xml파일을 입력받아 수정하는 함수
+Parameter: cpu: int cpu코어수
+Parameter: memory: int memory용량(GiB)
+Parameter: xml: str xml파일의 경로
+:return: json
+'''
 def editVMOffering(cpu, memory, xml='/root/text.xml', H=False):
     soup = ""
     with open(xml, 'rt') as fp:
@@ -76,7 +92,14 @@ def editVMOffering(cpu, memory, xml='/root/text.xml', H=False):
     return createReturn(code=200, val=item)
 
 
-
+'''
+cpu, memory, xml파일을 입력받아 수정하는 스크립트입니다.
+example: python3 virshedit.py --cpu 4 --memory 16 --xml /opt/ablestack/scvm.xml
+Parameter: cpu: int cpu코어수
+Parameter: memory: int memory용량(GiB)
+Parameter: xml: str xml파일의 경로
+:return: json
+'''
 if __name__ == '__main__':
     parser = createArgumentParser()
     args = parser.parse_args()

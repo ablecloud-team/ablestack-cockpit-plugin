@@ -1,5 +1,14 @@
 #!/usr/bin/python3
+# -*- coding: utf-8 -*-
+'''
+Copyright (c) 2021 ABLECLOUD Co. Ltd.
 
+libvirt domain 들의 정보를 수집하는 스크립트입니다.
+현재 인자가 없습니다.
+출력은 json형태로 화면에 나타나게 됩니다.
+
+최초작성일 : 2021-03-22
+'''
 import os
 import sh
 import pprint
@@ -55,18 +64,5 @@ for vm in vms:
                 vm['nictype'] = items[1]
                 vm['nicbridge'] = items[2]
 
-# virsh dominfo --domain djpark-dev-1
-# Id:             -
-# Name:           djpark-dev-1
-# UUID:           3e2b2d33-4b8f-48df-9cfd-71741d6ba1a6
-# OS Type:        hvm
-# State:          shut off
-# CPU(s):         4
-# Max memory:     4194304 KiB
-# Used memory:    4194304 KiB
-# Persistent:     yes
-# Autostart:      disable
-# Managed save:   no
-# Security model: selinux
-# Security DOI:   0
+
 print(json.dumps(vms, indent=2))
