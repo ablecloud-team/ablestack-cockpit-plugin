@@ -28,7 +28,7 @@ def parseArgs():
     parser = argparse.ArgumentParser(description='Pacemaker cluster for Cloud Center VM',
                                      epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
     
-    parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status', 'remove'], help='choose one of the actions')
+    parser.add_argument('action', choices=['config', 'create', 'enable', 'disable', 'move', 'cleanup', 'status', 'remove', 'destroy'], help='choose one of the actions')
     parser.add_argument('--cluster', metavar='name', type=str, help='The name of the cluster to be created')
     parser.add_argument('--hosts', metavar='name', type=str, nargs='*', help='Hostnames to form a cluster')
     parser.add_argument('--resource', metavar='name', type=str, help='The name of the resource to be created')
@@ -136,14 +136,14 @@ class Pacemaker:
             ret = createReturn(code=500, val='cannot be migrated to the same host.')
             print(json.dumps(json.loads(ret), indent=4))
 
-            sys.exit(1)
+            sys.exit(0)
 
         elif current_host == None:
             # print('정지 상태에서는 다른 호스트로 마이그레이션 할 수 없습니다.')
             ret = createReturn(code=501, val='Migration is not possible while stopped.')
             print(json.dumps(json.loads(ret), indent=4))
 
-            sys.exit(1)
+            sys.exit(0)
 
         else:
             pcs('resource', 'move', self.resource_name, self.target_host)
@@ -171,14 +171,33 @@ class Pacemaker:
     def removeResource(self, resource_name):
         self.resource_name = resource_name
         
-        pcs('resource', 'cleanup', self.resource_name)
-        pcs('resource', 'disable', self.resource_name)
-        pcs('resource', 'remove', self.resource_name)
-        pcs('resource', 'refresh')
-        
-        ret = createReturn(code=200, val='remove')
-        print(json.dumps(json.loads(ret), indent=4))
+        try:
+            pcs('resource', 'cleanup', self.resource_name)
+            pcs('resource', 'disable', self.resource_name)
+            pcs('resource', 'remove', self.resource_name)
+            pcs('resource', 'refresh')
+            
+            ret = createReturn(code=200, val='remove')
+            print(json.dumps(json.loads(ret), indent=4))
+            
+        except:
+            ret = createReturn(code=400, val='resource not found.')
+            print(json.dumps(json.loads(ret), indent=4))
 
+        return ret
+    
+    # 함수명 : destroyCluster
+    # 주요 기능 : 현재 cluster를 삭제하는 기능
+    def destroyCluster(self):
+        try:
+            pcs('cluster', 'destroy', '--all')
+            
+            ret = createReturn(code=200, val='destroy')
+            print(json.dumps(json.loads(ret), indent=4))
+        except:
+            ret = createReturn(code=400, val='cluster not found.')
+            print(json.dumps(json.loads(ret), indent=4))
+            
         return ret
     
     # 함수명 : statusResource
@@ -192,14 +211,24 @@ class Pacemaker:
         nodes = []
         node_list = []
         current_host = None
-
-        xml = pcs('status', 'xml').stdout.decode()
-        soup = BeautifulSoup(xml, 'lxml')
-        soup_nodes = soup.find('nodes').select('node')
-        soup_resource = soup.select_one(f'#{self.resource_name}')
-
-        if soup_resource['nodes_running_on'] == '1':
-            current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
+        
+        try:
+            xml = pcs('status', 'xml').stdout.decode()
+            soup = BeautifulSoup(xml, 'lxml')
+            soup_nodes = soup.find('nodes').select('node')
+            soup_resource = soup.select_one(f'#{self.resource_name}')
+        except:
+            ret = createReturn(code=400, val='cluster is not configured.')
+            print(json.dumps(json.loads(ret), indent=4))
+            sys.exit(0)
+            
+        try:
+            if soup_resource['nodes_running_on'] == '1':
+                current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
+        except:
+            ret = createReturn(code=400, val='resource not found.')
+            print(json.dumps(json.loads(ret), indent=4))
+            sys.exit(0)
  
         for soup_node in soup_nodes:
             node = {}
@@ -215,10 +244,11 @@ class Pacemaker:
         res_active = res['active'] = soup_resource['active']
         res_blocked = res['blocked'] = soup_resource['blocked']
         res_failed = res['failed'] = soup_resource['failed']
+        res_role = res['role'] = soup_resource['role']
         res['resource'] = soup_resource['id']
         resource.append(res)
 
-        ret_val = {'clustered_host':node_list, 'started':current_host, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
+        ret_val = {'clustered_host':node_list, 'started':current_host, 'role':res_role, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
         ret = createReturn(code=200, val=ret_val)
         print(json.dumps(json.loads(ret), indent=4))
 

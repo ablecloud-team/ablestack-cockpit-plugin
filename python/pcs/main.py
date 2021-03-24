@@ -35,8 +35,11 @@ def main():
         pcs.cleanupResource(args.resource)
     elif (args.action) == 'remove':
         pcs.removeResource(args.resource)       
+    elif (args.action) == 'destroy':
+        pcs.destroyCluster()
     elif (args.action) == 'status':
         pcs.statusResource(args.resource)
+
 
 
 if __name__ == "__main__":
