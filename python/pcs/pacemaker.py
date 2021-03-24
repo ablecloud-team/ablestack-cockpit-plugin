@@ -136,14 +136,14 @@ class Pacemaker:
             ret = createReturn(code=500, val='cannot be migrated to the same host.')
             print(json.dumps(json.loads(ret), indent=4))
 
-            sys.exit(1)
+            sys.exit(0)
 
         elif current_host == None:
             # print('정지 상태에서는 다른 호스트로 마이그레이션 할 수 없습니다.')
             ret = createReturn(code=501, val='Migration is not possible while stopped.')
             print(json.dumps(json.loads(ret), indent=4))
 
-            sys.exit(1)
+            sys.exit(0)
 
         else:
             pcs('resource', 'move', self.resource_name, self.target_host)
@@ -220,7 +220,7 @@ class Pacemaker:
         except:
             ret = createReturn(code=400, val='cluster is not configured.')
             print(json.dumps(json.loads(ret), indent=4))
-            sys.exit(1)
+            sys.exit(0)
             
         try:
             if soup_resource['nodes_running_on'] == '1':
@@ -228,7 +228,7 @@ class Pacemaker:
         except:
             ret = createReturn(code=400, val='resource not found.')
             print(json.dumps(json.loads(ret), indent=4))
-            sys.exit(1)
+            sys.exit(0)
  
         for soup_node in soup_nodes:
             node = {}
