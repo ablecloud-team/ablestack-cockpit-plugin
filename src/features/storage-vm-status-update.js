@@ -65,8 +65,7 @@ $('#button-storage-vm-status-update').on('click', function(){
             alert("정상적으로 처리되지 않았습니다.")
             //console.log(":::Error:::"+data);
 
-        });
-        
+        });        
     }
   
     
@@ -79,7 +78,7 @@ $('#button-storage-vm-status-update').on('click', function(){
     
             if(cmd == "stop" && retVal.val.scvm_status == "shut off" 
             || cmd == "start" && retVal.val.scvm_status == "running"
-            || cmd == "delete" && retVal.val.scvm_status == "delete" ){
+            || cmd == "delete" && retVal.val.scvm_status == "no signal" ){
                 console.log("OK Call!!!!!!!!!!!!");
                 clearInterval(intervalCall);
                 $('#scvm-status-update-cmd').val("");
