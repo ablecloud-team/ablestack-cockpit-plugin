@@ -39,17 +39,23 @@ def statusDeteil():
         scvm_status = output.strip()
         #print(scvm_status)
 
-        output = check_output(["virsh dominfo scvm | sed -n 6p | cut -f 2 -d ':' "], universal_newlines=True, shell=True, env=env)    
-        vcpu = output.strip()
+        output = check_output(["virsh vcpuinfo --domain scvm"], universal_newlines=True, shell=True, env=env)    
+        vcpu = output.count('VCPU')
         #print(vcpu)
         
         output = check_output(["virsh dominfo scvm | sed -n 8p | cut -f 2 -d ':' | sed 's/ KiB//g'"], universal_newlines=True, shell=True, env=env)    
         memory = output.strip()
         memory_mib = int(memory) / 1024  #KiB => MiB
+        memory_gib = 0
+        memory_tib = 0
         if memory_mib < 1024:
             memory = str(memory_mib) + " MiB"
-        elif memory_mib >1024:
-            memory = str(memory_mib / 1024) + " GiB"
+        elif memory_mib >=1024:
+            memory_gib = memory_mib / 1024
+            memory = str(memory_gib) + " GiB"
+        elif memory_gib >=1024:
+            memory_tib = memory_gib / 1024
+            memory = str(memory_tib) + " TiB"    
        
         ##임시 테스트 데이터사용, 실제 qcow2 파일 사용시 수정해야함.
         output = check_output(["virsh vol-info --pool default --vol scvm.qcow2 | grep Capacity"], universal_newlines=True, shell=True, env=env)    
@@ -69,7 +75,7 @@ def statusDeteil():
 
 
         ##임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp1s21)
-        output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp8s0|bond1'"], universal_newlines=True, shell=True, env=env)    
+        output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp8s0|bond0'"], universal_newlines=True, shell=True, env=env)    
         storageServerNicMacAddr = ' '.join(output.split()).split()[1]
         storageServerNicIp = ' '.join(output.split()).split()[3]
         #print(manageNicIp)
@@ -81,7 +87,7 @@ def statusDeteil():
 
 
         ##임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp1s22)
-        output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp9s0|bond2'"], universal_newlines=True, shell=True, env=env)    
+        output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp9s0|bond1'"], universal_newlines=True, shell=True, env=env)    
         storageReplicationNicMacAddr = ' '.join(output.split()).split()[1]
         storageReplicationNicIp = ' '.join(output.split()).split()[3]
         #print(manageNicIp)
