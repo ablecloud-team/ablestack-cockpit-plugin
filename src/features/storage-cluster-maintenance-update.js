@@ -7,47 +7,43 @@
 
 $('#button-maintenance-mode-update').on('click', function(){
     
-    if(sessionStorage.getItem("storage_cluster_maintenance_status") == "true"){            
+    var cmd = $('#scc-maintenance-update-cmd').val();    
+
+    if(cmd == "unset"){
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_cluster_status/scc_status_update.py", "unset_noout" ])
         .then(function(data){
             //console.log(data);
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){
                 location.reload();
-            }else{
-                ('#div-modal-storage-cluster-maintenance-update').hide();
+            }else{                
                 alert("정상적으로 처리되지 않았습니다.")
             }
-            
+            $('#div-modal-storage-cluster-maintenance-update').hide();
         })
-        .catch(function(data){ 
-            ('#div-modal-storage-cluster-maintenance-update').hide();
+        .catch(function(data){             
             alert("정상적으로 처리되지 않았습니다.")
-            //console.log(":::Error:::");
-            
+            //console.log(":::Error:::");            
         });
 
-    }else{        
+    }else if(cmd == "set"){
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_cluster_status/scc_status_update.py", "set_noout" ])
         .then(function(data){  
             //console.log(data);
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){
                 location.reload();
-            }else{
-                ('#div-modal-storage-cluster-maintenance-update').hide();
+            }else{                
                 alert("정상적으로 처리되지 않았습니다.")
             }
-
+            $('#div-modal-storage-cluster-maintenance-update').hide();
         })
-        .catch(function(data){
-            ('#div-modal-storage-cluster-maintenance-update').hide();
+        .catch(function(data){            
             alert("정상적으로 처리되지 않았습니다.")
             //console.log(":::Error:::"+data);
-
-        });
-        
+        });        
     }
+    
 });
 
 
