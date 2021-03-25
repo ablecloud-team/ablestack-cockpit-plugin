@@ -34,10 +34,10 @@ json 형태의 return값 확인
     "name": "Storage Center VM Status Detail",
     "type": "dict"
 }
+참고 : socket, core, manageNicGw, dataDiskType데이터는 현재 확인 불가
 ```
 
-##기타
-socket, core, manageNicGw, dataDiskType데이터는 현재 확인 불가
+
 
 
 
