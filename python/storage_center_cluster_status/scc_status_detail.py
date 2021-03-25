@@ -136,7 +136,7 @@ def statusDeteil():
 
     except Exception as e:
         ret_val = {
-            'cluster_status': 'N/A', 
+            'cluster_status': 'no signal', 
             'osd': 'N/A', 
             'osd_up': 'N/A', 
             'mon_gw1' : 'N/A',
