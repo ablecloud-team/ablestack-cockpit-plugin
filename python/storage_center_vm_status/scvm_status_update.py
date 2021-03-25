@@ -42,7 +42,7 @@ def parseArgs():
 def startStorageVM():
 
     try:
-        rc = call(['virsh start jsdev'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        rc = call(['virsh start scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
         
         if rc == 0: # ok
             retVal = True
@@ -64,7 +64,7 @@ def startStorageVM():
 def stopStorageVM():  
         
     try:
-        rc = call(['virsh shutdown jsdev'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        rc = call(['virsh shutdown scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
         
         if rc == 0: # ok
             retVal = True
@@ -87,9 +87,9 @@ def deleteStorageVM():
 
     try:
 
-        rc = call(['virsh destroy jsdev'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        rc = call(['virsh destroy scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
         if rc == 0: # 
-            rc = call(['virsh undefine jsdev'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
+            rc = call(['virsh undefine scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
             if rc == 0: # ok
                 retVal = True
                 retCode = 200
@@ -114,13 +114,13 @@ def deleteStorageVM():
 #스토리지 VM 삭제
 def updateStorageVM(cpu, memory):
 
-    memory = memory * 1024
+    memory = memory * 1024 #MiB 형태로 변경    
     
     try:
 
         # #값이 없을때 
         if cpu > 0 :
-            rc = call(['virt-xml jsdev --edit --vcpus maxvcpus=' + str(cpu)], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
+            rc = call(['virt-xml scvm --edit --vcpus maxvcpus=' + str(cpu)], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
             
             if rc == 0: # ok
                 retVal = True
@@ -131,7 +131,7 @@ def updateStorageVM(cpu, memory):
             
             
         if memory > 0 :
-            rc = call(['virt-xml jsdev --edit --memory ' + str(memory) + ',maxmemory=' + str(memory)], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+            rc = call(['virt-xml scvm --edit --memory ' + str(memory) + ',maxmemory=' + str(memory)], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
             
             if rc == 0: # ok                
                 retVal = True
@@ -140,7 +140,7 @@ def updateStorageVM(cpu, memory):
                 retVal = False
                 retCode = 500
                  
-        ret = createReturn(code=200, val='adf', retname='Storage Center VM UPDATE')
+        ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM UPDATE')
 
     except Exception as e:
         ret = createReturn(code=500, val='virsh destroy, undefine error', retname='Storage Center VM UPDATE Error')

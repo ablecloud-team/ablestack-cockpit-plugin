@@ -35,7 +35,7 @@ def statusDeteil():
         #run("ls | grep ablestack", universal_newlines=True,  shell=True)
     
         # vm 상태조회
-        output = check_output(["virsh domstate jsdev"], universal_newlines=True, shell=True, env=env)    
+        output = check_output(["virsh domstate scvm"], universal_newlines=True, shell=True, env=env)    
         scvm_status = output.strip()
         #print(scvm_status)
 
@@ -106,8 +106,8 @@ def statusDeteil():
         ################################################임시데이터
         #scvm_status = "Running"
         #vcpu = 8
-        socket = "데이터 가져올방법 없음...."
-        core = "데이터 가져올방법 없음...."
+        socket = "XXX"
+        core = "XXX"
 
         #memory= "16GB"
         #rdisk = "128GB"
@@ -115,14 +115,14 @@ def statusDeteil():
         #manageNicType = "VirtIO"
         #manageNicParent = "br0"
         #manageNicIp = "10.10.0.100"
-        manageNicGw = "데이터 가져올방법 없음...."
+        manageNicGw = "XXX"
 
 
         #storageNicType = "VirtIO"
         #storageNicParent = "br1"
         #storageNicServerIp = "100.100.0.1"
         #storageNicReplicationIp = "100.100.0.100"
-        dataDiskType = "데이터 가져올방법 없음...."
+        dataDiskType = "XXX"
 
         ################################################
         

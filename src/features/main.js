@@ -103,7 +103,7 @@ $(document).ready(function(){
 
 
     // 스토리지센터 VM 상태 조회 시작
-    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_vm_status/scvm_status_detail.py", "detail" ])
+    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_detail.py", "detail" ])
     .then(function(data){
         
         var retVal = JSON.parse(data);        

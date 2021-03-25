@@ -24,12 +24,12 @@ $('#scvm-resource-update').click(function(){
         alert("CPU 또는 Memory 사용 정보를 선택하세요.")
     }else{
         
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_vm_status/scvm_status_update.py", "resource", "-c", cpu, "-m", memory ])
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_update.py", "resource", "-c", cpu, "-m", memory ])
         .then(function(data){
             //console.log(data);
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){
-                alert("가상머신을 시작하면 변경된 자원이 적용되어 구동됩니다.")
+                //alert("가상머신을 시작하면 변경된 자원이 정상적으로 반영됩니다.")
                 $('#div-modal-storage-vm-resource-update').hide();   
                 location.reload();
             }else{
