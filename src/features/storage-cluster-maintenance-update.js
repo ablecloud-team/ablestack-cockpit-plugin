@@ -10,7 +10,7 @@ $('#button-maintenance-mode-update').on('click', function(){
     var cmd = $('#scc-maintenance-update-cmd').val();    
 
     if(cmd == "unset"){
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_cluster_status/scc_status_update.py", "unset_noout" ])
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_update.py", "unset_noout" ])
         .then(function(data){
             //console.log(data);
             var retVal = JSON.parse(data);
@@ -28,7 +28,7 @@ $('#button-maintenance-mode-update').on('click', function(){
         });
 
     }else if(cmd == "set"){
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_cluster_status/scc_status_update.py", "set_noout" ])
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_update.py", "set_noout" ])
         .then(function(data){  
             //console.log(data);
             var retVal = JSON.parse(data);
