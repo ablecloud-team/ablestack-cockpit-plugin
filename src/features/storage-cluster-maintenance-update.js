@@ -15,7 +15,8 @@ $('#button-maintenance-mode-update').on('click', function(){
             //console.log(data);
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){
-                location.reload();
+                sessionStorage.setItem("storage_cluster_maintenance_status", "false");
+                location.reload();                
             }else{                
                 alert("정상적으로 처리되지 않았습니다.")
             }
@@ -32,7 +33,8 @@ $('#button-maintenance-mode-update').on('click', function(){
             //console.log(data);
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){
-                location.reload();
+                sessionStorage.setItem("storage_cluster_maintenance_status", "true");
+                location.reload();                
             }else{                
                 alert("정상적으로 처리되지 않았습니다.")
             }

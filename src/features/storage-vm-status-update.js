@@ -15,7 +15,7 @@ $('#button-storage-vm-status-update').on('click', function(){
     var cmd = $('#scvm-status-update-cmd').val();    
 
     if(cmd == "stop"){
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_vm_status/scvm_status_update.py", "stop" ])
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_update.py", "stop" ])
         .then(function(data){
             //console.log(data);
             var retVal = JSON.parse(data);
@@ -32,7 +32,7 @@ $('#button-storage-vm-status-update').on('click', function(){
         });
 
     }else if(cmd == "start"){
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_vm_status/scvm_status_update.py", "start" ])
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_update.py", "start" ])
         .then(function(data){  
             //console.log(data);
             var retVal = JSON.parse(data);
@@ -50,7 +50,7 @@ $('#button-storage-vm-status-update').on('click', function(){
         });
         
     }else if(cmd == "delete"){
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_vm_status/scvm_status_update.py", "delete" ])
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_update.py", "delete" ])
         .then(function(data){  
             //console.log(data);
             var retVal = JSON.parse(data);
@@ -65,28 +65,27 @@ $('#button-storage-vm-status-update').on('click', function(){
             alert("정상적으로 처리되지 않았습니다.")
             //console.log(":::Error:::"+data);
 
-        });
-        
+        });        
     }
   
     
 
     intervalCall = setInterval(function () {
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack-jsdev/python/storage_center_vm_status/scvm_status_detail.py", "detail" ])
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_detail.py", "detail" ])
         .then(function(data){
             var retVal = JSON.parse(data);
-            console.log($('#scvm-status-update-cmd').val() + " :::::::::::: " + retVal.val.scvm_status);
+            //console.log($('#scvm-status-update-cmd').val() + " :::::::::::: " + retVal.val.scvm_status);
     
             if(cmd == "stop" && retVal.val.scvm_status == "shut off" 
             || cmd == "start" && retVal.val.scvm_status == "running"
-            || cmd == "delete" && retVal.val.scvm_status == "delete" ){
-                console.log("OK Call!!!!!!!!!!!!");
+            || cmd == "delete" && retVal.val.scvm_status == "no signal" ){
+                //console.log("OK Call!!!!!!!!!!!!");
                 clearInterval(intervalCall);
                 $('#scvm-status-update-cmd').val("");
                 $('#div-modal-storage-vm-status-update').hide();   
                 location.reload();
             }else{
-                console.log("No No!!!!!!!!!!!!");
+                //console.log("No No!!!!!!!!!!!!");
             }               
             
         });
