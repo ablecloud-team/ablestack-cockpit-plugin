@@ -11,7 +11,7 @@
 
 ```
 
-python3 /usr/share/cockpit/ablestack-jsdev/python/storage_center_cluster_status/scvm_status_detail.py detail
+python3 /usr/share/cockpit/ablestack/python/storage_center_cluster_status/scvm_status_detail.py detail
 
 json 형태의 return값 확인
 {
