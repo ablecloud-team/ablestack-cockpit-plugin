@@ -346,31 +346,6 @@ $('#nav-button-finish').on('click', function(){
     cur_step_wizard_vm_config = "9";
 });
 
-// ssh-key 파일 선택 시 hidden textarea 내용을 선택한 파일의 내용으로 변경
-$('#form-input-storage-vm-ssh-key-pri-file').on('click', function(){
-    let ssh_key_input_pri = document.querySelector('#form-input-storage-vm-ssh-key-pri-file');
-    let ssh_key_textarea_existing_pri = "div-textarea-storage-vm-temp-ssh-key-pri-file";
-    fileReaderFunc(ssh_key_input_pri, ssh_key_textarea_existing_pri);
-});
-$('#form-input-storage-vm-ssh-key-pub-file').on('click', function(){
-    let ssh_key_input_pub = document.querySelector('#form-input-storage-vm-ssh-key-pub-file');
-    let ssh_key_textarea_existing_pub = "div-textarea-storage-vm-temp-ssh-key-pub-file";
-    fileReaderFunc(ssh_key_input_pub, ssh_key_textarea_existing_pub);
-});
-// Hosts 파일 선택 시 hidden textarea 내용을 선택한 파일의 내용으로 변경
-$('#form-input-storage-vm-hosts-file').on('click', function(){
-    let hosts_input = document.querySelector('#form-input-storage-vm-hosts-file');
-    let hosts_textarea_existing = "div-textarea-storage-vm-temp-hosts-file";
-    fileReaderFunc(hosts_input, hosts_textarea_existing);
-});
-// Hosts 기존 파일 선택 시 파일 선택 취소 시 hidden textarea 초기화
-$('#form-input-storage-vm-hosts-file').on('change', function(){
-    if($(this).val() == ""){
-        $('#div-textarea-storage-vm-temp-hosts-file').val("");
-    }
-});
-
-
 /**
  * Meathod Name : hideAllMainBody  
  * Date Created : 2021.02.22
