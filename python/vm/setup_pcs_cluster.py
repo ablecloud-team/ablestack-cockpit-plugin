@@ -2,10 +2,12 @@
 
 import argparse
 import logging
+import json
 import sys
 import os
 
 from ablestack import *
+from sh import python3
 
 def createArgumentParser():
     '''
@@ -14,11 +16,13 @@ def createArgumentParser():
     '''
     # 참조: https://docs.python.org/ko/3/library/argparse.html
     # 프로그램 설명
-    parser = argparse.ArgumentParser(description='호스트의 네트워크 연결 상태를 확인하는 프로그램',
+    parser = argparse.ArgumentParser(description='장애조치 클러스터를 구성하고 클라우드센터 가상머신을 배포하는 프로그램',
                                         epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™',
                                         usage='%(prog)s arguments')
 
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
+
+    #parser.add_argument('action', choices=['reset'], help='choose one of the actions')
 
     parser.add_argument('-hns', '--host-names', metavar=('[hostname1]','[hostname2]','[hostname3]'), type=str, nargs=3, help='input Value to three host names', required=True)
 
@@ -34,34 +38,29 @@ def createArgumentParser():
     return parser
 
 def resetCloud(args):
-    try:
-        # 3대의 호스트에 ping 테스트
-        ret_val = []
-        ret_text = ""
-        for host in args.host_names:
-            item = {}
-            ping_check = os.system("ping -c 1 -W 1 "+ host + "> /dev/null")
-            if ping_check == 0 :
-                item["host"] = host
-                item["status"] = 'up'
-            else:
-                item["host"] = host
-                item["status"] = 'down'
-                ret_text += host+"와 네트워크 테스트 실패하였습니다\n"
+    
+    success_bool = True
 
-            ret_val.append(item)
-        # 인증된 서버인지 여부를 확인할 수 있는지? 향후 추가 개발 필요
-        # ex : ssh root@host date 명령을 수행시 인증이 되어있으면 바로 응답이 오는데 인증이 되어있지 않으면 정상응답이 오지 않음
 
-        if ret_text == "":
-            return createReturn(code=200, val="host ping test success")
-        else:
-            return createReturn(code=500, val=ret_text)
+    #=========== pcs cluster 구성 ===========
+    # ceph 이미지 등록
+    #os.system("qemu-img convert -f qcow2 -O rbd /opt/ablestack/vm/qcow2-template/centos8-template.qcow2 rbd:rbd/ccvm")
 
-    except Exception as e:
-        # 결과값 리턴
-        print(e)
-        return createReturn(code=500, val={})
+    # 클러스터 구성
+    result = json.loads(python3('/usr/share/cockpit/cockpit-plugin-ablestack/python/pcs/main.py', 'config', '--cluster', 'cloudcenter_cluster', '--hosts', args.host_names[0], args.host_names[1], args.host_names[2] ).stdout.decode())
+    if result['code'] not in [200]:
+        success_bool = False
+
+    # 리소스 생성
+    result = json.loads(python3('/usr/share/cockpit/cockpit-plugin-ablestack/python/pcs/main.py', 'create', '--resource', 'cloudcenter_res', '--xml', '/opt/ablestack/vm/ccvm/ccvm.xml' ).stdout.decode())
+    if result['code'] not in [200]:
+        success_bool = False
+
+    # 결과값 리턴
+    if success_bool:
+        return createReturn(code=200, val="cloud center setup success")
+    else:
+        return createReturn(code=500, val="cloud center setup fail")
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

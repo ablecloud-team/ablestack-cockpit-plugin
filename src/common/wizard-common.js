@@ -175,6 +175,18 @@ function setSshKeyFileReader(input, callBackFunction) {
         icon.removeClass('fa-info-circle fa-check-circle fa-play fa-exclamation-circle');
 
         if(status == "proceeding" || status==1){
+            if(span.attr('id') == "span-progress-step1"){
+                $('#progress-step-text').text('클라우드센터 가상머신을 배포 중입니다. 전체 5단계 중 1단계 진행 중입니다.');
+            } else if(span.attr('id') == "span-progress-step2"){
+                $('#progress-step-text').text('클라우드센터 가상머신을 배포 중입니다. 전체 5단계 중 2단계 진행 중입니다.');
+            } else if(span.attr('id') == "span-progress-step3"){
+                $('#progress-step-text').text('클라우드센터 가상머신을 배포 중입니다. 전체 5단계 중 3단계 진행 중입니다.');
+            } else if(span.attr('id') == "span-progress-step4"){
+                $('#progress-step-text').text('클라우드센터 가상머신을 배포 중입니다. 전체 5단계 중 4단계 진행 중입니다.');
+            } else if(span.attr('id') == "span-progress-step5"){
+                $('#progress-step-text').text('클라우드센터 가상머신을 배포 중입니다. 전체 5단계 중 5단계 진행 중입니다.');
+            }
+
             span.addClass('pf-m-orange');
             icon.addClass('fa-play');
             progress_text.text('진행중');

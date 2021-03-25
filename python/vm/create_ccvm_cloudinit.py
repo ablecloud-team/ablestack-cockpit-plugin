@@ -16,7 +16,7 @@ def createArgumentParser():
     '''
     # 참조: https://docs.python.org/ko/3/library/argparse.html
     # 프로그램 설명
-    parser = argparse.ArgumentParser(description='장애조치 클러스터 및 가상머신 배포 초기화 프로그램',
+    parser = argparse.ArgumentParser(description='클라우드 센터를 초기화하는 프로그램',
                                         epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™',
                                         usage='%(prog)s arguments')
 
@@ -24,7 +24,12 @@ def createArgumentParser():
 
     #parser.add_argument('action', choices=['reset'], help='choose one of the actions')
 
-    #parser.add_argument('-hns', '--host-names', metavar=('[hostname1]','[hostname2]','[hostname3]'), type=str, nargs=3, help='input Value to three host names', required=True)
+    parser.add_argument('-f1', '--file1', metavar='[file location]', type=str, help='input Value to hosts file location and name', required=True)
+    parser.add_argument('-t1', '--text1', metavar='[file text]', type=str, help='input Value to hosts text', required=True)
+    parser.add_argument('-f2', '--file2', metavar='[file2 location]', type=str, help='input Value to pricate key file location and name', required=True)
+    parser.add_argument('-t2', '--text2', metavar='[file2 text]', type=str, help='input Value to pricate key text', required=True)
+    parser.add_argument('-f3', '--file3', metavar='[file3 location]', type=str, help='input Value to public key file location and name', required=True)
+    parser.add_argument('-t3', '--text3', metavar='[file3 text]', type=str, help='input Value to public key text', required=True)
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
@@ -40,46 +45,37 @@ def createArgumentParser():
 def resetCloud(args):
     
     success_bool = True
-
-    #=========== pcs cluster 초기화 ===========
-    # 리소스 삭제
-    result = json.loads(python3('/usr/share/cockpit/cockpit-plugin-ablestack/python/pcs/main.py', 'remove', '--resource', 'cloudcenter_res').stdout.decode())
-    if result['code'] not in [200,400]:
-        success_bool = False
-
-    # 클러스터 삭제
-    result = json.loads(python3('/usr/share/cockpit/cockpit-plugin-ablestack/python/pcs/main.py', 'destroy').stdout.decode())
-    if result['code'] not in [200,400]:
-        success_bool = False
     
-    # ceph rbd 이미지 삭제
-    result = os.system("rbd ls -p rbd | grep ccvm > /dev/null")
-    if result == 0:
-        os.system("rbd rm rbd/ccvm")
+    # cloudinit iso에 사용할 hosts 파일 생성
+    cmd = "cat > "+args.file1+"<< EOF\n"
+    cmd += args.text1
+    cmd += "\nEOF"
+    os.system(cmd)
 
-    # cloudinit iso 삭제
-    os.system("rm -f /opt/ablestack/vm/ccvm/ccvm-cloudinit.iso")
-    
-    # vm xml 템플릿 삭제
-    os.system("rm -f /opt/ablestack/vm/ccvm/ccvm.xml")
-    
-    # cloudinit iso에 사용할 hosts 삭제
-    os.system("rm -f /opt/ablestack/vm/ccvm/hosts")
+    # cloudinit iso에 사용할 개인키 : ablecloud 파일 생성
+    cmd = "cat > "+args.file2+"<< EOF\n"
+    cmd += args.text2
+    cmd += "\nEOF"
+    os.system(cmd)
 
-    # cloudinit iso에 사용할 개인키 : ablecloud 삭제
-    os.system("rm -f /opt/ablestack/vm/ccvm/ablecloud")
+    # cloudinit iso에 사용할 공개키 : ablecloud.pub 생성
+    cmd = "cat > "+args.file3+"<< EOF\n"
+    cmd += args.text3
+    cmd += "\nEOF"
+    os.system(cmd)
 
-    # cloudinit iso에 사용할 공개키 : ablecloud.pub 삭제
-    os.system("rm -f /opt/ablestack/vm/ccvm/ablecloud.pub")
+    # cloudinit iso 생성 (/opt/ablestack/vm/ccvm/ccvm-cloudinit.iso)
+    #
+    #
+    #
+    #
+    #
 
-    # 확인후 폴더 밑 내용 다 삭제해도 무관하면 아래 코드 수행
-    #os.system("rm -rf /opt/ablestack/vm/ccvm/*")
-    
     # 결과값 리턴
     if success_bool:
-        return createReturn(code=200, val="cloud center reset success")
+        return createReturn(code=200, val="ccvm cloudinit iso create success")
     else:
-        return createReturn(code=500, val="cloud center reset fail")
+        return createReturn(code=500, val="ccvm cloudinit iso create fail")
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

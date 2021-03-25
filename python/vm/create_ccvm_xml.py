@@ -5,6 +5,8 @@ import logging
 import sys
 import fileinput
 import random
+import os
+import subprocess
 
 from ablestack import *
 
@@ -15,7 +17,7 @@ def createArgumentParser():
     '''
     # 참조: https://docs.python.org/ko/3/library/argparse.html
     # 프로그램 설명
-    parser = argparse.ArgumentParser(description='클라우드 센터 가상머신 xml 생성하는 프로그램',
+    parser = argparse.ArgumentParser(description='클라우드센터 가상머신 xml 생성하는 프로그램',
                                         epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™',
                                         usage='%(prog)s arguments')
 
@@ -30,6 +32,9 @@ def createArgumentParser():
     
     #--service-network-bridge br1                                           | 1택, 조건부 필수
     parser.add_argument('-snb', '--service-network-bridge', metavar='[bridge name]', type=str, help='input Value to bridge name of the service network')
+
+    # three host names
+    parser.add_argument('-hns', '--host-names', metavar=('[hostname1]','[hostname2]','[hostname3]'), type=str, nargs=3, help='input Value to three host names', required=True)
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
@@ -61,50 +66,109 @@ def generateDecToHex():
         hex_list.append(hex(num))
     return hex_list
 
+def createSecretKey(host_names):
+    
+    # secret.xml 생성
+    cmd = "cat > /opt/ablestack/vm/ccvm/secret.xml <<EOF\n"
+    cmd += "<secret ephemeral='no' private='no'>\n"
+    cmd += "    <uuid>11111111-1111-1111-1111-111111111111</uuid>\n"
+    cmd += "    <usage type='ceph'>\n"
+    cmd += "        <name>client.admin secret</name>\n"
+    cmd += "    </usage>\n"
+    cmd += "</secret>\n"
+    cmd += "EOF\n"
+    os.system(cmd)
+
+    # 이미 3대의 호스트 /opt/ablestack/vm/secret/secret.xml 경로에 secret.xml이 존재 한다고 가정
+
+    for host_name in host_names:    
+
+        os.system("scp /opt/ablestack/vm/ccvm/secret.xml root@"+host_name+":/opt/ablestack/vm/ccvm/secret.xml")
+
+        # virsh secret-list 11111111-1111-1111-1111-111111111111 값이 존재하는지 확인
+        secret_val = subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-list | grep  11111111-1111-1111-1111-111111111111'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+
+        # ceph_admin_key를 받아오기 위한 변수
+        ceph_admin_key = subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='ceph auth get-key client.admin'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+        ecret_set_value_cmd = 'virsh secret-set-value --secret 11111111-1111-1111-1111-111111111111 --base64 ' + ceph_admin_key[0].decode()
+
+        if secret_val[0].decode() == '': # secret이 정의되어 있지 않으면 생성
+            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-define /opt/ablestack/vm/ccvm/secret.xml'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd=ecret_set_value_cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+        else: # secret이 정의되어 있으면 삭제후 재생성
+            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-undefine 11111111-1111-1111-1111-111111111111'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-define /opt/ablestack/vm/ccvm/secret.xml'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd=ecret_set_value_cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+
 def createCcvmXml(args):
     try:
         slot_hex_num = generateDecToHex()
         br_num = 0
-        
-        # 생성할 가상머신 xml 템플릿
-        template_file = '/usr/share/cockpit/cockpit-plugin-ablestack/tools/xml-template/ccvm.xml'
 
-        with fileinput.FileInput(template_file, inplace=True, backup='.bak' ) as fi:
+        # 템플릿 파일을 /opt/ablestack/vm/ccvm 경로로 복사
+        for host_name in args.host_names:
+            os.system("yes|cp -f /usr/share/cockpit/cockpit-plugin-ablestack/tools/xml-template/ccvm-xml-template.xml /opt/ablestack/vm/ccvm/ccvm-temp.xml")
+            
+            template_file = '/opt/ablestack/vm/ccvm/ccvm-temp.xml'
 
-            for line in fi:
+            with fileinput.FileInput(template_file, inplace=True, backup='.bak' ) as fi:
 
-                if '<!--memory-->' in line:
-                    line = line.replace('<!--memory-->', str(args.memory))
-                elif '<!--cpu-->' in line:
-                    line = line.replace('<!--cpu-->', str(args.cpu))
-                elif '<!--management_network_bridge-->' in line:
-                    mnb_txt = "\t\t<interface type='bridge'>\n"
-                    mnb_txt += "\t\t\t<mac address='" + generateMacAddress() + "'/>\n"
-                    mnb_txt += "\t\t\t<source bridge='" + args.management_network_bridge + "'/>\n"
-                    mnb_txt += "\t\t\t<target dev='vnet" + str(br_num) + "'/>\n"
-                    mnb_txt += "\t\t\t<model type='virtio'/>\n"
-                    mnb_txt += "\t\t\t<alias name='net" + str(br_num) + "'/>\n"
-                    mnb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
-                    mnb_txt += "\t\t</interface>\n"
+                for line in fi:
 
-                    br_num += 1
-                    line = line.replace('<!--management_network_bridge-->', mnb_txt)
-                elif '<!--service_network_bridge-->' in line:
-                    snb_txt = "\t\t<interface type='bridge'>\n"
-                    snb_txt += "\t\t\t<mac address='" + generateMacAddress() + "'/>\n"
-                    snb_txt += "\t\t\t<source bridge='" + args.service_network_bridge + "'/>\n"
-                    snb_txt += "\t\t\t<target dev='vnet" + str(br_num) + "'/>\n"
-                    snb_txt += "\t\t\t<model type='virtio'/>\n"
-                    snb_txt += "\t\t\t<alias name='net" + str(br_num) + "'/>\n"
-                    snb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
-                    snb_txt += "\t\t</interface>\n"
+                    if '<!--memory-->' in line:
+                        line = line.replace('<!--memory-->', str(args.memory))
+                    elif '<!--cpu-->' in line:
+                        line = line.replace('<!--cpu-->', str(args.cpu))
+                    elif '<!--ccvm-root-disk-->' in line:
+                        host_num = host_name.replace('ablecube', '')
 
-                    br_num += 1
-                    line = line.replace('<!--service_network_bridge-->', snb_txt)
-                
-                # 라인 수정
-                sys.stdout.write(line)
+                        crd_txt = "  <disk type='network' device='disk'>\n"
+                        crd_txt += "      <source protocol='rbd' name='rbd/ccvm'>\n"
+                        crd_txt += "        <host name='scvm"+str(host_num)+"-pn' port='6789'/>\n"
+                        crd_txt += "      </source>\n"
+                        crd_txt += "      <auth username='admin'>\n"
+                        crd_txt += "        <secret type='ceph' uuid='11111111-1111-1111-1111-111111111111'/>\n"
+                        crd_txt += "      </auth>\n"
+                        crd_txt += "      <target dev='vdb' bus='virtio'/>\n"
+                        crd_txt += "    </disk>"
 
+                        line = line.replace('<!--ccvm-root-disk-->', crd_txt)
+                    elif '<!--management_network_bridge-->' in line:
+                        mnb_txt = "    <interface type='bridge'>\n"
+                        mnb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
+                        mnb_txt += "      <source bridge='" + args.management_network_bridge + "'/>\n"
+                        mnb_txt += "      <target dev='vnet" + str(br_num) + "'/>\n"
+                        mnb_txt += "      <model type='virtio'/>\n"
+                        mnb_txt += "      <alias name='net" + str(br_num) + "'/>\n"
+                        mnb_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
+                        mnb_txt += "    </interface>"
+
+                        br_num += 1
+                        line = line.replace('<!--management_network_bridge-->', mnb_txt)
+                    elif '<!--service_network_bridge-->' in line:
+                        if args.service_network_bridge is not None:
+                            snb_txt = "    <interface type='bridge'>\n"
+                            snb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
+                            snb_txt += "      <source bridge='" + args.service_network_bridge + "'/>\n"
+                            snb_txt += "      <target dev='vnet" + str(br_num) + "'/>\n"
+                            snb_txt += "      <model type='virtio'/>\n"
+                            snb_txt += "      <alias name='net" + str(br_num) + "'/>\n"
+                            snb_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
+                            snb_txt += "    </interface>"
+
+                            br_num += 1
+                            line = line.replace('<!--service_network_bridge-->', snb_txt)
+                        else:
+                            # <!--service_network_bridge--> 주석제거
+                            line = ''
+                    
+                    # 라인 수정
+                    sys.stdout.write(line)
+
+            os.system("scp /opt/ablestack/vm/ccvm/ccvm-temp.xml root@"+host_name+":/opt/ablestack/vm/ccvm/ccvm.xml")
+
+        #작업파일 지우기
+        os.system("rm -f /opt/ablestack/vm/ccvm/ccvm-temp.xml /opt/ablestack/vm/ccvm/ccvm.xml.bak")
         # 결과값 리턴
         return createReturn(code=200, val={})        
 
@@ -124,6 +188,9 @@ if __name__ == '__main__':
 
     # 로깅을 위한 logger 생성, 모든 인자에 default 인자가 있음.
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
+
+    # secret.xml 생성 및 virsh 등록
+    createSecretKey(args.host_names)
 
     # 실제 로직 부분 호출 및 결과 출력
     ret = createCcvmXml(args)
