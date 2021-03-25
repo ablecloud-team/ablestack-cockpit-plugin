@@ -5,14 +5,6 @@
  * Description : main.html에서 발생하는 이벤트 처리를 위한 JavaScript
 **/
 
-$(document).click(function(e){
-    //토글 생성시 토글영역 외의 영역을 클릭시 토글 숨김
-    if (!$(e.target).is('#card-action-storage-cluster-status, #card-action-cloud-cluster-status, #card-action-storage-vm-status, #card-action-cloud-vm-status')) {
-        $('#dropdown-menu-storage-cluster-status, #dropdown-menu-cloud-cluster-status, #dropdown-menu-storage-vm-status, #dropdown-menu-cloud-vm-status').hide();
-    }
-});
-
-
 // document.ready 영역 시작
 
 $(document).ready(function(){
