@@ -2,9 +2,12 @@ import sys
 import argparse
 import json
 import logging
+import sh
 
 from subprocess import check_output
 from able_return import *
+
+
 
 
 def parseArgs():
@@ -12,23 +15,14 @@ def parseArgs():
                                      epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
     
     parser.add_argument('action', choices=['pcsDetail','pcsStart','pcsStop','pcsCleanup','pcsMigration'])
+    parser.add_argument('--target', metavar='name', type=str, help='Target hostname to migrate Cloud Center VM')
     
     return parser.parse_args()
 
 
-def pcsDeteil():
+def pcsDetail():
     try:
-        ret_val = {
-            'pcsClusterStatus': 'Health_OK',
-            'nodeConfig': {
-                'host1': '172.16.0.11',
-                'host2': '172.16.0.12',
-                'host3': '172.16.0.13'
-                },
-            'resourceStatus': 'ENABLE',
-            'executionNode': '172.16.0.11'
-        } 
-        ret = createReturn(code=200, val=ret_val)
+        ret = sh.python3("/usr/share/cockpit/ablestack/python/pcs/main.py","status", "--resource", "cloudcenter_res").stdout.decode()
     except Exception as e:
         ret = createReturn(code=500, val='ERROR')
         print ('EXCEPTION : ',e)
@@ -37,17 +31,11 @@ def pcsDeteil():
 
 def pcsStart():
     try:
-        ret_val = {
-            'pcsClusterStatus': 'Health_OK',
-            'nodeConfig': {
-                'host1': '172.16.0.11',
-                'host2': '172.16.0.12',
-                'host3': '172.16.0.13'
-                },
-            'resourceStatus': 'ENABLE',
-            'executionNode': '172.16.0.11'
-        } 
-        ret = createReturn(code=200, val=ret_val)
+        ret = sh.python3("/usr/share/cockpit/ablestack/python/pcs/main.py","enable", "--resource", "cloudcenter_res").stdout.decode()
+        while True:
+            retPcsStatusJson = json.loads(sh.python3("/usr/share/cockpit/ablestack/python/pcs/main.py","status", "--resource", "cloudcenter_res").stdout.decode())
+            if retPcsStatusJson['val']['role'] == 'Started':
+                break
     except Exception as e:
         ret = createReturn(code=500, val='ERROR')
         print ('EXCEPTION : ',e)
@@ -56,17 +44,34 @@ def pcsStart():
     
 def pcsStop():
     try:
-        ret_val = {
-            'pcsClusterStatus': 'Health_OK',
-            'nodeConfig': {
-                'host1': '172.16.0.11',
-                'host2': '172.16.0.12',
-                'host3': '172.16.0.13'
-                },
-            'resourceStatus': 'DISABLE',
-            'executionNode': 'N/A'
-        } 
-        ret = createReturn(code=200, val=ret_val)
+        ret = sh.python3("/usr/share/cockpit/ablestack/python/pcs/main.py","disable", "--resource", "cloudcenter_res").stdout.decode()
+        while True:
+            retPcsStatusJson = json.loads(sh.python3("/usr/share/cockpit/ablestack/python/pcs/main.py","status", "--resource", "cloudcenter_res").stdout.decode())
+            if retPcsStatusJson['val']['role'] == 'Stopped':
+                break
+    except Exception as e:
+        ret = createReturn(code=500, val='ERROR')
+        print ('EXCEPTION : ',e)
+    
+    return ret
+
+def pcsCleanup():
+    try:
+        ret = sh.python3("/usr/share/cockpit/ablestack/python/pcs/main.py","cleanup", "--resource", "cloudcenter_res").stdout.decode()
+    except Exception as e:
+        ret = createReturn(code=500, val='ERROR')
+        print ('EXCEPTION : ',e)
+    
+    return ret
+
+def pcsMigration():
+    try:
+        ret = sh.python3("/usr/share/cockpit/ablestack/python/pcs/main.py","move", "--resource", "cloudcenter_res", "--target",  args.target).stdout.decode()
+        while True:
+            retPcsStatusJson = json.loads(sh.python3("/usr/share/cockpit/ablestack/python/pcs/main.py","status", "--resource", "cloudcenter_res").stdout.decode())
+            if retPcsStatusJson['val']['role'] == 'Started':
+                break
+        sh.python3("/usr/share/cockpit/ablestack/python/pcs/main.py","cleanup", "--resource", "cloudcenter_res").stdout.decode()
     except Exception as e:
         ret = createReturn(code=500, val='ERROR')
         print ('EXCEPTION : ',e)
@@ -81,13 +86,16 @@ if __name__ == '__main__':
     args = parseArgs()
     ##print(args);
     if args.action == 'pcsDetail':
-        ret = pcsDeteil()
+        ret = pcsDetail()
         print(ret)
     elif args.action == 'pcsStart':
         ret = pcsStart()
         print(ret)
     elif args.action == 'pcsStop':
         ret = pcsStop()
+        print(ret)
+    elif args.action == 'pcsCleanup':
+        ret = pcsCleanup()
         print(ret)
     elif args.action == 'pcsMigration':
         ret = pcsMigration()
