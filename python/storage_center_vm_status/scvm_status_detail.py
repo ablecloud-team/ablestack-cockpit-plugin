@@ -57,7 +57,7 @@ def statusDeteil():
             memory_tib = memory_gib / 1024
             memory = str(memory_tib) + " TiB"    
        
-        ##임시 테스트 데이터사용, 실제 qcow2 파일 사용시 수정해야함.
+        ##임시 테스트 데이터사용, 실제 qcow2 파일과 pool명 확인시 수정필요
         output = check_output(["virsh vol-info --pool default --vol scvm.qcow2 | grep Capacity"], universal_newlines=True, shell=True, env=env)    
         rdisk = output.split("Capacity:")[1].strip()
         #print(rdisk)

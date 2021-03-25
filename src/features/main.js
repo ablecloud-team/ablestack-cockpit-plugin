@@ -5,14 +5,6 @@
  * Description : main.html에서 발생하는 이벤트 처리를 위한 JavaScript
 **/
 
-$(document).click(function(e){
-    //토글 생성시 토글영역 외의 영역을 클릭시 토글 숨김
-    if (!$(e.target).is('#card-action-storage-cluster-status, #card-action-cloud-cluster-status, #card-action-storage-vm-status, #card-action-cloud-vm-status')) {
-        $('#dropdown-menu-storage-cluster-status, #dropdown-menu-cloud-cluster-status, #dropdown-menu-storage-vm-status, #dropdown-menu-cloud-vm-status').hide();
-    }
-});
-
-
 // document.ready 영역 시작
 
 $(document).ready(function(){
@@ -41,9 +33,9 @@ $(document).ready(function(){
     //스토리지 클러스터 유지보수 모드 변경 페이지 로드
     $('#div-modal-storage-cluster-maintenance-update').load("./src/features/storage-cluster-maintenance-update.html");
     $('#div-modal-storage-cluster-maintenance-update').hide();
+   
     
-
-    
+   
     // 스토리지센터 클러스터 상태 조회 시작
     cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_detail.py", "detail" ])
     .then(function(data){  
@@ -88,9 +80,11 @@ $(document).ready(function(){
         if(retVal.code == 200){
             $('#scc-status-check').text("스토리지센터 클러스터가 구성되었습니다.");
             $('#scc-status-check').attr("style","color: var(--pf-global--success-color--100)");
+            $("#menu-item-linkto-storage-center").attr('class','pf-c-dropdown__menu-item');            
         }else{
             $('#scc-status-check').text("스토리지센터 클러스터가 구성되지 않았습니다.");            
             $('#scc-status-check').attr("style","color: var(--pf-global--danger-color--100)");
+            $("#menu-item-linkto-storage-center").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
         }
 
     })
@@ -98,6 +92,7 @@ $(document).ready(function(){
         console.log(":::Error:::");
         $('#scc-status-check').text("토리지센터 클러스터가 구성되지 않았습니다.");
         $('#scc-status-check').attr("style","color: var(--pf-global--danger-color--100)");
+        $("#menu-item-linkto-storage-center").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
     });
     
 
@@ -164,13 +159,13 @@ $(document).ready(function(){
         if(retVal.code == 200){
             $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되었습니다.");
             $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--success-color--100)");
+            $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item');
         }else{
             $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
             $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
             $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
             $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-            
-
+            $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item pf-m-disabled');           
             $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되지 않았습니다.");            
             $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--danger-color--100)");
         }
@@ -182,6 +177,7 @@ $(document).ready(function(){
         $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
         $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
         $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+        $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
 
         $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되지 않았습니다.");
         $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--danger-color--100)");
@@ -261,3 +257,36 @@ $('#menu-item-set-storage-center-vm-resource-update').on('click', function(){
     $('#div-modal-storage-vm-resource-update').show();
 });
 
+
+
+$('#menu-item-linkto-storage-center').on('click', function(){
+
+    //storageCenter url 링크 주소 가져오기
+    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/url/create_address.py", "storageCenter", "-H" ])
+    .then(function(data){
+        var retVal = JSON.parse(data);        
+        if(retVal.code == 200){
+            // 스토리지 센터 VM 연결
+            window.open(retVal.val);
+        }
+    })
+    .catch(function(data){
+        //console.log(":::Error:::");        
+    });
+});
+
+$('#menu-item-linkto-storage-center-vm').on('click', function(){
+
+    //storageCenterVm url 링크 주소 가져오기
+    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/url/create_address.py", "storageCenterVm", "-H" ])
+    .then(function(data){
+        var retVal = JSON.parse(data);        
+        if(retVal.code == 200){ 
+            // 스토리지 센터 VM 연결
+            window.open(retVal.val);
+        }
+    })
+    .catch(function(data){
+        //console.log(":::Error:::");        
+    });    
+});
