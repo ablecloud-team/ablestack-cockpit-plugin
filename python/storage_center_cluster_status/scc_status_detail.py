@@ -60,9 +60,11 @@ def statusDeteil():
         #print(mon_gw1)
         #print(mon_gw2)
 
-        output = check_output(['ceph -s | grep mgr'], universal_newlines=True, shell=True)
-        mgr = output.split('mgr: ')[1].strip()    
-        #mgr_cnt = mgr.count('scvm')      
+        #output = check_output(['ceph -s | grep mgr'], universal_newlines=True, shell=True)
+        output_mgr = check_output(['ceph mgr stat'], universal_newlines=True, shell=True, env=env)        
+        output_mgr = json.loads(output_mgr)
+        mgr = output_mgr['active_name'];
+        #mgr = output.split('mgr: ')[1].strip()         
         
         mgr_cnt= int(output_json['mgrmap']['num_standbys']) + 1        
         #print(mgr)
