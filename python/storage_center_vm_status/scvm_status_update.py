@@ -4,16 +4,28 @@ import sys
 import argparse
 import json
 import logging
+import os
+import bs4
 
+import subprocess
 from subprocess import check_output
-from subprocess import run
+from subprocess import call
 from ablestack import *
+import libvirt
+
+
+env=os.environ.copy()
+env['LANG']="en_US.utf-8"
+env['LANGUAGE']="en"
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Storage Center VM action ',
                                      epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
     
-    parser.add_argument('action', choices=['start', 'stop', 'delete'], help="Storage Center VM action")
+    parser.add_argument('action', choices=['start', 'stop', 'delete', 'resource'], help="Storage Center VM action")
+
+    parser.add_argument('-c', '--cpu', metavar='[cpu cores]', type=int, help='input Value to cpu cores')
+    parser.add_argument('-m', '--memory', metavar='[memory gb]', type=int, help='input Value to memory GB')
     
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐)
     parser.add_argument("-v", "--verbose", action='count', default=0, help="increase output verbosity")
@@ -27,44 +39,111 @@ def parseArgs():
     return parser.parse_args()
 
 #스토리지 VM 시작 
-def StartStroageVM():
-        
-    try:        
-        #run(['virsh', 'start', 'scvm1'], universal_newlines=True)
+def startStorageVM():
 
-        ret = createReturn(code=200, val='success', retname='Storage Center VM Start')
+    try:
+        rc = call(['virsh start scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        
+        if rc == 0: # ok
+            retVal = True
+            retCode = 200
+        elif rc == 1: # not ok
+            retVal = False
+            retCode = 500
+
+        ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM Start')
 
     except Exception as e:
-        ret = createReturn(code=500, val='ERROR', retname='Storage Center VM Start Error')
+        ret = createReturn(code=500, val='virsh start error', retname='Storage Center VM Start Error')
         #print ('EXCEPTION : ',e)
                 
     return print(json.dumps(json.loads(ret), indent=4))
 
 
 #스토리지 VM 정지
-def StopStroageVM():  
+def stopStorageVM():  
         
     try:
-        #run(['virsh', 'start', 'scvm1'], universal_newlines=True)  
+        rc = call(['virsh shutdown scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
         
-        ret = createReturn(code=200, val='success', retname='Storage Center VM Stop')
+        if rc == 0: # ok
+            retVal = True
+            retCode = 200
+        elif rc == 1: # not ok
+            retVal = False
+            retCode = 500
+         
+        
+        ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM Stop')
 
     except Exception as e:
-        ret = createReturn(code=500, val='ERROR', retname='Storage Center VM Stop Error')
+        ret = createReturn(code=retCode, val='virsh shutdown error', retname='Storage Center VM Stop Error')
         #print ('EXCEPTION : ',e)
     
     return print(json.dumps(json.loads(ret), indent=4))
     
 #스토리지 VM 삭제
-def DeleteStroageVM():  
-        
+def deleteStorageVM():   
+
     try:
-        #run(['virsh', 'destroy', 'scvm1'], universal_newlines=True)
+
+        rc = call(['virsh destroy scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        if rc == 0: # 
+            rc = call(['virsh undefine scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
+            if rc == 0: # ok
+                retVal = True
+                retCode = 200
+            elif rc == 1: # not ok
+                retVal = False
+                retCode = 500
+
+        elif rc == 1: # not ok
+            retVal = False
+            retCode = 500
+
         
-        ret = createReturn(code=200, val='success', retname='Storage Center VM Delete')
+        ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM Delete')
 
     except Exception as e:
-        ret = createReturn(code=500, val='ERROR', retname='Storage Center VM Delete Error')
+        ret = createReturn(code=500, val='virsh destroy, undefine error', retname='Storage Center VM Delete Error')
+        #print ('EXCEPTION : ',e)
+    
+    return print(json.dumps(json.loads(ret), indent=4))
+
+
+#스토리지 VM 삭제
+def updateStorageVM(cpu, memory):
+
+    memory = memory * 1024 #MiB 형태로 변경    
+    
+    try:
+
+        # #값이 없을때 
+        if cpu > 0 :
+            rc = call(['virt-xml scvm --edit --vcpus maxvcpus=' + str(cpu)], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
+            
+            if rc == 0: # ok
+                retVal = True
+                retCode = 200
+            elif rc == 1: # not ok
+                retVal = False
+                retCode = 500
+            
+            
+        if memory > 0 :
+            rc = call(['virt-xml scvm --edit --memory ' + str(memory) + ',maxmemory=' + str(memory)], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+            
+            if rc == 0: # ok                
+                retVal = True
+                retCode = 200
+            elif rc == 1: # not ok
+                retVal = False
+                retCode = 500
+                 
+        ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM UPDATE')
+
+    except Exception as e:
+        ret = createReturn(code=500, val='virsh destroy, undefine error', retname='Storage Center VM UPDATE Error')
         #print ('EXCEPTION : ',e)
     
     return print(json.dumps(json.loads(ret), indent=4))
@@ -82,14 +161,16 @@ if __name__ == '__main__':
     #logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
     if args.action == 'start':        
-        ret = StartStroageVM();    
+        ret = startStorageVM();    
     
     elif args.action == 'stop':
-        ret = StopStroageVM();    
+        ret = stopStorageVM();    
     
     elif args.action == 'delete':
-        ret = DeleteStroageVM();    
-        
+        ret = deleteStorageVM();    
+    
+    elif args.action == 'resource':
+        ret = updateStorageVM(args.cpu, args.memory); 
 
     #print(ret)
     

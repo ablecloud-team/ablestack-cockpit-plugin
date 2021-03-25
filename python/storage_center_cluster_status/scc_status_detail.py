@@ -130,12 +130,13 @@ def statusDeteil():
             'avail': available,
             'used': used,
             'usage_percentage': usage_percentage, 
-            'maintenance_status': maintenance_status }
+            'maintenance_status': maintenance_status,
+            'json_raw' : output_json}
         ret = createReturn(code=200, val=ret_val, retname='Storage Cluster Status Detail')
 
     except Exception as e:
         ret_val = {
-            'cluster_status': 'N/A', 
+            'cluster_status': 'no signal', 
             'osd': 'N/A', 
             'osd_up': 'N/A', 
             'mon_gw1' : 'N/A',
