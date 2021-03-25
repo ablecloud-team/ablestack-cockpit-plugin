@@ -9,6 +9,7 @@ ex)
 /usr/bin/python3 /root/cockpit-plugin-ablestack/tools/cloudinit/gencloudinit.py --hostname scvm1 \
     --pubkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa.pub \
     --privkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa \
+    --hosts /root/cockpit-plugin-ablestack/tools/cloudinit/hosts \
     --mgmt-nic=ens12 --mgmt-ip 10.10.14.150 --mgmt-prefix 16 --mgmt-gw 10.10.0.1 --dns 8.8.8.8 \
     --pn-nic ens13 --pn-ip 10.10.14.151 \
     --cn-nic ens14 --cn-ip 10.10.14.152 --iso-path scvm.iso scvm
@@ -16,6 +17,7 @@ ex)
 /usr/bin/python3 /root/cockpit-plugin-ablestack/tools/cloudinit/gencloudinit.py --hostname ccvm \
     --pubkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa.pub \
     --privkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa \
+    --hosts /root/cockpit-plugin-ablestack/tools/cloudinit/hosts \
     --mgmt-nic=ens12 --mgmt-ip 10.10.14.150 --mgmt-prefix 16 --mgmt-gw 10.10.0.1 --dns 8.8.8.8 \
     --iso-path ccvm.iso ccvm
 
@@ -55,6 +57,7 @@ def argumentParser():
     # 선택지 추가(동작 선택)
     tmp_parser.add_argument('--iso-path', metavar='ISO file', help="저장할 ISO파일 이름")
     tmp_parser.add_argument('--hostname', metavar='hostname', help="VM의 이름")
+    tmp_parser.add_argument('--hosts', metavar='hosts file', help="hosts파일의 이름")
     tmp_parser.add_argument('--mgmt-nic', metavar='Management NIC', help="관리 네트워크 nic의 이름")
     tmp_parser.add_argument('--pubkey', metavar='Public Key File', help="Public Key File")
     tmp_parser.add_argument('--privkey', metavar='Private Key File', help="Private Key File")
@@ -93,6 +96,25 @@ def argumentParser():
     tmp_parser.add_argument("-V", "--Version", action='version',
                             version="%(prog)s 1.0")
     return tmp_parser.parse_args()
+
+
+
+"""
+hosts 파일 복사를 지정하는 함수
+
+:param :filename :str hosts 파일명
+:return 
+"""
+def genHosts(filename: str):
+    with open(filename, 'rt') as f:
+        hosts = f.read()
+    yam = {'write_files':
+                 [{'content': hosts,
+                   'owner': 'root:root',
+                   'path': '/etc/hosts',
+                   'permissions': '0644'}]}
+    with open('user-data', 'at') as f:
+        f.write(yaml.dump(yam))
 
 
 """
@@ -277,6 +299,7 @@ cloudinit iso를 생성하는 스크립트입니다.
 :param :dns         :ip     가상머신의 dns
 :param :pubkey      :str    가상머신에 넣을 publickey 파일의 이름
 :param :privkey     :str    가상머신의 넣을 privkey 파일의 이름
+:param :hosts       :str    가상머신에 적용할 hosts 파일의 이름
 :param :pn-nic      :str    PN의 NIC 이름      (scvm만)
 :param :pn-ip       :ip     PN의 IP            (scvm만)
 :param :cn-nic      :str    CN의 NIC 이름      (scvm만)
@@ -285,6 +308,7 @@ ex)
 /usr/bin/python3 /root/cockpit-plugin-ablestack/tools/cloudinit/gencloudinit.py --hostname scvm1 \
     --pubkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa.pub \
     --privkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa \
+    --hosts /root/cockpit-plugin-ablestack/tools/cloudinit/hosts \
     --mgmt-nic=ens12 --mgmt-ip 10.10.14.150 --mgmt-prefix 16 --mgmt-gw 10.10.0.1 --dns 8.8.8.8 \
     --pn-nic ens13 --pn-ip 10.10.14.151 \
     --cn-nic ens14 --cn-ip 10.10.14.152 --iso-path scvm.iso scvm
@@ -292,6 +316,7 @@ ex)
 /usr/bin/python3 /root/cockpit-plugin-ablestack/tools/cloudinit/gencloudinit.py --hostname ccvm \
     --pubkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa.pub \
     --privkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa \
+    --hosts /root/cockpit-plugin-ablestack/tools/cloudinit/hosts \
     --mgmt-nic=ens12 --mgmt-ip 10.10.14.150 --mgmt-prefix 16 --mgmt-gw 10.10.0.1 --dns 8.8.8.8 \
     --iso-path ccvm.iso ccvm
     
@@ -300,6 +325,7 @@ ex)
 def main(args):
     genMeta(hostname=args.hostname)
     genUserFromFile(pubkeyfile=args.pubkey, privkeyfile=args.privkey)
+    genHosts(filename=args.hosts)
     genManagement(mgmt_nic=args.mgmt_nic, mgmt_ip=args.mgmt_ip, mgmt_prefix=args.mgmt_prefix, mgmt_gw=args.mgmt_gw,
                   dns=args.dns)
     """
