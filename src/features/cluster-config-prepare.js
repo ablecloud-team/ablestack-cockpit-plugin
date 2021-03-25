@@ -575,7 +575,7 @@ function generateSshkey() {
  * Meathod Name : readSshKeyFile
  * Date Created : 2021.03.17
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 설정확인을 위해 로컬에 존재하는 SSHKey를 읽어오는 함수
+ * Description : 클러스터 준비 마법사에서 로컬에 존재하는 SSHKey를 읽어오는 함수
  * Parameter : 없음
  * Return  : 없음
  * History  : 2021.03.11 최초 작성
@@ -607,8 +607,8 @@ function readSshKeyFile() {
  * Meathod Name : fileReaderFunc
  * Date Created : 2021.03.17
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 SSHKey 파일을 선택하면 문자열로 읽어오는 함수
- * Parameter : input
+ * Description : 클러스터 준비 마법사에서 input box에서 파일을 선택하면 문자열로 읽어와 textarea에 담 함수
+ * Parameter : input (input box id 값), textarea_type는(textarea id 값)
  * Return  : 없음
  * History  : 2021.03.11 최초 작성
 **/
@@ -735,8 +735,8 @@ function putTimeServerValueIntoTextarea(radio_value) {
  * Meathod Name : saveAsFile
  * Date Created : 2021.03.21
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 파일을 저장할 때 사용하는 함수
- * Parameter : id, str, filename
+ * Description : 클러스터 준비 마법사에서 변수 값을 다운로드 링크 형태로 제공하여 파일을 다운로드할 수 있는 함수
+ * Parameter : id(링크 태크 id), str(다운로드 할 파일 내용), filename(다운로드 시 파일 명)
  * Return  : 없음
  * History  : 2021.03.21 최초 작성
 **/
@@ -755,7 +755,7 @@ function saveAsFile(id, str, filename) {
  * Meathod Name : writeFile
  * Date Created : 2021.03.17
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 완료를 누를 때 설정확인의 정보대로 파일을 host에 업로드하거나 수정하는 함수
+ * Description : 클러스터 준비 마법사에서 완료를 누를 때 설정확인의 정보대로 파일(ssh-key, hosts)을 host에 업로드하거나 수정하는 함수
  * Parameter : text1, text2, file_type
  * Return  : 없음
  * History  : 2021.03.11 최초 작성
@@ -776,11 +776,6 @@ function writeFile(text1, text2, file_type) {
         cockpit.file("/etc/hosts").replace(text1)
             .done(function (tag) {})
             .fail(function (error) {});
-    }else if (file_type == 'timeserver_type'){
-        cockpit.spawn(["sed", "-i", "'/^server /d'", "/root/test.txt"])
-        .stream(console.log)
-        .then(console.log)
-        .catch(console.log);
     }
 }
 
@@ -789,8 +784,8 @@ function writeFile(text1, text2, file_type) {
  * Meathod Name : modifyTimeServer
  * Date Created : 2021.03.24
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 완료를 누를 때 설정확인의 time server 정보대로 host에 업데이하는 함수트
- * Parameter : timeserver_confirm_ip_text, file_type, timeserver_host_num
+ * Description : 클러스터 준비 마법사에서 완료를 누를 때 설정확인 메뉴에서 확인했던 time server 정보대로 host에 업데이트하는 함수
+ * Parameter : timeserver_confirm_ip_text(설정확인 단계에서의 ip주소 값), file_type(외부 또는 로컬서버) , timeserver_host_num(현재 설정 중인 호스트 번호)
  * Return  : 없음
  * History  : 2021.03.24 최초 작성
 **/
