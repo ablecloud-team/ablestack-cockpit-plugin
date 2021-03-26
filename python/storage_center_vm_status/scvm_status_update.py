@@ -11,7 +11,6 @@ import subprocess
 from subprocess import check_output
 from subprocess import call
 from ablestack import *
-import libvirt
 
 
 env=os.environ.copy()
@@ -47,7 +46,7 @@ def startStorageVM():
         if rc == 0: # ok
             retVal = True
             retCode = 200
-        elif rc == 1: # not ok
+        else : # not ok
             retVal = False
             retCode = 500
 
@@ -69,7 +68,7 @@ def stopStorageVM():
         if rc == 0: # ok
             retVal = True
             retCode = 200
-        elif rc == 1: # not ok
+        else : # not ok
             retVal = False
             retCode = 500
          
@@ -93,14 +92,12 @@ def deleteStorageVM():
             if rc == 0: # ok
                 retVal = True
                 retCode = 200
-            elif rc == 1: # not ok
+            else : # not ok
                 retVal = False
                 retCode = 500
-
-        elif rc == 1: # not ok
+        else : # not ok
             retVal = False
             retCode = 500
-
         
         ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM Delete')
 
@@ -125,18 +122,17 @@ def updateStorageVM(cpu, memory):
             if rc == 0: # ok
                 retVal = True
                 retCode = 200
-            elif rc == 1: # not ok
+            else : # not ok
                 retVal = False
-                retCode = 500
-            
+                retCode = 500            
             
         if memory > 0 :
             rc = call(['virt-xml scvm --edit --memory ' + str(memory) + ',maxmemory=' + str(memory)], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
             
             if rc == 0: # ok                
                 retVal = True
-                retCode = 200
-            elif rc == 1: # not ok
+                retCode = 200                
+            else : # not ok
                 retVal = False
                 retCode = 500
                  

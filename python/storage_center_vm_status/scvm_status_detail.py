@@ -4,17 +4,17 @@ import json
 import logging
 import os
 
+import subprocess
 from subprocess import check_output
+from subprocess import call
 from ablestack import *
 
 env=os.environ.copy()
 env['LANG']="en_US.utf-8"
 env['LANGUAGE']="en"
 
-
 def parseArgs():
-    parser = argparse.ArgumentParser(description='Storage Center VM Status Details',
-                                     epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
+    parser = argparse.ArgumentParser(description='Storage Center VM Status Details', epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
     
     parser.add_argument('action', choices=['detail'])
     
@@ -26,80 +26,161 @@ def parseArgs():
 
     # Version 추가
     parser.add_argument("-V", "--Version", action='version', version="%(prog)s 1.0")
+    
     return parser.parse_args()
 
 
 def statusDeteil():        
-    
-    try:
-        #run("ls | grep ablestack", universal_newlines=True,  shell=True)
-    
-        # vm 상태조회
-        output = check_output(["virsh domstate scvm"], universal_newlines=True, shell=True, env=env)    
-        scvm_status = output.strip()
-        #print(scvm_status)
+   
+    scvm_status = ''
+    vcpu = ''
+    socket = ''
+    core = ''
+    memory = ''
+    rdisk = ''
+    manageNicType = ''
+    manageNicParent = ''
+    manageNicIp = ''
+    manageNicGw = ''
+    storageServerNicType = ''
+    storageServerNicParent = ''
+    storageServerNicIp = ''
+    storageReplicationNicType = ''
+    storageReplicationNicParent = ''
+    storageReplicationNicIp = ''
+    dataDiskType = ''
 
-        output = check_output(["virsh vcpuinfo --domain scvm"], universal_newlines=True, shell=True, env=env)    
-        vcpu = output.count('VCPU')
-        #print(vcpu)
+    try:       
+
+        rc = call(['virsh domstate scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
         
-        output = check_output(["virsh dominfo scvm | sed -n 8p | cut -f 2 -d ':' | sed 's/ KiB//g'"], universal_newlines=True, shell=True, env=env)    
-        memory = output.strip()
-        memory_mib = int(memory) / 1024  #KiB => MiB
-        memory_gib = 0
-        memory_tib = 0
-        if memory_mib < 1024:
-            memory = str(memory_mib) + " MiB"
-        elif memory_mib >=1024:
-            memory_gib = memory_mib / 1024
-            memory = str(memory_gib) + " GiB"
-        elif memory_gib >=1024:
-            memory_tib = memory_gib / 1024
-            memory = str(memory_tib) + " TiB"    
-       
-        ##임시 테스트 데이터사용, 실제 qcow2 파일과 pool명 확인시 수정필요
-        output = check_output(["virsh vol-info --pool default --vol scvm.qcow2 | grep Capacity"], universal_newlines=True, shell=True, env=env)    
-        rdisk = output.split("Capacity:")[1].strip()
-        #print(rdisk)
+        if rc == 0: # ok
+            output = check_output(["virsh domstate scvm"], universal_newlines=True, shell=True, env=env)
+            scvm_status = output.strip()
+        else : # not ok
+            scvm_status = 'no signal'
 
+
+        rc = call(['virsh vcpuinfo --domain scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        
+        if rc == 0: # ok
+            output = check_output(["virsh vcpuinfo --domain scvm"], universal_newlines=True, shell=True, env=env)
+            vcpu = output.count('VCPU')
+        else : # not ok
+            vcpu = 'undefine'
+        
+        
+        rc = call(['virsh dommemstat --domain scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        
+        if rc == 0: # ok
+            output = check_output(["virsh dommemstat --domain scvm | grep actual"], universal_newlines=True, shell=True, env=env)
+            memory = output.split(" ")[1]
+            memory_mib = int(memory) / 1024  #KiB => MiB
+            memory_gib = 0
+            memory_tib = 0
+            if memory_mib < 1024:
+                memory = str(memory_mib) + " MiB"
+            elif memory_mib >=1024:
+                memory_gib = memory_mib / 1024
+                memory = str(memory_gib) + " GiB"
+            elif memory_gib >=1024:
+                memory_tib = memory_gib / 1024
+                memory = str(memory_tib) + " TiB"    
+        else : # not ok
+            memory = 'undefine'
+
+
+        rc = call(['virsh vol-info  /var/lib/libvirt/images/scvm.qcow2 | grep Capacity'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        
+        if rc == 0: # ok
+            output = check_output(["virsh vol-info  /var/lib/libvirt/images/scvm.qcow2 | grep Capacity"], universal_newlines=True, shell=True, env=env)
+            rdisk = output.split("Capacity:")[1].strip()
+        else : # not ok
+            rdisk = 'undefine'
+
+        
         ##임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp1s20)
-        output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp1s0|bond0'"], universal_newlines=True, shell=True, env=env)    
-        manageNicMacAddr = ' '.join(output.split()).split()[1]
-        manageNicIp = ' '.join(output.split()).split()[3]
-        #print(manageNicIp)
+        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp1s0|bond0'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        
+        if rc == 0: # ok
+            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp1s0|bond0'"], universal_newlines=True, shell=True, env=env)
+            manageNicMacAddr = ' '.join(output.split()).split()[1]
+            manageNicIp = ' '.join(output.split()).split()[3]
 
-        output = check_output(["virsh domiflist --domain scvm | grep " + manageNicMacAddr], universal_newlines=True, shell=True, env=env)    
-        manageNicParent = ' '.join(output.split()).split()[2]
-        manageNicType = ' '.join(output.split()).split()[3]  
-        #print(manageNicIp)
+            rc = call(["virsh domiflist --domain scvm | grep " + manageNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+            
+            if rc == 0: # ok
+                output = check_output(["virsh domiflist --domain scvm | grep " + manageNicMacAddr], universal_newlines=True, shell=True, env=env)
+                manageNicParent = ' '.join(output.split()).split()[2]   
+                manageNicType = ' '.join(output.split()).split()[3] 
+
+            else : # not ok
+                manageNicMacAddr = 'undefine'
+                manageNicIp = 'undefine'
+                manageNicParent = 'undefine'
+                manageNicType = 'undefine'
+
+        else : # not ok
+            manageNicMacAddr = 'undefine'
+            manageNicIp = 'undefine'
+            manageNicParent = 'undefine'
+            manageNicType = 'undefine'
 
 
         ##임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp1s21)
-        output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp8s0|bond0'"], universal_newlines=True, shell=True, env=env)    
-        storageServerNicMacAddr = ' '.join(output.split()).split()[1]
-        storageServerNicIp = ' '.join(output.split()).split()[3]
-        #print(manageNicIp)
+        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp8s0|bond0'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        
+        if rc == 0: # ok
+            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp8s0|bond0'"], universal_newlines=True, shell=True, env=env)
+            storageServerNicMacAddr = ' '.join(output.split()).split()[1]
+            storageServerNicIp = ' '.join(output.split()).split()[3]            
 
-        output = check_output(["virsh domiflist --domain scvm | grep " + storageServerNicMacAddr], universal_newlines=True, shell=True, env=env)    
-        storageServerNicParent = ' '.join(output.split()).split()[2]
-        storageServerNicType = ' '.join(output.split()).split()[3]  
-        #print(manageNicIp)
+            rc = call(["virsh domiflist --domain scvm | grep " + storageServerNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+            
+            if rc == 0: # ok
+                output = check_output(["virsh domiflist --domain scvm | grep " + storageServerNicMacAddr], universal_newlines=True, shell=True, env=env)
+                storageServerNicParent = ' '.join(output.split()).split()[2]
+                storageServerNicType = ' '.join(output.split()).split()[3]  
+
+            else : # not ok
+                storageServerNicMacAddr = 'undefine'
+                storageServerNicIp = 'undefine'
+                storageServerNicParent = 'undefine'
+                storageServerNicType = 'undefine'
+
+        else : # not ok
+            storageServerNicMacAddr = 'undefine'
+            storageServerNicIp = 'undefine'
+            storageServerNicParent = 'undefine'
+            storageServerNicType = 'undefine'
 
 
-        ##임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp1s22)
-        output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp9s0|bond1'"], universal_newlines=True, shell=True, env=env)    
-        storageReplicationNicMacAddr = ' '.join(output.split()).split()[1]
-        storageReplicationNicIp = ' '.join(output.split()).split()[3]
-        #print(manageNicIp)
+        ##임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp1s21)
+        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp9s0|bond1'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        
+        if rc == 0: # ok
+            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp9s0|bond1'"], universal_newlines=True, shell=True, env=env)
+            storageReplicationNicMacAddr = ' '.join(output.split()).split()[1]
+            storageReplicationNicIp = ' '.join(output.split()).split()[3]
+            
+            rc = call(["virsh domiflist --domain scvm | grep " + storageReplicationNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+            
+            if rc == 0: # ok
+                output = check_output(["virsh domiflist --domain scvm | grep " + storageReplicationNicMacAddr], universal_newlines=True, shell=True, env=env)
+                storageReplicationNicParent = ' '.join(output.split()).split()[2]
+                storageReplicationNicType = ' '.join(output.split()).split()[3]
 
-        output = check_output(["virsh domiflist --domain scvm | grep " + storageReplicationNicMacAddr], universal_newlines=True, shell=True, env=env)    
-        storageReplicationNicParent = ' '.join(output.split()).split()[2]
-        storageReplicationNicType = ' '.join(output.split()).split()[3]  
-        #print(manageNicIp)
+            else : # not ok
+                storageReplicationNicMacAddr = 'undefine'
+                storageReplicationNicIp = 'undefine'
+                storageReplicationNicParent = 'undefine'
+                storageReplicationNicType = 'undefine'
 
-
-
-
+        else : # not ok
+            storageReplicationNicMacAddr = 'undefine'
+            storageReplicationNicIp = 'undefine'
+            storageReplicationNicParent = 'undefine'
+            storageReplicationNicType = 'undefine'
 
 
 
@@ -117,13 +198,11 @@ def statusDeteil():
         #manageNicIp = "10.10.0.100"
         manageNicGw = "XXX"
 
-
         #storageNicType = "VirtIO"
         #storageNicParent = "br1"
         #storageNicServerIp = "100.100.0.1"
         #storageNicReplicationIp = "100.100.0.100"
         dataDiskType = "XXX"
-
         ################################################
         
         # 실제 데이터 세팅
@@ -150,32 +229,30 @@ def statusDeteil():
         ret = createReturn(code=200, val=ret_val, retname='Storage Center VM Status Detail' )
 
     except Exception as e:
+        # 실제 데이터 세팅
         ret_val = {
-            'scvm_status': 'no signal', 
-            'vcpu': 'N/A', 
-            'socket': 'N/A', 
-            'core': 'N/A',
-            'memory': 'N/A',
-            'rdisk': 'N/A',
-            'manageNicType': 'N/A',
-            'manageNicParent': 'N/A',
-            'manageNicIp': 'N/A',
-            'manageNicGw': 'N/A',
-            'storageServerNicType': 'N/A',
-            'storageServerNicParent': 'N/A',
-            'storageServerNicIp': 'N/A',
-            'storageReplicationNicType': 'N/A',
-            'storageReplicationNicParent': 'N/A',
-            'storageReplicationNicIp': 'N/A',
-            'dataDiskType': 'N/A'
+            'scvm_status': scvm_status, 
+            'vcpu': vcpu, 
+            'socket': socket, 
+            'core': core,
+            'memory': memory,
+            'rdisk': rdisk,
+            'manageNicType': manageNicType,
+            'manageNicParent': manageNicParent,
+            'manageNicIp': manageNicIp,
+            'manageNicGw': manageNicGw,
+            'storageServerNicType': storageServerNicType,
+            'storageServerNicParent': storageServerNicParent,
+            'storageServerNicIp': storageServerNicIp,
+            'storageReplicationNicType': storageReplicationNicType,
+            'storageReplicationNicParent': storageReplicationNicParent,
+            'storageReplicationNicIp': storageReplicationNicIp,
+            'dataDiskType': dataDiskType
             }
         ret = createReturn(code=500, val=ret_val, retname='Storage Center VM Status Detail')
         #print ('EXCEPTION : ',e)
     
     return print(json.dumps(json.loads(ret), indent=4))
-    
-
-
 
 
 if __name__ == '__main__':
