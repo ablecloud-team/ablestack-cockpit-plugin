@@ -318,9 +318,14 @@ $('#form-radio-ssh-key-file').on('click', function () {
 $('#form-radio-hosts-new').on('click', function(){
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
-    // $('#form-textarea-cluster-config-new-host-profile').empty();
     // "기존 파일 사용"에서 "신규 생성"을 클릭하면 초기화 된다.
-
+    $('#form-textarea-cluster-config-new-host-profile').val("");
+    let hosts_text = "10.10.0.10\tccvm-mngt\n" +
+        "192.168.0.10\tccvm-svc\n" +
+        "10.10.0.11\tablestack1\n" +
+        "10.10.0.101\tcvm1-pn\n" +
+        "100.100.0.101\tscvm1-cn\n";
+    $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
     $('#form-input-cluster-config-host-number').val(1);
 });
 
@@ -329,12 +334,7 @@ $('#form-radio-hosts-file').on('click', function(){
     $('#div-form-hosts-profile').hide();
     $('#div-form-hosts-file').show();
 
-    let hosts_text = "10.10.0.10\tccvm-mngt\n" +
-        "192.168.0.10\tccvm-svc\n" +
-        "10.10.0.11\tablestack1\n" +
-        "10.10.0.101\tcvm1-pn\n" +
-        "100.100.0.101\tscvm1-cn\n";
-    $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
+
 });
 // Host 파일 준비 중 Host 수를 편집하고 제한하는 기능
 $('#form-input-cluster-config-host-number-plus').on('click', function () {
