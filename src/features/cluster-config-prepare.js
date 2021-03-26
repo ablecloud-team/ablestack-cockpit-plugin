@@ -318,13 +318,9 @@ $('#form-radio-ssh-key-file').on('click', function () {
 $('#form-radio-hosts-new').on('click', function(){
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
+    // $('#form-textarea-cluster-config-new-host-profile').empty();
     // "기존 파일 사용"에서 "신규 생성"을 클릭하면 초기화 된다.
-    let hosts_text = "10.10.0.10\tccvm-mngt\n" +
-        "192.168.0.10\tccvm-svc\n" +
-        "10.10.0.11\tablestack1\n" +
-        "10.10.0.101\tcvm1-pn\n" +
-        "100.100.0.101\tscvm1-cn\n";
-    $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
+
     $('#form-input-cluster-config-host-number').val(1);
 });
 
@@ -332,6 +328,13 @@ $('#form-radio-hosts-new').on('click', function(){
 $('#form-radio-hosts-file').on('click', function(){
     $('#div-form-hosts-profile').hide();
     $('#div-form-hosts-file').show();
+
+    let hosts_text = "10.10.0.10\tccvm-mngt\n" +
+        "192.168.0.10\tccvm-svc\n" +
+        "10.10.0.11\tablestack1\n" +
+        "10.10.0.101\tcvm1-pn\n" +
+        "100.100.0.101\tscvm1-cn\n";
+    $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
 });
 // Host 파일 준비 중 Host 수를 편집하고 제한하는 기능
 $('#form-input-cluster-config-host-number-plus').on('click', function () {
@@ -356,22 +359,23 @@ $('#form-input-cluster-config-host-number').on('keyup', function () {
 $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-number-plus, #form-input-cluster-config-host-number-minus').on('change click', function () {
     let current_val = $('#form-input-cluster-config-host-number').val();
     let target_textarea = $('#form-textarea-cluster-config-new-host-profile');
+    let host_ip_info;
+    target_textarea.val("");
 
-    target_textarea.text("");
-
-    target_textarea.append("10.10.0.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n");
+    host_ip_info = "10.10.0.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n";
     for(let i=1; i<=current_val; i++){
         let sum = 10+i;
-        target_textarea.append("10.10.0."+sum+"\tablestack"+i+"\n");
+        host_ip_info = host_ip_info + "10.10.0."+sum+"\tablestack"+i+"\n";
     }
     for(let i=1; i<=current_val; i++){
         let sum = 100+i;
-        target_textarea.append("10.10.0."+sum+"\tscvm"+i+"-pn\n");
+        host_ip_info = host_ip_info + "10.10.0."+sum+"\tscvm"+i+"-pn\n";
     }
     for(let i=1; i<=current_val; i++){
         let sum = 100+i;
-        target_textarea.append("100.100.0."+sum+"\tscvm"+i+"-cn\n");
+        host_ip_info = host_ip_info + "100.100.0."+sum+"\tscvm"+i+"-cn\n";
     }
+    target_textarea.val(host_ip_info);
 });
 
 // 로컬 시간서버를 외부 시간서버로 선택하면 시간서버 2, 3은 선택 입력으로 전환한다.
