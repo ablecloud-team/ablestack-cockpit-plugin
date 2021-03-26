@@ -30,3 +30,24 @@ function IpCheck(ip_address, required_check) {
   }
 }
 
+/**
+ * Meathod Name : fileSizeCheck
+ * Date Created : 2021.03.26
+ * Writer  : 류홍욱
+ * Description : 파일을 선택할 때 파일 용량을 검사하는 함수 (비대칭키, hosts 파일 업로드 용으로 파일용량을 10KB 이하로 설정)
+ * Parameter : file (Array)
+ * Return  : boolean
+ * History  : 2021.03.26 최초 작성
+ */
+
+function fileSizeCheck(file) {
+    // let file = this.files[0];
+    if (!file) return false;
+    let size = file.size || file.fileSize;
+    let limit = 8500;
+    if (size > limit) {
+        alert('파일용량은 10KB 를 넘을수 없습니다.');
+        $(this).val('');
+        return false;
+    }
+}

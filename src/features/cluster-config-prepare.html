@@ -85,7 +85,7 @@
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-pub-file">
-                                                <span class="pf-c-form__label-text">SSH Key 개인키 파일</span>
+                                                <span class="pf-c-form__label-text">SSH 개인 키 파일</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
@@ -94,7 +94,7 @@
                                         </div>
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-pub-file">
-                                                <span class="pf-c-form__label-text">SSH Key 공개키 파일</span>
+                                                <span class="pf-c-form__label-text">SSH 공개 키 파일</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
@@ -306,7 +306,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pri-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pri-file" style="width:670px;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
                                                     </div>
                                                 </dd>
                                                 <dt class="pf-c-description-list__term">
@@ -314,7 +314,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pub-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pub-file" style="width:670px;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -346,7 +346,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-hosts-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text">Host 프로파일 내용</textarea>
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-hosts-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>Host 프로파일 내용</textarea>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -410,17 +410,17 @@
                             <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
                                 <span>
                                     -Private SSH Key 다운로드 :
-                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pri-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download">파일을 재사용 하려면 클릭하십시오</a>
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pri-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                                 <br/>
                                 <span>
                                     -Public SSH Key 다운로드 :
-                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pub-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download">파일을 재사용 하려면 클릭하십시오</a>
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pub-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                                 <br/>
                                 <span>
                                     - Hosts 프로파일 다운로드 : 
-                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-hosts-file-download" href="https://172.16.0.30:9090/ablestack/hosts.in">파일을 재사용 하려면 클릭하십시오</a>
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-hosts-file-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                             </div>
                         </div>
@@ -440,6 +440,6 @@
 </div>
 
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
-<script src="./src/common/charValidation.js"></script>
+<script src="./src/common/validation.js"></script>
 <script src="./src/features/cluster-config-prepare.js"></script>
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
