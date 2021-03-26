@@ -97,48 +97,14 @@ $(document).ready(function(){
     
 
 
+ 
     // 스토리지센터 VM 상태 조회 시작
     cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_detail.py", "detail" ])
     .then(function(data){
         
         var retVal = JSON.parse(data);        
 
-        sessionStorage.setItem("scvm_status", retVal.val.scvm_status);
-
-        if(retVal.val.scvm_status == "running"){
-            $("#scvm-css").attr('class','pf-c-label pf-m-green');
-            $("#scvm-icon").attr('class','fas fa-fw fa-check-circle');
-
-            $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-            $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-            
-            if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true"){                
-                $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item');
-            }else{
-                $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled'); 
-            }
-
-        }else{
-            $("#scvm-css").attr('class','pf-c-label');
-            $("#scvm-icon").attr('class','fas fa-fw fa-times-circle');
-            
-            $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-
-            if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true"){
-                $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item');
-                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item');                            
-            }else{        
-                $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');  
-                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');       
-            }
-        }
-
-
-        if(sessionStorage.getItem("cluster_status") == "N/A"){
-            $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item');
-        }else{
-            $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-        }
+        sessionStorage.setItem("scvm_status", retVal.val.scvm_status);        
 
         
         $('#scvm-status').text(retVal.val.scvm_status.toUpperCase());
@@ -170,6 +136,40 @@ $(document).ready(function(){
             $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--danger-color--100)");
         }
 
+
+
+        //스토리지 센터 가상머신 toggle세팅
+        if(retVal.val.scvm_status == "running"){
+            $("#scvm-css").attr('class','pf-c-label pf-m-green');
+            $("#scvm-icon").attr('class','fas fa-fw fa-check-circle');
+    
+            $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            
+            if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true"){                
+                $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item');
+            }else{
+                $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled'); 
+            }
+    
+        }else{
+            $("#scvm-css").attr('class','pf-c-label');
+            $("#scvm-icon").attr('class','fas fa-fw fa-times-circle');
+            
+            $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+    
+            if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true"){
+                $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item');
+                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item');                            
+            }else{        
+                $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');  
+                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');       
+            }
+        }
+
+
+
+
     })
     .catch(function(data){
         //console.log(":::Error:::");        
@@ -182,6 +182,15 @@ $(document).ready(function(){
         $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되지 않았습니다.");
         $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--danger-color--100)");
     });
+
+
+
+
+    if(sessionStorage.getItem("cluster_status") == "no signal"){
+        $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item');
+    }else{
+        $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+    }
 
 });
 
