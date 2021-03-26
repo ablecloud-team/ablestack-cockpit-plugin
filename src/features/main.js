@@ -6,7 +6,9 @@
 **/
 
 // document.ready 영역 시작
-
+this.ccvm_instance = new CloudCenterVirtualMachine()
+ccvm_instance = this.ccvm_instance
+$(document).ccvm_instance = ccvm_instance
 $(document).ready(function(){
     $('#dropdown-menu-storage-cluster-status').hide();
     $('#dropdown-menu-cloud-cluster-status').hide();
@@ -21,6 +23,14 @@ $(document).ready(function(){
 
     $('#div-modal-wizard-cloud-vm').load("./src/features/cloud-vm-wizard.html");
     $('#div-modal-wizard-cloud-vm').hide();
+    
+    $('#div-change-modal-cloud-vm').load("./src/features/cloud-vm-change.html");
+    $('#div-change-modal-cloud-vm').hide();
+    $('#div-change-alert-cloud-vm').load("./src/features/cloud-vm-change-alert.html");
+    $('#div-change-alert-cloud-vm').hide();
+    
+    new CloudCenterVirtualMachine().checkCCVM();
+    
 
     //스토리지 센터 가상머신 자원변경 페이지 로드
     $('#div-modal-storage-vm-resource-update').load("./src/features/storage-vm-resource-update.html");
@@ -208,6 +218,19 @@ $('#card-action-storage-vm-status').on('click', function(){
 $('#card-action-cloud-vm-status').on('click', function(){
     $('#dropdown-menu-cloud-vm-status').toggle();
 });
+
+var cpu=0;
+var memory=0;
+$('#card-action-cloud-vm-change').on('click', function(){
+    ccvm_instance.createChangeModal();
+});
+
+$('#card-action-cloud-vm-connect').on('click', function(){
+    // 클라우드센터VM 연결
+    window.open('http://' + ccvm_instance.ip + ":9090");
+});
+
+
 
 $('#button-open-modal-wizard-storage-vm').on('click', function(){
     $('#div-modal-wizard-storage-vm').show();
