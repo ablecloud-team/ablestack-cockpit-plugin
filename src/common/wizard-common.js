@@ -9,9 +9,7 @@
  * History  : 2021.03.18 wizard ui 공통 함수로 분리
  */
  function setNicBridge(select_box_id){
-    //var cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/nic/network_action.py","list"];
-    //명령어 확인 필요
-    var cmd = "date";
+    var cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/nic/network_action.py","list"];
 
     cockpit.spawn(cmd).then(function(data){
         
@@ -19,7 +17,7 @@
         $('#'+select_box_id).empty();
 
         var el ='';
-        var result = JSON.parse(nic_json_string);
+        var result = JSON.parse(data);
         var bridge_list = result.val.bridges;
 
         el += '<option value="" selected>선택하십시오</option>';

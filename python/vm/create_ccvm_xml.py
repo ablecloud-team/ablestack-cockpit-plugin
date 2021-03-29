@@ -102,11 +102,12 @@ def createSecretKey(host_names):
 
 def createCcvmXml(args):
     try:
-        slot_hex_num = generateDecToHex()
-        br_num = 0
-
         # 템플릿 파일을 /opt/ablestack/vm/ccvm 경로로 복사
         for host_name in args.host_names:
+
+            slot_hex_num = generateDecToHex()
+            br_num = 0
+            
             os.system("yes|cp -f /usr/share/cockpit/cockpit-plugin-ablestack/tools/xml-template/ccvm-xml-template.xml /opt/ablestack/vm/ccvm/ccvm-temp.xml")
             
             template_file = '/opt/ablestack/vm/ccvm/ccvm-temp.xml'

@@ -57,6 +57,10 @@ def resetCloud(args):
     if result == 0:
         os.system("rbd rm rbd/ccvm")
 
+    # virsh 초기화
+    os.system("virsh destroy ccvm")
+    os.system("virsh undefine ccvm")
+
     # cloudinit iso 삭제
     os.system("rm -f /opt/ablestack/vm/ccvm/ccvm-cloudinit.iso")
     

@@ -213,6 +213,7 @@
                                             <div class="pf-c-form__group-control pf-m-inline">
                                                 <select class="pf-c-form-control" id="form-select-cloud-vm-compute-cpu-core" name="form-select-cloud-vm-compute-cpu-core" style="width:40%;">
                                                     <option value="" selected>선택하십시오</option>
+                                                    <option value="1">1 vCore</option>
                                                     <option value="4">4 vCore</option>
                                                     <option value="8">8 vCore</option>
                                                 </select>
@@ -228,6 +229,7 @@
                                             <div class="pf-c-form__group-control">
                                                 <select class="pf-c-form-control" id="form-select-cloud-vm-compute-memory" name="form-select-cloud-vm-compute-memory" style="width:40%;">
                                                     <option value="" selected>선택하십시오</option>
+                                                    <option value="1">1 GiB</option>
                                                     <option value="8">8 GiB</option>
                                                     <option value="16">16 GiB</option>
                                                     <option value="32">32 GiB</option>
@@ -441,14 +443,26 @@
                                     <section class="pf-c-form__section">
                                         <div class="pf-c-form__group">
                                             <div class="pf-c-form__group-label">
-                                                <label class="pf-c-form__label" for="form-input-cloud-vm-ssh-key-file">
-                                                    <span class="pf-c-form__label-text">SSH Key 파일</span>
+                                                <label class="pf-c-form__label" for="form-input-cloud-vm-ssh-private-key-file">
+                                                    <span class="pf-c-form__label-text">SSH 개인 Key 파일</span>
                                                     <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                                 </label>
                                             </div>
                                             <div class="pf-c-form__group-control pf-m-inline">
-                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-key-file" name="form-input-cloud-vm-ssh-key-file" value="aa"/>
-                                                <textarea class="pf-c-form-control" type="text" id="form-textarea-cloud-vm-ssh-key-file" hidden></textarea>
+                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-private-key-file" name="form-input-cloud-vm-ssh-private-key-file"/>
+                                                <textarea class="pf-c-form-control" type="text" id="form-textarea-cloud-vm-ssh-private-key-file" hidden></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-cloud-vm-ssh-public-key-file">
+                                                    <span class="pf-c-form__label-text">SSH 공개 Key 파일</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-public-key-file" name="form-input-cloud-vm-ssh-public-key-file"/>
+                                                <textarea class="pf-c-form-control" type="text" id="form-textarea-cloud-vm-ssh-public-key-file" hidden></textarea>
                                             </div>
                                         </div>
                                     </section>
@@ -700,11 +714,21 @@
                                         <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text">SSH Key 파일</span>
+                                                    <span class="pf-c-description-list__text">SSH 개인 Key 파일</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <span id="span-cloud-vm-ssh-key-file"></span><br/>
+                                                        <span id="span-cloud-vm-ssh-private-key-file"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">SSH 공개 Key 파일</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-ssh-public-key-file"></span><br/>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -726,7 +750,7 @@
                                         </span><p>준비중</p>
                                     </span>
                                 </span>
-                                <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성 host 네트워크 연결 테스트</span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성 HOST 네트워크 연결 테스트</span>
                             </div>
                             <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
                                 <span class="pf-c-label pf-m-blue" id="span-progress-step2">

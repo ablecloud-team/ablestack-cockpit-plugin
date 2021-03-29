@@ -9,89 +9,6 @@
 var cur_step_wizard_cloud_vm = "1";
 var xml_create_cmd;
 
-var nic_json_string='{';
-nic_json_string += '  "code": 200,';
-nic_json_string += '  "val": {';
-nic_json_string += '    "bridges": [';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "bridge0",';
-nic_json_string += '        "TYPE": "bridge",';
-nic_json_string += '        "STATE": "connected"';
-nic_json_string += '      },';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "bridge1",';
-nic_json_string += '        "TYPE": "bridge",';
-nic_json_string += '        "STATE": "connected"';
-nic_json_string += '      },';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "bridge2",';
-nic_json_string += '        "TYPE": "bridge",';
-nic_json_string += '        "STATE": "connected"';
-nic_json_string += '      },';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "cloud0",';
-nic_json_string += '        "TYPE": "bridge",';
-nic_json_string += '        "STATE": "connected"';
-nic_json_string += '      }';
-nic_json_string += '    ],';
-nic_json_string += '    "ethernets": [';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "enp3s0",';
-nic_json_string += '        "TYPE": "ethernet",';
-nic_json_string += '        "STATE": "connected",';
-nic_json_string += '        "PCI": "0000:03:00.0"';
-nic_json_string += '      },';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "enp3s0",';
-nic_json_string += '        "TYPE": "ethernet",';
-nic_json_string += '        "STATE": "connected",';
-nic_json_string += '        "PCI": "0000:03:00.1"';
-nic_json_string += '      },';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "enp3s1",';
-nic_json_string += '        "TYPE": "ethernet",';
-nic_json_string += '        "STATE": "connected",';
-nic_json_string += '        "PCI": "0000:04:00.0"';
-nic_json_string += '      },';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "enp3s1",';
-nic_json_string += '        "TYPE": "ethernet",';
-nic_json_string += '        "STATE": "connected",';
-nic_json_string += '        "PCI": "0000:04:00.1"';
-nic_json_string += '      }';
-nic_json_string += '    ],';
-nic_json_string += '    "others": [';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "wlp2s0",';
-nic_json_string += '        "TYPE": "wifi",';
-nic_json_string += '        "STATE": "connected"';
-nic_json_string += '      },';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "vnet0",';
-nic_json_string += '        "TYPE": "tun",';
-nic_json_string += '        "STATE": "connected"';
-nic_json_string += '     },';
-nic_json_string += '     {';
-nic_json_string += '       "DEVICE": "vnet1",';
-nic_json_string += '       "TYPE": "tun",';
-nic_json_string += '        "STATE": "connected"';
-nic_json_string += '      },';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "vnet2",';
-nic_json_string += '        "TYPE": "tun",';
-nic_json_string += '        "STATE": "connected"';
-nic_json_string += '      },';
-nic_json_string += '      {';
-nic_json_string += '        "DEVICE": "lo",';
-nic_json_string += '        "TYPE": "loopback",';
-nic_json_string += '        "STATE": "unmanaged"';
-nic_json_string += '      }';
-nic_json_string += '    ]';
-nic_json_string += '  },';
-nic_json_string += '  "name": "listNetworkInterface",';
-nic_json_string += '  "type": "dict"';
-nic_json_string += '}';
-
 /* Document Ready 이벤트 처리 시작 */
 
 $(document).ready(function(){
@@ -129,8 +46,11 @@ $(document).ready(function(){
     //hosts 파일 선택 이벤트 세팅
     setHostsFileReader($('#form-input-cloud-vm-hosts-file'), setCcvmNetworkInfo);
     
-    //ssh key 파일 선택 이벤트 세팅
-    setSshKeyFileReader($('#form-input-cloud-vm-ssh-key-file'), setCcvmSshKeyInfo);
+    //ssh 개인 key 파일 선택 이벤트 세팅
+    setSshKeyFileReader($('#form-input-cloud-vm-ssh-private-key-file'), setCcvmSshPrivateKeyInfo);
+
+    //ssh 공개 key 파일 선택 이벤트 세팅
+    setSshKeyFileReader($('#form-input-cloud-vm-ssh-public-key-file'), setCcvmSshPublicKeyInfo);
 });
 
 /* Document Ready 이벤트 처리 끝 */
@@ -355,9 +275,8 @@ $('#button-next-step-modal-wizard-cloud-vm').on('click', function(){
         cur_step_wizard_cloud_vm = "7";
     }
     else if (cur_step_wizard_cloud_vm == "7") {
-        if(true||validateCloudCenterVm()){
+        if(validateCloudCenterVm()){
             deployCloudCenterVM();
-    
             cur_step_wizard_cloud_vm = "8";
         }        
     }
@@ -641,9 +560,9 @@ function deployCloudCenterVM() {
                             setProgressStep("span-progress-step2",2);
                             setProgressStep("span-progress-step3",1);
                             var create_ccvm_cloudinit = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/create_ccvm_cloudinit.py'
-                                                    ,"-f1","/opt/ablestack/vm/ccvm/hosts","-t1", $("#form-textarea-cloud-vm-hosts-file").val()
-                                                    ,"-f2","/opt/ablestack/vm/ccvm/ablecloud","-t2", $("#form-textarea-cloud-vm-hosts-file").val() //향후 변경해야 함
-                                                    ,"-f3","/opt/ablestack/vm/ccvm/ablecloud.pub","-t3", $("#form-textarea-cloud-vm-hosts-file").val()]; //향후 변경해야 함
+                                                    ,"-f1","/opt/ablestack/vm/ccvm/hosts","-t1", $("#form-textarea-cloud-vm-hosts-file").val() // hosts 파일
+                                                    ,"-f2","/opt/ablestack/vm/ccvm/ablecloud","-t2", $("#form-textarea-cloud-vm-ssh-private-key-file").val() // ssh 개인 key 파일
+                                                    ,"-f3","/opt/ablestack/vm/ccvm/ablecloud.pub","-t3", $("#form-textarea-cloud-vm-ssh-public-key-file").val()]; // ssh 공개 key 파일
 
                             cockpit.spawn(create_ccvm_cloudinit)
                                 .then(function(data){
@@ -887,19 +806,36 @@ function resetCcvmNetworkInfo(){
 }
 
 /**
- * Meathod Name : setCcvmSshKeyInfo
+ * Meathod Name : setCcvmSshPrivateKeyInfo
  * Date Created : 2021.03.19
  * Writer  : 배태주
- * Description : 클라우드센터 가상머신에 사용할 ssh key 파일 세팅
+ * Description : 클라우드센터 가상머신에 사용할 ssh private key 파일 세팅
  * Parameter : String
  * Return  : 없음
  * History  : 2021.03.19 최초 작성
  */
-function setCcvmSshKeyInfo(ssh_key){
-    if(ssh_key != ""){
-        $("#form-textarea-cloud-vm-ssh-key-file").val(ssh_key);
+function setCcvmSshPrivateKeyInfo(ssh_private_key){
+    if(ssh_private_key != ""){
+        $("#form-textarea-cloud-vm-ssh-private-key-file").val(ssh_private_key);
     } else {
-        $("#form-textarea-cloud-vm-ssh-key-file").val("");
+        $("#form-textarea-cloud-vm-ssh-private-key-file").val("");
+    }
+}
+
+/**
+ * Meathod Name : setCcvmSshPublicKeyInfo
+ * Date Created : 2021.03.29
+ * Writer  : 배태주
+ * Description : 클라우드센터 가상머신에 사용할 ssh public key 파일 세팅
+ * Parameter : String
+ * Return  : 없음
+ * History  : 2021.03.29 최초 작성
+ */
+ function setCcvmSshPublicKeyInfo(ssh_public_key){
+    if(ssh_public_key != ""){
+        $("#form-textarea-cloud-vm-ssh-public-key-file").val(ssh_public_key);
+    } else {
+        $("#form-textarea-cloud-vm-ssh-public-key-file").val("");
     }
 }
 
@@ -1077,11 +1013,18 @@ function setCcvmReviewInfo(){
         $('#span-cloud-vm-additional-svc-gateway').text("N/A");
     }
     //-----SSH Key 정보-----
-    var ssh_key_url = $('#form-input-cloud-vm-ssh-key-file').val();
-    if(ssh_key_url == '') {
-        $('#span-cloud-vm-ssh-key-file').text("미입력");
+    var ssh_private_key_url = $('#form-input-cloud-vm-ssh-private-key-file').val();
+    if(ssh_private_key_url == '') {
+        $('#span-cloud-vm-ssh-private-key-file').text("미입력");
     } else {
-        $('#span-cloud-vm-ssh-key-file').text(ssh_key_url);
+        $('#span-cloud-vm-ssh-private-key-file').text(ssh_private_key_url);
+    }
+
+    var ssh_public_key_url = $('#form-input-cloud-vm-ssh-public-key-file').val();
+    if(ssh_public_key_url == '') {
+        $('#span-cloud-vm-ssh-public-key-file').text("미입력");
+    } else {
+        $('#span-cloud-vm-ssh-public-key-file').text(ssh_public_key_url);
     }
 }
 
@@ -1139,8 +1082,11 @@ function validateCloudCenterVm(){
     } else if (svc_bool && $('#form-input-cloud-vm-svc-gw').val() == "") { //서비스 NIC Gateway
         alert("서비스 NIC Gateway를 입력해주세요.");
         valicateCheck = false;
-    } else if ( $('#form-textarea-cloud-vm-ssh-key-file').val() == "") { //SSH Key 정보
-        alert("SSH Key 파일을 입력해주세요.");
+    } else if ( $('#form-textarea-cloud-vm-ssh-private-key-file').val() == "") { //SSH 개인 Key 정보
+        alert("SSH 개인 Key 파일을 입력해주세요.");
+        valicateCheck = false;
+    } else if ( $('#form-textarea-cloud-vm-ssh-public-key-file').val() == "") { //SSH 공개 Key 정보
+        alert("SSH 공개 Key 파일을 입력해주세요.");
         valicateCheck = false;
     }
 
