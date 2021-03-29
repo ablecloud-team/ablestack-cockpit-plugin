@@ -2,7 +2,7 @@
 
 ##사용법(가상머신 상태를 조회)
 ```shell
-# python/storage_center_vm_status/scvm_status_detail.py detail
+# python /usr/share/cockpit/ablestack/python/storage_center_cluster_status/scvm_status_detail.py detail
 
 ```
 
