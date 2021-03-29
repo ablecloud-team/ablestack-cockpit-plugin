@@ -639,18 +639,15 @@ function resetClusterConfigWizard(){
  * Date Created : 2021.03.11
  * Writer  : 류홍욱
  * Description : 클러스터 준비 마법사에서 SSHKey를 생성하는 함수
+                 키 속성 - 패스워드(없음), 알고리즘(RSA2048), 덮어쓰기(TRUE)
  * Parameter : 없음
  * Return  : 없음
  * History  : 2021.03.11 최초 작성
 **/
 
 function generateSshkey() {
-    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "geneSsh"])
-        // .stream(console.log)
-        // .then(console.log)
-        // .catch(console.log);
+    cockpit.script(["ssh-keygen -t rsa -b 2048 -f $HOME/.ssh/ablecloud -N '' <<<y 2>&1 >/dev/null"])
 }
-
 
 /**
  * Meathod Name : readSshKeyFile
@@ -721,7 +718,6 @@ function fileReaderFunc(input, textarea_type, file_type) {
                 $('#' + textarea_type).val("");
             }
         }
-
     });
 }
 
@@ -749,7 +745,7 @@ function fileExtensionChecker(file_name){
  * Date Created : 2021.03.19
  * Writer  : 류홍욱
  * Description : 클러스터 준비 마법사에서 파일을 선택할 때 이름을 체크하는 함수
- * Parameter : fileName, file_type
+ * Parameter : fileName, file_type(ssh-key 또는 hosts)
  * Return  : true, false
  * History  : 2021.03.19 최초 작성
 **/
@@ -873,16 +869,16 @@ function saveAsFile(id, str, filename) {
 
 function writeFile(text1, text2, file_type) {
     if (file_type == 'ssh_key') {
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "makePri"])
+        cockpit.script(["touch $HOME/.ssh/ablecloud"])
         cockpit.file("/root/.ssh/ablecloud").replace(text1)
             .done(function (tag) {})
             .fail(function (error) {});
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "makePub"])
+        cockpit.script(["touch $HOME/.ssh/ablecloud.pub"])
         cockpit.file("/root/.ssh/ablecloud.pub").replace(text2)
             .done(function (tag) {})
             .fail(function (error) {});
     }else if (file_type == 'hosts_file'){
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "makeHosts"])
+        cockpit.script(["touch /etc/hosts"])
         cockpit.file("/etc/hosts").replace(text1)
             .done(function (tag) {})
             .fail(function (error) {});
