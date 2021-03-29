@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+'''
+Copyright (c) 2021 ABLECLOUD Co. Ltd.
 
+호스트의 디스크 목록을 조회하는 스크립트
+
+최초작성일 : 2021-03-15
+'''
 import argparse
 import json
 import logging
@@ -12,23 +18,22 @@ import distro
 
 lsblk_cmd = sh.Command('/usr/bin/lsblk')
 if distro.linux_distribution() == ('CentOS Linux', '8', ''):
-    print('centos8')
+    # print('centos8')
     lspci_cmd = sh.Command('/usr/sbin/lspci')
 else:
-    print('other')
+    # print('other')
     lspci_cmd = sh.Command('/usr/bin/lspci')
 
 env = os.environ.copy()
 env['LANG'] = "en_US.utf-8"
 env['LANGUAGE'] = "en"
 
+"""
+입력된 argument를 파싱하여 dictionary 처럼 사용하게 만들어 주는 parser를 생성하는 함수
 
+:return: argparse.ArgumentParser
+"""
 def createArgumentParser():
-    """
-    입력된 argument를 파싱하여 dictionary 처럼 사용하게 만들어 주는 parser를 생성하는 함수
-
-    :return: argparse.ArgumentParser
-    """
     # 참조: https://docs.python.org/ko/3/library/argparse.html
     # 프로그램 설명
     tmp_parser = argparse.ArgumentParser(description='NIC 목록을 출력하는 프로그',
@@ -53,7 +58,11 @@ def createArgumentParser():
                             version="%(prog)s 1.0")
     return tmp_parser
 
+"""
+PCI 장치의 목록을 출력하는 함수
 
+:return: dict
+"""
 def listPCIInterface(classify=None):
     list_output = lspci_cmd('-vmm', '-k').stdout.decode().splitlines()
     if classify is None:
@@ -82,7 +91,11 @@ def listPCIInterface(classify=None):
                 newpci = {}
     return list_pci
 
+"""
+디스크의 목록을 출력하는 함수
 
+:return: dict
+"""
 def listDiskInterface(H=False, classify=None):
     # output = nmcli_cmd('-c', 'no', '-f', 'TYPE,ACTIVE,DEVICE,STATE,SLAVE', 'con', 'show')
     # output = nmcli_cmd('-c', 'no', '-f', 'ALL', 'con', 'show')
@@ -120,7 +133,11 @@ def listDiskInterface(H=False, classify=None):
         return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=item)))
     return createReturn(code=200, val=item)
 
+"""
+PCI 장치와 디스크의 목록을 출력하는 함수
 
+:return: dict
+"""
 def diskAction(action, H):
     if action == 'list':
         return listDiskInterface(H=H)
