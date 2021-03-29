@@ -368,8 +368,8 @@ $('#form-input-cluster-config-host-number-minus').on('click', function () {
     }
 });
 $('#form-input-cluster-config-host-number').on('propertychange change keyup paste input', function () {
-    if(this.value <= 0 || this.value >= 1000 ){
-        alert("1~999까지의 숫자만 입력할 수 있습니다.")
+    if(this.value <= 0 || this.value > 90 ){
+        alert("1~90까지의 숫자만 입력할 수 있습니다.")
         this.value = 1;
     }
 });
@@ -378,8 +378,7 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
     let current_val = $('#form-input-cluster-config-host-number').val();
     let target_textarea = $('#form-textarea-cluster-config-new-host-profile');
     let host_ip_info;
-    console.log(current_val);
-    if (current_val < 1000) {
+    if (current_val <= 90) {
         target_textarea.val("");
 
         host_ip_info = "10.10.0.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n";
@@ -396,6 +395,9 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
             host_ip_info = host_ip_info + "100.100.0." + sum + "\tscvm" + i + "-cn\n";
         }
         target_textarea.val(host_ip_info);
+    }else{
+        $('#form-input-cluster-config-host-number').val(90);
+        alert("1~90까지의 숫자만 입력할 수 있습니다.");
     }
 });
 
