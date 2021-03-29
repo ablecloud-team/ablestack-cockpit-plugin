@@ -646,7 +646,7 @@ function resetClusterConfigWizard(){
 **/
 
 function generateSshkey() {
-    cockpit.script(["ssh-keygen -t rsa -b 2048 -f $HOME/.ssh/ablecloud -N '' <<<y 2>&1 >/dev/null"])
+    cockpit.script(["ssh-keygen -t rsa -b 2048 -f /root/.ssh/ablecloud -N '' <<<y 2>&1 >/dev/null"])
 }
 
 /**
@@ -869,11 +869,11 @@ function saveAsFile(id, str, filename) {
 
 function writeFile(text1, text2, file_type) {
     if (file_type == 'ssh_key') {
-        cockpit.script(["touch $HOME/.ssh/ablecloud"])
+        cockpit.script(["touch /root/.ssh/ablecloud"])
         cockpit.file("/root/.ssh/ablecloud").replace(text1)
             .done(function (tag) {})
             .fail(function (error) {});
-        cockpit.script(["touch $HOME/.ssh/ablecloud.pub"])
+        cockpit.script(["touch /root/.ssh/ablecloud.pub"])
         cockpit.file("/root/.ssh/ablecloud.pub").replace(text2)
             .done(function (tag) {})
             .fail(function (error) {});
