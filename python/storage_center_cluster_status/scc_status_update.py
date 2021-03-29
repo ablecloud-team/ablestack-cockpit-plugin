@@ -9,6 +9,11 @@ from subprocess import check_output
 from subprocess import run
 from ablestack import *
 
+'''
+함수명 : parseArgs
+이 함수는 python library argparse를 시용하여 함수를 실행될 때 필요한 파라미터를 입력받고 파싱하는 역할을 수행합니다.
+예를들어 action을 요청하면 해당 action일 때 요구되는 파라미터를 입력받고 해당 코드를 수행합니다.
+'''
 def parseArgs():
     parser = argparse.ArgumentParser(description='Storage Cluster maintenance Mode Setting',
                                      epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
@@ -26,7 +31,8 @@ def parseArgs():
     
     return parser.parse_args()
 
-#유지보수모드 
+# 함수명 : onMaintenance
+# 주요 기능 : 스토리지 클러스트 유지보수모드 세팅
 def onMaintenance():
 
         
@@ -46,7 +52,8 @@ def onMaintenance():
     return print(json.dumps(json.loads(ret), indent=4))
 
 
-#유지보수모드 해제
+# 함수명 : offMaintenance
+# 주요 기능 : 스토리지 클러스트 유지보수모드 해제
 def offMaintenance():  
         
     try:
