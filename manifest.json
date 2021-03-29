@@ -2,7 +2,7 @@
     "version": "1.0",
     "name": "ablestack",
     "requires": {
-        "cockpit": "234"
+        "cockpit": "224"
     },
 
     "tools": {
