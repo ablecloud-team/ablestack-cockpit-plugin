@@ -1,5 +1,5 @@
 /**
- * File Name : cluster-config-prepare.js  
+ * File Name : cluster-config-prepare.js
  * Date Created : 2020.03.02
  * Writer  : 박동혁
  * Description : 클러스터 구성 준비 마법사 UI를 컨트롤하기 위한 스크립트
@@ -24,7 +24,7 @@ $(document).ready(function(){
     $('#div-accordion-timeserver').hide();
 
     $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
-    $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', true);    
+    $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', true);
 
     $('#nav-button-cluster-config-overview').addClass('pf-m-current');
 });
@@ -50,7 +50,7 @@ $('#nav-button-cluster-config-overview').on('click', function(){
 
 $('#nav-button-cluster-config-ssh-key').on('click', function(){
     resetClusterConfigWizard();
-    
+
     $('#div-modal-wizard-cluster-config-ssh-key').show();
     $('#nav-button-cluster-config-ssh-key').addClass('pf-m-current');
 
@@ -223,8 +223,8 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
 
         // time server 파일
         let timeserver_type = $('input[name=radio-timeserver]:checked').val();
-        let timeserver_host_num = $('input[name=radio-timeserver_host_num]:checked').val();
-        let timeserver_confirm_current_ip_text = $('#div-cluster-config-confirm-time-server-'+timeserver_host_num).text();
+        let timeserver_current_host_num = $('input[name=radio-timeserver_host_num]:checked').val();
+        let timeserver_confirm_current_ip_text = $('#div-cluster-config-confirm-time-server-'+timeserver_current_host_num).text();
         let timeserver_confirm_ip_list = new Array();
         for (let i=1; i<=3; i++){
             timeserver_confirm_ip_list.push($('#form-input-cluster-config-time-server-ip-'+i).val());
@@ -232,12 +232,14 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
         timeserver_confirm_ip_list  = timeserver_confirm_ip_list.filter(function(item) {
           return item !== null && item !== undefined && item !== '';
         });
-        modifyTimeServer(timeserver_confirm_ip_list, timeserver_type, timeserver_host_num);
+        modifyTimeServer(timeserver_confirm_ip_list, timeserver_type, timeserver_current_host_num);
     }
 });
-        $('#button-test').on('click', function (){
-            
-        })
+
+$('#button-test').on('click', function () {
+    let timeserver_type = $('input[name=radio-timeserver]:checked').val();
+    validateClusterConfigPrepare(timeserver_type);
+});
 
 $('#button-before-step-modal-wizard-cluster-config-prepare').on('click', function(){
     resetClusterConfigWizard();
@@ -316,11 +318,23 @@ $('#form-radio-ssh-key-file').on('click', function () {
 $('#form-radio-hosts-new').on('click', function(){
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
+    // "기존 파일 사용"에서 "신규 생성"을 클릭하면 초기화 된다.
+    $('#form-textarea-cluster-config-new-host-profile').val("");
+    let hosts_text = "10.10.0.10\tccvm-mngt\n" +
+        "192.168.0.10\tccvm-svc\n" +
+        "10.10.0.11\tablestack1\n" +
+        "10.10.0.101\tcvm1-pn\n" +
+        "100.100.0.101\tscvm1-cn\n";
+    $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
+    $('#form-input-cluster-config-host-number').val(1);
 });
+
 // Host 파일 준비 방법 중 기존 파일 사용을 클릭하는 경우 Host 프로파일 디비전을 숨기고 Hosts 파일 디비전은 보여준다.
 $('#form-radio-hosts-file').on('click', function(){
     $('#div-form-hosts-profile').hide();
     $('#div-form-hosts-file').show();
+
+
 });
 // Host 파일 준비 중 Host 수를 편집하고 제한하는 기능
 $('#form-input-cluster-config-host-number-plus').on('click', function () {
@@ -345,37 +359,62 @@ $('#form-input-cluster-config-host-number').on('keyup', function () {
 $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-number-plus, #form-input-cluster-config-host-number-minus').on('change click', function () {
     let current_val = $('#form-input-cluster-config-host-number').val();
     let target_textarea = $('#form-textarea-cluster-config-new-host-profile');
+    let host_ip_info;
+    target_textarea.val("");
 
-    target_textarea.text("");
-    target_textarea.append("10.10.0.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n");
+    host_ip_info = "10.10.0.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n";
     for(let i=1; i<=current_val; i++){
         let sum = 10+i;
-        target_textarea.append("10.10.0."+sum+"\tablestack"+i+"\n");
+        host_ip_info = host_ip_info + "10.10.0."+sum+"\tablestack"+i+"\n";
     }
     for(let i=1; i<=current_val; i++){
         let sum = 100+i;
-        target_textarea.append("10.10.0."+sum+"\tscvm"+i+"-pn\n");
+        host_ip_info = host_ip_info + "10.10.0."+sum+"\tscvm"+i+"-pn\n";
     }
     for(let i=1; i<=current_val; i++){
         let sum = 100+i;
-        target_textarea.append("100.100.0."+sum+"\tscvm"+i+"-cn\n");
+        host_ip_info = host_ip_info + "100.100.0."+sum+"\tscvm"+i+"-cn\n";
     }
+    target_textarea.val(host_ip_info);
 });
 
-// 외부 시간서버를 시간서버로 선택하면 시간서버 2, 3은 선택 입력으로 전환한다.
+// 로컬 시간서버를 외부 시간서버로 선택하면 시간서버 2, 3은 선택 입력으로 전환한다.
 $('#form-radio-timeserver-ext').on('click', function(){
     $('#span-timeserver2-required').hide();
     $('#span-timeserver3-required').hide();
-
+    $('#form-input-cluster-config-time-server-ip-2').removeAttr('required');
+    $('#form-input-cluster-config-time-server-ip-3').removeAttr('required');
+    // 현재 host radio 버튼 숨김
     $('#div-timeserver-host-num').hide();
+    // radio 버튼 클릭 시 ip 정보 초기화
+    $('input[name=form-input-cluster-config-timeserver]').val("");
 });
 
-// 로컬 시간서버를 시간서버로 선택하면 시간서버 2, 3은 필수 입력으로 전환한다.
+// 외부 시간서버를 로컬 시간서버로 선택하면 시간서버 2, 3은 필수 입력으로 전환한다.
 $('#form-radio-timeserver-int').on('click', function(){
     $('#span-timeserver2-required').show();
     $('#span-timeserver3-required').show();
-
+    $('#form-input-cluster-config-time-server-ip-2').attr('required','required');
+    $('#form-input-cluster-config-time-server-ip-3').attr('required','required');
+    // 현재 host radio 버튼 보임
     $('#div-timeserver-host-num').show();
+    $('input[name=form-input-cluster-config-timeserver]').val("");
+});
+
+// 시간 서버 IP 체크
+$('input[name=form-input-cluster-config-timeserver]').on('focusout', function(){
+    let ip_address = this.value;
+    let input_id = this.id;
+    // 현재 focus된 IP의 값과 required 속성 값으로 IP 유효성 체크
+    let required_check = $('#'+input_id).prop('required');
+    let ip_address_check = IpCheck(ip_address, required_check);
+    if(ip_address_check != true){
+        alert("시간 서버의 IP 주소를 확인해 주세요.")
+        // if(required_check == "false"){
+            this.value = "";
+        // }
+        return false;
+    }
 });
 
 // 아코디언 개체의 버튼 클릭 이벤트 처리
@@ -434,12 +473,14 @@ $('#button-open-modal-wizard-storage-cluster').on('click', function(){
 $('#form-input-cluster-config-ssh-key-pri-file').on('click', function(){
     let ssh_key_input_pri = document.querySelector('#form-input-cluster-config-ssh-key-pri-file');
     let ssh_key_textarea_existing_pri = "div-textarea-cluster-config-temp-existing-ssh-key-pri-file";
-    fileReaderFunc(ssh_key_input_pri, ssh_key_textarea_existing_pri);
+    let file_type = "pri-ssh_key";
+    fileReaderFunc(ssh_key_input_pri, ssh_key_textarea_existing_pri, file_type);
 });
 $('#form-input-cluster-config-ssh-key-pub-file').on('click', function(){
     let ssh_key_input_pub = document.querySelector('#form-input-cluster-config-ssh-key-pub-file');
     let ssh_key_textarea_existing_pub = "div-textarea-cluster-config-temp-existing-ssh-key-pub-file";
-    fileReaderFunc(ssh_key_input_pub, ssh_key_textarea_existing_pub);
+    let file_type = "pub-ssh_key";
+    fileReaderFunc(ssh_key_input_pub, ssh_key_textarea_existing_pub, file_type);
 });
 
 // ssh-key 기존 파일 선택 시 파일 선택 취소 시 hidden textarea 초기화
@@ -467,7 +508,8 @@ $('input[name=radio-ssh-key]').on('click', function() {
 $('#form-input-cluster-config-hosts-file').on('click', function(){
     let hosts_input = document.querySelector('#form-input-cluster-config-hosts-file');
     let hosts_textarea_existing = "form-textarea-cluster-config-existing-host-profile";
-    fileReaderFunc(hosts_input, hosts_textarea_existing);
+    let file_type = "hosts";
+    fileReaderFunc(hosts_input, hosts_textarea_existing, file_type);
 });
 // Hosts 기존 파일 선택 시 파일 선택 취소 시 hidden textarea 초기화
 $('#form-input-cluster-config-hosts-file').on('change', function(){
@@ -496,27 +538,45 @@ $('#button-accordion-timeserver').on('click change', function(){
 
 // 완료 단계에서 파일 다운로드 링크 생성
 // SSH Key 다운로드 링크 생성
-$('a[name=span-modal-wizard-cluster-config-finish-sshkey-download]').on('click', function (){
+$('#span-modal-wizard-cluster-config-finish-pri-sshkey-download').on('click', function (){
     let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
     putSshKeyValueIntoTextarea(ssh_key_type);
 
     let pri_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val();
-    let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val();
     let pri_ssh_key_download_link_id = 'span-modal-wizard-cluster-config-finish-pri-sshkey-download';
-    let pub_ssh_key_download_link_id = 'span-modal-wizard-cluster-config-finish-pub-sshkey-download';
+    // 다운로드 링크 생성 전 유효성 검정
+    if(pri_ssh_key_text.trim() != "") {
+        saveAsFile(pri_ssh_key_download_link_id, pri_ssh_key_text, "ablecloud");
+    }else {
+        alert("SSH 개인 키 파일 정보를 입력해 주세요.");
+    }
+});
+$('#span-modal-wizard-cluster-config-finish-pub-sshkey-download').on('click', function (){
+    let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
+    putSshKeyValueIntoTextarea(ssh_key_type);
 
-    saveAsFile(pri_ssh_key_download_link_id, pri_ssh_key_text, "ablecloud");
-    saveAsFile(pub_ssh_key_download_link_id, pub_ssh_key_text, "ablecloud.pub");
+    let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val();
+    let pub_ssh_key_download_link_id = 'span-modal-wizard-cluster-config-finish-pub-sshkey-download';
+    // 다운로드 링크 생성 전 유효성 검정
+    if(pub_ssh_key_text.trim() != ""){
+        saveAsFile(pub_ssh_key_download_link_id, pub_ssh_key_text, "ablecloud.pub");
+    }else {
+        alert("SSH 공개 키 파일 정보를 입력해 주세요.");
+    }
 });
 // Host File 다운로드 링크 생성
 $('#span-modal-wizard-cluster-config-finish-hosts-file-download').on('click', function (){
     let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
-    putSshKeyValueIntoTextarea(hosts_file_type);
+    putHostsValueIntoTextarea(hosts_file_type);
 
     let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
     let hosts_file_download_link_id = 'span-modal-wizard-cluster-config-finish-hosts-file-download';
-
-    saveAsFile(hosts_file_download_link_id, hosts_file_text, "hosts");
+    // 다운로드 링크 생성 전 유효성 검정
+    if(hosts_file_text.trim() != ""){
+        saveAsFile(hosts_file_download_link_id, hosts_file_text, "hosts");
+    }else {
+        alert("Hosts 파일 정보를 입력해 주세요.");
+    }
 });
 
 
@@ -608,38 +668,39 @@ function readSshKeyFile() {
  * Date Created : 2021.03.17
  * Writer  : 류홍욱
  * Description : 클러스터 준비 마법사에서 input box에서 파일을 선택하면 문자열로 읽어와 textarea에 담 함수
- * Parameter : input (input box id 값), textarea_type는(textarea id 값)
+ * Parameter : input (input box id 값), textarea_type(textarea id 값), file_type(ssh-key, hosts 파일 타입에 따라 분류)
  * Return  : 없음
  * History  : 2021.03.11 최초 작성
 **/
 
-function fileReaderFunc(input, textarea_type) {
+function fileReaderFunc(input, textarea_type, file_type) {
     input.addEventListener('change', function (event) {
-        try {
-            let fileList = input.files || event.target.files;
-            let file = fileList[0];
-            // id
-            let id = input.getAttribute('id');
-            if ($(input).val() != "") {
-                let fileName = fileList[0].name;
-                // 파일 확장자 체크
-                if (fileExtensionChecker(fileName) != false) {
-                    // FileList
-                    let reader = new FileReader();
+        let file_list = input.files || event.target.files;
+        let file = file_list[0];
+        let id = input.getAttribute('id');
+        if ($(input).val() != "") {
+            let file_name = file_list[0].name;
+            // 파일 이름 및 용량 체크
+            if (fileNameChecker(file_name, file_type) != false && fileSizeCheck(file) != false) {
+                // FileList
+                let reader = new FileReader();
+                try {
                     reader.onload = function (progressEvent) {
                         console.log(progressEvent.target.result);
                         let result = progressEvent.target.result;
-                        $('#'+textarea_type).val(result);
+                        $('#' + textarea_type).val(result);
                     };
                     reader.readAsText(file);
-                } else {
-                    // input 박스 초기화
-                    $('#'+id).val("");
+                } catch (err) {
+                    console.error(err);
                 }
+            } else {
+                // validation 실패 시 초기화
+                $('#' + id).val("");
+                $('#' + textarea_type).val("");
             }
-        } catch (err) {
-            console.error(err);
         }
+
     });
 }
 
@@ -649,17 +710,46 @@ function fileReaderFunc(input, textarea_type) {
  * Date Created : 2021.03.19
  * Writer  : 류홍욱
  * Description : 클러스터 준비 마법사에서 파일을 선택할 때 확장자를 체크하는 함수
- * Parameter : fileName
+ * Parameter : file_name
  * Return  : true, false
  * History  : 2021.03.19 최초 작성
 **/
 
-function fileExtensionChecker(fileName){
-    let ext = fileName.split('.').pop().toLowerCase();
+function fileExtensionChecker(file_name){
+    let ext = file_name.split('.').pop().toLowerCase();
     if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'doc', 'docx', 'xls', 'xlsx', 'hwp','html', 'js', 'rpm']) != -1) {
-        alert('키 파일만 업로드할 수 있습니다.');
+        alert('해당 확장자 파일은 업로드할 수 있습니다.');
         return false;
     };
+}
+
+/**
+ * Meathod Name : fileNameChecker
+ * Date Created : 2021.03.19
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 파일을 선택할 때 이름을 체크하는 함수
+ * Parameter : fileName, file_type
+ * Return  : true, false
+ * History  : 2021.03.19 최초 작성
+**/
+
+function fileNameChecker(file_name, file_type) {
+    if (file_type == "pri-ssh_key") {
+        if (file_name != "ablecloud") {
+            alert("'ablecloud'으로 된 개인 키 파일만 업로드할 수 있습니다.");
+            return false;
+        }
+    } else if (file_type == "pub-ssh_key") {
+        if (file_name != "ablecloud.pub") {
+            alert("'ablecloud.pub'으로 된 공개 키 파일만 업로드할 수 있습니다.");
+            return false;
+        }
+    } else if (file_type == "hosts") {
+        if (file_name != "hosts") {
+            alert("'hosts'으로 된 파일만 업로드할 수 있습니다.");
+            return false;
+        }
+    }
 }
 
 /**
@@ -742,7 +832,6 @@ function putTimeServerValueIntoTextarea(radio_value) {
 **/
 
 function saveAsFile(id, str, filename) {
-    console.log(id, str, filename);
     $('#'+id).attr({
         target: '_blank',
         href: 'data:attachment/text,' + encodeURI(str),
@@ -785,16 +874,17 @@ function writeFile(text1, text2, file_type) {
  * Date Created : 2021.03.24
  * Writer  : 류홍욱
  * Description : 클러스터 준비 마법사에서 완료를 누를 때 설정확인 메뉴에서 확인했던 time server 정보대로 host에 업데이트하는 함수
- * Parameter : timeserver_confirm_ip_text(설정확인 단계에서의 ip주소 값), file_type(외부 또는 로컬서버) , timeserver_host_num(현재 설정 중인 호스트 번호)
+ * Parameter : timeserver_confirm_ip_text(설정확인 단계에서의 ip주소 값), file_type(외부 또는 로컬서버) , timeserver_current_host_num(현재 설정 중인 호스트 번호)
  * Return  : 없음
  * History  : 2021.03.24 최초 작성
 **/
 
-function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserver_host_num) {
+function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserver_current_host_num) {
     let chrony_file_root = "root/test.txt"
     // chrony.conf 파일 서버 리스트 부분 초기화
     cockpit.script(["sed -i '/^server /d' /"+chrony_file_root+""])
     cockpit.script(["sed -i '/^pool /d' /"+chrony_file_root+""])
+
     // chrony.conf 파일에서 서버 추가하는 부분
     // 외부 시간 서버
     if(file_type == "external"){
@@ -814,14 +904,14 @@ function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserver_host
         cockpit.script(["sed -i '/^allow /d' /"+chrony_file_root+""])
         cockpit.script(["sed -i '/^#local stratum /d' /"+chrony_file_root+""])
         cockpit.script(["sed -i '/^local stratum /d' /"+chrony_file_root+""])
-        if (timeserver_host_num == 1){
+        if (timeserver_current_host_num == 1){
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server "+timeserver_confirm_ip_text[0]+" iburst minpoll 0 maxpoll 0\" /"+chrony_file_root+""])
         }
-        if (timeserver_host_num == 2){
+        if (timeserver_current_host_num == 2){
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server "+timeserver_confirm_ip_text[0]+" prefer iburst minpoll 0 maxpoll 0\" /"+chrony_file_root+""])
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server "+timeserver_confirm_ip_text[1]+" minpoll 0 maxpoll 0\" /"+chrony_file_root+""])
         }
-        if (timeserver_host_num == 3){
+        if (timeserver_current_host_num == 3){
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server "+timeserver_confirm_ip_text[1]+" prefer iburst minpoll 0 maxpoll 0\" /"+chrony_file_root+""])
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server "+timeserver_confirm_ip_text[0]+" iburst minpoll 0 maxpoll 0\" /"+chrony_file_root+""])
         }
@@ -832,7 +922,42 @@ function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserver_host
         cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow "+allow_ip+"\" /"+chrony_file_root+""])
         cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\local stratum 10\" /"+chrony_file_root+""])
     }
-
-
 }
+
+
+/**
+ * Meathod Name : validateClusterConfigPrepare
+ * Date Created : 2021.03.25
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 완료를 누를 때 유효성 검사하는 함수
+ * Parameter : timeserver_type(시간서버 타입에 따라 필수 입력 값이 달라져 구분하기 위한 값)
+ * Return  : 없음
+ * History  : 2021.03.25 최초 작성
+ */
+function validateClusterConfigPrepare(timeserver_type){
+
+    let validate_check = true;
+
+    if($('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val().trim() == "" ){
+        alert("SSH 개인 키 파일 정보를 확인해 주세요.");
+        validate_check = false;
+    } else if ($('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val().trim() == "") {
+        alert("SSH 공개 키 파일 정보를 확인해 주세요.");
+        validate_check = false;
+    } else if ($('#div-textarea-cluster-config-confirm-hosts-file').val().trim() == "") {
+        alert("Hosts 파일 정보를 확인해 주세요.");
+        validate_check = false;
+    } else if ($('#div-cluster-config-confirm-time-server-1').text().trim() == "") {
+        alert("시간 서버 1번 IP정보를 확인해 주세요.");
+        validate_check = false;
+    }else if ($('#div-cluster-config-confirm-time-server-2').text().trim() == "" && timeserver_type == "internal") {
+        alert("시간 서버 2번 IP정보를 확인해 주세요.");
+        validate_check = false;
+    }else if ($('#div-cluster-config-confirm-time-server-3').text().trim() == "" && timeserver_type == "internal") {
+        alert("시간 서버 3번 IP정보를 확인해 주세요.");
+        validate_check = false;
+    }
+    return validate_check;
+}
+
 

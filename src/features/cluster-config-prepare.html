@@ -85,17 +85,16 @@
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-pub-file">
-                                                <span class="pf-c-form__label-text">SSH Key 개인키 파일</span>
+                                                <span class="pf-c-form__label-text">SSH 개인 키 파일</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline">
                                             <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cluster-config-ssh-key-pri-file" name="form-input-cluster-config-ssh-key-file" disabled/>
-
                                         </div>
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-pub-file">
-                                                <span class="pf-c-form__label-text">SSH Key 공개키 파일</span>
+                                                <span class="pf-c-form__label-text">SSH 공개 키 파일</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
@@ -170,8 +169,7 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-new-host-profile">10.10.0.10&#9;ccvm-mngt&#10;192.168.0.10&#9;ccvm-svc&#10;10.10.0.11&#9;ablestack1&#10;10.10.0.101&#9;cvm1-pn&#10;100.100.0.101&#9;scvm1-cn&#10;
-                                            </textarea>
+                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-new-host-profile">10.10.0.10&#9;ccvm-mngt&#10;192.168.0.10&#9;ccvm-svc&#10;10.10.0.11&#9;ablestack1&#10;10.10.0.101&#9;cvm1-pn&#10;100.100.0.101&#9;scvm1-cn&#10;</textarea>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-file">
@@ -247,7 +245,7 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-1" name="form-input-cluster-config-timeserver1"/>
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-1" name="form-input-cluster-config-timeserver" required="required"/>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
@@ -258,7 +256,7 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-2" name="form-input-cluster-config-timeserver1"/>
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-2" name="form-input-cluster-config-timeserver"/>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
@@ -269,7 +267,7 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-3" name="form-input-cluster-config-timeserver1"/>
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-3" name="form-input-cluster-config-timeserver"/>
                                         </div>
                                     </div>
                                 </section>
@@ -307,7 +305,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pri-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pri-file" style="width:670px;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
                                                     </div>
                                                 </dd>
                                                 <dt class="pf-c-description-list__term">
@@ -315,7 +313,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pub-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pub-file" style="width:670px;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -347,7 +345,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-hosts-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text">Host 프로파일 내용</textarea>
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-hosts-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>Host 프로파일 내용</textarea>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -411,17 +409,17 @@
                             <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
                                 <span>
                                     -Private SSH Key 다운로드 :
-                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pri-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download">파일을 재사용 하려면 클릭하십시오</a>
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pri-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                                 <br/>
                                 <span>
                                     -Public SSH Key 다운로드 :
-                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pub-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download">파일을 재사용 하려면 클릭하십시오</a>
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pub-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                                 <br/>
                                 <span>
                                     - Hosts 프로파일 다운로드 : 
-                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-hosts-file-download" href="https://172.16.0.30:9090/ablestack/hosts.in">파일을 재사용 하려면 클릭하십시오</a>
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-hosts-file-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                             </div>
                         </div>
@@ -429,6 +427,7 @@
                 </div>
                 <footer class="pf-c-wizard__footer" style="box-shadow:var(--pf-global--BoxShadow--sm-top)">
                     <button class="pf-c-button pf-m-primary" type="submit" id="button-next-step-modal-wizard-cluster-config-prepare">다음</button>
+                    <button class="pf-c-button pf-m-primary" type="submit" id="button-test">테스트</button>
                     <button class="pf-c-button pf-m-secondary" type="button" id="button-before-step-modal-wizard-cluster-config-prepare">이전</button>
                     <div class="pf-c-wizard__footer-cancel">
                         <button class="pf-c-button pf-m-link" type="button" id="button-cancel-config-modal-wizard-cluster-config-prepare">취소</button>
@@ -440,5 +439,6 @@
 </div>
 
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+<script src="./src/common/validation.js"></script>
 <script src="./src/features/cluster-config-prepare.js"></script>
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
