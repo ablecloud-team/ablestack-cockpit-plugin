@@ -51,3 +51,38 @@ function fileSizeCheck(file) {
         return false;
     }
 }
+
+/**
+ * Meathod Name : netmaskFormatCheck
+ * Date Created : 2021.03.28
+ * Writer  : 류홍욱
+ * Description : netmask 유효성 체크 (예 :255.255.255.255)
+ * Parameter : obj
+ * Return  : boolean
+ * History  : 2021.03.28 최초 작성
+ */
+
+function netmaskFormatCheck(obj){
+  let netmaskFormatCheckBoolean = false;
+  let netmaskFormat = /^(255?)\.(255?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  if(obj.replace(/[ㄱ-ㅎㅏ-ㅣ가-힣`~!@#$%^&*()\-\\_=+|;:'",/<>?]/g, "").match(netmaskFormat)) netmaskFormatCheckBoolean = true;
+  return netmaskFormatCheckBoolean;
+}
+
+
+/**
+ * Meathod Name : cidrFormatCheck
+ * Date Created : 2021.03.28
+ * Writer  : 류홍욱
+ * Description : cidr 유효성 체크
+ * Parameter : obj (예: 192.168.0.0/16)
+ * Return  : boolean
+ * History  : 2021.03.28 최초 작성
+ */
+
+function cidrFormatCheck(obj){
+  let cidrFormatCheckBoolean = false;
+  let cidrkFormat = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$/;
+  if(obj.replace(/[ㄱ-ㅎㅏ-ㅣ가-힣`~!@#$%^&*()\-\\_=+|;:'",<>?]/g, "").match(cidrkFormat)) cidrFormatCheckBoolean = true;
+  return cidrFormatCheckBoolean;
+}
