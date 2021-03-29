@@ -66,13 +66,11 @@ if __name__ == '__main__':
     verbose = (5 - args.verbose) * 10
 
     '''로깅을 위한 logger 생성, 모든 인자에 default 인자가 있음.
-    logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')'''
-    
+    logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')'''    
     if args.action == 'set_noout':
         '''유지보수 모드 설정'''
         ret = onMaintenance()        
     elif args.action == 'unset_noout':
         '''유지보수 모드 해제'''
         ret = offMaintenance()
-
     '''print(ret)'''
