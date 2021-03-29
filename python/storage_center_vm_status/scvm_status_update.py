@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+# Copyright (c) 2021 ABLECLOUD Co. Ltd
+
+# 스토리지 가상머신 상태 상태 변경을 위한 파일입니다.
+# 최초 작성일 : 2021. 03. 19
 
 import sys
 import argparse
@@ -12,11 +15,15 @@ from subprocess import check_output
 from subprocess import call
 from ablestack import *
 
-
 env=os.environ.copy()
 env['LANG']="en_US.utf-8"
 env['LANGUAGE']="en"
 
+'''
+함수명 : parseArgs
+이 함수는 python library argparse를 시용하여 함수를 실행될 때 필요한 파라미터를 입력받고 파싱하는 역할을 수행합니다.
+예를들어 action을 요청하면 해당 action일 때 요구되는 파라미터를 입력받고 해당 코드를 수행합니다.
+'''
 def parseArgs():
     parser = argparse.ArgumentParser(description='Storage Center VM action ',
                                      epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
@@ -37,7 +44,8 @@ def parseArgs():
     
     return parser.parse_args()
 
-#스토리지 VM 시작 
+# 함수명 : startStorageVM
+# 주요 기능 : 스토리지 VM 시작 
 def startStorageVM():
 
     try:
@@ -58,8 +66,8 @@ def startStorageVM():
                 
     return print(json.dumps(json.loads(ret), indent=4))
 
-
-#스토리지 VM 정지
+# 함수명 : stopStorageVM
+# 주요 기능 : 스토리지 VM 정지
 def stopStorageVM():  
         
     try:
@@ -81,7 +89,8 @@ def stopStorageVM():
     
     return print(json.dumps(json.loads(ret), indent=4))
     
-#스토리지 VM 삭제
+# 함수명 : deleteStorageVM
+# 주요 기능 : 스토리지 VM 삭제
 def deleteStorageVM():   
 
     try:
@@ -108,7 +117,8 @@ def deleteStorageVM():
     return print(json.dumps(json.loads(ret), indent=4))
 
 
-#스토리지 VM 삭제
+# 함수명 : updateStorageVM
+# 주요 기능 : 스토리지 VM 자원변경
 def updateStorageVM(cpu, memory):
 
     memory = memory * 1024 #MiB 형태로 변경    
