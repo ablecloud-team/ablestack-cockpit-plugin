@@ -134,7 +134,7 @@ $('#nav-button-cluster-config-finish').on('click', function(){
 
 /* 마법사 Footer 영역의 버튼 클릭 이벤트 처리 시작 */
 
-$('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(){
+$('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function () {
     resetClusterConfigWizard();
 
     if (cur_step_wizard_cluster_config_prepare == "1") {
@@ -145,8 +145,7 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
         $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
         cur_step_wizard_cluster_config_prepare = "2";
-    }
-    else if(cur_step_wizard_cluster_config_prepare == "2") {
+    } else if (cur_step_wizard_cluster_config_prepare == "2") {
         $('#div-modal-wizard-cluster-config-ip-info').show();
         $('#nav-button-cluster-config-ip-info').addClass('pf-m-current');
 
@@ -174,8 +173,7 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
         let timeserver_type = $('input[name=radio-timeserver]:checked').val();
         putTimeServerValueIntoTextarea(timeserver_type);
 
-    }
-    else if(cur_step_wizard_cluster_config_prepare == "4") {
+    } else if (cur_step_wizard_cluster_config_prepare == "4") {
         $('#div-modal-wizard-cluster-config-review').show();
         $('#nav-button-cluster-config-review').addClass('pf-m-current');
 
@@ -184,8 +182,17 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
 
         cur_step_wizard_cluster_config_prepare = "5";
 
-    }
-    else if(cur_step_wizard_cluster_config_prepare == "5") {
+        // 변경된 키 내용을 설정 확인에 반영
+        let ssh_key_type = $('input[name=radio-ssh-key]:checked').val();
+        putSshKeyValueIntoTextarea(ssh_key_type);
+        // 변경된 hosts file 내용을 설정 확인에 반영
+        let host_file_type = $('input[name=radio-hosts-file]:checked').val();
+        putHostsValueIntoTextarea(host_file_type);
+        // time server 내용을 설정 확인에 반영
+        let timeserver_type = $('input[name=radio-timeserver]:checked').val();
+        putTimeServerValueIntoTextarea(timeserver_type);
+
+    } else if (cur_step_wizard_cluster_config_prepare == "5") {
         $('#div-modal-wizard-cluster-config-finish').show();
         $('#nav-button-cluster-config-finish').addClass('pf-m-current');
 
@@ -195,51 +202,61 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function(
         $('#button-next-step-modal-wizard-cluster-config-prepare').html('완료');
 
         cur_step_wizard_cluster_config_prepare = "6";
-    }
-    else if(cur_step_wizard_cluster_config_prepare == "6") {
-        resetClusterConfigWizard();
+    } else if (cur_step_wizard_cluster_config_prepare == "6") {
 
-        $('#div-modal-wizard-cluster-config-prepare').hide();
-        $('#div-modal-wizard-cluster-config-overview').show();
-        $('#nav-button-cluster-config-overview').addClass('pf-m-current');
-
-        cur_step_wizard_cluster_config_prepare = "1";
-
-        // 완료 버튼을 누르면 선택한 내용대로 파일이 서버에 저장
-        // SSH Key 파일
-        let radio_value = $('input[name=radio-ssh-key]:checked').val();
-        putSshKeyValueIntoTextarea(radio_value);
-        let pri_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val();
-        let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val();
-        let file_type = "ssh_key";
-        writeFile(pri_ssh_key_text, pub_ssh_key_text, file_type);
-
-        // hosts 파일
-        radio_value = $('input[name=radio-hosts-file]:checked').val();
-        putHostsValueIntoTextarea(radio_value);
-        let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
-        file_type = "hosts_file";
-        writeFile(hosts_file_text, "", file_type);
-
-        // time server 파일
+        // 유효성 검증 후 완료 버튼을 누르면 선택한 내용대로 파일이 호스트에 저장
         let timeserver_type = $('input[name=radio-timeserver]:checked').val();
-        let timeserver_current_host_num = $('input[name=radio-timeserver_host_num]:checked').val();
-        let timeserver_confirm_current_ip_text = $('#div-cluster-config-confirm-time-server-'+timeserver_current_host_num).text();
-        let timeserver_confirm_ip_list = new Array();
-        for (let i=1; i<=3; i++){
-            timeserver_confirm_ip_list.push($('#form-input-cluster-config-time-server-ip-'+i).val());
+        let cluster_config_prepare_vaildation = validateClusterConfigPrepare(timeserver_type);
+        if (cluster_config_prepare_vaildation != false) {
+            // SSH Key 파일
+            let radio_value = $('input[name=radio-ssh-key]:checked').val();
+            putSshKeyValueIntoTextarea(radio_value);
+            let pri_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val();
+            let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val();
+            let file_type = "ssh_key";
+            writeFile(pri_ssh_key_text, pub_ssh_key_text, file_type);
+
+            // hosts 파일
+            radio_value = $('input[name=radio-hosts-file]:checked').val();
+            putHostsValueIntoTextarea(radio_value);
+            let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
+            file_type = "hosts_file";
+            writeFile(hosts_file_text, "", file_type);
+
+            // time server 파일
+            timeserver_type = $('input[name=radio-timeserver]:checked').val();
+            let timeserver_current_host_num = $('input[name=radio-timeserver_host_num]:checked').val();
+            let timeserver_confirm_current_ip_text = $('#div-cluster-config-confirm-time-server-' + timeserver_current_host_num).text();
+            let timeserver_confirm_ip_list = new Array();
+            for (let i = 1; i <= 3; i++) {
+                timeserver_confirm_ip_list.push($('#form-input-cluster-config-time-server-ip-' + i).val());
+            }
+            timeserver_confirm_ip_list = timeserver_confirm_ip_list.filter(function (item) {
+                return item !== null && item !== undefined && item !== '';
+            });
+            modifyTimeServer(timeserver_confirm_ip_list, timeserver_type, timeserver_current_host_num);
+            resetClusterConfigWizard();
+
+            $('#div-modal-wizard-cluster-config-prepare').hide();
+            $('#div-modal-wizard-cluster-config-overview').show();
+            $('#nav-button-cluster-config-overview').addClass('pf-m-current');
+
+            cur_step_wizard_cluster_config_prepare = "1";
+
+        } else {
+            $('#div-modal-wizard-cluster-config-finish').show();
+            $('#nav-button-cluster-config-finish').addClass('pf-m-current');
+
+            $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
+            $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
+
+            $('#button-next-step-modal-wizard-cluster-config-prepare').html('완료');
+
+            cur_step_wizard_cluster_config_prepare = "6";
         }
-        timeserver_confirm_ip_list  = timeserver_confirm_ip_list.filter(function(item) {
-          return item !== null && item !== undefined && item !== '';
-        });
-        modifyTimeServer(timeserver_confirm_ip_list, timeserver_type, timeserver_current_host_num);
     }
 });
 
-$('#button-test').on('click', function () {
-    let timeserver_type = $('input[name=radio-timeserver]:checked').val();
-    validateClusterConfigPrepare(timeserver_type);
-});
 
 $('#button-before-step-modal-wizard-cluster-config-prepare').on('click', function(){
     resetClusterConfigWizard();
@@ -350,8 +367,9 @@ $('#form-input-cluster-config-host-number-minus').on('click', function () {
         return;
     }
 });
-$('#form-input-cluster-config-host-number').on('keyup', function () {
-    if(this.value <= 0){
+$('#form-input-cluster-config-host-number').on('propertychange change keyup paste input', function () {
+    if(this.value <= 0 || this.value >= 1000 ){
+        alert("1~999까지의 숫자만 입력할 수 있습니다.")
         this.value = 1;
     }
 });
@@ -360,22 +378,25 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
     let current_val = $('#form-input-cluster-config-host-number').val();
     let target_textarea = $('#form-textarea-cluster-config-new-host-profile');
     let host_ip_info;
-    target_textarea.val("");
+    console.log(current_val);
+    if (current_val < 1000) {
+        target_textarea.val("");
 
-    host_ip_info = "10.10.0.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n";
-    for(let i=1; i<=current_val; i++){
-        let sum = 10+i;
-        host_ip_info = host_ip_info + "10.10.0."+sum+"\tablestack"+i+"\n";
+        host_ip_info = "10.10.0.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n";
+        for (let i = 1; i <= current_val; i++) {
+            let sum = 10 + i;
+            host_ip_info = host_ip_info + "10.10.0." + sum + "\tablestack" + i + "\n";
+        }
+        for (let i = 1; i <= current_val; i++) {
+            let sum = 100 + i;
+            host_ip_info = host_ip_info + "10.10.0." + sum + "\tscvm" + i + "-pn\n";
+        }
+        for (let i = 1; i <= current_val; i++) {
+            let sum = 100 + i;
+            host_ip_info = host_ip_info + "100.100.0." + sum + "\tscvm" + i + "-cn\n";
+        }
+        target_textarea.val(host_ip_info);
     }
-    for(let i=1; i<=current_val; i++){
-        let sum = 100+i;
-        host_ip_info = host_ip_info + "10.10.0."+sum+"\tscvm"+i+"-pn\n";
-    }
-    for(let i=1; i<=current_val; i++){
-        let sum = 100+i;
-        host_ip_info = host_ip_info + "100.100.0."+sum+"\tscvm"+i+"-cn\n";
-    }
-    target_textarea.val(host_ip_info);
 });
 
 // 로컬 시간서버를 외부 시간서버로 선택하면 시간서버 2, 3은 선택 입력으로 전환한다.
@@ -407,7 +428,7 @@ $('input[name=form-input-cluster-config-timeserver]').on('focusout', function(){
     let input_id = this.id;
     // 현재 focus된 IP의 값과 required 속성 값으로 IP 유효성 체크
     let required_check = $('#'+input_id).prop('required');
-    let ip_address_check = IpCheck(ip_address, required_check);
+    let ip_address_check = checkTimeServerIp(ip_address, required_check);
     if(ip_address_check != true){
         alert("시간 서버의 IP 주소를 확인해 주세요.")
         // if(required_check == "false"){
@@ -618,18 +639,15 @@ function resetClusterConfigWizard(){
  * Date Created : 2021.03.11
  * Writer  : 류홍욱
  * Description : 클러스터 준비 마법사에서 SSHKey를 생성하는 함수
+                 키 속성 - 패스워드(없음), 알고리즘(RSA2048), 덮어쓰기(TRUE)
  * Parameter : 없음
  * Return  : 없음
  * History  : 2021.03.11 최초 작성
 **/
 
 function generateSshkey() {
-    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "geneSsh"])
-        .stream(console.log)
-        .then(console.log)
-        .catch(console.log);
+    cockpit.script(["ssh-keygen -t rsa -b 2048 -f /root/.ssh/ablecloud -N '' <<<y 2>&1 >/dev/null"])
 }
-
 
 /**
  * Meathod Name : readSshKeyFile
@@ -645,7 +663,7 @@ function readSshKeyFile() {
     // 개인키 읽어오기
     cockpit.file("/root/.ssh/ablecloud").read()
         .done(function (tag) {
-            console.log(tag);
+            // console.log(tag);
             // ssh_key_textarea에 텍스트 삽입
             $('#div-textarea-cluster-config-temp-new-ssh-key-pri-file').val(tag);
         })
@@ -654,7 +672,7 @@ function readSshKeyFile() {
     // 공개키 읽어오기
     cockpit.file("/root/.ssh/ablecloud.pub").read()
         .done(function (tag) {
-            console.log(tag);
+            // console.log(tag);
             // ssh_key_textarea에 텍스트 삽입
             $('#div-textarea-cluster-config-temp-new-ssh-key-pub-file').val(tag);
         })
@@ -681,18 +699,18 @@ function fileReaderFunc(input, textarea_type, file_type) {
         if ($(input).val() != "") {
             let file_name = file_list[0].name;
             // 파일 이름 및 용량 체크
-            if (fileNameChecker(file_name, file_type) != false && fileSizeCheck(file) != false) {
+            if (checkClusterConfigPrepareFileName(file_name, file_type) != false && checkFileSize(file) != false) {
                 // FileList
                 let reader = new FileReader();
                 try {
                     reader.onload = function (progressEvent) {
-                        console.log(progressEvent.target.result);
+                        // console.log(progressEvent.target.result);
                         let result = progressEvent.target.result;
                         $('#' + textarea_type).val(result);
                     };
                     reader.readAsText(file);
                 } catch (err) {
-                    console.error(err);
+                    // console.error(err);
                 }
             } else {
                 // validation 실패 시 초기화
@@ -700,7 +718,6 @@ function fileReaderFunc(input, textarea_type, file_type) {
                 $('#' + textarea_type).val("");
             }
         }
-
     });
 }
 
@@ -724,16 +741,16 @@ function fileExtensionChecker(file_name){
 }
 
 /**
- * Meathod Name : fileNameChecker
+ * Meathod Name : checkClusterConfigPrepareFileName
  * Date Created : 2021.03.19
  * Writer  : 류홍욱
  * Description : 클러스터 준비 마법사에서 파일을 선택할 때 이름을 체크하는 함수
- * Parameter : fileName, file_type
+ * Parameter : fileName, file_type(ssh-key 또는 hosts)
  * Return  : true, false
  * History  : 2021.03.19 최초 작성
 **/
 
-function fileNameChecker(file_name, file_type) {
+function checkClusterConfigPrepareFileName(file_name, file_type) {
     if (file_type == "pri-ssh_key") {
         if (file_name != "ablecloud") {
             alert("'ablecloud'으로 된 개인 키 파일만 업로드할 수 있습니다.");
@@ -852,16 +869,16 @@ function saveAsFile(id, str, filename) {
 
 function writeFile(text1, text2, file_type) {
     if (file_type == 'ssh_key') {
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "makePri"])
+        cockpit.script(["touch /root/.ssh/ablecloud"])
         cockpit.file("/root/.ssh/ablecloud").replace(text1)
             .done(function (tag) {})
             .fail(function (error) {});
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "makePub"])
+        cockpit.script(["touch /root/.ssh/ablecloud.pub"])
         cockpit.file("/root/.ssh/ablecloud.pub").replace(text2)
             .done(function (tag) {})
             .fail(function (error) {});
     }else if (file_type == 'hosts_file'){
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/cluster_wizard/cluster_wizard.py", "makeHosts"])
+        cockpit.script(["touch /etc/hosts"])
         cockpit.file("/etc/hosts").replace(text1)
             .done(function (tag) {})
             .fail(function (error) {});
@@ -926,6 +943,39 @@ function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserver_curr
 
 
 /**
+ * Meathod Name : checkTimeServerIp
+ * Date Created : 2021.03.25
+ * Writer  : 류홍욱
+ * Description : IP주소와 필수 여부 값으로 유효성 검사를 실행하고 실패할 경우 false를 리턴하는 함수.
+ * Parameter : ip_address(ip주소 값), required_check(외부 또는 로컬 시간서버별로 필수 입력 값이 달라 구분하기 위한 값)
+ * Return  : boolean
+ * History  : 2021.03.25 최초 작성
+**/
+
+// IP 확인
+function checkTimeServerIp(ip_address, required_check) {
+// IP 주소 미입력
+  let ip_format_check_boolean = false;
+  let ip_format = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  let ip_address_arr = ip_address.split('.');
+  // 필수 입력 값이 아닌 IP 주소의 정상 범위 체크
+  if (required_check == false){
+    if(ip_address !=="" && ip_address !==undefined){
+      if(ip_address.replace(/[ㄱ-ㅎㅏ-ㅣ가-힣`~!@#$%^&*()\-\\_=+|;:'",/<>?]/g, "").match(ip_format) && !Number(ip_address_arr[3])==0) ip_format_check_boolean = true;
+      return ip_format_check_boolean;
+    } else {
+      ip_format_check_boolean = true;
+      return ip_format_check_boolean;
+    }
+  // 필수 입력해야하는 IP 주소의 정상 범위 체크
+  } else {
+    if(ip_address.replace(/[ㄱ-ㅎㅏ-ㅣ가-힣`~!@#$%^&*()\-\\_=+|;:'",/<>?]/g, "").match(ip_format) && !Number(ip_address_arr[3])==0) ip_format_check_boolean = true;
+    return ip_format_check_boolean;
+  }
+}
+
+
+/**
  * Meathod Name : validateClusterConfigPrepare
  * Date Created : 2021.03.25
  * Writer  : 류홍욱
@@ -959,5 +1009,3 @@ function validateClusterConfigPrepare(timeserver_type){
     }
     return validate_check;
 }
-
-
