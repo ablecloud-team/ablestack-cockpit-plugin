@@ -113,10 +113,9 @@ def createScvmXml(args):
                         lpl_txt = ""
                         num = 0
                         for lun in args.lun_passthrough_list:
-                            lpl_txt += "\t\t<disk type='file' device='disk'>\n"
+                            lpl_txt += "\t\t<disk type='block' device='lun'>\n"
                             lpl_txt += "\t\t\t<driver name='qemu' type='raw'/>\n"
                             lpl_txt += "\t\t\t<source file='" + lun + "'/>\n"
-                            lpl_txt += "\t\t\t<backingStore/>\n"
                             lpl_txt += "\t\t\t<target dev='sd"+ alphabet[num] +"' bus='scsi'/>\n"
                             lpl_txt += "\t\t\t<alias name='scsi0-0-0-"+ str(num) +"'/>\n"
                             lpl_txt += "\t\t\t<address type='drive' controller='0' bus='0' target='0' unit='"+ str(num) +"'/>\n"
@@ -228,9 +227,10 @@ def createScvmXml(args):
                         np_txt += "\t\t\t\t<address domain='0x" + snp_domain_num + "' bus='0x"+ snp_bus_num +"' slot='0x"+ snp_slot_num +"' function='0x"+ snp_fun_num +"'/>\n"
                         np_txt += "\t\t\t</source>\n"
                         np_txt += "\t\t\t<alias name='hostdev"+ str(host_dev_num) +"'/>\n"
-                        np_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0' multifunction='on'/>\n"
+                        np_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
                         np_txt += "\t\t</hostdev>\n"
                         host_dev_num += 1
+                        slot_hex_num.pop(0)
 
                         np_txt += "\t\t<hostdev mode='subsystem' type='pci' managed='yes'>\n"
                         np_txt += "\t\t\t<driver name='vfio'/>\n"
@@ -238,7 +238,7 @@ def createScvmXml(args):
                         np_txt += "\t\t\t\t<address domain='0x" + rnp_domain_num + "' bus='0x"+ rnp_bus_num +"' slot='0x"+ rnp_slot_num +"' function='0x"+ rnp_fun_num +"'/>\n"
                         np_txt += "\t\t\t</source>\n"
                         np_txt += "\t\t\t<alias name='hostdev"+ str(host_dev_num) +"'/>\n"
-                        np_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x1'/>\n"
+                        np_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
                         np_txt += "\t\t</hostdev>\n"
                         host_dev_num += 1
                         slot_hex_num.pop(0)
@@ -272,17 +272,18 @@ def createScvmXml(args):
                             npb_txt += "\t\t\t\t<address domain='0x" + snp_domain_num + "' bus='0x"+ snp_bus_num +"' slot='0x"+ snp_slot_num +"' function='0x"+ snp_fun_num +"'/>\n"
                             npb_txt += "\t\t\t</source>\n"
                             npb_txt += "\t\t\t<alias name='hostdev"+ str(host_dev_num) +"'/>\n"
-                            npb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0' multifunction='on'/>\n"
+                            npb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
                             npb_txt += "\t\t</hostdev>\n"
                             host_dev_num += 1
-
+                            slot_hex_num.pop(0)
+                            
                             npb_txt += "\t\t<hostdev mode='subsystem' type='pci' managed='yes'>\n"
                             npb_txt += "\t\t\t<driver name='vfio'/>\n"
                             npb_txt += "\t\t\t<source>\n"
                             npb_txt += "\t\t\t\t<address domain='0x" + rnp_domain_num + "' bus='0x"+ rnp_bus_num +"' slot='0x"+ rnp_slot_num +"' function='0x"+ rnp_fun_num +"'/>\n"
                             npb_txt += "\t\t\t</source>\n"
                             npb_txt += "\t\t\t<alias name='hostdev"+ str(host_dev_num) +"'/>\n"
-                            npb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x1'/>\n"
+                            npb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
                             npb_txt += "\t\t</hostdev>\n"
                             host_dev_num += 1
                             slot_hex_num.pop(0)
