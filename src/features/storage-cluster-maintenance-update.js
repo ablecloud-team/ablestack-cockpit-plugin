@@ -4,12 +4,15 @@
  * Writer  : 최진성
  * Description : 스토리지클러스터 유지보수모드 변경시 발생하는 이벤트 처리를 위한 JavaScript
 **/
+// 닫기 이벤트 처리
+$('#button-close1, #button-close2').on('click', function(){
+    $('#div-modal-storage-cluster-maintenance-update').hide();
+});
 
+// 변경 버튼 클릭 이벤트
 $('#button-maintenance-mode-update').on('click', function(){    
     var cmd = $('#scc-maintenance-update-cmd').val();    
-
-    //유지보수 모드 해제 시 이벤트 요청
-    if(cmd == "unset"){
+    if(cmd == "unset"){//유지보수 모드 해제 시 이벤트 요청
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_update.py", "unset_noout" ])
         .then(function(data){            
             var retVal = JSON.parse(data);
@@ -24,10 +27,8 @@ $('#button-maintenance-mode-update').on('click', function(){
         .catch(function(data){             
             alert("정상적으로 처리되지 않았습니다.")
             //console.log(":::Error:::");            
-        });
-
-    //유지보수 모드 설정 시 이벤트 요청
-    }else if(cmd == "set"){
+        });    
+    }else if(cmd == "set"){//유지보수 모드 설정 시 이벤트 요청
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_update.py", "set_noout" ])
         .then(function(data){            
             var retVal = JSON.parse(data);
@@ -44,8 +45,4 @@ $('#button-maintenance-mode-update').on('click', function(){
             //console.log(":::Error:::"+data);
         });        
     }    
-});
-
-$('#button-close1, #button-close2').on('click', function(){
-    $('#div-modal-storage-cluster-maintenance-update').hide();
 });

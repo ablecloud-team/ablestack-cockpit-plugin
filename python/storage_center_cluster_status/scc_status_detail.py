@@ -24,21 +24,16 @@ env['LANGUAGE']="en"
 예를들어 action을 요청하면 해당 action일 때 요구되는 파라미터를 입력받고 해당 코드를 수행합니다.
 '''
 def parseArgs():
-    parser = argparse.ArgumentParser(description='Storage Cluster Status Details',
-                                     epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
-    
-    parser.add_argument('action', choices=['detail'])
-    
+    parser = argparse.ArgumentParser(description='Storage Cluster Status Details', epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
+    ''' action값 확인'''
+    parser.add_argument('action', choices=['detail'])    
     ''' output 민감도 추가(v갯수에 따라 output및 log가 많아짐) '''
     parser.add_argument("-v", "--verbose", action='count', default=0, help="increase output verbosity")
-
     ''' flag 추가(샘플임, 테스트용으로 json이 아닌 plain text로 출력하는 플래그 역할) '''
     parser.add_argument("-H", "--Human", action='store_const', dest='H', const=True, help="Human readable")
-
     ''' Version 추가 '''
     parser.add_argument("-V", "--Version", action='version', version="%(prog)s 1.0")
     return parser.parse_args()
-
 
 '''
 함수명 : statusDetail
@@ -74,23 +69,31 @@ def statusDetail():
             ''' ceph -s시 출력값을 json으로 리턴 '''
             output = check_output(['ceph -s -f json-pretty'], universal_newlines=True, shell=True, env=env)
             output_json = json.loads(output)
+            '''스토리지 클러스터 상태'''
             cluster_status= output_json['health']['status']
         else :
             cluster_status= "no signal"
 
+        '''mon 갯수'''
         mon_gw1= output_json['monmap']['num_mons']
+        '''mon quorum list'''
         mon_gw2= output_json['quorum_names']
+        '''디스크 갯수'''
         osd= output_json['osdmap']['num_osds']
+        '''작동중 디스크 갯수'''
         osd_up= output_json['osdmap']['num_up_osds']
+        '''풀 갯수'''
         pools= output_json['pgmap']['num_pools']
 
         ''' 클러스터 MGR Daemon값 체크 0 이면 정상, 아니면 undefine '''
         rc = call(['ceph mgr stat'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
         if rc == 0:
-            # MGR deamon 상태값 조회
+            '''MGR deamon 상태값 조회'''
             output_mgr = check_output(['ceph mgr stat'], universal_newlines=True, shell=True, env=env)        
             output_mgr = json.loads(output_mgr)
+            '''관리 데몬 호스트'''
             mgr = output_mgr['active_name'];
+            '''관리 데몬 전체 갯수'''
             mgr_cnt= int(output_json['mgrmap']['num_standbys']) + 1
         else : 
             mgr= "undefine"
@@ -149,5 +152,3 @@ if __name__ == '__main__':
     if args.action == 'detail':        
         ret = statusDetail()    
     '''print(ret)'''
-    
-
