@@ -25,6 +25,7 @@ ex)
 """
 
 import argparse
+import base64
 import datetime
 import json
 import logging
@@ -96,25 +97,6 @@ def argumentParser():
     tmp_parser.add_argument("-V", "--Version", action='version',
                             version="%(prog)s 1.0")
     return tmp_parser.parse_args()
-
-
-
-"""
-hosts 파일 복사를 지정하는 함수
-
-:param :filename :str hosts 파일명
-:return 
-"""
-def genHosts(filename: str):
-    with open(filename, 'rt') as f:
-        hosts = f.read()
-    yam = {'write_files':
-                 [{'content': hosts,
-                   'owner': 'root:root',
-                   'path': '/etc/hosts',
-                   'permissions': '0644'}]}
-    with open('user-data', 'at') as f:
-        f.write(yaml.dump(yam))
 
 
 """
@@ -206,13 +188,14 @@ def genManagement(mgmt_nic: str, mgmt_ip: str, mgmt_prefix: int, mgmt_gw: str, d
 
 
 """
-user-data파일을 사용하여 publickey와 privatekey, authorized_key를 생성하는 부분
+user-data파일을 사용하여 publickey와 privatekey, authorized_key, /etc/hosts를 생성하는 부분
 
 :param :pubkeyfile :str    가상머신에 넣을 publickey 파일의 이름
-:param :privkeyfile :str   가상머신의 넣을 privkey 파일의 이름
+:param :privkeyfile :str   가상머신에 넣을 privkey 파일의 이름
+:param :hostsfile :str     가상머신에 넣을 hosts 파일의 이름
 :return 없음
 """
-def genUserFromFile(pubkeyfile: str, privkeyfile: str):
+def genUserFromFile(pubkeyfile: str, privkeyfile: str, hostsfile: str):
     # with open('user-data.tmpl', 'rt') as f:
     #     yam = yaml.load(f)
     #     tmp_meta = f.read()
@@ -226,28 +209,103 @@ def genUserFromFile(pubkeyfile: str, privkeyfile: str):
         # for line in lines:
         #     privkey += line.strip() + "\n"
         privkey = f.read()
+    # privkey = privkey.replace("\n", "")
 
-    yam = {'disable_root': 0,
-           'ssh_pwauth': True,
-           'users': [{'groups': 'sudo',
-                      'lock_passwd': False,
-                      'name': 'ceph',
-                      'plain_text_passwd': 'Ablecloud1!',
-                      'ssh-authorized-keys': [pubkey],
-                      'ssh_keys': {'rsa_private': privkey,
-                                   'rsa_public': pubkey},
-                      'sudo': ['ALL=(ALL) NOPASSWD:ALL']},
-                     {'name': 'root',
-                      'ssh-authorized-keys': [pubkey],
-                      'ssh_keys': {'rsa_private': privkey,
-                                   'rsa_public': pubkey}}]}
+    with open(hostsfile, 'rt') as f:
+        hosts = f.read()
+    yam = {
+        'disable_root': 0,
+        'ssh_pwauth': True,
+        'users': [
+            {
+                'homedir': '/var/lib/ceph',
+                'groups': 'sudo',
+                'lock_passwd': False,
+                'name': 'ceph',
+                'plain_text_passwd': 'Ablecloud1!',
+                'ssh-authorized-keys': [pubkey],
+                'sudo': ['ALL=(ALL) NOPASSWD:ALL']
+            },
+            {
+                'groups': 'sudo',
+                'lock_passwd': False,
+                'name': 'ablecloud',
+                'plain_text_passwd': 'Ablecloud1!',
+                'ssh-authorized-keys': [pubkey],
+                'sudo': ['ALL=(ALL) NOPASSWD:ALL']
+            },
+            {
+                'disable_root': 0,
+                'ssh_pwauth': True,
+                'name': 'root',
+                'plain_text_passwd': 'Ablecloud1!',
+                'ssh-authorized-keys': [pubkey],
+            }
+        ],
+        'write_files':
+            [
+                {
+                    'encoding': 'base64',
+                    'content': base64.encodebytes(pubkey.encode()),
+                    'owner': 'root:root',
+                    'path': '/root/.ssh/id_rsa.pub',
+                    'permissions': '0644'
+                },
+                {
+                    'encoding': 'base64',
+                    'content': base64.encodebytes(privkey.encode()),
+                    'owner': 'root:root',
+                    'path': '/root/.ssh/id_rsa',
+                    'permissions': '0600'
+                },
+                {
+                    'encoding': 'base64',
+                    'content': base64.encodebytes(pubkey.encode()),
+                    'owner': 'ceph:ceph',
+                    'path': '/var/lib/ceph/.ssh/id_rsa.pub',
+                    'permissions': '0644'
+                },
+                {
+                    'encoding': 'base64',
+                    'content': base64.encodebytes(privkey.encode()),
+                    'owner': 'ceph:ceph',
+                    'path': '/var/lib/ceph/.ssh/id_rsa',
+                    'permissions': '0600'
+                },
+                {
+                    'encoding': 'base64',
+                    'content': base64.encodebytes(pubkey.encode()),
+                    'owner': 'ablecloud:ablecloud',
+                    'path': '/home/ablecloud/.ssh/id_rsa.pub',
+                    'permissions': '0644'
+                },
+                {
+                    'encoding': 'base64',
+                    'content': base64.encodebytes(privkey.encode()),
+                    'owner': 'ablecloud:ablecloud',
+                    'path': '/home/ablecloud/.ssh/id_rsa.pub',
+                    'permissions': '0600'
+                },
+                {
+                    'encoding': 'base64',
+                    'content': base64.encodebytes(hosts.encode()),
+                    'owner': 'root:root',
+                    'path': '/etc/hosts',
+                    'permissions': '0644'
+                }
+            ]
+    }
+    # base64.decodebytes(base64.encodebytes(pubkey.encode())).decode()
+    # with open('user-data', 'wt') as f:
     with open('user-data', 'wt') as f:
-        f.write(yaml.dump(yam))
+        f.write('#cloud-config\n')
+        f.write(yaml.dump(yam).replace("\n\n", "\n"))
     # with open('user-data', 'rt') as f:
     #     pprint.pprint(yaml.load(f))
     # meta = tmp_meta.format(pubKey=pubkey, privKey=privkey)
     # with open('user-data', 'wt') as f:
     #     f.write(meta)
+
 
 """
 ccvm용 네트워크설정(스토리지 네트워크 추가 없음)하는 부분
@@ -261,6 +319,7 @@ def ccvmGen():
     with open('network-config', 'wt') as f:
         f.write(yaml.dump(yam))
     return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=yam)))
+
 
 """
 scvm용 네트워크설정(스토리지 네트워크 추가)하는 부분
@@ -286,6 +345,7 @@ def scvmGen(pn_nic=None, pn_ip=None, cn_nic=None, cn_ip=None):
         f.write(yaml.dump(yam))
 
     return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=yam)))
+
 
 """
 cloudinit iso를 생성하는 스크립트입니다.
@@ -324,8 +384,8 @@ ex)
 """
 def main(args):
     genMeta(hostname=args.hostname)
-    genUserFromFile(pubkeyfile=args.pubkey, privkeyfile=args.privkey)
-    genHosts(filename=args.hosts)
+    genUserFromFile(pubkeyfile=args.pubkey, privkeyfile=args.privkey, hostsfile=args.hosts)
+
     genManagement(mgmt_nic=args.mgmt_nic, mgmt_ip=args.mgmt_ip, mgmt_prefix=args.mgmt_prefix, mgmt_gw=args.mgmt_gw,
                   dns=args.dns)
     """
