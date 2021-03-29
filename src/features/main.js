@@ -6,7 +6,9 @@
 **/
 
 // document.ready 영역 시작
-
+this.ccvm_instance = new CloudCenterVirtualMachine()
+ccvm_instance = this.ccvm_instance
+$(document).ccvm_instance = ccvm_instance
 $(document).ready(function(){
     $('#dropdown-menu-storage-cluster-status').hide();
     $('#dropdown-menu-cloud-cluster-status').hide();
@@ -21,8 +23,23 @@ $(document).ready(function(){
 
     $('#div-modal-wizard-cloud-vm').load("./src/features/cloud-vm-wizard.html");
     $('#div-modal-wizard-cloud-vm').hide();
+    
+    $('#div-change-modal-cloud-vm').load("./src/features/cloud-vm-change.html");
+    $('#div-change-modal-cloud-vm').hide();
+    $('#div-change-alert-cloud-vm').load("./src/features/cloud-vm-change-alert.html");
+    $('#div-change-alert-cloud-vm').hide();
+    
+    new CloudCenterVirtualMachine().checkCCVM();
+    
 
-    //스토리지 센터 가상머신 자원변경 페이지 로드
+    $('#div-change-modal-cloud-vm').load("./src/features/cloud-vm-change.html");
+    $('#div-change-modal-cloud-vm').hide();
+    $('#div-change-alert-cloud-vm').load("./src/features/cloud-vm-change-alert.html");
+    $('#div-change-alert-cloud-vm').hide();
+    new CloudCenterVirtualMachine().checkCCVM();
+  
+  
+      //스토리지 센터 가상머신 자원변경 페이지 로드
     $('#div-modal-storage-vm-resource-update').load("./src/features/storage-vm-resource-update.html");
     $('#div-modal-storage-vm-resource-update').hide();
     
@@ -77,14 +94,14 @@ $(document).ready(function(){
         $('#scc-pools').text(retVal.val.pools + " pools");
         $('#scc-usage').text("전체 " + retVal.val.avail + " 중 " +retVal.val.used + " 사용 중 (사용률 " + retVal.val.usage_percentage+ " %)" );
 
-        if(retVal.code == 200){
-            $('#scc-status-check').text("스토리지센터 클러스터가 구성되었습니다.");
-            $('#scc-status-check').attr("style","color: var(--pf-global--success-color--100)");
-            $("#menu-item-linkto-storage-center").attr('class','pf-c-dropdown__menu-item');            
-        }else{
+        if(retVal.val.cluster_status == "no signal"){
             $('#scc-status-check').text("스토리지센터 클러스터가 구성되지 않았습니다.");            
             $('#scc-status-check').attr("style","color: var(--pf-global--danger-color--100)");
             $("#menu-item-linkto-storage-center").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+        }else{
+            $('#scc-status-check').text("스토리지센터 클러스터가 구성되었습니다.");
+            $('#scc-status-check').attr("style","color: var(--pf-global--success-color--100)");
+            $("#menu-item-linkto-storage-center").attr('class','pf-c-dropdown__menu-item');            
         }
 
     })
@@ -92,53 +109,21 @@ $(document).ready(function(){
         console.log(":::Error:::");
         $('#scc-status-check').text("토리지센터 클러스터가 구성되지 않았습니다.");
         $('#scc-status-check').attr("style","color: var(--pf-global--danger-color--100)");
+        $("#menu-item-set-maintenance-mode").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+        $("#menu-item-unset-maintenance-mode").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
         $("#menu-item-linkto-storage-center").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
     });
     
 
 
+ 
     // 스토리지센터 VM 상태 조회 시작
     cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_detail.py", "detail" ])
     .then(function(data){
         
         var retVal = JSON.parse(data);        
 
-        sessionStorage.setItem("scvm_status", retVal.val.scvm_status);
-
-        if(retVal.val.scvm_status == "running"){
-            $("#scvm-css").attr('class','pf-c-label pf-m-green');
-            $("#scvm-icon").attr('class','fas fa-fw fa-check-circle');
-
-            $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-            $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-            
-            if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true"){                
-                $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item');
-            }else{
-                $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled'); 
-            }
-
-        }else{
-            $("#scvm-css").attr('class','pf-c-label');
-            $("#scvm-icon").attr('class','fas fa-fw fa-times-circle');
-            
-            $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-
-            if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true"){
-                $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item');
-                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item');                            
-            }else{        
-                $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');  
-                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');       
-            }
-        }
-
-
-        if(sessionStorage.getItem("cluster_status") == "N/A"){
-            $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item');
-        }else{
-            $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-        }
+        sessionStorage.setItem("scvm_status", retVal.val.scvm_status);        
 
         
         $('#scvm-status').text(retVal.val.scvm_status.toUpperCase());
@@ -156,19 +141,47 @@ $(document).ready(function(){
         $('#scvm-storage-datadisk-type').text("Disk Type : " + retVal.val.dataDiskType);
 
 
-        if(retVal.code == 200){
-            $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되었습니다.");
-            $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--success-color--100)");
-            $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item');
-        }else{
-            $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-            $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-            $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-            $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-            $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item pf-m-disabled');           
+        if(retVal.val.scvm_status == "no signal"){
             $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되지 않았습니다.");            
             $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--danger-color--100)");
+            $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+        }else{        
+            $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되었습니다.");
+            $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--success-color--100)");
+            $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item');            
         }
+
+
+
+        //스토리지 센터 가상머신 toggle세팅
+        if(retVal.val.scvm_status == "running"){
+            $("#scvm-css").attr('class','pf-c-label pf-m-green');
+            $("#scvm-icon").attr('class','fas fa-fw fa-check-circle');    
+            $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            
+            if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true"){                
+                $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item');
+            }else{
+                $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled'); 
+            }
+    
+        }else{
+            $("#scvm-css").attr('class','pf-c-label');
+            $("#scvm-icon").attr('class','fas fa-fw fa-times-circle');            
+            $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+    
+            if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true"){
+                $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item');
+                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item');                            
+            }else{        
+                $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');  
+                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');       
+            }
+        }
+
+
+
 
     })
     .catch(function(data){
@@ -182,6 +195,15 @@ $(document).ready(function(){
         $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되지 않았습니다.");
         $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--danger-color--100)");
     });
+
+
+
+
+    if(sessionStorage.getItem("cluster_status") == "no signal"){
+        $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item');
+    }else{
+        $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+    }
 
 });
 
@@ -203,6 +225,19 @@ $('#card-action-storage-vm-status').on('click', function(){
 $('#card-action-cloud-vm-status').on('click', function(){
     $('#dropdown-menu-cloud-vm-status').toggle();
 });
+
+var cpu=0;
+var memory=0;
+$('#card-action-cloud-vm-change').on('click', function(){
+    ccvm_instance.createChangeModal();
+});
+
+$('#card-action-cloud-vm-connect').on('click', function(){
+    // 클라우드센터VM 연결
+    window.open('http://' + ccvm_instance.ip + ":9090");
+});
+
+
 
 $('#button-open-modal-wizard-storage-vm').on('click', function(){
     $('#div-modal-wizard-storage-vm').show();

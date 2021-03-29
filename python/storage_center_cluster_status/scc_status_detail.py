@@ -10,11 +10,15 @@ from subprocess import check_output
 from subprocess import call
 from ablestack import *
 
-
 env=os.environ.copy()
 env['LANG']="en_US.utf-8"
 env['LANGUAGE']="en"
 
+'''
+함수명 : parseArgs
+이 함수는 python library argparse를 시용하여 함수를 실행될 때 필요한 파라미터를 입력받고 파싱하는 역할을 수행합니다.
+예를들어 action을 요청하면 해당 action일 때 요구되는 파라미터를 입력받고 해당 코드를 수행합니다.
+'''
 def parseArgs():
     parser = argparse.ArgumentParser(description='Storage Cluster Status Details',
                                      epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
@@ -31,8 +35,25 @@ def parseArgs():
     parser.add_argument("-V", "--Version", action='version', version="%(prog)s 1.0")
     return parser.parse_args()
 
+# 함수명 : statusDeteil
+# 주요 기능 : 스토리지 클러스트 상태 상세조회
+def statusDeteil():     
 
-def statusDeteil():        
+    ret_val = ''
+    cluster_status = ''
+    osd = ''
+    osd_up = ''
+    mon_gw1 = ''
+    mon_gw2 = ''
+    mgr = ''
+    mgr_cnt = ''
+    pools = ''
+    available = ''
+    used = ''
+    usage_percentage = ''
+    maintenance_status = ''
+    output_json = ''
+
     try:
 
         rc = call(['ceph -s | grep noout'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
@@ -43,79 +64,55 @@ def statusDeteil():
             maintenance_status = False
 
 
-        output = check_output(['ceph -s -f json-pretty'], universal_newlines=True, shell=True, env=env)        
-        output_json = json.loads(output)
-        cluster_status= output_json['health']['status']
-        #cluster_status = output.split(':')[1].strip()
-        #print(cluster_status)
-
-
-        #output = check_output(['ceph -s | grep mon'], universal_newlines=True, shell=True)
-        #output = output.split(':')[1].strip().split(' daemons, ')
-        #mon_gw1 = output[0]
-        #mon_gw2 = output[1]
+        rc = call(['ceph -s -f json-pretty'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        
+        if rc == 0: # found
+            output = check_output(['ceph -s -f json-pretty'], universal_newlines=True, shell=True, env=env)
+            output_json = json.loads(output)
+            cluster_status= output_json['health']['status']
+        else : # not found
+            cluster_status= "no signal"
 
         mon_gw1= output_json['monmap']['num_mons']
         mon_gw2= output_json['quorum_names']
-        #print(mon_gw1)
-        #print(mon_gw2)
 
-        output = check_output(['ceph -s | grep mgr'], universal_newlines=True, shell=True)
-        mgr = output.split('mgr: ')[1].strip()    
-        #mgr_cnt = mgr.count('scvm')      
-        
-        mgr_cnt= int(output_json['mgrmap']['num_standbys']) + 1        
-        #print(mgr)
+     
 
-        #output = check_output(['ceph -s | grep osd'], universal_newlines=True, shell=True)        
-        #osd = output.split(' ')[3].strip()
-        #osd_up = output.split(' ')[5].strip()
 
         osd= output_json['osdmap']['num_osds']
-        osd_up= output_json['osdmap']['num_up_osds']
-        #print(osd)
-        #print(osd_up)
+        osd_up= output_json['osdmap']['num_up_osds']   
 
-        #output = check_output(['ceph -s | grep pools'], universal_newlines=True, shell=True)
-        #pools = output.split('pools:  ')[1].strip()   
+        pools= output_json['pgmap']['num_pools']        
 
-        pools= output_json['pgmap']['num_pools']
+
+        rc = call(['ceph mgr stat'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         
-        #print(pools)
+        if rc == 0: # found
+            output_mgr = check_output(['ceph mgr stat'], universal_newlines=True, shell=True, env=env)        
+            output_mgr = json.loads(output_mgr)
+            mgr = output_mgr['active_name'];
+            mgr_cnt= int(output_json['mgrmap']['num_standbys']) + 1
+        else : # not found
+            mgr= "undefine"
+            mgr_cnt = "undefine"
 
-        output = check_output(['ceph df | grep TOTAL'], universal_newlines=True, shell=True)        
-        output = ' '.join(output.split()).split()        
-        available = output[3] + " "+ output[4]
-        used = output[7] + " "+ output[8]
-        usage_percentage = output[9]
-        #print(output)
 
-        #output = output.split('usage:  ')[1].strip().split(' ')
-        #used = output[0] +' '+ output[1]
-        #available = output[-3] + ' ' + output[-2]
-        #usage_percentage = round(float(output[0]) / float(output[-3]) * 100.0 , 2)
-        #usage_percentage = str(usage_percentage) + '%'
-        #print(used)
-        #print(available)
-        #print(usage_percentage)
+
+
+        rc = call(['ceph df | grep TOTAL'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         
+        if rc == 0: # found
+            output = check_output(['ceph df | grep TOTAL'], universal_newlines=True, shell=True, env=env)        
+            output = ' '.join(output.split()).split()        
+            available = output[3] + " "+ output[4]
+            used = output[7] + " "+ output[8]
+            usage_percentage = output[9]
+        else : # not found
+            available= "undefine"
+            used = "undefine"
+            usage_percentage = "undefine"
 
-
-        #output = check_output(['ceph -s'], universal_newlines=True, shell=True)
         
-        ################################################임시데이터
-        #cluster_status = "HEALTH_ERR"
-        #osd =16
-        #osd_up = 12
-        #mon_gw = 11
-        #mgr = "SCVM1"
-        #mgr_cnt= "3"
-        #pools = 12
-        #available = "4.4TB"
-        #used = "150GB"
-        #usage_percentage = 12
-        #maintenance_status = "On"
-        ################################################
         
         # 실제 데이터 세팅
         ret_val = {
@@ -136,25 +133,23 @@ def statusDeteil():
 
     except Exception as e:
         ret_val = {
-            'cluster_status': 'no signal', 
-            'osd': 'N/A', 
-            'osd_up': 'N/A', 
-            'mon_gw1' : 'N/A',
-            'mon_gw2' : 'N/A',
-            'mgr': 'N/A',            
-            'mgr_cnt': 'N/A',
-            'pools': 'N/A',
-            'avail': 'N/A',
-            'used': 'N/A',
-            'usage_percentage': 'N/A', 
-            'maintenance_status': 'N/A' }
+            'cluster_status': cluster_status, 
+            'osd': osd, 
+            'osd_up': osd_up, 
+            'mon_gw1' : mon_gw1,
+            'mon_gw2' : mon_gw2,
+            'mgr': mgr,            
+            'mgr_cnt': mgr_cnt,
+            'pools': pools,
+            'avail': available,
+            'used': used,
+            'usage_percentage': usage_percentage, 
+            'maintenance_status': maintenance_status,
+            'json_raw' : output_json}
         ret = createReturn(code=500, val=ret_val, retname='Storage Cluster Status Detail')
         #print ('EXCEPTION : ',e)
     
     return print(json.dumps(json.loads(ret), indent=4))
-    
-
-
 
 
 if __name__ == '__main__':
