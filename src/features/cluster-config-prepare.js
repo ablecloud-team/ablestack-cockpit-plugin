@@ -899,7 +899,7 @@ function writeFile(text1, text2, file_type) {
 **/
 
 function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserver_current_host_num) {
-    let chrony_file_root = "root/test.txt"
+    let chrony_file_root = "/etc/chrony.conf"
     // chrony.conf 파일 서버 리스트 부분 초기화
     cockpit.script(["sed -i '/^server /d' /"+chrony_file_root+""])
     cockpit.script(["sed -i '/^pool /d' /"+chrony_file_root+""])
