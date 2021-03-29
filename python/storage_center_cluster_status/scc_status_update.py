@@ -18,12 +18,13 @@ from ablestack import *
 '''
 def parseArgs():
     parser = argparse.ArgumentParser(description='Storage Cluster maintenance Mode Setting',epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')    
+    '''maintenance Mode action값 확인'''
     parser.add_argument('action', choices=['set_noout', 'unset_noout'], help="Maintenance action")    
-    # output 민감도 추가(v갯수에 따라 output및 log가 많아짐)
+    '''output 민감도 추가(v갯수에 따라 output및 log가 많아짐)'''
     parser.add_argument("-v", "--verbose", action='count', default=0, help="increase output verbosity")
-    # flag 추가(샘플임, 테스트용으로 json이 아닌 plain text로 출력하는 플래그 역할)
+    '''flag 추가(샘플임, 테스트용으로 json이 아닌 plain text로 출력하는 플래그 역할)'''
     parser.add_argument("-H", "--Human", action='store_const', dest='H', const=True, help="Human readable")
-    # Version 추가
+    '''Version 추가'''
     parser.add_argument("-V", "--Version", action='version', version="%(prog)s 1.0")    
     return parser.parse_args()
 
