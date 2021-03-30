@@ -6,9 +6,11 @@
 **/
 
 // document.ready 영역 시작
+
 this.ccvm_instance = new CloudCenterVirtualMachine()
 ccvm_instance = this.ccvm_instance
 $(document).ccvm_instance = ccvm_instance
+
 $(document).ready(function(){
     $('#dropdown-menu-storage-cluster-status').hide();
     $('#dropdown-menu-cloud-cluster-status').hide();
@@ -23,7 +25,12 @@ $(document).ready(function(){
 
     $('#div-modal-wizard-cloud-vm').load("./src/features/cloud-vm-wizard.html");
     $('#div-modal-wizard-cloud-vm').hide();
-    
+
+    $('#dev-modal-migration-cloud-vm').hide();
+    $('#dev-modal-stop-cloud-vm').hide();
+
+    CardCloudClusterStatus();
+
     $('#div-change-modal-cloud-vm').load("./src/features/cloud-vm-change.html");
     $('#div-change-modal-cloud-vm').hide();
     $('#div-change-alert-cloud-vm').load("./src/features/cloud-vm-change-alert.html");
@@ -166,6 +173,7 @@ $(document).ready(function(){
     }else{
         $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
     }
+
 
 });
 // document.ready 영역 끝
