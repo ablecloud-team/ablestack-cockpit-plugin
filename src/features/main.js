@@ -173,15 +173,6 @@ $(document).ready(function(){
     }else{
         $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
     }
-
-    // 클러스터 구성준비 상태 조회
-    checkConfigStatus()
-
-    // 배포상태에 따른 요약리본 UI 
-    setTimeout(function(){
-        checkDeployStatus()
-     },5000);
-
 });
 // document.ready 영역 끝
 
