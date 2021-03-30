@@ -812,9 +812,9 @@ function putTimeServerValueIntoTextarea(radio_value) {
         // time server 준비 방법 표시 및 값 설정
         $('#div-accordion-timeserver-type').text("로컬 시간서버");
     }
-    $('#div-cluster-config-confirm-time-server-1').text($('#form-input-cluster-config-time-server-ip-1').val());
-    $('#div-cluster-config-confirm-time-server-2').text($('#form-input-cluster-config-time-server-ip-2').val());
-    $('#div-cluster-config-confirm-time-server-3').text($('#form-input-cluster-config-time-server-ip-3').val());
+    $('#div-cluster-config-confirm-time-server-1').val($('#form-input-cluster-config-time-server-ip-1').val());
+    $('#div-cluster-config-confirm-time-server-2').val($('#form-input-cluster-config-time-server-ip-2').val());
+    $('#div-cluster-config-confirm-time-server-3').val($('#form-input-cluster-config-time-server-ip-3').val());
 }
 
 /**
@@ -941,9 +941,13 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
 function validateClusterConfigPrepare(timeserver_type) {
 
     let validate_check = true;
-    let timeserver_ip_check_1 = checkHostFormat($('#div-cluster-config-confirm-time-server-1').val());
-    let timeserver_ip_check_2 = checkHostFormat($('#div-cluster-config-confirm-time-server-2').val());
-    let timeserver_ip_check_3 = checkHostFormat($('#div-cluster-config-confirm-time-server-3').val());
+    // time server가 외부일 때는 IP, 문자열 입력 가능하나 내부일 때는 IP형식으로만 입력 가능
+    let timeserver_ip_check_external_1 = checkHostFormat($('#div-cluster-config-confirm-time-server-1').val());
+    let timeserver_ip_check_external_2 = checkHostFormat($('#div-cluster-config-confirm-time-server-2').val());
+    let timeserver_ip_check_external_3 = checkHostFormat($('#div-cluster-config-confirm-time-server-3').val());
+    let timeserver_ip_check_internal_1 = checkIp($('#div-cluster-config-confirm-time-server-1').val());
+    let timeserver_ip_check_internal_2 = checkIp($('#div-cluster-config-confirm-time-server-2').val());
+    let timeserver_ip_check_internal_3 = checkIp($('#div-cluster-config-confirm-time-server-3').val());
 
     if ($('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val().trim() == "") {
         alert("SSH 개인 키 파일 정보를 확인해 주세요.");
@@ -954,15 +958,28 @@ function validateClusterConfigPrepare(timeserver_type) {
     } else if ($('#div-textarea-cluster-config-confirm-hosts-file').val().trim() == "") {
         alert("Hosts 파일 정보를 확인해 주세요.");
         validate_check = false;
-    } else if (timeserver_ip_check_1 == false) {
-        alert("시간 서버 1번 IP정보를 확인해 주세요.");
-        validate_check = false;
-    } else if (timeserver_ip_check_2 == false && timeserver_type == "internal") {
-        alert("시간 서버 2번 IP정보를 확인해 주세요.");
-        validate_check = false;
-    } else if (timeserver_ip_check_3 == false && timeserver_type == "internal") {
-        alert("시간 서버 3번 IP정보를 확인해 주세요.");
-        validate_check = false;
+    } else if (timeserver_type == "external") {
+        if (timeserver_ip_check_external_1 == false) {
+            alert("시간 서버 1번 IP정보를 확인해 주세요.");
+            validate_check = false;
+        } else if (timeserver_ip_check_external_2 == false && $('#div-cluster-config-confirm-time-server-2').val() != "") {
+            alert("시간 서버 2번 IP정보를 확인해 주세요.");
+            validate_check = false;
+        } else if (timeserver_ip_check_external_3 == false && $('#div-cluster-config-confirm-time-server-3').val() != "") {
+            alert("시간 서버 3번 IP정보를 확인해 주세요.");
+            validate_check = false;
+        }
+    } else if (timeserver_type == "internal") {
+        if (timeserver_ip_check_internal_1 == false) {
+            alert("시간 서버 1번 IP정보를 확인해 주세요. IP 형식으로만 입력 가능합니다.");
+            validate_check = false;
+        } else if (timeserver_ip_check_internal_2 == false) {
+            alert("시간 서버 2번 IP정보를 확인해 주세요. IP 형식으로만 입력 가능합니다.");
+            validate_check = false;
+        } else if (timeserver_ip_check_internal_3 == false) {
+            alert("시간 서버 3번 IP정보를 확인해 주세요. IP 형식으로만 입력 가능합니다.");
+            validate_check = false;
+        }
     }
     return validate_check;
 }
