@@ -106,11 +106,11 @@ def statusDeteil():
             rdisk = 'undefine'        
         
         '''scvm 관리 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
-        '''임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp1s20)'''
-        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp1s20'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
+        '''임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp0s20)'''
+        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s20'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
         if rc == 0:
             '''scvm 관리 nic 정보 확인'''
-            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp1s20'"], universal_newlines=True, shell=True, env=env)
+            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s20'"], universal_newlines=True, shell=True, env=env)
             manageNicMacAddr = ' '.join(output.split()).split()[1]
             manageNicIp = ' '.join(output.split()).split()[3]
             '''관리 nic mac address로 추가 정보 확인, 리턴값 0이면 정상, 아니면 비정상'''
@@ -132,11 +132,11 @@ def statusDeteil():
             manageNicType = 'undefine'
 
         '''scvm 서버용 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
-        '''임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp1s21)'''
-        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp1s21|bond0'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)       
+        '''임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp0s21)'''
+        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s21|bond0'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)       
         if rc == 0:
             '''scvm 서버용 nic 정보 확인'''
-            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp1s21|bond0'"], universal_newlines=True, shell=True, env=env)
+            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s21|bond0'"], universal_newlines=True, shell=True, env=env)
             storageServerNicMacAddr = ' '.join(output.split()).split()[1]
             storageServerNicIp = ' '.join(output.split()).split()[3]            
             '''서버용 nic mac address로 추가 정보 확인, 리턴값 0이면 정상, 아니면 비정상'''
@@ -158,11 +158,11 @@ def statusDeteil():
             storageServerNicType = 'undefine'
 
         '''scvm 복제용 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
-        '''임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp1s22)'''
-        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp1s22|bond1'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
+        '''임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp0s22)'''
+        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s22|bond1'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
         if rc == 0:
             '''scvm 복제용 nic 정보 확인'''
-            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp1s22|bond1'"], universal_newlines=True, shell=True, env=env)
+            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s22|bond1'"], universal_newlines=True, shell=True, env=env)
             storageReplicationNicMacAddr = ' '.join(output.split()).split()[1]
             storageReplicationNicIp = ' '.join(output.split()).split()[3]
             '''복제용 nic mac address로 추가 정보 확인, 리턴값 0이면 정상, 아니면 비정상'''
