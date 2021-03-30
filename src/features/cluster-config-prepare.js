@@ -235,13 +235,8 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
             });
             modifyTimeServer(timeserver_confirm_ip_list, timeserver_type, timeserver_current_host_num);
             resetClusterConfigWizard();
-
-            $('#div-modal-wizard-cluster-config-prepare').hide();
-            $('#div-modal-wizard-cluster-config-overview').show();
-            $('#nav-button-cluster-config-overview').addClass('pf-m-current');
-
             cur_step_wizard_cluster_config_prepare = "1";
-
+            resetClusterConfigWizardWithData();
         } else {
             $('#div-modal-wizard-cluster-config-finish').show();
             $('#nav-button-cluster-config-finish').addClass('pf-m-current');
@@ -304,8 +299,11 @@ $('#button-before-step-modal-wizard-cluster-config-prepare').on('click', functio
     }
 });
 
+// 취소 버튼 클릭 이벤트 처리
 $('#button-cancel-config-modal-wizard-cluster-config-prepare').on('click', function () {
-    $('#div-modal-wizard-cluster-config-prepare').hide();
+    resetClusterConfigWizard();
+    cur_step_wizard_cluster_config_prepare = "1";
+    resetClusterConfigWizardWithData();
 });
 
 
@@ -330,6 +328,7 @@ $('#form-radio-ssh-key-file').on('click', function () {
 $('#form-radio-hosts-new').on('click', function () {
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
+    $('#div-form-hosts-input-number').show();
     // "기존 파일 사용"에서 "신규 생성"을 클릭하면 초기화 된다.
     $('#form-textarea-cluster-config-new-host-profile').val("");
     let hosts_text = "10.10.0.10\tccvm-mngt\n" +
@@ -345,9 +344,9 @@ $('#form-radio-hosts-new').on('click', function () {
 $('#form-radio-hosts-file').on('click', function () {
     $('#div-form-hosts-profile').hide();
     $('#div-form-hosts-file').show();
-
-
+    $('#div-form-hosts-input-number').hide();
 });
+
 // Host 파일 준비 중 Host 수를 편집하고 제한하는 기능
 $('#form-input-cluster-config-host-number-plus').on('click', function () {
     let n = $('.bt_up').index(this);
@@ -610,6 +609,73 @@ function resetClusterConfigWizard() {
     $('#button-next-step-modal-wizard-cluster-config-prepare').html('다음');
 }
 
+
+/**
+ * Meathod Name : resetClusterConfigWizardWithData
+ * Date Created : 2021.03.30
+ * Writer  : 류홍욱
+ * Description : 마법사 대화상자에서 취소 및 완료를 클릭하면 화면 위치 및 사이드 메뉴의 위치, 입력된 데이터를 초기화하는 함수.
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.03.30 최초 작성
+ **/
+
+
+function resetClusterConfigWizardWithData() {
+    // 입력된 모든 데이터를 초기화한다.
+    $('#nav-button-cluster-config-overview').addClass('pf-m-current');
+    $('#nav-button-cluster-config-ssh-key').removeClass('pf-m-current');
+    $('#nav-button-cluster-config-ip-info').removeClass('pf-m-current');
+    $('#nav-button-cluster-config-time-server').removeClass('pf-m-current');
+    $('#nav-button-cluster-config-review').removeClass('pf-m-current');
+    $('#nav-button-cluster-config-finish').removeClass('pf-m-current');
+    $('#div-modal-wizard-cluster-config-overview').show();
+    // ssh-key
+    $('#form-radio-ssh-key-new').prop('checked', true);
+    $('#form-radio-ssh-key-file').prop('checked', false);
+    $('#form-input-cluster-config-ssh-key-pri-file').attr('disabled', true);
+    $('#form-input-cluster-config-ssh-key-pub-file').attr('disabled', true);
+    $('input[name=form-input-cluster-config-ssh-key-file]').val("");
+    $('textarea[name=div-textarea-cluster-config-temp-new-ssh-key-file]').val("");
+    $('textarea[name=div-textarea-cluster-config-temp-existing-ssh-key-file]').val("");
+    // hosts
+    $('#form-radio-hosts-new').prop('checked', true);
+    $('#form-radio-hosts-file').prop('checked', false);
+    $('#form-input-cluster-config-hosts-file').val("");
+    $('#form-textarea-cluster-config-existing-host-profile').val("");
+    $('#div-form-hosts-profile').show();
+    $('#div-form-hosts-file').hide();
+    $('#div-form-hosts-input-number').show();
+    let hosts_text = "10.10.0.10\tccvm-mngt\n" +
+        "192.168.0.10\tccvm-svc\n" +
+        "10.10.0.11\tablestack1\n" +
+        "10.10.0.101\tcvm1-pn\n" +
+        "100.100.0.101\tscvm1-cn\n";
+    $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
+    $('#form-input-cluster-config-host-number').val(1);
+    // 시간 서버
+    $('#form-radio-timeserver-ext').prop('checked', true);
+    $('#form-radio-timeserver-int').prop('checked', false);
+    $('input[name=form-input-cluster-config-timeserver]').val("");
+    $('#form-radio-timeserver-host-num-1').prop('checked', true);
+    $('#form-radio-timeserver-host-num-2').prop('checked', false);
+    $('#form-radio-timeserver-host-num-3').prop('checked', false);
+    // 설정확인
+    $('#button-accordion-ssh-key').attr("aria-expanded", "false");
+    $('#button-accordion-ssh-key').removeClass("pf-m-expanded");
+    $('#div-accordion-ssh-key').fadeOut();
+    $('#div-accordion-ssh-key').removeClass("pf-m-expanded")
+    $('#button-accordion-hosts-file').attr("aria-expanded", "false");
+    $('#button-accordion-hosts-file').removeClass("pf-m-expanded");
+    $('#div-accordion-hosts-file').fadeOut();
+    $('#div-accordion-hosts-file').removeClass("pf-m-expanded");
+    $('#button-accordion-timeserver').attr("aria-expanded", "false");
+    $('#button-accordion-timeserver').removeClass("pf-m-expanded");
+    $('#div-accordion-timeserver').fadeOut();
+    $('#div-accordion-timeserver').removeClass("pf-m-expanded");
+
+    $('#div-modal-wizard-cluster-config-prepare').hide();
+}
 
 /**
  * Meathod Name : generateSshkey
