@@ -167,13 +167,17 @@ $('#button-cloud-cluster-migration').on('click', function(){
     $('#div-modal-migration-cloud-vm').show();
 });
 
-$('#button-cloud-cluster-connect').on('click', function(){
-    console.log('cloud-cluster-connect click start');
-    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'CCConnection'])
+$('#cloud-cluster-connect').on('click', function(){
+    //클라우드센터 연결
+    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/url/create_address.py", "cloudCenter"])
     .then(function(data){
-
-    }).catch(function(data){
-        console.log('cloud-cluster-connect spawn error');
+        var retVal = JSON.parse(data);        
+        if(retVal.code == 200){
+            window.open(retVal.val);
+        }
+    })
+    .catch(function(data){
+        //console.log(":::Error:::");        
     });
 });
 
