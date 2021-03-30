@@ -5,6 +5,7 @@ Copyright (c) 2021 ABLECLOUD Co. Ltd.
 
 cloudinit iso를 생성하는 스크립트입니다.
 
+* Writer  : 윤여천
 ex)
 /usr/bin/python3 /root/cockpit-plugin-ablestack/tools/cloudinit/gencloudinit.py --hostname scvm1 \
     --pubkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa.pub \
@@ -19,6 +20,7 @@ ex)
     --privkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa \
     --hosts /root/cockpit-plugin-ablestack/tools/cloudinit/hosts \
     --mgmt-nic=ens12 --mgmt-ip 10.10.14.150 --mgmt-prefix 16 --mgmt-gw 10.10.0.1 --dns 8.8.8.8 \
+    [--sn-nic=ens12 --sn-ip 10.10.14.150 --sn-prefix 16 --sn-gw 10.10.0.1] \
     --iso-path ccvm.iso ccvm
 
 최초작성일 : 2021-03-25
@@ -59,13 +61,17 @@ def argumentParser():
     tmp_parser.add_argument('--iso-path', metavar='ISO file', help="저장할 ISO파일 이름")
     tmp_parser.add_argument('--hostname', metavar='hostname', help="VM의 이름")
     tmp_parser.add_argument('--hosts', metavar='hosts file', help="hosts파일의 이름")
-    tmp_parser.add_argument('--mgmt-nic', metavar='Management NIC', help="관리 네트워크 nic의 이름")
     tmp_parser.add_argument('--pubkey', metavar='Public Key File', help="Public Key File")
     tmp_parser.add_argument('--privkey', metavar='Private Key File', help="Private Key File")
+    tmp_parser.add_argument('--mgmt-nic', metavar='Management NIC', help="관리 네트워크 nic의 이름")
     tmp_parser.add_argument('--mgmt-ip', metavar='Management IP', help="관리 네트워크 IP")
     tmp_parser.add_argument('--mgmt-prefix', metavar='Management prefix', help="관리 네트워크 prefix")
     tmp_parser.add_argument('--mgmt-gw', metavar='Management gw', help="관리 네트워크 gw")
     tmp_parser.add_argument('--dns', metavar='dns', help="dns")
+    tmp_parser.add_argument('--sn-nic', metavar='Service NIC', help="서비스 네트워크 nic의 이름")
+    tmp_parser.add_argument('--sn-ip', metavar='Service IP', help="서비스 네트워크 IP")
+    tmp_parser.add_argument('--sn-prefix', metavar='Service prefix', help="서비스 네트워크 prefix")
+    tmp_parser.add_argument('--sn-gw', metavar='Service gw', help="서비스 네트워크 gw")
     tmp_parser.add_argument('--pn-nic', metavar='Storage NIC',  help="스토리지 네트워크 NIC   (scvm만)")
     tmp_parser.add_argument('--pn-ip', metavar='Storage IP',    help="스토리지 네트워크 IP    (scvm만)")
     tmp_parser.add_argument('--cn-nic', metavar='Cluster NIC',  help="클러스터 네트워크 NIC   (scvm만)")
@@ -313,9 +319,16 @@ ccvm용 네트워크설정(스토리지 네트워크 추가 없음)하는 부분
 :param 없음
 :return yaml 파일
 """
-def ccvmGen():
+def ccvmGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str ):
     with open('network-config.mgmt', 'rt') as f:
         yam = yaml.load(f)
+
+    if sn_nic is not None or sn_ip is not None or sn_prefix is not None or sn_gw is not None :
+        yam['network']['config'].append({'name': sn_nic,
+                                         'subnets': [{'address': f'{sn_ip}/{sn_prefix}',
+                                                      'gateway': sn_gw,
+                                                      'type': 'static'}],
+                                         'type': 'physical'})
     with open('network-config', 'wt') as f:
         f.write(yaml.dump(yam))
     return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=yam)))
@@ -378,6 +391,7 @@ ex)
     --privkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa \
     --hosts /root/cockpit-plugin-ablestack/tools/cloudinit/hosts \
     --mgmt-nic=ens12 --mgmt-ip 10.10.14.150 --mgmt-prefix 16 --mgmt-gw 10.10.0.1 --dns 8.8.8.8 \
+    [--sn-nic ens13 --sn-ip 10.10.14.151 --sn-prefix 16 --sn-gw 10.10.0.1] \
     --iso-path ccvm.iso ccvm
     
 :return yaml 파일
@@ -395,7 +409,7 @@ def main(args):
     pn_nic=None, pn_ip=None, cn_nic=None, cn_ip=None, 
     """
     if args.type == 'ccvm':
-        ret = ccvmGen()
+        ret = ccvmGen(sn_nic=args.sn_nic, sn_ip=args.sn_ip, sn_prefix=args.sn_prefix, sn_gw=args.sn_gw)
     elif args.type == 'scvm':
         ret = scvmGen(pn_nic=args.pn_nic, pn_ip=args.pn_ip, cn_nic=args.cn_nic, cn_ip=args.cn_ip)
     ret = genCloudInit(filename=args.iso_path)
