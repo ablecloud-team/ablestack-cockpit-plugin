@@ -358,7 +358,12 @@ def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_p
                                      'type': 'physical'})
     with open('network-config', 'wt') as f:
         f.write(yaml.dump(yam))
-
+    with open('user-data', 'rt') as f:
+        yam2 = yaml.load(f)
+    yam2['bootcmd'] = [['/usr/bin/systemctl', 'enable', '--now', 'cockpit.socket'], ['/usr/bin/systemctl', 'enable', '--now', 'cockpit.service']]
+    with open('user-data', 'wt') as f:
+        f.write('#cloud-config\n')
+        f.write(yaml.dump(yam2).replace("\n\n", "\n"))
     return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=yam)))
 
 
