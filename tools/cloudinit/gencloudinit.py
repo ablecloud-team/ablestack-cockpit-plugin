@@ -33,6 +33,7 @@ import json
 import logging
 import pprint
 import sys
+import tempfile
 
 import yaml
 from ablestack import *
@@ -46,6 +47,7 @@ env = os.environ.copy()
 env['LANG'] = "en_US.utf-8"
 env['LANGUAGE'] = "en"
 
+tmpdir = ''
 """
 입력된 argument를 파싱하여 dictionary를 생성하는 함수
 
@@ -116,7 +118,7 @@ ISO를 생성하는 함수
 def genCloudInit(filename: str):
     genisoimage = sh.Command("/usr/bin/genisoimage")
     output = genisoimage("-output", filename, "-volid", "cidata", "-joliet", "-input-charset", "utf-8", "-rock",
-                         "user-data", "meta-data", "network-config")
+                         f'{tmpdir}/user-data', f'{tmpdir}/meta-data''', f'{tmpdir}/network-config')
     item = {
         "ctime": str(datetime.datetime.fromtimestamp(os.path.getctime(filename))),
         # 수정시간을 타임 스탬프로 출력
@@ -137,11 +139,12 @@ meta-data파일을 생성하는 함수
 :return 없음
 """
 def genMeta(hostname: str):
-    with open('meta-data.tmpl', 'rt') as f:
-        tmp_meta = f.read()
-    meta = tmp_meta.format(hostname=hostname)
-    with open('meta-data', 'wt') as f:
-        f.write(meta)
+    # with open('meta-data.tmpl', 'rt') as f:
+    #     tmp_meta = f.read()
+    # meta = tmp_meta.format(hostname=hostname)
+    meta = {'instance-id': f'{hostname}', 'local-hostname': f'{hostname}'}
+    with open(f'{tmpdir}/meta-data', 'wt') as f:
+        f.write(yaml.dump(meta))
 
 
 """
@@ -191,7 +194,7 @@ def genManagement(mgmt_nic: str, mgmt_ip: str, mgmt_prefix: int, mgmt_gw: str, d
                 address: <cn-ip>/24
     """
     # meta = tmp_meta.format(mgmt_nic=mgmt_nic, mgmt_ip=mgmt_ip, mgmt_prefix=mgmt_prefix, mgmt_gw=mgmt_gw, dns=dns)
-    with open('network-config.mgmt', 'wt') as f:
+    with open(f'{tmpdir}/network-config.mgmt', 'wt') as f:
         f.write(yaml.dump(yam))
 
 
@@ -305,14 +308,9 @@ def genUserFromFile(pubkeyfile: str, privkeyfile: str, hostsfile: str):
     }
     # base64.decodebytes(base64.encodebytes(pubkey.encode())).decode()
     # with open('user-data', 'wt') as f:
-    with open('user-data', 'wt') as f:
+    with open(f'{tmpdir}/user-data', 'wt') as f:
         f.write('#cloud-config\n')
         f.write(yaml.dump(yam).replace("\n\n", "\n"))
-    # with open('user-data', 'rt') as f:
-    #     pprint.pprint(yaml.load(f))
-    # meta = tmp_meta.format(pubKey=pubkey, privKey=privkey)
-    # with open('user-data', 'wt') as f:
-    #     f.write(meta)
 
 
 """
@@ -322,7 +320,7 @@ ccvm용 네트워크설정(스토리지 네트워크 추가 없음)하는 부분
 :return yaml 파일
 """
 def ccvmGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str ):
-    with open('network-config.mgmt', 'rt') as f:
+    with open(f'{tmpdir}/network-config.mgmt', 'rt') as f:
         yam = yaml.load(f)
 
     if sn_nic is not None or sn_ip is not None or sn_prefix is not None or sn_gw is not None :
@@ -331,7 +329,7 @@ def ccvmGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str ):
                                                       'gateway': sn_gw,
                                                       'type': 'static'}],
                                          'type': 'physical'})
-    with open('network-config', 'wt') as f:
+    with open(f'{tmpdir}/network-config', 'wt') as f:
         f.write(yaml.dump(yam))
     return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=yam)))
 
@@ -346,7 +344,7 @@ scvm용 네트워크설정(스토리지 네트워크 추가)하는 부분
 :return yaml 파일
 """
 def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_prefix=24):
-    with open('network-config.mgmt', 'rt') as f:
+    with open(f'{tmpdir}/network-config.mgmt', 'rt') as f:
         yam = yaml.load(f)
     yam['network']['config'].append({'mtu': 9000, 'name': pn_nic,
                                      'subnets': [{'address': f'{pn_ip}/{pn_prefix}',
@@ -356,12 +354,12 @@ def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_p
                                      'subnets': [{'address': f'{cn_ip}/{cn_prefix}',
                                                   'type': 'static'}],
                                      'type': 'physical'})
-    with open('network-config', 'wt') as f:
+    with open(f'{tmpdir}/network-config', 'wt') as f:
         f.write(yaml.dump(yam))
-    with open('user-data', 'rt') as f:
+    with open(f'{tmpdir}/user-data', 'rt') as f:
         yam2 = yaml.load(f)
     yam2['bootcmd'] = [['/usr/bin/systemctl', 'enable', '--now', 'cockpit.socket'], ['/usr/bin/systemctl', 'enable', '--now', 'cockpit.service']]
-    with open('user-data', 'wt') as f:
+    with open(f'{tmpdir}/user-data', 'wt') as f:
         f.write('#cloud-config\n')
         f.write(yaml.dump(yam2).replace("\n\n", "\n"))
     return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=yam)))
@@ -425,6 +423,9 @@ def main(args):
 
 if __name__ == '__main__':
     args = argumentParser()
-
+    tmpdir=tempfile.mkdtemp()
     ret = main(args)
+    ret_t = json.loads(ret)
+    ret_t['tmpdir']=tmpdir
+    ret = json.dumps(ret_t)
     print(ret)
