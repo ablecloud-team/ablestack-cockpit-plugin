@@ -136,14 +136,14 @@ class Pacemaker:
             ret = createReturn(code=500, val='cannot be migrated to the same host.')
             print(json.dumps(json.loads(ret), indent=4))
 
-            sys.exit(1)
+            sys.exit(0)
 
         elif current_host == None:
             # print('정지 상태에서는 다른 호스트로 마이그레이션 할 수 없습니다.')
             ret = createReturn(code=501, val='Migration is not possible while stopped.')
             print(json.dumps(json.loads(ret), indent=4))
 
-            sys.exit(1)
+            sys.exit(0)
 
         else:
             pcs('resource', 'move', self.resource_name, self.target_host)
@@ -171,25 +171,33 @@ class Pacemaker:
     def removeResource(self, resource_name):
         self.resource_name = resource_name
         
-        pcs('resource', 'cleanup', self.resource_name)
-        pcs('resource', 'disable', self.resource_name)
-        pcs('resource', 'remove', self.resource_name)
-        pcs('resource', 'refresh')
-        
-        ret = createReturn(code=200, val='remove')
-        print(json.dumps(json.loads(ret), indent=4))
+        try:
+            pcs('resource', 'cleanup', self.resource_name)
+            pcs('resource', 'disable', self.resource_name)
+            pcs('resource', 'remove', self.resource_name)
+            pcs('resource', 'refresh')
+            
+            ret = createReturn(code=200, val='remove')
+            print(json.dumps(json.loads(ret), indent=4))
+            
+        except:
+            ret = createReturn(code=400, val='resource not found.')
+            print(json.dumps(json.loads(ret), indent=4))
 
         return ret
     
     # 함수명 : destroyCluster
     # 주요 기능 : 현재 cluster를 삭제하는 기능
     def destroyCluster(self):
-        
-        pcs('cluster', 'destroy', '--all')
-        
-        ret = createReturn(code=200, val='destroy')
-        print(json.dumps(json.loads(ret), indent=4))
-
+        try:
+            pcs('cluster', 'destroy', '--all')
+            
+            ret = createReturn(code=200, val='destroy')
+            print(json.dumps(json.loads(ret), indent=4))
+        except:
+            ret = createReturn(code=400, val='cluster not found.')
+            print(json.dumps(json.loads(ret), indent=4))
+            
         return ret
     
     # 함수명 : statusResource
@@ -203,14 +211,24 @@ class Pacemaker:
         nodes = []
         node_list = []
         current_host = None
-
-        xml = pcs('status', 'xml').stdout.decode()
-        soup = BeautifulSoup(xml, 'lxml')
-        soup_nodes = soup.find('nodes').select('node')
-        soup_resource = soup.select_one(f'#{self.resource_name}')
-
-        if soup_resource['nodes_running_on'] == '1':
-            current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
+        
+        try:
+            xml = pcs('status', 'xml').stdout.decode()
+            soup = BeautifulSoup(xml, 'lxml')
+            soup_nodes = soup.find('nodes').select('node')
+            soup_resource = soup.select_one(f'#{self.resource_name}')
+        except:
+            ret = createReturn(code=400, val='cluster is not configured.')
+            print(json.dumps(json.loads(ret), indent=4))
+            sys.exit(0)
+            
+        try:
+            if soup_resource['nodes_running_on'] == '1':
+                current_host = soup.select_one(f'#{self.resource_name}').select_one("node")['name']
+        except:
+            ret = createReturn(code=400, val='resource not found.')
+            print(json.dumps(json.loads(ret), indent=4))
+            sys.exit(0)
  
         for soup_node in soup_nodes:
             node = {}
