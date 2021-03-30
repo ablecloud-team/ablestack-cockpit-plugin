@@ -5,6 +5,7 @@ import logging
 import sys
 import fileinput
 import random
+import os
 
 from ablestack import *
 
@@ -98,7 +99,9 @@ def createScvmXml(args):
         br_num = 0
         
         # 생성할 가상머신 xml 템플릿
-        template_file = '/usr/share/cockpit/cockpit-plugin-ablestack/tools/xml-template/scvm.xml'
+        os.system("yes|cp -f /usr/share/cockpit/cockpit-plugin-ablestack/tools/xml-template/scvm-xml-template.xml /var/lib/libvirt/ablestack/vm/scvm/scvm-temp.xml")
+            
+        template_file = '/var/lib/libvirt/ablestack/vm/scvm/scvm-temp.xml'
 
         with fileinput.FileInput(template_file, inplace=True, backup='.bak' ) as fi:
 
@@ -295,6 +298,10 @@ def createScvmXml(args):
                         line = ''
                 # 라인 수정
                 sys.stdout.write(line)
+            
+        # 작업파일 삭제 및 이름 변경
+        os.system("mv /var/lib/libvirt/ablestack/vm/scvm/scvm-temp.xml /var/lib/libvirt/ablestack/vm/scvm/scvm.xml")
+        os.system("rm -f /var/lib/libvirt/ablestack/vm/scvm/scvm-temp.xml.bak")
 
         # 결과값 리턴
         return createReturn(code=200, val={})        
