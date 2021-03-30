@@ -12,8 +12,8 @@ ex)
     --privkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa \
     --hosts /root/cockpit-plugin-ablestack/tools/cloudinit/hosts \
     --mgmt-nic=ens12 --mgmt-ip 10.10.14.150 --mgmt-prefix 16 --mgmt-gw 10.10.0.1 --dns 8.8.8.8 \
-    --pn-nic ens13 --pn-ip 10.10.14.151 \
-    --cn-nic ens14 --cn-ip 10.10.14.152 --iso-path scvm.iso scvm
+    --pn-nic ens13 --pn-ip 10.10.14.151 --pn-prefix 24\
+    --cn-nic ens14 --cn-ip 10.10.14.152 --cn-prefix 24 --iso-path scvm.iso scvm
 
 /usr/bin/python3 /root/cockpit-plugin-ablestack/tools/cloudinit/gencloudinit.py --hostname ccvm \
     --pubkey /root/cockpit-plugin-ablestack/tools/cloudinit/id_rsa.pub \
@@ -68,14 +68,16 @@ def argumentParser():
     tmp_parser.add_argument('--mgmt-prefix', metavar='Management prefix', help="관리 네트워크 prefix")
     tmp_parser.add_argument('--mgmt-gw', metavar='Management gw', help="관리 네트워크 gw")
     tmp_parser.add_argument('--dns', metavar='dns', help="dns")
-    tmp_parser.add_argument('--sn-nic', metavar='Service NIC', help="서비스 네트워크 nic의 이름")
-    tmp_parser.add_argument('--sn-ip', metavar='Service IP', help="서비스 네트워크 IP")
-    tmp_parser.add_argument('--sn-prefix', metavar='Service prefix', help="서비스 네트워크 prefix")
-    tmp_parser.add_argument('--sn-gw', metavar='Service gw', help="서비스 네트워크 gw")
-    tmp_parser.add_argument('--pn-nic', metavar='Storage NIC',  help="스토리지 네트워크 NIC   (scvm만)")
-    tmp_parser.add_argument('--pn-ip', metavar='Storage IP',    help="스토리지 네트워크 IP    (scvm만)")
-    tmp_parser.add_argument('--cn-nic', metavar='Cluster NIC',  help="클러스터 네트워크 NIC   (scvm만)")
-    tmp_parser.add_argument('--cn-ip', metavar='Cluster IP',    help="클러스터 네트워크 IP    (scvm만)")
+    tmp_parser.add_argument('--sn-nic', metavar='Service NIC', help="서비스 네트워크 nic의 이름      (ccvm만)")
+    tmp_parser.add_argument('--sn-ip', metavar='Service IP', help="서비스 네트워크 IP               (ccvm만)")
+    tmp_parser.add_argument('--sn-prefix', metavar='Service prefix', help="서비스 네트워크 prefix   (ccvm만)")
+    tmp_parser.add_argument('--sn-gw', metavar='Service gw', help="서비스 네트워크 gw               (ccvm만)")
+    tmp_parser.add_argument('--pn-nic', metavar='Storage NIC',  help="스토리지 네트워크 NIC         (scvm만)")
+    tmp_parser.add_argument('--pn-ip', metavar='Storage IP',    help="스토리지 네트워크 IP          (scvm만)")
+    tmp_parser.add_argument('--pn-prefix', metavar='Service prefix', help="스토리지 네트워크 prefix (scvm만)", default=24)
+    tmp_parser.add_argument('--cn-nic', metavar='Cluster NIC',  help="클러스터 네트워크 NIC         (scvm만)")
+    tmp_parser.add_argument('--cn-ip', metavar='Cluster IP',    help="클러스터 네트워크 IP          (scvm만)")
+    tmp_parser.add_argument('--cn-prefix', metavar='Service prefix', help="클러스터 네트워크 prefix (scvm만)", default=24)
 
     # ccvm_parser.add_argument('--hostname', metavar='hostname', help="VM의 이름")
     # ccvm_parser.add_argument('--mgmt-nic', metavar='Management NIC', help="관리 네트워크 nic의 이름")
@@ -343,15 +345,15 @@ scvm용 네트워크설정(스토리지 네트워크 추가)하는 부분
 :param :cn_ip  :str  CN의 IP
 :return yaml 파일
 """
-def scvmGen(pn_nic=None, pn_ip=None, cn_nic=None, cn_ip=None):
+def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_prefix=24):
     with open('network-config.mgmt', 'rt') as f:
         yam = yaml.load(f)
     yam['network']['config'].append({'mtu': 9000, 'name': pn_nic,
-                                     'subnets': [{'address': f'{pn_ip}/24',
+                                     'subnets': [{'address': f'{pn_ip}/{pn_prefix}',
                                                   'type': 'static'}],
                                      'type': 'physical'})
     yam['network']['config'].append({'mtu': 9000, 'name': cn_nic,
-                                     'subnets': [{'address': f'{cn_ip}/24',
+                                     'subnets': [{'address': f'{cn_ip}/{cn_prefix}',
                                                   'type': 'static'}],
                                      'type': 'physical'})
     with open('network-config', 'wt') as f:
@@ -411,7 +413,7 @@ def main(args):
     if args.type == 'ccvm':
         ret = ccvmGen(sn_nic=args.sn_nic, sn_ip=args.sn_ip, sn_prefix=args.sn_prefix, sn_gw=args.sn_gw)
     elif args.type == 'scvm':
-        ret = scvmGen(pn_nic=args.pn_nic, pn_ip=args.pn_ip, cn_nic=args.cn_nic, cn_ip=args.cn_ip)
+        ret = scvmGen(pn_nic=args.pn_nic, pn_ip=args.pn_ip, pn_prefix=args.pn_prefix, cn_nic=args.cn_nic, cn_ip=args.cn_ip, cn_prefix=args.cn_prefix)
     ret = genCloudInit(filename=args.iso_path)
     return ret
 
