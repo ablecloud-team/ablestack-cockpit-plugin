@@ -62,6 +62,38 @@
                                 원활한 SSH 연결 및 상호 인증을 위해 동일한 SSH Key 설정이 필요합니다. 
                                 마법사를 통해 새로운 SSH Key를 생성하여 사용하거나 기존의 SSH Key 파일을 사용하도록 설정할 수 있습니다. 
                             </p>
+                            <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                <section class="pf-c-form__section">
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label">
+                                                <span class="pf-c-form__label-text">SSH Key 준비 방법</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-ssh-key-new" name="radio-ssh-key" checked/>
+                                                <label class="pf-c-radio__label" for="form-radio-ssh-key-new">신규 생성</label>
+                                            </div>
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-ssh-key-file" name="radio-ssh-key" />
+                                                <label class="pf-c-radio__label" for="form-radio-ssh-key-file">기존 파일 사용</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-file">
+                                                <span class="pf-c-form__label-text">SSH Key 파일</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline">
+                                            <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cluster-config-ssh-key-file" name="form-input-cluster-config-ssh-key-file" disabled/>
+                                        </div>
+                                    </div>
+                                </section>
+                            </form>
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cluster-config-ip-info">
                             <p>
@@ -70,6 +102,60 @@
                                 호스트 프로파일을 생성하기 위해서는 클러스터를 구성하는 호스트 및 가상머신에 대한 호스트명과 IP 정보를 미리 정의해야 합니다. 
                                 호스트명 및 IP정보를 모두 사전 준비한 후 아래의 정보를 구성하십시오.
                             </p>
+                            <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                <section class="pf-c-form__section">
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-host-number">
+                                                <span class="pf-c-form__label-text">구성 호스트 수</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline">
+                                            <input class="pf-c-form-control" style="width:15%" type="text" id="form-input-cluster-config-host-number" name="form-input-cluster-config-host-number"/>
+                                            <span style="margin-top:10px">대</span>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label">
+                                                <span class="pf-c-form__label-text">Hosts 파일 준비 방법</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-new" name="radio-hosts-file" checked/>
+                                                <label class="pf-c-radio__label" for="form-radio-hosts-new">신규 생성</label>
+                                            </div>
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-file" name="radio-hosts-file" />
+                                                <label class="pf-c-radio__label" for="form-radio-hosts-file">기존 파일 사용</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-form-hosts-profile">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-hosts-profile">
+                                                <span class="pf-c-form__label-text">Hosts 프로파일</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-host-profile"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-form-hosts-file">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-hosts-file">
+                                                <span class="pf-c-form__label-text">Hosts 파일</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <input class="pf-c-form-control" style="width:60%" type="file" id="form-input-cluster-config-hosts-file" name="form-input-cluster-config-hosts-file"/>
+                                        </div>
+                                    </div>
+                                </section>
+                            </form>
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cluster-config-time-server">
                             <p>
@@ -78,6 +164,61 @@
                                 <br/>
                                 시간 동기화를 위해서는 시간 동기화 서버의 설정이 필요합니다. <br/>인터넷 연결이 되지 않는 환경이라면 반드시 내부 시간 서버를 구성한 후 클러스터를 구성해야 합니다.
                             </p>
+                            <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                <section class="pf-c-form__section">
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label">
+                                                <span class="pf-c-form__label-text">시간서버 종류</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-ext" name="radio-timeserver" checked/>
+                                                <label class="pf-c-radio__label" for="form-radio-timeserver-ext">외부 시간서버</label>
+                                            </div>
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-int" name="radio-timeserver" />
+                                                <label class="pf-c-radio__label" for="form-radio-timeserver-int">로컬 시간서버</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-timeserver1">
+                                                <span class="pf-c-form__label-text">시간서버 #1</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-timeserver1" name="form-input-cluster-config-timeserver1"/>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-timeserver2">
+                                                <span class="pf-c-form__label-text">시간서버 #2</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true" id="span-timeserver2-required">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-timeserver1" name="form-input-cluster-config-timeserver1"/>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-timeserver3">
+                                                <span class="pf-c-form__label-text">시간서버 #3</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true" id="span-timeserver3-required">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-timeserver1" name="form-input-cluster-config-timeserver1"/>
+                                        </div>
+                                    </div>
+                                </section>
+                            </form>
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cluster-config-review">
                             <p>
@@ -85,6 +226,118 @@
                                 <br/>
                                 정보를 수정해야 하는 경우 해당 단계로 이동하십시오. 설정을 완료하려면 "완료" 버튼을 눌러 설정을 완료합니다.
                             </p>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:20px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-ssh-key">
+                                        <span class="pf-c-accordion__toggle-text">SSH Key 파일</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-ssh-key">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">SSH Key 준비 방법</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">기존 파일 사용 (파일명 : sample.key)</div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Key 내용</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <textarea class="pf-c-form-control" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text">SSH Key 내용</textarea>                                                     
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-hosts-file">
+                                        <span class="pf-c-accordion__toggle-text">Hosts 파일</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-hosts-file">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Hosts 파일 준비 방법</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">기존 파일 사용 (파일명 : hosts)</div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Hosts 프로파일</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <textarea class="pf-c-form-control" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text">Host 프로파일 내용</textarea>                                                     
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-timeserver">
+                                        <span class="pf-c-accordion__toggle-text">시간서버</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-timeserver">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">시간서버 종류</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">로컬 시간 서버</div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">시간서버 #1</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">192.168.0.11</div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">시간서버 #2</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">192.168.0.12</div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">시간서버 #3</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">192.168.0.13</div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cluster-config-finish">
                             <p>
@@ -92,6 +345,17 @@
                                 <br/>
                                 SSH Key 파일 및 호스트 프로파일을 다운로드 받아 스토리지센터 및 클라우드센터 가상머신 배포 시 사용하십시오.
                             </p>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span>
+                                    - SSH Key 다운로드 : 
+                                    <a class="pf-c-button pf-m-link" href="https://172.16.0.30:9090/ablestack/sshkey.in">파일을 재사용 하려면 클릭하십시오</a>
+                                </span>
+                                <br/>
+                                <span>
+                                    - Hosts 프로파일 다운로드 : 
+                                    <a class="pf-c-button pf-m-link" href="https://172.16.0.30:9090/ablestack/hosts.in">파일을 재사용 하려면 클릭하십시오</a>
+                                </span>
+                            </div>
                         </div>
                     </main>
                 </div>
