@@ -464,7 +464,7 @@ $('#button-accordion-timeserver').on('click', function () {
 
 // ssh-key 클러스터 구성 준비 마법사가 시작되면 ssh key키를 생성하고 읽어와 hidden 처리된 textarea에 저장
 $('#button-open-modal-wizard-storage-cluster').on('click', function () {
-    generateSshkey();
+    // generateSshkey();
     readSshKeyFile();
 });
 
@@ -624,7 +624,9 @@ function resetClusterConfigWizard() {
  **/
 
 function generateSshkey() {
-    cockpit.script(["ssh-keygen -t rsa -b 2048 -f /root/.ssh/ablecloud -N '' <<<y 2>&1 >/dev/null"])
+    return new Promise(function (resolve, reject){
+        resolve(cockpit.script(["ssh-keygen -t rsa -b 2048 -f /root/.ssh/ablecloud -N '' <<<y 2>&1 >/dev/null"]));
+    });
 }
 
 /**
@@ -637,7 +639,8 @@ function generateSshkey() {
  * History  : 2021.03.11 최초 작성
  **/
 
-function readSshKeyFile() {
+async function readSshKeyFile() {
+    await generateSshkey();
     // 개인키 읽어오기
     cockpit.file("/root/.ssh/ablecloud").read()
         .done(function (tag) {
