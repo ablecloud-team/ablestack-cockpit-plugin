@@ -28,20 +28,12 @@ $('#button-execution-modal-cloud-vm-start').on('click', function(){
     .then(function(data){
         var retVal = JSON.parse(data);
 
-        console.log("##########################");
-        console.log("button-execution-modal-cloud-vm-start");
-        console.log(JSON.stringify(retVal));
-        console.log(retVal.code);
-        // console.log(Object.keys(retVal.val.clustered_host).length);
-        // console.log(retVal.val.clustered_host[0]);
-        console.log("##########################");
-
         if(retVal.code == 200){
             CardCloudClusterStatus();
         }
         $('#div-modal-spinner').hide();
     }).catch(function(data){
-        console.log('cloud-cluster-start spawn error');
+        console.log('button-execution-modal-cloud-vm-start');
     });
 });
 /** cloud vm start 관련 action end */
@@ -69,17 +61,12 @@ $('#button-execution-modal-cloud-vm-stop').on('click', function(){
     .then(function(data){
         var retVal = JSON.parse(data);
 
-        console.log("##########################");
-        console.log("button-execution-modal-cloud-vm-stop");
-        console.log(JSON.stringify(retVal));
-        console.log(retVal.code);
-        console.log("##########################");
         if(retVal.code == 200){
             CardCloudClusterStatus();
         }
         $('#div-modal-spinner').hide();
     }).catch(function(data){
-
+        console.log('button-execution-modal-cloud-vm-stop spawn error');
     });
     
 });
@@ -102,13 +89,6 @@ $('#button-execution-modal-cloud-vm-cleanup').on('click', function(){
     .then(function(data){
         var retVal = JSON.parse(data);
 
-        console.log("##########################");
-        console.log("button-execution-modal-cloud-vm-cleanup");
-        console.log(JSON.stringify(retVal));
-        console.log(retVal.code);
-        // console.log(Object.keys(retVal.val.clustered_host).length);
-        // console.log(retVal.val.clustered_host[0]);
-        console.log("##########################");
     }).catch(function(data){
         console.log('cloud-cluster-cleanup spawn error');
     });
@@ -131,8 +111,6 @@ $('#button-cancel-modal-cloud-vm-migration').on('click', function(){
 
 $('#button-execution-modal-cloud-vm-migration').on('click', function(){
     var valSelect = $('#form-select-cloud-vm-migration-node option:selected').val();
-    console.log(valSelect);
-    // div-modal-migration-cloud-vm-select
     if(valSelect == 'null'){
         $('#div-modal-migration-cloud-vm-select').text('선택이 잘못되었습니다. 마이그레이션할 노드를 선택해주세요.');
     }else{
@@ -143,14 +121,6 @@ $('#button-execution-modal-cloud-vm-migration').on('click', function(){
         cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsMigration', '--target', valSelect])
         .then(function(data){
             var retVal = JSON.parse(data);
-
-            console.log("##########################");
-            console.log("button-execution-modal-cloud-vm-cleanup");
-            console.log(JSON.stringify(retVal));
-            console.log(retVal.code);
-            // console.log(Object.keys(retVal.val.clustered_host).length);
-            // console.log(retVal.val.clustered_host[0]);
-            console.log("##########################");
             if(retVal.code == 200){
                 CardCloudClusterStatus();
             }
@@ -177,20 +147,15 @@ $('#cloud-cluster-connect').on('click', function(){
         }
     })
     .catch(function(data){
-        //console.log(":::Error:::");        
+        console.log('cloud-cluster-connect');
     });
 });
 
+// 클라우드 센터 클러스터 상태 조회 및 조회 결과값으로 화면 변경하는 함수
 function CardCloudClusterStatus(){
     cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsDetail' ])
     .then(function(data){ 
         var retVal = JSON.parse(data);
-
-        console.log("##########################");
-        console.log("CardCloudClusterStatus");
-        console.log(JSON.stringify(retVal));
-        console.log(retVal.code);
-        console.log("##########################");
 
         if(retVal.code == '200'){
             var nodeText = '';
