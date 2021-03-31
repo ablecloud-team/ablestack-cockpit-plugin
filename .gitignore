@@ -1,0 +1,5 @@
+**/.idea/
+**/*.egg-info/
+*.whl
+**/build
+.*/*
