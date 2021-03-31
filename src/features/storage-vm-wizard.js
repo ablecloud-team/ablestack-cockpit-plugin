@@ -121,6 +121,9 @@ $('#button-next-step-modal-wizard-vm-config').on('click', function(){
     }
     else if (cur_step_wizard_vm_config == "6") {
 
+        // review 정보 세팅
+        setReviewInfo();
+
         $('#div-modal-wizard-vm-config-ssh-key').hide();
         $('#div-modal-wizard-vm-config-review').show();
         $('#button-next-step-modal-wizard-vm-config').attr('disabled', false);
@@ -135,7 +138,7 @@ $('#button-next-step-modal-wizard-vm-config').on('click', function(){
     }
     else if (cur_step_wizard_vm_config == "7") {
         if(validateStorageVm()){
-            // 배포 버튼을 누르면 배포 진행 단계로 이동한다. 
+            // 배포 버튼을 누르면 배포 진행 단계로 이동한다.
             hideAllMainBody();
             resetCurrentMode();
 
@@ -337,7 +340,7 @@ $('#nav-button-ssh-key').on('click', function(){
     resetCurrentMode();
 
     $('#div-modal-wizard-vm-config-ssh-key').show();
-    $('#button-next-step-modal-wizard-vm-config').attr('disabled', true);
+    $('#button-next-step-modal-wizard-vm-config').attr('disabled', false);
     $('#button-before-step-modal-wizard-vm-config').attr('disabled', false);
     $('#nav-button-ssh-key').addClass('pf-m-current');
 
@@ -542,6 +545,8 @@ function deployStorageCenterVM() {
                                                 if(result.code=="200"){
                                                     seScvmProgressStep("span-progress-step4",2);
 
+                                                    //최종 화면 호출
+                                                    showDivisionVMConfigFinish();
                                                 } else {
                                                     setProgressFail(4);
                                                     alert(pcs_config.val);            
@@ -579,10 +584,6 @@ function deployStorageCenterVM() {
             setProgressFail(1);
             alert("클러스터 구성 설정 초기화 작업 실패 : "+data);
         });
-
-    //최종 화면 호출
-    showDivisionVMConfigFinish();
-
 }
 
 /**
