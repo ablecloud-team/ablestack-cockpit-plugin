@@ -6,6 +6,7 @@ Copyright (c) 2021 ABLECLOUD Co. Ltd
 
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import argparse
 import logging
 import json
