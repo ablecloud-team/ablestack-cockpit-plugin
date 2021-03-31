@@ -1,6 +1,6 @@
 '''
 Copyright (c) 2021 ABLECLOUD Co. Ltd
-설명 : 장애조치 클러스터 및 클라우드센터 가상머신 배포를 초기화하는 프로그램
+설명 : 스토리지센터 가상머신 배포 초기화 프로그램
 최초 작성일 : 2021. 03. 31
 '''
 
@@ -23,15 +23,11 @@ def createArgumentParser():
     '''
     # 참조: https://docs.python.org/ko/3/library/argparse.html
     # 프로그램 설명
-    parser = argparse.ArgumentParser(description='장애조치 클러스터 및 클라우드센터 가상머신 배포를 초기화하는 프로그램',
+    parser = argparse.ArgumentParser(description='스토리지센터 가상머신 배포 초기화 프로그램',
                                         epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™',
                                         usage='%(prog)s arguments')
 
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
-
-    #parser.add_argument('action', choices=['reset'], help='choose one of the actions')
-
-    #parser.add_argument('-hns', '--host-names', metavar=('[hostname1]','[hostname2]','[hostname3]'), type=str, nargs=3, help='input Value to three host names', required=True)
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
@@ -44,57 +40,38 @@ def createArgumentParser():
 
     return parser
 
-def resetCloud(args):
+def resetStorageCenter(args):
     
-    success_bool = True
-
-    #=========== pcs cluster 초기화 ===========
-    # 리소스 삭제
-    result = json.loads(python3('/usr/share/cockpit/cockpit-plugin-ablestack/python/pcs/main.py', 'remove', '--resource', 'cloudcenter_res').stdout.decode())
-    if result['code'] not in [200,400]:
-        success_bool = False
-
-    # 클러스터 삭제
-    result = json.loads(python3('/usr/share/cockpit/cockpit-plugin-ablestack/python/pcs/main.py', 'destroy').stdout.decode())
-    if result['code'] not in [200,400]:
-        success_bool = False
-    
-    # ceph rbd 이미지 삭제
-    result = os.system("rbd ls -p rbd | grep ccvm > /dev/null")
-    if result == 0:
-        os.system("rbd rm rbd/ccvm")
+    # 기본 작업 폴더 생성
+    os.system("mkdir -p /var/lib/libvirt/ablestack/vm/scvm")
 
     # virsh 초기화
-    os.system("virsh destroy ccvm")
-    os.system("virsh undefine ccvm")
+    os.system("virsh destroy scvm")
+    os.system("virsh undefine scvm")
 
-    # 작업폴더 생성
-    os.system("mkdir -p /var/lib/libvirt/ablestack/vm/ccvm")
-    '''
+    # 스토리지센터 가상머신 qcow2 템플릿 삭제
+    os.system("rm -rf /var/lib/libvirt/images/scvm.qcow2")
+
     # cloudinit iso 삭제
-    os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/ccvm-cloudinit.iso")
+    #os.system("rm -f /var/lib/libvirt/ablestack/vm/scvm/scvm-cloudinit.iso")
     
     # vm xml 템플릿 삭제
-    os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/ccvm.xml")
+    #os.system("rm -f /var/lib/libvirt/ablestack/vm/scvm/scvm.xml")
     
     # cloudinit iso에 사용할 hosts 삭제
-    os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/hosts")
+    #os.system("rm -f /var/lib/libvirt/ablestack/vm/scvm/hosts")
 
     # cloudinit iso에 사용할 개인키 : ablecloud 삭제
-    os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/ablecloud")
+    #os.system("rm -f /var/lib/libvirt/ablestack/vm/scvm/ablecloud")
 
     # cloudinit iso에 사용할 공개키 : ablecloud.pub 삭제
-    os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/ablecloud.pub")
-    '''
+    #os.system("rm -f /var/lib/libvirt/ablestack/vm/scvm/ablecloud.pub")
 
     # 확인후 폴더 밑 내용 다 삭제해도 무관하면 아래 코드 수행
-    os.system("rm -rf /var/lib/libvirt/ablestack/vm/ccvm/*")
+    os.system("rm -rf /var/lib/libvirt/ablestack/vm/scvm/*")
     
     # 결과값 리턴
-    if success_bool:
-        return createReturn(code=200, val="cloud center reset success")
-    else:
-        return createReturn(code=500, val="cloud center reset fail")
+    return createReturn(code=200, val="storage center reset success")
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -109,5 +86,5 @@ if __name__ == '__main__':
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
     # 실제 로직 부분 호출 및 결과 출력
-    ret = resetCloud(args)
+    ret = resetStorageCenter(args)
     print(ret)

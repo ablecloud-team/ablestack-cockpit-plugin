@@ -1,6 +1,6 @@
 '''
 Copyright (c) 2021 ABLECLOUD Co. Ltd
-설명 : 장애조치 클러스터 구성할 호스트의 네트워크 연결 상태를 확인하는 프로그램
+설명 : 스토리지센터 가상머신을 배포하는 프로그램
 최초 작성일 : 2021. 03. 31
 '''
 
@@ -9,10 +9,12 @@ Copyright (c) 2021 ABLECLOUD Co. Ltd
 
 import argparse
 import logging
+import json
 import sys
 import os
 
 from ablestack import *
+from sh import python3
 
 def createArgumentParser():
     '''
@@ -21,13 +23,11 @@ def createArgumentParser():
     '''
     # 참조: https://docs.python.org/ko/3/library/argparse.html
     # 프로그램 설명
-    parser = argparse.ArgumentParser(description='장애조치 클러스터 구성할 호스트의 네트워크 연결 상태를 확인하는 프로그램',
+    parser = argparse.ArgumentParser(description='스토리지센터 가상머신을 배포하는 프로그램',
                                         epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™',
                                         usage='%(prog)s arguments')
 
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
-
-    parser.add_argument('-hns', '--host-names', metavar=('[hostname1]','[hostname2]','[hostname3]'), type=str, nargs=3, help='input Value to three host names', required=True)
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
@@ -41,34 +41,16 @@ def createArgumentParser():
     return parser
 
 def resetCloud(args):
-    try:
-        # 3대의 호스트에 ping 테스트
-        ret_val = []
-        ret_text = ""
-        for host in args.host_names:
-            item = {}
-            ping_check = os.system("ping -c 1 -W 1 "+ host + "> /dev/null")
-            if ping_check == 0 :
-                item["host"] = host
-                item["status"] = 'up'
-            else:
-                item["host"] = host
-                item["status"] = 'down'
-                ret_text += host+"와 네트워크 테스트 실패하였습니다\n"
+    
+    # 스토리지 가상머신용 qcow2 이미지 생성
+    os.system("yes|cp -f /var/lib/libvirt/images/centos8-template.qcow2 /var/lib/libvirt/images/scvm.qcow2")
 
-            ret_val.append(item)
-        # 인증된 서버인지 여부를 확인할 수 있는지? 향후 추가 개발 필요
-        # ex : ssh root@host date 명령을 수행시 인증이 되어있으면 바로 응답이 오는데 인증이 되어있지 않으면 정상응답이 오지 않음
+    # virsh 초기화
+    os.system("virsh define /var/lib/libvirt/ablestack/vm/scvm/scvm.xml")
+    os.system("virsh start scvm")
 
-        if ret_text == "":
-            return createReturn(code=200, val="host ping test success")
-        else:
-            return createReturn(code=500, val=ret_text)
-
-    except Exception as e:
-        # 결과값 리턴
-        print(e)
-        return createReturn(code=500, val={})
+    # 결과값 리턴
+    return createReturn(code=200, val="storage center setup success")
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

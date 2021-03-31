@@ -29,16 +29,23 @@
   </pm>
   <devices>
     <emulator>/usr/libexec/qemu-kvm</emulator>
+    <disk type="file" device="cdrom">
+      <driver name="qemu" type="raw"/>
+      <source file="/var/lib/libvirt/ablestack/vm/scvm/scvm-cloudinit.iso"/>
+      <target dev="hda" bus="ide"/>
+      <readonly/>
+      <shareable/>
+      <address type="drive" controller="0" bus="0" target="0" unit="0"/>
+    </disk>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
-      <source file='/opt/scvm/scvm.qcow2'/>
+      <source file='/var/lib/libvirt/images/scvm.qcow2'/>
       <backingStore/>
       <target dev='vda' bus='virtio'/>
       <boot order='1'/>
       <alias name='virtio-disk0'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
     </disk>
-    
 <!--lun_passthrough-->
     <controller type='usb' index='0' model='ich9-ehci1'>
       <alias name='usb'/>

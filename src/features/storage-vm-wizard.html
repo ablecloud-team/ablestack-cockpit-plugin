@@ -301,9 +301,10 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline">
-                                            <input class="pf-c-check__input" style="margin-top:12px;margin-right:5px" type="checkbox" id="form-input-storage-vm-additional-file" name="form-input-storage-vm-additional-file"/>
+                                            <input class="pf-c-check__input" style="margin-top:12px;margin-right:5px" type="checkbox" id="form-input-storage-vm-additional-file" name="form-input-storage-vm-additional-file" checked/>
                                             <label class="pf-c-check__label" style="margin-top:8px;margin-left:0px" for="form-input-storage-vm-additional-file">Hosts 파일 사용</label>
                                             <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-storage-vm-hosts-file" name="form-input-storage-vm-hosts-file"/>
+                                            <textarea class="pf-c-form-control" style="width:90%;height:110px;margin-top:10px" type="text" id="form-textarea-storage-vm-hosts-file"></textarea>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
@@ -319,7 +320,7 @@
                                     </div>
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-storage-vm-hostname">
+                                            <label class="pf-c-form__label" for="form-input-storage-vm-mgmt-ip">
                                                 <span class="pf-c-form__label-text">관리 NIC IP</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
@@ -378,13 +379,26 @@
                                 <section class="pf-c-form__section">
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-storage-vm-ssh-key-file">
-                                                <span class="pf-c-form__label-text">SSH Key 파일</span>
+                                            <label class="pf-c-form__label" for="form-input-storage-vm-ssh-private-key-file">
+                                                <span class="pf-c-form__label-text">SSH 개인 Key 파일</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline">
-                                            <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-storage-vm-ssh-key-file" name="form-input-storage-vm-ssh-key-file"/>
+                                            <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-storage-vm-ssh-private-key-file" name="form-input-storage-vm-ssh-private-key-file"/>
+                                            <textarea class="pf-c-form-control" type="text" id="form-textarea-storage-vm-ssh-private-key-file" hidden></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-storage-vm-ssh-public-key-file">
+                                                <span class="pf-c-form__label-text">SSH 공개 Key 파일</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline">
+                                            <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-storage-vm-ssh-public-key-file" name="form-input-storage-vm-ssh-public-key-file"/>
+                                            <textarea class="pf-c-form-control" type="text" id="form-textarea-storage-vm-ssh-public-key-file" hidden></textarea>
                                         </div>
                                     </div>
                                 </section>
@@ -408,169 +422,231 @@
                             </div>
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-vm-config-review">
-                            <p>
-                                스토리지 가상머신 배포를 위해 입력한 값은 다음과 같습니다. 입력 정보를 확인한 후 "배포" 버튼을 누르면 가상머신 배포를 시작합니다. 입력한 정보의 수정이 필요하다면 "이전" 버튼을 눌러 원하는 정보를 입력하십시오.
-                            </p>
-                            <br/>
-                            <section class="pf-c-content">
-                                <h4>가상머신 장치 구성</h4>
-                            </section>
-                            <section class="pf-c-page__main" style="margin-top:10px;margin-left:15px">
-                                <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 7px;">
-                                    <div class="pf-c-description-list__group">
-                                        <dt class="pf-c-description-list__term">
-                                            <span class="pf-c-description-list__text">CPU</span>
-                                        </dt>
-                                        <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text" id="rv-cpu"></div>
-                                        </dd>
-                                    </div>
-                                    <div class="pf-c-description-list__group">
-                                        <dt class="pf-c-description-list__term">
-                                            <span class="pf-c-description-list__text">Memory</span>
-                                        </dt>
-                                        <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text" id="rv-memory"></div>
-                                        </dd>
-                                    </div>
-                                    <div class="pf-c-description-list__group">
-                                        <dt class="pf-c-description-list__term">
-                                            <span class="pf-c-description-list__text">ROOT Disk</span>
-                                        </dt>
-                                        <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text">70 GiB (Thin Provisioning)</div>
-                                        </dd>
-                                    </div>
-                                    <div class="pf-c-description-list__group">
-                                        <dt class="pf-c-description-list__term">
-                                            <span class="pf-c-description-list__text">Data Disk</span>
-                                        </dt>
-                                        <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text" id="rv-data-disk">
+                            <div class="pf-c-content">
+                                <p>
+                                    스토리지센터 VM의 배포를 위해 입력한 설정 정보는 다음과 같습니다. 
+                                    입력한 정보를 수정하고자 하는 경우, 해당 탭으로 이동하여 정보를 수정하십시오. 
+                                    <br/>
+                                    <br/>
+                                    모든 정보를 확인한 후 "배포"를 시작합니다. 
+                                </p>
+                            </div>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:10px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-storage-vm-device-conifg">
+                                        <span class="pf-c-accordion__toggle-text">가상머신 장치 구성</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-storage-vm-device-conifg">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">CPU</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-cpu-core"></span><br/>
+                                                    </div>
+                                                </dd>
                                             </div>
-                                        </dd>
-                                    </div>
-                                    <div class="pf-c-description-list__group">
-                                        <dt class="pf-c-description-list__term">
-                                            <span class="pf-c-description-list__text">네트워크</span>
-                                        </dt>
-                                        <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text" id="rv-management-traffic">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Memory</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-memory"></span><br/>
+                                                    </div>
+                                                </dd>
                                             </div>
-                                            <div class="pf-c-description-list__text" id="rv-storage-traffic">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">ROOT Disk</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id=""></span>70 GiB (Thin Provisioning)<br/>
+                                                    </div>
+                                                </dd>
                                             </div>
-                                        </dd>
-                                    </div>
-                                </dl>
-                            </section>
-                            <section class="pf-c-content">
-                                <h4>추가 네트워크 정보</h4>
-                            </section>
-                            <section class="pf-c-page__main" style="margin-top:10px;margin-left:15px">
-                                <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 7px;">
-                                    <div class="pf-c-description-list__group">
-                                        <dt class="pf-c-description-list__term">
-                                            <span class="pf-c-description-list__text">호스트명</span>
-                                        </dt>
-                                        <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text">SCVM1</div>
-                                        </dd>
-                                    </div>
-                                    <div class="pf-c-description-list__group">
-                                        <dt class="pf-c-description-list__term">
-                                            <span class="pf-c-description-list__text">관리네트워크</span>
-                                        </dt>
-                                        <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text">IP Addr : 192.168.0.10/24</div>
-                                            <div class="pf-c-description-list__text">Gateway : 192.168.0.1</div>
-                                        </dd>
-                                    </div>
-                                    <div class="pf-c-description-list__group">
-                                        <dt class="pf-c-description-list__term">
-                                            <span class="pf-c-description-list__text">스토리지네트워크</span>
-                                        </dt>
-                                        <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text">서버 IP Addr : 100.100.100.101/24</div>
-                                            <div class="pf-c-description-list__text">복제 IP Addr : 100.100.200.101/24</div>
-                                        </dd>
-                                    </div>
-                                </dl>
-                            </section>
-                            <section class="pf-c-content">
-                                <h4>SSH Key 정보</h4>
-                            </section>
-                            <section class="pf-c-page__main" style="margin-top:10px;margin-left:15px">
-                                <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 7px;">
-                                    <div class="pf-c-description-list__group">
-                                        <dt class="pf-c-description-list__term">
-                                            <span class="pf-c-description-list__text">Key File</span>
-                                        </dt>
-                                        <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text">ablestack-host.key</div>
-                                        </dd>
-                                    </div>
-                                    <div class="pf-c-description-list__group">
-                                        <dt class="pf-c-description-list__term">
-                                            <span class="pf-c-description-list__text">File 내용</span>
-                                        </dt>
-                                        <dd class="pf-c-description-list__description">
-                                            <div class="pf-c-description-list__text">
-                                                <pre>
------BEGIN OPENSSH PRIVATE KEY-----
-b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
-NhAAAAAwEAAQAAAQEA3ozgiQm7WVakcO4JWM5p5eqUXzPD+CV9ftDTHMEnmfD1n+WUZ4UC
-RZlcUmHdU0jh+8oontTxiXZNY2kFQpr3763cMYewLUZU5lw2tQ+VF9Ui+4v28V/gPRaJfl
------END OPENSSH PRIVATE KEY-----
-                                                </pre>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Data Disk</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-data-disk"></span><br/>
+                                                    </div>
+                                                </dd>
                                             </div>
-                                        </dd>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">네트워크</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-management-traffic"></span><br/>
+                                                    </div>
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-storage-traffic"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
                                     </div>
-                                </dl>
-                            </section>
+                                </div>
+                            </div>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:10px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-storage-vm-additional">
+                                        <span class="pf-c-accordion__toggle-text">추가 네트워크 정보</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-storage-vm-additional">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">정보 입력 소스</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-hosts-source"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Hosts 파일</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-hosts-file"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">호스트명</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-host-name"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">관리네트워크</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-mngt-ip-info"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">스토리지네트워크</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-storage-traffic-ip-info"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:10px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-storage-vm-ssh-key">
+                                        <span class="pf-c-accordion__toggle-text">SSH Key 정보</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-storage-vm-ssh-key">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">SSH 개인 Key 파일</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-private-key-file"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">SSH 공개 Key 파일</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-storage-vm-public-key-file"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-vm-config-deploy">
-                            <p>
-                                스토리지 가상머신을 배포 중입니다. 전체 00단계 중 00단계 진행 중입니다.  
+                            <p id='progress-step-text'>
+                                스토리지 가상머신을 배포 중입니다. 전체 4단계 중 1단계 진행 중입니다.  
                             </p>
+
                             <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
-                                <span class="pf-c-label pf-m-blue">
+                                <span class="pf-c-label pf-m-blue" id="span-progress-step1">
                                     <span class="pf-c-label__content">
                                         <span class="pf-c-label__icon">
                                             <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
-                                        </span>준비중
+                                        </span><p>준비중</p>
                                     </span>
                                 </span>
-                                <span class="pf-c-label__content" style="margin-left:4px">가상머신 설정 파일 생성</span>
+                                <span class="pf-c-label__content" style="margin-left:4px">스토리지센터 가상머신 초기화 작업</span>
                             </div>
-                            <div class="pf-c-content" style="margin-top:15px;margin-left:15px">
-                                <span class="pf-c-label pf-m-green">
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-progress-step2">
                                     <span class="pf-c-label__content">
                                         <span class="pf-c-label__icon">
-                                            <i class="fas fa-fw fa-check-circle" aria-hidden="true"></i>
-                                        </span>완료됨
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
                                     </span>
                                 </span>
-                                <span class="pf-c-label__content" style="margin-left:4px">스토리지센터 가상머신 생성</span>
+                                <span class="pf-c-label__content" style="margin-left:4px">cloudinit iso 파일 생성</span>
                             </div>
-                            <div class="pf-c-content" style="margin-top:15px;margin-left:15px">
-                                <span class="pf-c-label pf-m-orange">
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-progress-step3">
                                     <span class="pf-c-label__content">
                                         <span class="pf-c-label__icon">
-                                            <i class="fas fa-fw fa-play" aria-hidden="true"></i>
-                                        </span>진행중
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
                                     </span>
                                 </span>
-                                <span class="pf-c-label__content" style="margin-left:4px">스토리지센터 가상머신 시작</span>
+                                <span class="pf-c-label__content" style="margin-left:4px">스토리지센터 가상머신 구성</span>
                             </div>
-                            <div class="pf-c-content" style="margin-top:15px;margin-left:15px">
-                                <span class="pf-c-label pf-m-red">
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-progress-step4">
                                     <span class="pf-c-label__content">
                                         <span class="pf-c-label__icon">
-                                            <i class="fas fa-fw fa-exclamation-circle" aria-hidden="true"></i>
-                                        </span>중단됨
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
                                     </span>
                                 </span>
-                                <span class="pf-c-label__content" style="margin-left:4px">스토리지센터 가상머신 설정</span>
+                                <span class="pf-c-label__content" style="margin-left:4px">스토리지센터 가상머신 배포</span>
                             </div>
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-vm-config-finish">
@@ -582,7 +658,7 @@ RZlcUmHdU0jh+8oontTxiXZNY2kFQpr3763cMYewLUZU5lw2tQ+VF9Ui+4v28V/gPRaJfl
                                 <br/>
                                 <span class="pf-c-label__content" style="margin-top:8px">- 스토리지센터 접속 방법</span>
                                 <br/>
-                                <span class="pf-c-label__content" style="margin-top:8px;margin-left:15px">https://192.168.0.11:9000</span>
+                                <span class="pf-c-label__content" style="margin-top:8px;margin-left:15px">https://ip:9000</span>
                                 <br/><br/>
                                 <span class="pf-c-label__content" style="margin-top:8px">- 스토리지센터에 접속하여 스토리지 클러스터를 구성하십시오.</span>
                             </div>
@@ -605,5 +681,6 @@ RZlcUmHdU0jh+8oontTxiXZNY2kFQpr3763cMYewLUZU5lw2tQ+VF9Ui+4v28V/gPRaJfl
 </div>
 
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+<script src="./src/common/wizard-common.js"></script>
 <script src="./src/features/storage-vm-wizard.js"></script>
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
