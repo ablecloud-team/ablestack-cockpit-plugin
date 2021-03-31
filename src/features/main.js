@@ -209,7 +209,6 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  * Return  : 없음
  * History  : 2021.03.23 최초 작성
  */
-
  function checkConfigStatus(){
     return new Promise((resolve) => {
         cockpit.spawn(['grep', '-c', 'ccvm-mngt', '/etc/hosts'], {'host': 'localhost'})
@@ -399,7 +398,6 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  * Return  : 없음
  * History  : 2021.03.30 최초 작성
  */
-
  function checkDeployStatus(){ 
     /*
        가상머신 배포 및 클러스터 구성 상태를 세션 스토리지에서 조회 
@@ -484,7 +482,6 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  * Return  : 없음
  * History  : 2021.03.23 최초 작성
  */
-
  function showRibbon(status, description) {
     $('#ribbon').attr('class','pf-c-alert pf-m-'+status)
     if(status =='success'){
