@@ -106,6 +106,7 @@
                                                         <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host1-name" name="form-input-cloud-vm-failover-cluster-host1-name" required />
                                                     </div>
                                                 </div>
+                                                <!--
                                                 <div class="pf-c-form__group" style="padding:0px;">
                                                     <div class="pf-c-form__group-label">
                                                         <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host1-addr">
@@ -117,6 +118,7 @@
                                                         <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host1-addr" name="form-input-cloud-vm-failover-cluster-host1-addr" required />
                                                     </div>
                                                 </div>
+                                                -->
                                             </div>
                                         </div>
                                         <div class="pf-c-form__field-group">
@@ -139,6 +141,7 @@
                                                         <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host2-name" name="form-input-cloud-vm-failover-cluster-host2-name" required />
                                                     </div>
                                                 </div>
+                                                <!--
                                                 <div class="pf-c-form__group" style="padding:0px;">
                                                     <div class="pf-c-form__group-label">
                                                         <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host2-addr">
@@ -150,6 +153,7 @@
                                                         <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host2-addr" name="form-input-cloud-vm-failover-cluster-host2-addr" required />
                                                     </div>
                                                 </div>
+                                                -->
                                             </div>
                                         </div>
                                         <div class="pf-c-form__field-group">
@@ -172,6 +176,7 @@
                                                         <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host3-name" name="form-input-cloud-vm-failover-cluster-host3-name" required />
                                                     </div>
                                                 </div>
+                                                <!--
                                                 <div class="pf-c-form__group" style="padding:0px;">
                                                     <div class="pf-c-form__group-label">
                                                         <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host3-addr">
@@ -183,6 +188,7 @@
                                                         <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-cloud-vm-failover-cluster-host3-addr" name="form-input-cloud-vm-failover-cluster-host3-addr" required />
                                                     </div>
                                                 </div>
+                                                -->
                                             </div>
                                         </div>
                                     </section>
@@ -206,7 +212,7 @@
                                             </div>
                                             <div class="pf-c-form__group-control pf-m-inline">
                                                 <select class="pf-c-form-control" id="form-select-cloud-vm-compute-cpu-core" name="form-select-cloud-vm-compute-cpu-core" style="width:40%;">
-                                                    <option selected>선택하십시오</option>
+                                                    <option value="" selected>선택하십시오</option>
                                                     <option value="4">4 vCore</option>
                                                     <option value="8">8 vCore</option>
                                                 </select>
@@ -221,10 +227,10 @@
                                             </div>
                                             <div class="pf-c-form__group-control">
                                                 <select class="pf-c-form-control" id="form-select-cloud-vm-compute-memory" name="form-select-cloud-vm-compute-memory" style="width:40%;">
-                                                    <option selected>선택하십시오</option>
-                                                    <option value="16">8 GiB</option>
-                                                    <option value="32">16 GiB</option>
-                                                    <option value="64">32 GiB</option>
+                                                    <option value="" selected>선택하십시오</option>
+                                                    <option value="8">8 GiB</option>
+                                                    <option value="16">16 GiB</option>
+                                                    <option value="32">32 GiB</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -306,10 +312,6 @@
                                                     </div>
                                                     <div class="pf-c-form__group-control">
                                                         <select class="pf-c-form-control" id="form-select-cloud-vm-mngt-parent" name="form-select-cloud-vm-mngt-parent" style="width:40%;">
-                                                            <option selected>선택하십시오</option>
-                                                            <option value="16">cloud0</option>
-                                                            <option value="32">br0</option>
-                                                            <option value="64">br1</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -322,10 +324,6 @@
                                                     </div>
                                                     <div class="pf-c-form__group-control">
                                                         <select class="pf-c-form-control" id="form-select-cloud-vm-svc-parent" name="form-select-cloud-vm-svc-parent" style="width:40%;" disabled>
-                                                            <option selected>선택하십시오</option>
-                                                            <option value="16">cloud0</option>
-                                                            <option value="32">br0</option>
-                                                            <option value="64">br1</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -366,9 +364,10 @@
                                                 </label>
                                             </div>
                                             <div class="pf-c-form__group-control pf-m-inline">
-                                                <input class="pf-c-check__input" style="margin-top:12px;margin-right:5px" type="checkbox" id="form-input-cloud-vm-additional-file" name="form-input-cloud-vm-additional-file"/>
+                                                <input class="pf-c-check__input" style="margin-top:12px;margin-right:5px" type="checkbox" id="form-input-cloud-vm-additional-file" name="form-input-cloud-vm-additional-file" checked/>
                                                 <label class="pf-c-check__label" style="margin-top:8px;margin-left:0px" for="form-input-cloud-vm-additional-file">Hosts 파일 사용</label>
                                                 <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-hosts-file" name="form-input-cloud-vm-hosts-file"/>
+                                                <textarea class="pf-c-form-control" style="width:90%;height:120px;margin-top:10px" type="text" id="form-textarea-cloud-vm-hosts-file"></textarea>
                                             </div>
                                         </div>
                                         <div class="pf-c-form__group">
@@ -442,13 +441,26 @@
                                     <section class="pf-c-form__section">
                                         <div class="pf-c-form__group">
                                             <div class="pf-c-form__group-label">
-                                                <label class="pf-c-form__label" for="form-input-cloud-vm-ssh-key-file">
-                                                    <span class="pf-c-form__label-text">SSH Key 파일</span>
+                                                <label class="pf-c-form__label" for="form-input-cloud-vm-ssh-private-key-file">
+                                                    <span class="pf-c-form__label-text">SSH 개인 Key 파일</span>
                                                     <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                                 </label>
                                             </div>
                                             <div class="pf-c-form__group-control pf-m-inline">
-                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-key-file" name="form-input-cloud-vm-ssh-key-file"/>
+                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-private-key-file" name="form-input-cloud-vm-ssh-private-key-file"/>
+                                                <textarea class="pf-c-form-control" type="text" id="form-textarea-cloud-vm-ssh-private-key-file" hidden></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-cloud-vm-ssh-public-key-file">
+                                                    <span class="pf-c-form__label-text">SSH 공개 Key 파일</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-public-key-file" name="form-input-cloud-vm-ssh-public-key-file"/>
+                                                <textarea class="pf-c-form-control" type="text" id="form-textarea-cloud-vm-ssh-public-key-file" hidden></textarea>
                                             </div>
                                         </div>
                                     </section>
@@ -508,8 +520,8 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host1-name">ablestack1</span><br/>
-                                                        IP Address : <span id="span-cloud-vm-failover-cluster-host1-ipaddr">192.168.0.11</span>                                                   
+                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host1-name"></span><br/>
+                                                        <!--IP Address : <span id="span-cloud-vm-failover-cluster-host1-ipaddr">192.168.0.11</span>-->
                                                     </div>
                                                 </dd>
                                             </div>
@@ -519,9 +531,8 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host2-name">ablestack2</span><br/>
-                                                        IP Address : <span id="span-cloud-vm-failover-cluster-host2-ipaddr">192.168.0.12</span>                                                  
-                                                    </div>
+                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host2-name"></span><br/>
+                                                        <!--IP Address : <span id="span-cloud-vm-failover-cluster-host2-ipaddr">192.168.0.12</span>-->                                                    </div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
@@ -530,8 +541,8 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host3-name">ablestack3</span><br/>
-                                                        IP Address : <span id="span-cloud-vm-failover-cluster-host3-ipaddr">192.168.0.13</span>                                                   
+                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host3-name"></span><br/>
+                                                        <!--IP Address : <span id="span-cloud-vm-failover-cluster-host3-ipaddr">192.168.0.13</span>-->
                                                     </div>
                                                 </dd>
                                             </div>
@@ -557,7 +568,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <span id="span-cloud-vm-cpu-core">4 Cores</span>                                              
+                                                        <span id="span-cloud-vm-cpu-core"></span>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -567,7 +578,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <span id="span-cloud-vm-memory">8 GiB</span>                                               
+                                                        <span id="span-cloud-vm-memory"></span>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -577,7 +588,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <span id="span-cloud-vm-root-disk-size">70 GiB</span>                                                
+                                                        <span id="span-cloud-vm-root-disk-size">70 GiB</span>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -587,7 +598,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <span id="span-cloud-vm-network-config">관리네트워크, 서비스네트워크</span>                                                
+                                                        <span id="span-cloud-vm-network-config"></span>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -597,7 +608,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <span id="span-cloud-vm-mgmt-nic-bridge">br0</span>                                                
+                                                        <span id="span-cloud-vm-mgmt-nic-bridge"></span>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -607,7 +618,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <span id="span-cloud-vm-svc-nic-bridge">br1</span>                                                
+                                                        <span id="span-cloud-vm-svc-nic-bridge"></span>                                                
                                                     </div>
                                                 </dd>
                                             </div>
@@ -633,17 +644,29 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <span id="span-cloud-vm-additional-hosts-source">직접 입력</span>                                              
+                                                        <span id="span-cloud-vm-additional-hosts-source"></span>                                              
                                                     </div>
                                                 </dd>
                                             </div>
+
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Hosts 파일</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-additional-hosts-file"></span>                                              
+                                                    </div>
+                                                </dd>
+                                            </div>
+
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
                                                     <span class="pf-c-description-list__text">호스트명</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <span id="span-cloud-vm-additional-hostname">ablestack-temis</span>                                              
+                                                        <span id="span-cloud-vm-additional-hostname"></span>                                              
                                                     </div>
                                                 </dd>
                                             </div>
@@ -653,9 +676,9 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        IP Addr : <span id="span-cloud-vm-additional-mgmt-ipaddr">192.168.0.21/24</span><br/>      
-                                                        VLAN ID : <span id="span-cloud-vm-additional-mgmt-vlan-id">1001</span><br/>       
-                                                        Gateway : <span id="span-cloud-vm-additional-mgmt-gateway">192.168.0.1</span>                                           
+                                                        IP Addr : <span id="span-cloud-vm-additional-mgmt-ipaddr"></span><br/>      
+                                                        VLAN ID : <span id="span-cloud-vm-additional-mgmt-vlan-id"></span><br/>       
+                                                        Gateway : <span id="span-cloud-vm-additional-mgmt-gateway"></span>                                           
                                                     </div>
                                                 </dd>
                                             </div>
@@ -665,9 +688,9 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        IP Addr : <span id="span-cloud-vm-additional-svc-ipaddr">172.16.0.21/24</span><br/>      
-                                                        VLAN ID : <span id="span-cloud-vm-additional-svc-vlan-id">1001</span><br/>       
-                                                        Gateway : <span id="span-cloud-vm-additional-svc-gateway">172.16.0.1</span>                                           
+                                                        IP Addr : <span id="span-cloud-vm-additional-svc-ipaddr"></span><br/>      
+                                                        VLAN ID : <span id="span-cloud-vm-additional-svc-vlan-id"></span><br/>       
+                                                        Gateway : <span id="span-cloud-vm-additional-svc-gateway"></span>                                           
                                                     </div>
                                                 </dd>
                                             </div>
@@ -689,11 +712,21 @@
                                         <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text">SSH Key 파일</span>
+                                                    <span class="pf-c-description-list__text">SSH 개인 Key 파일</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <span id="span-cloud-vm-ssh-key-file">/Document/Files/ssh-key.key</span><br/>
+                                                        <span id="span-cloud-vm-ssh-private-key-file"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">SSH 공개 Key 파일</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-cloud-vm-ssh-public-key-file"></span><br/>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -703,50 +736,60 @@
                             </div>
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-deploy">
-                            <p>
-                                클라우드센터 가상머신을 배포 중입니다. 전체 00단계 중 00단계 진행 중입니다.  
+                            <p id='ccvm-progress-step-text'>
+                                클라우드센터 가상머신을 배포 중입니다. 전체 5단계 중 1단계 진행 중입니다.  
                             </p>
+
                             <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
-                                <span class="pf-c-label pf-m-blue">
+                                <span class="pf-c-label pf-m-blue" id="span-ccvm-progress-step1">
                                     <span class="pf-c-label__content">
                                         <span class="pf-c-label__icon">
                                             <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
-                                        </span>준비중
+                                        </span><p>준비중</p>
                                     </span>
                                 </span>
-                                <span class="pf-c-label__content" style="margin-left:4px">가상머신 설정 파일 생성</span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성 HOST 네트워크 연결 테스트</span>
                             </div>
-                            <div class="pf-c-content" style="margin-top:15px;margin-left:15px">
-                                <span class="pf-c-label pf-m-green">
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-ccvm-progress-step2">
                                     <span class="pf-c-label__content">
                                         <span class="pf-c-label__icon">
-                                            <i class="fas fa-fw fa-check-circle" aria-hidden="true"></i>
-                                        </span>완료됨
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
                                     </span>
                                 </span>
-                                <span class="pf-c-label__content" style="margin-left:4px">클라우드센터 가상머신 생성</span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성 설정 초기화 작업</span>
                             </div>
-                            <div class="pf-c-content" style="margin-top:15px;margin-left:15px">
-                                <span class="pf-c-label pf-m-orange">
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-ccvm-progress-step3">
                                     <span class="pf-c-label__content">
                                         <span class="pf-c-label__icon">
-                                            <i class="fas fa-fw fa-play" aria-hidden="true"></i>
-                                        </span>진행중
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
                                     </span>
                                 </span>
-                                <span class="pf-c-label__content" style="margin-left:4px">클라우드센터 가상머신 시작</span>
+                                <span class="pf-c-label__content" style="margin-left:4px">cloudinit iso 파일 생성</span>
                             </div>
-                            <div class="pf-c-content" style="margin-top:15px;margin-left:15px">
-                                <span class="pf-c-label pf-m-red">
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-ccvm-progress-step4">
                                     <span class="pf-c-label__content">
                                         <span class="pf-c-label__icon">
-                                            <i class="fas fa-fw fa-exclamation-circle" aria-hidden="true"></i>
-                                        </span>중단됨
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
                                     </span>
                                 </span>
-                                <span class="pf-c-label__content" style="margin-left:4px">클라우드센터 가상머신 설정</span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클라우드센터 가상머신 구성</span>
                             </div>
-                        </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-ccvm-progress-step5">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성 및 클라우드센터 가상머신 배포</span>
+                            </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-finish">
                             <div class="pf-c-content">
                                 <p>
@@ -776,7 +819,7 @@
     </div>
 </div>
 
-
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+<script src="./src/common/wizard-common.js"></script>
 <script src="./src/features/cloud-vm-wizard.js"></script>
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
