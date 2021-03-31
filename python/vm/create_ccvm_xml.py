@@ -93,6 +93,7 @@ def createSecretKey(host_names):
         ecret_set_value_cmd = 'virsh secret-set-value --secret 11111111-1111-1111-1111-111111111111 --base64 ' + ceph_admin_key[0].decode()
 
         if secret_val[0].decode() == '': # secret이 정의되어 있지 않으면 생성
+
             subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-define /var/lib/libvirt/ablestack/vm/ccvm/secret.xml'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd=ecret_set_value_cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
         else: # secret이 정의되어 있으면 삭제후 재생성
@@ -168,6 +169,7 @@ def createCcvmXml(args):
 
         #작업파일 지우기
         os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/ccvm-temp.xml /var/lib/libvirt/ablestack/vm/ccvm/ccvm.xml.bak /var/lib/libvirt/ablestack/vm/ccvm/ccvm-temp.xml.bak")
+
         # 결과값 리턴
         return createReturn(code=200, val={})        
 

@@ -537,6 +537,7 @@ function deployCloudCenterVM() {
 
     //=========== 1. 클러스터 구성 host 네트워크 연결 테스트 ===========
     setProgressStep("span-ccvm-progress-step1",1);
+
     var host_ping_test_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/host_ping_test.py', '-hns', host1_name, host2_name, host3_name];
     cockpit.spawn(host_ping_test_cmd)
         .then(function(data){
@@ -582,7 +583,6 @@ function deployCloudCenterVM() {
                                 create_ccvm_cloudinit_cmd.push('--sn-ip',sn_ip,'--sn-prefix',sn_prefix,'--sn-gw',sn_gw)
                             }
 
-                            console.log(create_ccvm_cloudinit_cmd)
                             cockpit.spawn(create_ccvm_cloudinit_cmd)
                                 .then(function(data){
                                     //결과 값 json으로 return

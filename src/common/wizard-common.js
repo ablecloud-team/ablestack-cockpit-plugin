@@ -183,6 +183,7 @@ function setSshKeyFileReader(input, callBackFunction) {
                 $('#ccvm-progress-step-text').text('클라우드센터 가상머신을 배포 중입니다. 전체 5단계 중 4단계 진행 중입니다.');
             } else if(span.attr('id') == "span-ccvm-progress-step5"){
                 $('#ccvm-progress-step-text').text('클라우드센터 가상머신을 배포 중입니다. 전체 5단계 중 5단계 진행 중입니다.');
+
             }
 
             span.addClass('pf-m-orange');

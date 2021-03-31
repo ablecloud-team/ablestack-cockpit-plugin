@@ -44,6 +44,7 @@ def resetCloud(args):
 
     #=========== pcs cluster 구성 ===========
     # ceph 이미지 등록
+
     os.system("qemu-img convert -f qcow2 -O rbd /var/lib/libvirt/images/centos8-template.qcow2 rbd:rbd/ccvm")
 
     # 클러스터 구성

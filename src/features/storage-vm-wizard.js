@@ -138,7 +138,6 @@ $('#button-next-step-modal-wizard-vm-config').on('click', function(){
     }
     else if (cur_step_wizard_vm_config == "7") {
         if(validateStorageVm()){
-
             // 배포 버튼을 누르면 배포 진행 단계로 이동한다.
             hideAllMainBody();
             resetCurrentMode();
@@ -545,6 +544,7 @@ function deployStorageCenterVM() {
                                                 var result = JSON.parse(data);
                                                 if(result.code=="200"){
                                                     seScvmProgressStep("span-progress-step4",2);
+
                                                     //최종 화면 호출
                                                     showDivisionVMConfigFinish();
                                                 } else {
