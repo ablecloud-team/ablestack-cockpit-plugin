@@ -1,4 +1,11 @@
+'''
+Copyright (c) 2021 ABLECLOUD Co. Ltd
+설명 : 장애조치 클러스터를 구성하고 클라우드센터 가상머신을 배포하는 프로그램
+최초 작성일 : 2021. 03. 31
+'''
+
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import argparse
 import logging

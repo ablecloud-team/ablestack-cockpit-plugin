@@ -1,4 +1,11 @@
+'''
+Copyright (c) 2021 ABLECLOUD Co. Ltd
+설명 : 스토리지센터 가상머신에 사용할 cloudinit iso를 생성하는 프로그램
+최초 작성일 : 2021. 03. 31
+'''
+
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import argparse
 import logging

@@ -1,4 +1,11 @@
+'''
+Copyright (c) 2021 ABLECLOUD Co. Ltd
+설명 : 장애조치 클러스터를 구성할 1,2,3호스트에 클라우드센터 가상머신 xml과 secret key를 생성하는 프로그램
+최초 작성일 : 2021. 03. 31
+'''
+
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import argparse
 import logging
@@ -17,7 +24,7 @@ def createArgumentParser():
     '''
     # 참조: https://docs.python.org/ko/3/library/argparse.html
     # 프로그램 설명
-    parser = argparse.ArgumentParser(description='클라우드센터 가상머신 xml 생성하는 프로그램',
+    parser = argparse.ArgumentParser(description='장애조치 클러스터를 구성할 1,2,3호스트에 클라우드센터 가상머신 xml과 secret key를 생성하는 프로그램',
                                         epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™',
                                         usage='%(prog)s arguments')
 

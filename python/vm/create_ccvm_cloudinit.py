@@ -1,5 +1,11 @@
-#!/usr/bin/env python3
+'''
+Copyright (c) 2021 ABLECLOUD Co. Ltd
+설명 : 클라우드센터 가상머신에 사용할 cloudinit iso를 생성하는 프로그램
+최초 작성일 : 2021. 03. 31
+'''
 
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import argparse
 import logging
 import json
@@ -16,7 +22,7 @@ def createArgumentParser():
     '''
     # 참조: https://docs.python.org/ko/3/library/argparse.html
     # 프로그램 설명
-    parser = argparse.ArgumentParser(description='클라우드 센터를 초기화하는 프로그램',
+    parser = argparse.ArgumentParser(description='클라우드센터 가상머신에 사용할 cloudinit iso를 생성하는 프로그램',
                                         epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™',
                                         usage='%(prog)s arguments')
 
