@@ -531,14 +531,12 @@ function deployCloudCenterVM() {
     $('#button-before-step-modal-wizard-cloud-vm').attr('disabled', true);
     $('#button-cancel-config-modal-wizard-cloud-vm').attr('disabled', false);
 
-
     var host1_name = $('#form-input-cloud-vm-failover-cluster-host1-name').val();
     var host2_name = $('#form-input-cloud-vm-failover-cluster-host2-name').val();
     var host3_name = $('#form-input-cloud-vm-failover-cluster-host3-name').val();
-    var host_array = [host1_name,host2_name,host3_name];
 
     //=========== 1. 클러스터 구성 host 네트워크 연결 테스트 ===========
-    setProgressStep("span-progress-step1",1);
+    setProgressStep("span-ccvm-progress-step1",1);
     var host_ping_test_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/host_ping_test.py', '-hns', host1_name, host2_name, host3_name];
     cockpit.spawn(host_ping_test_cmd)
         .then(function(data){
@@ -547,8 +545,8 @@ function deployCloudCenterVM() {
             if(ping_test_result.code=="200") { //정상
                 //=========== 2. 클러스터 구성 설정 초기화 작업 ===========
                 // 설정 초기화 ( 필요시 python까지 종료 )
-                setProgressStep("span-progress-step1",2);
-                setProgressStep("span-progress-step2",1);
+                setProgressStep("span-ccvm-progress-step1",2);
+                setProgressStep("span-ccvm-progress-step2",1);
                 var reset_cloud_center_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/reset_cloud_center.py'];
                 cockpit.spawn(reset_cloud_center_cmd)
                     .then(function(data){
@@ -556,22 +554,43 @@ function deployCloudCenterVM() {
                         var reset_cloud_center_result = JSON.parse(data);
                         if(reset_cloud_center_result.code=="200") { //정상
                             //=========== 3. cloudinit iso 파일 생성 ===========
-                            // host 파일 /opt/ablestack/vm/ccvm/cloudinit 경로에 hosts, ssh key 파일 저장
-                            setProgressStep("span-progress-step2",2);
-                            setProgressStep("span-progress-step3",1);
-                            var create_ccvm_cloudinit = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/create_ccvm_cloudinit.py'
-                                                    ,"-f1","/opt/ablestack/vm/ccvm/hosts","-t1", $("#form-textarea-cloud-vm-hosts-file").val() // hosts 파일
-                                                    ,"-f2","/opt/ablestack/vm/ccvm/ablecloud","-t2", $("#form-textarea-cloud-vm-ssh-private-key-file").val() // ssh 개인 key 파일
-                                                    ,"-f3","/opt/ablestack/vm/ccvm/ablecloud.pub","-t3", $("#form-textarea-cloud-vm-ssh-public-key-file").val()]; // ssh 공개 key 파일
+                            // host 파일 /var/lib/libvirt/ablestack/vm/ccvm/cloudinit 경로에 hosts, ssh key 파일 저장
+                            setProgressStep("span-ccvm-progress-step2",2);
+                            setProgressStep("span-ccvm-progress-step3",1);
 
-                            cockpit.spawn(create_ccvm_cloudinit)
+                            var host_name = $('#form-input-cloud-vm-hostname').val();
+                            var mgmt_ip = $('#form-input-cloud-vm-mngt-nic-ip').val().split("/")[0];
+                            var mgmt_prefix = $('#form-input-cloud-vm-mngt-nic-ip').val().split("/")[1];
+                            var mngt_gw = $('#form-input-cloud-vm-mngt-gw').val();
+                            
+                            create_ccvm_cloudinit_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/create_ccvm_cloudinit.py'
+                                                    ,"-f1","/var/lib/libvirt/ablestack/vm/ccvm/hosts","-t1", $("#form-textarea-cloud-vm-hosts-file").val() // hosts 파일
+                                                    ,"-f2","/var/lib/libvirt/ablestack/vm/ccvm/ablecloud","-t2", $("#form-textarea-cloud-vm-ssh-private-key-file").val() // ssh 개인 key 파일
+                                                    ,"-f3","/var/lib/libvirt/ablestack/vm/ccvm/ablecloud.pub","-t3", $("#form-textarea-cloud-vm-ssh-public-key-file").val() // ssh 공개 key 파일
+                                                    ,'--hostname',host_name
+                                                    , '-hns', host1_name, host2_name, host3_name
+                                                    ,'--mgmt-ip',mgmt_ip
+                                                    ,'--mgmt-prefix',mgmt_prefix
+                                                    ,'--mgmt-gw',mngt_gw
+                                                ];
+                            
+                            var svc_bool = $('input[type=checkbox][id="form-checkbox-svc-network"]').is(":checked");
+                            if(svc_bool){
+                                var sn_ip = $('#form-input-cloud-vm-svc-nic-ip').val().split("/")[0];
+                                var sn_prefix = $('#form-input-cloud-vm-svc-nic-ip').val().split("/")[1];
+                                var sn_gw = $('#form-input-cloud-vm-svc-gw').val();
+                                create_ccvm_cloudinit_cmd.push('--sn-ip',sn_ip,'--sn-prefix',sn_prefix,'--sn-gw',sn_gw)
+                            }
+
+                            console.log(create_ccvm_cloudinit_cmd)
+                            cockpit.spawn(create_ccvm_cloudinit_cmd)
                                 .then(function(data){
                                     //결과 값 json으로 return
                                     var create_ccvm_cloudinit_result = JSON.parse(data);
                                     if(create_ccvm_cloudinit_result.code=="200"){
                                         //=========== 4. 클라우드센터 가상머신 구성 ===========
-                                        setProgressStep("span-progress-step3",2);
-                                        setProgressStep("span-progress-step4",1);
+                                        setProgressStep("span-ccvm-progress-step3",2);
+                                        setProgressStep("span-ccvm-progress-step4",1);
                                         xml_create_cmd.push("-hns",host1_name,host2_name,host3_name);
                                         cockpit.spawn(xml_create_cmd)
                                             .then(function(data){
@@ -580,16 +599,17 @@ function deployCloudCenterVM() {
                                                 if(create_ccvm_xml_result.code=="200"){
                                                     //=========== 5. 클러스터 구성 및 클라우드센터 가상머신 배포 ===========
                                                     //클러스터 생성
-                                                    setProgressStep("span-progress-step4",2);
-                                                    setProgressStep("span-progress-step5",1);
+                                                    setProgressStep("span-ccvm-progress-step4",2);
+                                                    setProgressStep("span-ccvm-progress-step5",1);
                                                     var pcs_config = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/setup_pcs_cluster.py', '-hns', host1_name, host2_name, host3_name];
                                                     cockpit.spawn(pcs_config)
                                                         .then(function(data){
                                                             //결과 값 json으로 return
                                                             var result = JSON.parse(data);
                                                             if(result.code=="200"){
-                                                                setProgressStep("span-progress-step5",2);
-
+                                                                setProgressStep("span-ccvm-progress-step5",2);
+                                                                //최종 화면 호출
+                                                                showDivisionCloudVMConfigFinish();
                                                             } else {
                                                                 setProgressFail(5);
                                                                 alert(pcs_config.val);            
@@ -607,12 +627,7 @@ function deployCloudCenterVM() {
                                             .catch(function(data){
                                                 setProgressFail(4);
                                                 alert("클라우드센터 가상머신 XML 생성 실패 : "+data);
-                                            });
-
-                                        //secret key는 미리 호스트 /opt/ablestack/vm/secretkey에 secret.xml로 저장한다고 가정하고 생략
-
-                                        //secret key 명령 수행
-                                        
+                                            });                                        
                                     } else {
                                         setProgressFail(3);
                                         alert(create_ccvm_cloudinit_result.val);
@@ -642,16 +657,6 @@ function deployCloudCenterVM() {
             setProgressFail(1);
             alert("클러스터 구성할 host 연결 상태 확인 실패 : "+data);
         });
-
-
-    /*
-    
-    // 3대의 host의 '/opt/ablestack/vm/ccvm/ccvm.xml'에 cloudinit 부분 삭제 또는 동일한 iso 복제
-
-    // 클라우드센터 가상머신 mngt ip로 ping 테스트 작업 완료여부 판단.
-
-    // showDivisionCloudVMConfigFinish();
-    */
 }
 
 /**
@@ -665,25 +670,25 @@ function deployCloudCenterVM() {
  */
 function setProgressFail(setp_num){
     if( setp_num == 1 || setp_num == '1' ){   // 1단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step1",3);
-        setProgressStep("span-progress-step2",3);
-        setProgressStep("span-progress-step3",3);
-        setProgressStep("span-progress-step4",3);
-        setProgressStep("span-progress-step5",3);
+        setProgressStep("span-ccvm-progress-step1",3);
+        setProgressStep("span-ccvm-progress-step2",3);
+        setProgressStep("span-ccvm-progress-step3",3);
+        setProgressStep("span-ccvm-progress-step4",3);
+        setProgressStep("span-ccvm-progress-step5",3);
     } else if(setp_num == 2 || setp_num == '2') {   // 2단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step2",3);
-        setProgressStep("span-progress-step3",3);
-        setProgressStep("span-progress-step4",3);
-        setProgressStep("span-progress-step5",3);
+        setProgressStep("span-ccvm-progress-step2",3);
+        setProgressStep("span-ccvm-progress-step3",3);
+        setProgressStep("span-ccvm-progress-step4",3);
+        setProgressStep("span-ccvm-progress-step5",3);
     } else if(setp_num == 3 || setp_num == '3') {   // 3단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step3",3);
-        setProgressStep("span-progress-step4",3);
-        setProgressStep("span-progress-step5",3);
+        setProgressStep("span-ccvm-progress-step3",3);
+        setProgressStep("span-ccvm-progress-step4",3);
+        setProgressStep("span-ccvm-progress-step5",3);
     } else if(setp_num == 4 || setp_num == '4') {   // 4단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step4",3);
-        setProgressStep("span-progress-step5",3);
+        setProgressStep("span-ccvm-progress-step4",3);
+        setProgressStep("span-ccvm-progress-step5",3);
     } else if(setp_num == 5 || setp_num == '5') {   // 5단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step5",3);
+        setProgressStep("span-ccvm-progress-step5",3);
     }
 }
 
@@ -970,7 +975,7 @@ function setCcvmReviewInfo(){
     //관리 VLAN ID
     var ccvm_mngt_vlan_id = $('#form-input-cloud-vm-mngt-vlan').val();
     if(ccvm_mngt_vlan_id == '') {
-        $('#span-cloud-vm-additional-mgmt-vlan-id').text("미입력");
+        $('#span-cloud-vm-additional-mgmt-vlan-id').text("N/A");
     } else {
         $('#span-cloud-vm-additional-mgmt-vlan-id').text(ccvm_mngt_vlan_id);
     }
@@ -995,7 +1000,7 @@ function setCcvmReviewInfo(){
         //서비스 VLAN ID
         var ccvm_svc_vlan_id = $('#form-input-cloud-vm-svc-vlan').val();
         if(ccvm_svc_vlan_id == '') {
-            $('#span-cloud-vm-additional-svc-vlan-id').text("미입력");
+            $('#span-cloud-vm-additional-svc-vlan-id').text("N/A");
         } else {
             $('#span-cloud-vm-additional-svc-vlan-id').text(ccvm_svc_vlan_id);
         }
