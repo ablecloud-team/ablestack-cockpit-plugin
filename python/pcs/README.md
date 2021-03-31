@@ -83,6 +83,13 @@ python3 main.py remove --resource cloudcenter_res
 ![pcs_cluster](https://github.com/ablecloud-team/ablecloud-homepage/blob/master/wiki-img/pcs-readme-10.png?raw=true)
 
 
+#### pcs cluster destroy
+```
+python3 main.py destroy
+```
+![pcs_cluster](https://github.com/ablecloud-team/ablecloud-homepage/blob/master/wiki-img/pcs-readme-16.png?raw=true)
+
+
 #### pcs resource status
 ```
 python3 main.py status --resource cloudcenter_res
@@ -93,6 +100,11 @@ python3 main.py status --resource cloudcenter_res
 ##### 정지 상태
 ![pcs_cluster](https://github.com/ablecloud-team/ablecloud-homepage/blob/master/wiki-img/pcs-readme-12.png?raw=true)
 
+##### 클러스터가 구성되지 않은 경우
+![pcs_cluster](https://github.com/ablecloud-team/ablecloud-homepage/blob/master/wiki-img/pcs-readme-17.png?raw=true)
+
+##### 리소스가 생성되지 않은 경우
+![pcs_cluster](https://github.com/ablecloud-team/ablecloud-homepage/blob/master/wiki-img/pcs-readme-18.png?raw=true)
 
 ### resource 2개 이상
 #### pcs resource 추가 생성
