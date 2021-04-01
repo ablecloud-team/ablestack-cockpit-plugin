@@ -10,7 +10,7 @@ assignees: ''
 **Bug 개요**
 Bug에 대한 설명
 
-**Bug 발생 경위 **
+**Bug 발생 경위**
 Bug가 발생하게된 경위(재현하기 위한 절차):
 1. Go to '...'
 2. Click on '....'
