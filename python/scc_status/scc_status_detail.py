@@ -71,19 +71,23 @@ def statusDetail():
             output_json = json.loads(output)
             '''스토리지 클러스터 상태'''
             cluster_status= output_json['health']['status']
+            '''mon 갯수'''
+            mon_gw1= output_json['monmap']['num_mons']
+            '''mon quorum list'''
+            mon_gw2= output_json['quorum_names']
+            '''디스크 갯수'''
+            osd= output_json['osdmap']['num_osds']
+            '''작동중 디스크 갯수'''
+            osd_up= output_json['osdmap']['num_up_osds']
+            '''풀 갯수'''
+            pools= output_json['pgmap']['num_pools']
         else :
             cluster_status= "no signal"
-
-        '''mon 갯수'''
-        mon_gw1= output_json['monmap']['num_mons']
-        '''mon quorum list'''
-        mon_gw2= output_json['quorum_names']
-        '''디스크 갯수'''
-        osd= output_json['osdmap']['num_osds']
-        '''작동중 디스크 갯수'''
-        osd_up= output_json['osdmap']['num_up_osds']
-        '''풀 갯수'''
-        pools= output_json['pgmap']['num_pools']
+            mon_gw1 = "undefine"
+            mon_gw2 = "undefine"
+            osd=  "undefine"
+            osd_up = "undefine"
+            pools = "undefine"
 
         ''' 클러스터 MGR Daemon값 체크 0 이면 정상, 아니면 undefine '''
         rc = call(['ceph mgr stat'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
