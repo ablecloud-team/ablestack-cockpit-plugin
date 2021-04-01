@@ -246,7 +246,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  */
  function checkStorageClusterStatus(){
     return new Promise((resolve) => {
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_detail.py", "detail" ])
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scc_status/scc_status_detail.py", "detail" ])
         .then(function(data){
             var retVal = JSON.parse(data);
             sessionStorage.setItem("sc_status", retVal.val.cluster_status); //스토리지 클러스터 상태값 세션스토리지에 저장
@@ -269,10 +269,8 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
             }else if(retVal.val.cluster_status == "HEALTH_ERR"){
                 $("#scc-cluster-css").attr('class','pf-c-label pf-m-red');
                 $("#scc-cluster-icon").attr('class','fas fa-fw fa-exclamation-triangle');            
-            }else{
-                $("#scc-cluster-css").attr('class','pf-c-label');
-                $("#scc-cluster-icon").attr('class','fas fa-fw fa-times-circle');            
             }
+            
             //json으로 넘겨 받은 값들 세팅
             $('#scc-status').text(retVal.val.cluster_status);
             $('#scc-osd').text("전체 " + retVal.val.osd + "개의 디스크 중 " + retVal.val.osd_up + "개 작동 중");
@@ -281,7 +279,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
             $('#scc-pools').text(retVal.val.pools + " pools");
             $('#scc-usage').text("전체 " + retVal.val.avail + " 중 " +retVal.val.used + " 사용 중 (사용률 " + retVal.val.usage_percentage+ " %)" );
             // 스토리지 클러스터 미배포 상태일경우 display세팅
-            if(retVal.val.cluster_status == "no signal"){
+            if(retVal.val.cluster_status == "HEALTH_ERR"){
                 $('#scc-status-check').text("스토리지센터 클러스터가 구성되지 않았습니다.");            
                 $('#scc-status-check').attr("style","color: var(--pf-global--danger-color--100)");
                 $("#menu-item-linkto-storage-center").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
@@ -316,7 +314,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  */
  function checkStorageVmStatus(){
     return new Promise((resolve) => {
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_detail.py", "detail" ])
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_detail.py", "detail" ])
         .then(function(data){        
             var retVal = JSON.parse(data);
             sessionStorage.setItem("scvm_status", retVal.val.scvm_status);//스트리지센터 가상머신 상태값 세션스토리지에 저장
@@ -334,8 +332,9 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
             $('#scvm-storage-replication-nic-type').text("복제용 NIC Type : " + retVal.val.storageReplicationNicType + " (Parent : " + retVal.val.storageReplicationNicParent + ")");
             $('#scvm-storage-replication-nic-ip').text("복제용 IP : " + retVal.val.storageReplicationNicIp);
             $('#scvm-storage-datadisk-type').text("Disk Type : " + retVal.val.dataDiskType);
+            
             // 스토리지센터 가상머신 미배포 상태일경우 display세팅
-            if(retVal.val.scvm_status == "no signal"){
+            if(retVal.val.scvm_status == "HEALTH_ERR"){
                 $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되지 않았습니다.");            
                 $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--danger-color--100)");
                 $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
@@ -344,6 +343,53 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                 $('#scvm-deploy-status-check').attr("style","color: var(--pf-global--success-color--100)");
                 $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item');            
             }
+
+
+
+
+            
+            
+            if(sessionStorage.getItem("sc_status") == "HEALTH_ERR"){                
+                if(retVal.val.scvm_status == "running"){
+                    $("#scvm-css").attr('class','pf-c-label pf-m-green');
+                    $("#scvm-icon").attr('class','fas fa-fw fa-check-circle'); 
+                    if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true" ){
+
+
+
+                    }else{
+
+
+
+                    }
+                }else{
+
+
+
+                }
+            }else{
+                if(retVal.val.scvm_status == "HEALTH_ERR"){
+                    if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true" ){
+
+
+
+                    }else{
+
+
+                        
+                    }
+                }else{
+
+
+
+                }
+            }
+
+
+
+
+
+
             //스토리지 센터 가상머신 toggle세팅
             if(retVal.val.scvm_status == "running"){ //가상머신 상태가 running일 경우
                 $("#scvm-css").attr('class','pf-c-label pf-m-green');
@@ -381,7 +427,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
             resolve();
         });
         //스토리지 클러스터 배포 여부 확인 후 스토리지센터 가상머신 삭제 버튼 disabled 여부 세팅
-        if(sessionStorage.getItem("sc_status") == "no signal"){
+        if(sessionStorage.getItem("sc_status") == "HEALTH_ERR"){
             $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item');
         }else{
             $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
@@ -403,10 +449,10 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
     /*
        가상머신 배포 및 클러스터 구성 상태를 세션 스토리지에서 조회 
        - 클러스터 구성준비 상태 = false, true
-       - 스토리지센터 가상머신 상태 = no signal(배포x), RUNNING, SHUT OFF 등 
-       - 스토리지센터 클러스터 상태 = no signal(구성x), HEALTH_OK, HEALTH_WARN 등 
+       - 스토리지센터 가상머신 상태 = HEALTH_ERR(배포x), RUNNING, SHUT OFF 등 
+       - 스토리지센터 클러스터 상태 = HEALTH_ERR(구성x), HEALTH_OK, HEALTH_WARN 등 
        - 클라우드센터 클러스터 상태 = HEALTH_ERR1(구성x), HEALTH_ERR2(리소스 구성x), HEALTH_OK
-       - 클라우드센터 가상머신 상태 = no signal(배포x), RUNNING, SHUT OFF 등 
+       - 클라우드센터 가상머신 상태 = HEALTH_ERR(배포x), RUNNING, SHUT OFF 등 
     */
     const step1 = sessionStorage.getItem("ccfg_status"); 
     const step2 = sessionStorage.getItem("scvm_status"); 
@@ -420,13 +466,13 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         $('#button-open-modal-wizard-storage-cluster').show()
         showRibbon('warning','스토리지센터 및 클라우드센터 VM이 배포되지 않았습니다. 클러스터 구성준비를 진행하십시오.')
     }else{
-        if(step2=="no signal"||step2==null){
+        if(step2=="HEALTH_ERR"||step2==null){
             // 클러스터 구성준비 버튼, 스토리지센터 VM 배포 버튼 show
             $('#button-open-modal-wizard-storage-cluster').show()
             $('#button-open-modal-wizard-storage-vm').show()
             showRibbon('warning','스토리지센터 및 클라우드센터 VM이 배포되지 않았습니다. 스토리지센터 VM 배포를 진행하십시오.')
         }else{
-            if(step3=="no signal"||step3==null){
+            if(step3=="HEALTH_ERR"||step3==null){
                 // 스토리지센터 연결 버튼 show
                 $('#button-open-modal-wizard-cloud-vm').show()
                 $('#button-link-storage-center-dashboard').show()
@@ -442,7 +488,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                         showRibbon('warning','클라우드센터 클러스터는 구성되었으나 리소스 구성이 되지 않았습니다. 리소스 구성을 진행하십시오.')
                     }
                 }else{
-                    if(step5=="no signal"||step5==null){
+                    if(step5=="HEALTH_ERR"||step5==null){
                         //클라우드센터 VM 배포 버튼, 스토리지센터 연결 버튼 show
                         $('#button-open-modal-wizard-cloud-vm').show()
                         $('#button-link-storage-center-dashboard').show()
