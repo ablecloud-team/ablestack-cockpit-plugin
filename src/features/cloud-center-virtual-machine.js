@@ -244,7 +244,7 @@ class CloudCenterVirtualMachine {
     checkCCVM() {
 
         cockpit.spawn(['/usr/bin/python3',
-            '/usr/share/cockpit/ablestack/python/pcs/main.py',
+            pluginpath + '/python/pcs/main.py',
             'status', '--resource', ccvm_instance.resource], {'host': 'localhost'})
             .then(ccvm_instance.checkPCSOK)
             .catch(ccvm_instance.checkPCSERR)

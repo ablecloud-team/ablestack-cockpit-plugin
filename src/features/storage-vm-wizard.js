@@ -648,7 +648,7 @@ function deployStorageCenterVM() {
     //=========== 1. 스토리지센터 가상머신 초기화 작업 ===========
     // 설정 초기화 ( 필요시 python까지 종료 )
     seScvmProgressStep("span-progress-step1",1);
-    var reset_storage_center_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/reset_storage_center.py'];
+    var reset_storage_center_cmd = ['python3', pluginpath + '/python/vm/reset_storage_center.py'];
     cockpit.spawn(reset_storage_center_cmd)
         .then(function(data){
             //결과 값 json으로 return
@@ -668,7 +668,7 @@ function deployStorageCenterVM() {
                 var cn_ip = $('#form-input-storage-vm-cluster-ip').val().split("/")[0];
                 var cn_prefix = $('#form-input-storage-vm-cluster-ip').val().split("/")[1];
                 
-                var create_scvm_cloudinit_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/create_scvm_cloudinit.py'
+                var create_scvm_cloudinit_cmd = ['python3', pluginpath + '/python/vm/create_scvm_cloudinit.py'
                                         ,"-f1","/var/lib/libvirt/ablestack/vm/scvm/hosts","-t1", $("#form-textarea-storage-vm-hosts-file").val() // hosts 파일
                                         ,"-f2","/var/lib/libvirt/ablestack/vm/scvm/ablecloud","-t2", $("#form-textarea-storage-vm-ssh-private-key-file").val() // ssh 개인 key 파일
                                         ,"-f3","/var/lib/libvirt/ablestack/vm/scvm/ablecloud.pub","-t3", $("#form-textarea-storage-vm-ssh-public-key-file").val() // ssh 공개 key 파일
@@ -699,7 +699,7 @@ function deployStorageCenterVM() {
                                         //클러스터 생성
                                         seScvmProgressStep("span-progress-step3",2);
                                         seScvmProgressStep("span-progress-step4",1);
-                                        var pcs_config = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/setup_storage_vm.py'];
+                                        var pcs_config = ['python3', pluginpath + '/python/vm/setup_storage_vm.py'];
                                         cockpit.spawn(pcs_config)
                                             .then(function(data){
                                                 //결과 값 json으로 return
