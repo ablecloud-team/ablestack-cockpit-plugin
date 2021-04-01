@@ -106,21 +106,25 @@ def statusDeteil():
             rdisk = 'N/A'        
         
         '''scvm 관리 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
-        '''임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp0s20)'''
-        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s20'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
+        rc = call(["cat /etc/hosts | grep scvm-mngt"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:
-            '''scvm 관리 nic 정보 확인'''
-            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s20'"], universal_newlines=True, shell=True, env=env)
-            manageNicMacAddr = ' '.join(output.split()).split()[1]
-            manageNicIp = ' '.join(output.split()).split()[3]
-            '''관리 nic mac address로 추가 정보 확인, 리턴값 0이면 정상, 아니면 비정상'''
-            rc = call(["virsh domiflist --domain scvm | grep " + manageNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)            
-            if rc == 0: 
-                '''관리 nic mac address로 추가 정보 확인'''
-                output = check_output(["virsh domiflist --domain scvm | grep " + manageNicMacAddr], universal_newlines=True, shell=True, env=env)
-                manageNicParent = ' '.join(output.split()).split()[2]   
-                manageNicType = ' '.join(output.split()).split()[3]
-            else :                
+            output = check_output(["cat /etc/hosts | grep scvm-mngt"], universal_newlines=True, shell=True, env=env)
+            manageNicIp = output.split(' ')[0]
+            rc = call(["virsh domifaddr --domain scvm --source agent --full | grep " + manageNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            if rc == 0:
+                output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep " + manageNicIp], universal_newlines=True, shell=True, env=env)
+                manageNicMacAddr = ' '.join(output.split()).split()[1]
+                rc = call(["virsh domiflist --domain scvm | grep " + manageNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)            
+                if rc == 0: 
+                    '''관리 nic mac address로 추가 정보 확인'''
+                    output = check_output(["virsh domiflist --domain scvm | grep " + manageNicMacAddr], universal_newlines=True, shell=True, env=env)
+                    manageNicParent = ' '.join(output.split()).split()[2]   
+                    manageNicType = ' '.join(output.split()).split()[3]
+                else :                
+                    manageNicParent = 'N/A'
+                    manageNicType = 'N/A'
+            else :
+                manageNicMacAddr = 'N/A'
                 manageNicParent = 'N/A'
                 manageNicType = 'N/A'
         else :
@@ -130,21 +134,25 @@ def statusDeteil():
             manageNicType = 'N/A'
 
         '''scvm 서버용 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
-        '''임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp0s21)'''
-        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s21|bond0'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)       
+        rc = call(["cat /etc/hosts | grep scvm$"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:
-            '''scvm 서버용 nic 정보 확인'''
-            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s21|bond0'"], universal_newlines=True, shell=True, env=env)
-            storageServerNicMacAddr = ' '.join(output.split()).split()[1]
-            storageServerNicIp = ' '.join(output.split()).split()[3]            
-            '''서버용 nic mac address로 추가 정보 확인, 리턴값 0이면 정상, 아니면 비정상'''
-            rc = call(["virsh domiflist --domain scvm | grep " + storageServerNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)            
+            output = check_output(["cat /etc/hosts | grep scvm$"], universal_newlines=True, shell=True, env=env)
+            storageServerNicIp = output.split(' ')[0]
+            rc = call(["virsh domifaddr --domain scvm --source agent --full | grep " + storageServerNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             if rc == 0:
-                '''서버용 nic mac address로 추가 정보 확인'''
-                output = check_output(["virsh domiflist --domain scvm | grep " + storageServerNicMacAddr], universal_newlines=True, shell=True, env=env)
-                storageServerNicParent = ' '.join(output.split()).split()[2]
-                storageServerNicType = ' '.join(output.split()).split()[3]
+                output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep " + storageServerNicIp], universal_newlines=True, shell=True, env=env)
+                storageServerNicMacAddr = ' '.join(output.split()).split()[1]
+                rc = call(["virsh domiflist --domain scvm | grep " + storageServerNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)            
+                if rc == 0: 
+                    '''관리 nic mac address로 추가 정보 확인'''
+                    output = check_output(["virsh domiflist --domain scvm | grep " + storageServerNicMacAddr], universal_newlines=True, shell=True, env=env)
+                    storageServerNicParent = ' '.join(output.split()).split()[2]   
+                    storageServerNicType = ' '.join(output.split()).split()[3]
+                else :                
+                    storageServerNicParent = 'N/A'
+                    storageServerNicType = 'N/A'
             else :
+                storageServerNicMacAddr = 'N/A'
                 storageServerNicParent = 'N/A'
                 storageServerNicType = 'N/A'
         else :
@@ -152,30 +160,35 @@ def statusDeteil():
             storageServerNicIp = 'N/A'
             storageServerNicParent = 'N/A'
             storageServerNicType = 'N/A'
-
+        
         '''scvm 복제용 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
-        '''임시 테스트 데이터사용, 실제 nic명 고정될시 수정해야함. (enp0s22)'''
-        rc = call(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s22|bond1'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
+        rc = call(["cat /etc/hosts | grep scvm-cn"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:
-            '''scvm 복제용 nic 정보 확인'''
-            output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep ipv4 | grep -E 'enp0s22|bond1'"], universal_newlines=True, shell=True, env=env)
-            storageReplicationNicMacAddr = ' '.join(output.split()).split()[1]
-            storageReplicationNicIp = ' '.join(output.split()).split()[3]
-            '''복제용 nic mac address로 추가 정보 확인, 리턴값 0이면 정상, 아니면 비정상'''
-            rc = call(["virsh domiflist --domain scvm | grep " + storageReplicationNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)            
+            output = check_output(["cat /etc/hosts | grep scvm-cn"], universal_newlines=True, shell=True, env=env)
+            storageReplicationNicIp = output.split(' ')[0]
+            rc = call(["virsh domifaddr --domain scvm --source agent --full | grep " + storageReplicationNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             if rc == 0:
-                '''서버용 nic mac address로 추가 정보 확인'''
-                output = check_output(["virsh domiflist --domain scvm | grep " + storageReplicationNicMacAddr], universal_newlines=True, shell=True, env=env)
-                storageReplicationNicParent = ' '.join(output.split()).split()[2]
-                storageReplicationNicType = ' '.join(output.split()).split()[3]
+                output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep " + storageReplicationNicIp], universal_newlines=True, shell=True, env=env)
+                storageReplicationNicMacAddr = ' '.join(output.split()).split()[1]
+                rc = call(["virsh domiflist --domain scvm | grep " + storageReplicationNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)            
+                if rc == 0: 
+                    '''관리 nic mac address로 추가 정보 확인'''
+                    output = check_output(["virsh domiflist --domain scvm | grep " + storageReplicationNicMacAddr], universal_newlines=True, shell=True, env=env)
+                    storageReplicationNicParent = ' '.join(output.split()).split()[2]   
+                    storageReplicationNicType = ' '.join(output.split()).split()[3]
+                else :                
+                    storageReplicationNicParent = 'N/A'
+                    storageReplicationNicType = 'N/A'
             else :
+                storageReplicationNicMacAddr = 'N/A'
                 storageReplicationNicParent = 'N/A'
                 storageReplicationNicType = 'N/A'
         else :
             storageReplicationNicMacAddr = 'N/A'
             storageReplicationNicIp = 'N/A'
             storageReplicationNicParent = 'N/A'
-            storageReplicationNicType = 'N/A'        
+            storageReplicationNicType = 'N/A'
+        
         '''실제 데이터 세팅'''
         ret_val = {
             'scvm_status': scvm_status, 
