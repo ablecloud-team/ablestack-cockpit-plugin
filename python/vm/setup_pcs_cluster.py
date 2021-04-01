@@ -55,7 +55,7 @@ def resetCloud(args):
     os.system("qemu-img convert -f qcow2 -O rbd /var/lib/libvirt/images/centos8-template.qcow2 rbd:rbd/ccvm")
 
     # 클러스터 구성
-    result = json.loads(python3('/usr/share/cockpit/cockpit-plugin-ablestack/python/pcs/main.py', 'config', '--cluster', 'cloudcenter_cluster', '--hosts', args.host_names[0], args.host_names[1], args.host_names[2] ).stdout.decode())
+    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'config', '--cluster', 'cloudcenter_cluster', '--hosts', args.host_names[0], args.host_names[1], args.host_names[2] ).stdout.decode())
     if result['code'] not in [200]:
         success_bool = False
 
