@@ -612,7 +612,7 @@ function deployCloudCenterVM() {
                                                                 showDivisionCloudVMConfigFinish();
                                                             } else {
                                                                 setProgressFail(5);
-                                                                alert(pcs_config.val);            
+                                                                alert(result.val);            
                                                             }
                                                         })
                                                         .catch(function(data){
