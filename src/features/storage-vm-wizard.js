@@ -486,7 +486,7 @@ function deployStorageCenterVM() {
     //=========== 1. 스토리지센터 가상머신 초기화 작업 ===========
     // 설정 초기화 ( 필요시 python까지 종료 )
     seScvmProgressStep("span-progress-step1",1);
-    var reset_storage_center_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/reset_storage_center.py'];
+    var reset_storage_center_cmd = ['python3', pluginpath + '/python/vm/reset_storage_center.py'];
     cockpit.spawn(reset_storage_center_cmd)
         .then(function(data){
             //결과 값 json으로 return
@@ -506,7 +506,7 @@ function deployStorageCenterVM() {
                 var cn_ip = $('#form-input-storage-vm-cluster-ip').val().split("/")[0];
                 var cn_prefix = $('#form-input-storage-vm-cluster-ip').val().split("/")[1];
                 
-                var create_scvm_cloudinit_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/create_scvm_cloudinit.py'
+                var create_scvm_cloudinit_cmd = ['python3', pluginpath + '/python/vm/create_scvm_cloudinit.py'
                                         ,"-f1","/var/lib/libvirt/ablestack/vm/scvm/hosts","-t1", $("#form-textarea-storage-vm-hosts-file").val() // hosts 파일
                                         ,"-f2","/var/lib/libvirt/ablestack/vm/scvm/ablecloud","-t2", $("#form-textarea-storage-vm-ssh-private-key-file").val() // ssh 개인 key 파일
                                         ,"-f3","/var/lib/libvirt/ablestack/vm/scvm/ablecloud.pub","-t3", $("#form-textarea-storage-vm-ssh-public-key-file").val() // ssh 공개 key 파일
@@ -537,7 +537,7 @@ function deployStorageCenterVM() {
                                         //클러스터 생성
                                         seScvmProgressStep("span-progress-step3",2);
                                         seScvmProgressStep("span-progress-step4",1);
-                                        var pcs_config = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/setup_storage_vm.py'];
+                                        var pcs_config = ['python3', pluginpath + '/python/vm/setup_storage_vm.py'];
                                         cockpit.spawn(pcs_config)
                                             .then(function(data){
                                                 //결과 값 json으로 return
@@ -548,40 +548,40 @@ function deployStorageCenterVM() {
                                                     //최종 화면 호출
                                                     showDivisionVMConfigFinish();
                                                 } else {
-                                                    setProgressFail(4);
-                                                    alert(pcs_config.val);            
+                                                    setScvmProgressFail(4);
+                                                    alert(result.val);            
                                                 }
                                             })
                                             .catch(function(data){
-                                                setProgressFail(4);
+                                                setScvmProgressFail(4);
                                                 alert("클러스터 구성 및 클라우드센터 가상머신 배포 실패 : "+data);
                                             });                                                        
                                     } else {
-                                        setProgressFail(3);
+                                        setScvmProgressFail(3);
                                         alert(create_scvm_xml_result.val);
                                     }
                                 })
                                 .catch(function(data){
-                                    setProgressFail(3);
+                                    setScvmProgressFail(3);
                                     alert("클라우드센터 가상머신 XML 생성 실패 : "+data);
                                 });                            
                         } else {
-                            setProgressFail(2);
+                            setScvmProgressFail(2);
                             alert(create_scvm_cloudinit_result.val);
                         }
                     })
                     .catch(function(data){
-                        setProgressFail(2);
+                        setScvmProgressFail(2);
                         alert("cloudinit iso 파일 생성 실패 : "+data);
                     });
 
             } else {
-                setProgressFail(1);
+                setScvmProgressFail(1);
                 alert(reset_storage_center_result.val);
             }
         })
         .catch(function(data){
-            setProgressFail(1);
+            setScvmProgressFail(1);
             alert("클러스터 구성 설정 초기화 작업 실패 : "+data);
         });
 }
@@ -1223,18 +1223,18 @@ function validateStorageVm(){
  */
  function setScvmProgressFail(setp_num){
     if( setp_num == 1 || setp_num == '1' ){   // 1단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step1",3);
-        setProgressStep("span-progress-step2",3);
-        setProgressStep("span-progress-step3",3);
-        setProgressStep("span-progress-step4",3);
+        seScvmProgressStep("span-progress-step1",3);
+        seScvmProgressStep("span-progress-step2",3);
+        seScvmProgressStep("span-progress-step3",3);
+        seScvmProgressStep("span-progress-step4",3);
     } else if(setp_num == 2 || setp_num == '2') {   // 2단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step2",3);
-        setProgressStep("span-progress-step3",3);
-        setProgressStep("span-progress-step4",3);
+        seScvmProgressStep("span-progress-step2",3);
+        seScvmProgressStep("span-progress-step3",3);
+        seScvmProgressStep("span-progress-step4",3);
     } else if(setp_num == 3 || setp_num == '3') {   // 3단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step3",3);
-        setProgressStep("span-progress-step4",3);
+        seScvmProgressStep("span-progress-step3",3);
+        seScvmProgressStep("span-progress-step4",3);
     } else if(setp_num == 4 || setp_num == '4') {   // 4단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step4",3);
+        seScvmProgressStep("span-progress-step4",3);
     }
 }

@@ -538,7 +538,7 @@ function deployCloudCenterVM() {
     //=========== 1. 클러스터 구성 host 네트워크 연결 테스트 ===========
     setProgressStep("span-ccvm-progress-step1",1);
 
-    var host_ping_test_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/host_ping_test.py', '-hns', host1_name, host2_name, host3_name];
+    var host_ping_test_cmd = ['python3', pluginpath + '/python/vm/host_ping_test.py', '-hns', host1_name, host2_name, host3_name];
     cockpit.spawn(host_ping_test_cmd)
         .then(function(data){
             //결과 값 json으로 return
@@ -548,7 +548,7 @@ function deployCloudCenterVM() {
                 // 설정 초기화 ( 필요시 python까지 종료 )
                 setProgressStep("span-ccvm-progress-step1",2);
                 setProgressStep("span-ccvm-progress-step2",1);
-                var reset_cloud_center_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/reset_cloud_center.py'];
+                var reset_cloud_center_cmd = ['python3', pluginpath + '/python/vm/reset_cloud_center.py'];
                 cockpit.spawn(reset_cloud_center_cmd)
                     .then(function(data){
                         //결과 값 json으로 return
@@ -564,7 +564,7 @@ function deployCloudCenterVM() {
                             var mgmt_prefix = $('#form-input-cloud-vm-mngt-nic-ip').val().split("/")[1];
                             var mngt_gw = $('#form-input-cloud-vm-mngt-gw').val();
                             
-                            create_ccvm_cloudinit_cmd = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/create_ccvm_cloudinit.py'
+                            create_ccvm_cloudinit_cmd = ['python3', pluginpath + '/python/vm/create_ccvm_cloudinit.py'
                                                     ,"-f1","/var/lib/libvirt/ablestack/vm/ccvm/hosts","-t1", $("#form-textarea-cloud-vm-hosts-file").val() // hosts 파일
                                                     ,"-f2","/var/lib/libvirt/ablestack/vm/ccvm/ablecloud","-t2", $("#form-textarea-cloud-vm-ssh-private-key-file").val() // ssh 개인 key 파일
                                                     ,"-f3","/var/lib/libvirt/ablestack/vm/ccvm/ablecloud.pub","-t3", $("#form-textarea-cloud-vm-ssh-public-key-file").val() // ssh 공개 key 파일
@@ -601,7 +601,7 @@ function deployCloudCenterVM() {
                                                     //클러스터 생성
                                                     setProgressStep("span-ccvm-progress-step4",2);
                                                     setProgressStep("span-ccvm-progress-step5",1);
-                                                    var pcs_config = ['python3', '/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/setup_pcs_cluster.py', '-hns', host1_name, host2_name, host3_name];
+                                                    var pcs_config = ['python3', pluginpath + '/python/vm/setup_pcs_cluster.py', '-hns', host1_name, host2_name, host3_name];
                                                     cockpit.spawn(pcs_config)
                                                         .then(function(data){
                                                             //결과 값 json으로 return
@@ -612,7 +612,7 @@ function deployCloudCenterVM() {
                                                                 showDivisionCloudVMConfigFinish();
                                                             } else {
                                                                 setProgressFail(5);
-                                                                alert(pcs_config.val);            
+                                                                alert(result.val);            
                                                             }
                                                         })
                                                         .catch(function(data){
