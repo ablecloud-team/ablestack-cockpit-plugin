@@ -50,12 +50,12 @@ def resetCloud(args):
 
     #=========== pcs cluster 초기화 ===========
     # 리소스 삭제
-    result = json.loads(python3('/usr/share/cockpit/cockpit-plugin-ablestack/python/pcs/main.py', 'remove', '--resource', 'cloudcenter_res').stdout.decode())
+    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'remove', '--resource', 'cloudcenter_res').stdout.decode())
     if result['code'] not in [200,400]:
         success_bool = False
 
     # 클러스터 삭제
-    result = json.loads(python3('/usr/share/cockpit/cockpit-plugin-ablestack/python/pcs/main.py', 'destroy').stdout.decode())
+    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'destroy').stdout.decode())
     if result['code'] not in [200,400]:
         success_bool = False
     
