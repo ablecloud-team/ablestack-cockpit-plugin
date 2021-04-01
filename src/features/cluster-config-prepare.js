@@ -543,7 +543,7 @@ $('#span-modal-wizard-cluster-config-finish-pri-sshkey-download').on('click', fu
     let pri_ssh_key_download_link_id = 'span-modal-wizard-cluster-config-finish-pri-sshkey-download';
     // 다운로드 링크 생성 전 유효성 검정
     if (pri_ssh_key_text.trim() != "") {
-        saveAsFile(pri_ssh_key_download_link_id, pri_ssh_key_text, "ablecloud");
+        saveAsFile(pri_ssh_key_download_link_id, pri_ssh_key_text, "id_rsa");
     } else {
         alert("SSH 개인 키 파일 정보를 입력해 주세요.");
     }
@@ -556,7 +556,7 @@ $('#span-modal-wizard-cluster-config-finish-pub-sshkey-download').on('click', fu
     let pub_ssh_key_download_link_id = 'span-modal-wizard-cluster-config-finish-pub-sshkey-download';
     // 다운로드 링크 생성 전 유효성 검정
     if (pub_ssh_key_text.trim() != "") {
-        saveAsFile(pub_ssh_key_download_link_id, pub_ssh_key_text, "ablecloud.pub");
+        saveAsFile(pub_ssh_key_download_link_id, pub_ssh_key_text, "id_rsa.pub");
     } else {
         alert("SSH 공개 키 파일 정보를 입력해 주세요.");
     }
@@ -690,7 +690,7 @@ function resetClusterConfigWizardWithData() {
 
 function generateSshkey() {
     return new Promise(function (resolve){
-        resolve(cockpit.script(["ssh-keygen -t rsa -b 2048 -f /root/.ssh/ablecloud -N '' <<<y 2>&1 >/dev/null"]));
+        resolve(cockpit.script(["ssh-keygen -t rsa -b 2048 -f /root/.ssh/id_rsa -N '' <<<y 2>&1 >/dev/null"]));
     });
 }
 
@@ -708,7 +708,7 @@ function generateSshkey() {
 async function readSshKeyFile() {
     await generateSshkey();
     // 개인키 읽어오기
-    cockpit.file("/root/.ssh/ablecloud").read()
+    cockpit.file("/root/.ssh/id_rsa").read()
         .done(function (tag) {
             // console.log(tag);
             // ssh_key_textarea에 텍스트 삽입
@@ -717,7 +717,7 @@ async function readSshKeyFile() {
         .fail(function (error) {
         });
     // 공개키 읽어오기
-    cockpit.file("/root/.ssh/ablecloud.pub").read()
+    cockpit.file("/root/.ssh/id_rsa.pub").read()
         .done(function (tag) {
             // console.log(tag);
             // ssh_key_textarea에 텍스트 삽입
@@ -800,13 +800,13 @@ function fileExtensionChecker(file_name) {
 
 function checkClusterConfigPrepareFileName(file_name, file_type) {
     if (file_type == "pri-ssh_key") {
-        if (file_name != "ablecloud") {
-            alert("'ablecloud'으로 된 개인 키 파일만 업로드할 수 있습니다.");
+        if (file_name != "id_rsa") {
+            alert("'id_rsa'으로 된 개인 키 파일만 업로드할 수 있습니다.");
             return false;
         }
     } else if (file_type == "pub-ssh_key") {
-        if (file_name != "ablecloud.pub") {
-            alert("'ablecloud.pub'으로 된 공개 키 파일만 업로드할 수 있습니다.");
+        if (file_name != "id_rsa.pub") {
+            alert("'id_rsa.pub'으로 된 공개 키 파일만 업로드할 수 있습니다.");
             return false;
         }
     } else if (file_type == "hosts") {
@@ -917,14 +917,14 @@ function saveAsFile(id, str, filename) {
 
 async function writeFile(text1, text2, file_type) {
     if (file_type == 'ssh_key') {
-        cockpit.script(["touch /root/.ssh/ablecloud"])
-        cockpit.file("/root/.ssh/ablecloud").replace(text1)
+        cockpit.script(["touch /root/.ssh/id_rsa"])
+        cockpit.file("/root/.ssh/id_rsa").replace(text1)
             .done(function (tag) {
             })
             .fail(function (error) {
             });
-        cockpit.script(["touch /root/.ssh/ablecloud.pub"])
-        cockpit.file("/root/.ssh/ablecloud.pub").replace(text2)
+        cockpit.script(["touch /root/.ssh/id_rsa.pub"])
+        cockpit.file("/root/.ssh/id_rsa.pub").replace(text2)
             .done(function (tag) {
             })
             .fail(function (error) {

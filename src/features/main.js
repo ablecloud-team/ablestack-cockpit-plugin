@@ -214,7 +214,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         cockpit.spawn(['grep', '-c', 'ccvm-mngt', '/etc/hosts'], {'host': 'localhost'})
         .then(data=>{
             if(data){
-                cockpit.spawn(['cat', '/root/.ssh/ablecloud.pub'], {'host': 'localhost'})
+                cockpit.spawn(['cat', '/root/.ssh/id_rsa.pub'], {'host': 'localhost'})
                 .then(data=>{
                     sessionStorage.setItem("ccfg_status", "true");
                     resolve();
