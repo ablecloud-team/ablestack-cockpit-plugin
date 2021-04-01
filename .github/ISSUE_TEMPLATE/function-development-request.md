@@ -2,7 +2,7 @@
 name: Function Development request
 about: 기능개발에 대한 이슈 등록 템플릿
 title: ''
-labels: enhancement, Development
+labels: Development, enhancement
 assignees: ''
 
 ---

@@ -43,7 +43,7 @@
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cluster-config-overview">
                             <div class="pf-c-content">
                                 <p>
-                                    ABLESTACK 클러스터 구성 준비 마법사는 클러스터를 자동으로 구성하고, 스토리지센터 및 클라우드센터를 구성하기 위해 필요한 다음의 정보를 입력받아 준비합니다.  
+                                    ABLESTACK 클러스터 구성 준비 마법사는 클러스터를 자동으로 구성하고, 스토리지센터 및 클라우드센터를 구성하기 위해 필요한 다음의 정보를 입력받아 준비합니다.
                                 </p>
                                 <ul>
                                     <li>모든 호스트 및 가상머신에서 사용자 인증을 위해 공통으로 사용할 SSH Key 정보</li>
@@ -51,7 +51,7 @@
                                     <li>호스트 및 가상머신의 시간 동기화를 위한 시간서버</li>
                                 </ul>
                                 <p>
-                                    필요한 정보를 먼저 준비하십시오. 정보가 준비되었다면 "다음" 버튼을 눌러 클러스터 구성 준비를 시작합니다.  
+                                    필요한 정보를 먼저 준비하십시오. 정보가 준비되었다면 "다음" 버튼을 눌러 클러스터 구성 준비를 시작합니다.
                                 </p>
                             </div>
                         </div>
@@ -59,8 +59,8 @@
                             <p>
                                 ABLESTACK의 클러스터를 구성하는 호스트 및 가상머신은 모든 명령을 SSH를 이용해 암호화 하여 전달합니다. <br/>
                                 <br/>
-                                원활한 SSH 연결 및 상호 인증을 위해 동일한 SSH Key 설정이 필요합니다. 
-                                마법사를 통해 새로운 SSH Key를 생성하여 사용하거나 기존의 SSH Key 파일을 사용하도록 설정할 수 있습니다. 
+                                원활한 SSH 연결 및 상호 인증을 위해 동일한 SSH Key 설정이 필요합니다.
+                                마법사를 통해 새로운 SSH Key를 생성하여 사용하거나 기존의 SSH Key 파일을 사용하도록 설정할 수 있습니다.
                             </p>
                             <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
                                 <section class="pf-c-form__section">
@@ -73,24 +73,38 @@
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="form-radio-ssh-key-new" name="radio-ssh-key" checked/>
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-ssh-key-new" name="radio-ssh-key" value="new" checked/>
                                                 <label class="pf-c-radio__label" for="form-radio-ssh-key-new">신규 생성</label>
                                             </div>
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="form-radio-ssh-key-file" name="radio-ssh-key" />
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-ssh-key-file" name="radio-ssh-key" value="existing" />
                                                 <label class="pf-c-radio__label" for="form-radio-ssh-key-file">기존 파일 사용</label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-file">
-                                                <span class="pf-c-form__label-text">SSH Key 파일</span>
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-pub-file">
+                                                <span class="pf-c-form__label-text">SSH 개인 키 파일</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline">
-                                            <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cluster-config-ssh-key-file" name="form-input-cluster-config-ssh-key-file" disabled/>
+                                            <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cluster-config-ssh-key-pri-file" name="form-input-cluster-config-ssh-key-file" disabled/>
                                         </div>
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-pub-file">
+                                                <span class="pf-c-form__label-text">SSH 공개 키 파일</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline">
+                                            <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cluster-config-ssh-key-pub-file" name="form-input-cluster-config-ssh-key-file" disabled/>
+                                        </div>
+                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-temp-new-ssh-key-pri-file" name="div-textarea-cluster-config-temp-new-ssh-key-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" hidden></textarea>
+                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-temp-new-ssh-key-pub-file" name="div-textarea-cluster-config-temp-new-ssh-key-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" hidden></textarea>
+                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-temp-existing-ssh-key-pri-file" name="div-textarea-cluster-config-temp-existing-ssh-key-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" hidden></textarea>
+                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-temp-existing-ssh-key-pub-file" name="div-textarea-cluster-config-temp-existing-ssh-key-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" hidden></textarea>
                                     </div>
                                 </section>
                             </form>
@@ -99,12 +113,12 @@
                             <p>
                                 클러스터를 구성하는 호스트 및 가상머신은 SSH 연결 및 고가용성 구성 등을 위해 호스트 프로파일을 생성하여 사용합니다. <br/>
                                 <br/>
-                                호스트 프로파일을 생성하기 위해서는 클러스터를 구성하는 호스트 및 가상머신에 대한 호스트명과 IP 정보를 미리 정의해야 합니다. 
+                                호스트 프로파일을 생성하기 위해서는 클러스터를 구성하는 호스트 및 가상머신에 대한 호스트명과 IP 정보를 미리 정의해야 합니다.
                                 호스트명 및 IP정보를 모두 사전 준비한 후 아래의 정보를 구성하십시오.
                             </p>
                             <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
                                 <section class="pf-c-form__section">
-                                    <div class="pf-c-form__group">
+                                    <div class="pf-c-form__group" id="div-form-hosts-input-number">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-config-host-number">
                                                 <span class="pf-c-form__label-text">구성 호스트 수</span>
@@ -112,7 +126,21 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline">
-                                            <input class="pf-c-form-control" style="width:15%" type="text" id="form-input-cluster-config-host-number" name="form-input-cluster-config-host-number"/>
+                                            <div class="pf-c-number-input">
+                                              <div class="pf-c-input-group">
+                                                <button class="pf-c-button pf-m-control" id="form-input-cluster-config-host-number-minus" type="button" aria-label="Minus">
+                                                  <span class="pf-c-number-input__icon">
+                                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                                  </span>
+                                                </button>
+                                                <input class="pf-c-form-control" type="number" value="1" id="form-input-cluster-config-host-number" name="form-input-cluster-config-host-number" aria-label="Number input" />
+                                                <button class="pf-c-button pf-m-control" id="form-input-cluster-config-host-number-plus" type="button" aria-label="Plus">
+                                                  <span class="pf-c-number-input__icon">
+                                                    <i class="fas fa-plus" aria-hidden="true"></i>
+                                                  </span>
+                                                </button>
+                                              </div>
+                                            </div>
                                             <span style="margin-top:10px">대</span>
                                         </div>
                                     </div>
@@ -125,23 +153,23 @@
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-new" name="radio-hosts-file" checked/>
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-new" name="radio-hosts-file" value="new" checked/>
                                                 <label class="pf-c-radio__label" for="form-radio-hosts-new">신규 생성</label>
                                             </div>
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-file" name="radio-hosts-file" />
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-file" name="radio-hosts-file" value="existing" />
                                                 <label class="pf-c-radio__label" for="form-radio-hosts-file">기존 파일 사용</label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-profile">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-hosts-profile">
+                                            <label class="pf-c-form__label" for="form-textarea-cluster-config-new-host-profile">
                                                 <span class="pf-c-form__label-text">Hosts 프로파일</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-host-profile"></textarea>
+                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-new-host-profile">10.10.0.10&#9;ccvm-mngt&#10;192.168.0.10&#9;ccvm-svc&#10;10.10.0.11&#9;ablestack1&#10;10.10.0.101&#9;cvm1-pn&#10;100.100.0.101&#9;scvm1-cn&#10;</textarea>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-file">
@@ -152,6 +180,9 @@
                                         </div>
                                         <div class="pf-c-form__group-control">
                                             <input class="pf-c-form-control" style="width:60%" type="file" id="form-input-cluster-config-hosts-file" name="form-input-cluster-config-hosts-file"/>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-existing-host-profile" readonly></textarea>
                                         </div>
                                     </div>
                                 </section>
@@ -175,46 +206,68 @@
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-ext" name="radio-timeserver" checked/>
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-ext" name="radio-timeserver" value="external" checked/>
                                                 <label class="pf-c-radio__label" for="form-radio-timeserver-ext">외부 시간서버</label>
                                             </div>
                                             <div class="pf-c-radio">
-                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-int" name="radio-timeserver" />
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-int" name="radio-timeserver" value="internal" />
                                                 <label class="pf-c-radio__label" for="form-radio-timeserver-int">로컬 시간서버</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-timeserver-host-num" style="display:none">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label">
+                                                <span class="pf-c-form__label-text">현재 Host</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-host-num-1" name="radio-timeserver_host_num" value="1" checked/>
+                                                <label class="pf-c-radio__label" for="form-radio-timeserver-host-num-1">Host 1</label>
+                                            </div>
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-host-num-2" name="radio-timeserver_host_num" value="2" />
+                                                <label class="pf-c-radio__label" for="form-radio-timeserver-host-num-2">Host 2</label>
+                                            </div>
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-timeserver-host-num-3" name="radio-timeserver_host_num" value="3" />
+                                                <label class="pf-c-radio__label" for="form-radio-timeserver-host-num-3">Host 3</label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-timeserver1">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-time-server-ip-1">
                                                 <span class="pf-c-form__label-text">시간서버 #1</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-timeserver1" name="form-input-cluster-config-timeserver1"/>
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-1" name="form-input-cluster-config-timeserver" required="required"/>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-timeserver2">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-time-server-ip-2">
                                                 <span class="pf-c-form__label-text">시간서버 #2</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true" id="span-timeserver2-required">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-timeserver1" name="form-input-cluster-config-timeserver1"/>
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-2" name="form-input-cluster-config-timeserver"/>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-timeserver3">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-time-server-ip-3">
                                                 <span class="pf-c-form__label-text">시간서버 #3</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true" id="span-timeserver3-required">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-timeserver1" name="form-input-cluster-config-timeserver1"/>
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-cluster-config-time-server-ip-3" name="form-input-cluster-config-timeserver"/>
                                         </div>
                                     </div>
                                 </section>
@@ -243,16 +296,24 @@
                                                     <span class="pf-c-description-list__text">SSH Key 준비 방법</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">기존 파일 사용 (파일명 : sample.key)</div>
+                                                    <div class="pf-c-description-list__text" id="div-accordion-ssh-key-type"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text">Key 내용</span>
+                                                    <span class="pf-c-description-list__text">Private Key 내용</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text">SSH Key 내용</textarea>                                                     
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pri-file" style="width:670px;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
+                                                    </div>
+                                                </dd>
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Public Key 내용</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-ssh-key-pub-file" style="width:670px;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>SSH Key 내용</textarea>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -275,7 +336,7 @@
                                                     <span class="pf-c-description-list__text">Hosts 파일 준비 방법</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">기존 파일 사용 (파일명 : hosts)</div>
+                                                    <div class="pf-c-description-list__text" id="div-accordion-hosts-file-type"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
@@ -284,7 +345,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text">Host 프로파일 내용</textarea>                                                     
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-hosts-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>Host 프로파일 내용</textarea>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -307,7 +368,7 @@
                                                     <span class="pf-c-description-list__text">시간서버 종류</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">로컬 시간 서버</div>
+                                                    <div class="pf-c-description-list__text" id="div-accordion-timeserver-type"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
@@ -315,7 +376,7 @@
                                                     <span class="pf-c-description-list__text">시간서버 #1</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">192.168.0.11</div>
+                                                    <div class="pf-c-description-list__text" id="div-cluster-config-confirm-time-server-1"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
@@ -323,7 +384,7 @@
                                                     <span class="pf-c-description-list__text">시간서버 #2</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">192.168.0.12</div>
+                                                    <div class="pf-c-description-list__text" id="div-cluster-config-confirm-time-server-2"></div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
@@ -331,7 +392,7 @@
                                                     <span class="pf-c-description-list__text">시간서버 #3</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">192.168.0.13</div>
+                                                    <div class="pf-c-description-list__text" id="div-cluster-config-confirm-time-server-3"></div>
                                                 </dd>
                                             </div>
                                         </dl>
@@ -347,13 +408,18 @@
                             </p>
                             <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
                                 <span>
-                                    - SSH Key 다운로드 : 
-                                    <a class="pf-c-button pf-m-link" href="https://172.16.0.30:9090/ablestack/sshkey.in">파일을 재사용 하려면 클릭하십시오</a>
+                                    -Private SSH Key 다운로드 :
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pri-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
+                                </span>
+                                <br/>
+                                <span>
+                                    -Public SSH Key 다운로드 :
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pub-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                                 <br/>
                                 <span>
                                     - Hosts 프로파일 다운로드 : 
-                                    <a class="pf-c-button pf-m-link" href="https://172.16.0.30:9090/ablestack/hosts.in">파일을 재사용 하려면 클릭하십시오</a>
+                                    <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-hosts-file-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                             </div>
                         </div>
@@ -372,5 +438,6 @@
 </div>
 
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+<script src="./src/common/validation.js"></script>
 <script src="./src/features/cluster-config-prepare.js"></script>
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
