@@ -10,7 +10,7 @@
 this.ccvm_instance = new CloudCenterVirtualMachine()
 ccvm_instance = this.ccvm_instance
 $(document).ccvm_instance = ccvm_instance
-pluginpath = '/usr/share/cockpit/cockpit-plugin-ablestack'
+pluginpath = '/usr/share/cockpit/ablestack'
 
 $(document).ready(function(){
     $('#dropdown-menu-storage-cluster-status').hide();
