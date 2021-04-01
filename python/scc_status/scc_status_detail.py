@@ -63,7 +63,7 @@ def statusDetail():
         elif rc == 1:
             maintenance_status = False
 
-        ''' 클러스터 상태 체크 리턴값이 0 이면 정상, 아니면 클러스터 세팅이 안된것으로 확인(no signal) '''
+        ''' 클러스터 상태 체크 리턴값이 0 이면 정상, 아니면 클러스터 세팅이 안된것으로 확인(HEALTH_ERR) '''
         rc = call(['ceph -s -f json-pretty'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
         if rc == 0:
             ''' ceph -s시 출력값을 json으로 리턴 '''
@@ -82,14 +82,14 @@ def statusDetail():
             '''풀 갯수'''
             pools= output_json['pgmap']['num_pools']
         else :
-            cluster_status= "no signal"
-            mon_gw1 = "undefine"
-            mon_gw2 = "undefine"
-            osd=  "undefine"
-            osd_up = "undefine"
-            pools = "undefine"
+            cluster_status= "HEALTH_ERR"
+            mon_gw1 = "N/A"
+            mon_gw2 = "N/A"
+            osd=  "N/A"
+            osd_up = "N/A"
+            pools = "N/A"
 
-        ''' 클러스터 MGR Daemon값 체크 0 이면 정상, 아니면 undefine '''
+        ''' 클러스터 MGR Daemon값 체크 0 이면 정상, 아니면 N/A '''
         rc = call(['ceph mgr stat'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
         if rc == 0:
             '''MGR deamon 상태값 조회'''
@@ -100,10 +100,10 @@ def statusDetail():
             '''관리 데몬 전체 갯수'''
             mgr_cnt= int(output_json['mgrmap']['num_standbys']) + 1
         else : 
-            mgr= "undefine"
-            mgr_cnt = "undefine"
+            mgr= "N/A"
+            mgr_cnt = "N/A"
 
-        '''클러스터 디스크용량 체크 0 이면 정상, 아니면 undefine '''
+        '''클러스터 디스크용량 체크 0 이면 정상, 아니면 N/A '''
         rc = call(['ceph df | grep TOTAL'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
         if rc == 0:
             '''클러스터 디스크 사용가능 용량, 사용량, 사용량 % 확인'''
@@ -113,9 +113,9 @@ def statusDetail():
             used = output[7] + " "+ output[8]
             usage_percentage = output[9]
         else :
-            available= "undefine"
-            used = "undefine"
-            usage_percentage = "undefine"
+            available= "N/A"
+            used = "N/A"
+            usage_percentage = "N/A"
         
         ret_val = {
             'cluster_status': cluster_status, 
@@ -154,5 +154,5 @@ if __name__ == '__main__':
     '''parser 생성'''
     args = parseArgs()    
     if args.action == 'detail':        
-        ret = statusDetail()    
+        statusDetail()    
     '''print(ret)'''

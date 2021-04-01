@@ -7,14 +7,21 @@ import sys
 import argparse
 import json
 import logging
+import os
+import subprocess
 from subprocess import check_output
 from subprocess import run
+from subprocess import call
 from ablestack import *
+
+env=os.environ.copy()
+env['LANG']="en_US.utf-8"
+env['LANGUAGE']="en"
 
 '''
 함수명 : parseArgs
 이 함수는 python library argparse를 시용하여 함수를 실행될 때 필요한 파라미터를 입력받고 파싱하는 역할을 수행합니다.
-예를들어 action을 요청하면 해당 action일 때 요구되는 파라미터를 입력받고 해당 코드를 수행합니다.
+예를들어 action을 요청하면 해당 action일 때  요구되는 파라미터를 입력받고 해당 코드를 수행합니다.
 '''
 def parseArgs():
     parser = argparse.ArgumentParser(description='Storage Cluster maintenance Mode Setting',epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')    
@@ -35,11 +42,20 @@ def parseArgs():
 def onMaintenance():        
     try:
         '''유지보수 모드 설정 noout, nobackfill, norecover 세팅'''
-        run(['ceph', 'osd', 'set', 'noout'], universal_newlines=True)
-        run(['ceph', 'osd', 'set', 'nobackfill'], universal_newlines=True)
-        run(['ceph', 'osd', 'set', 'norecover'], universal_newlines=True)
-
-        ret = createReturn(code=200, val='success', retname='Maintenance Mode On')
+        rc = call(['ceph osd set noout'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        if rc == 0:
+            rc = call(['ceph osd set nobackfill'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            if rc == 0:
+                rc = call(['ceph osd set norecover'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) 
+                if rc == 0:
+                    ret = createReturn(code=200, val='success', retname='Maintenance Mode On')
+                else :
+                    ret = createReturn(code=500, val='set norecover ERROR', retname='Maintenance Mode On')   
+            else :
+                ret = createReturn(code=500, val='set nobackfill ERROR', retname='Maintenance Mode On')      
+        else :
+            ret = createReturn(code=500, val='set noout ERROR', retname='Maintenance Mode On')
+           
     except Exception as e:
         ret = createReturn(code=500, val='ERROR', retname='Maintenance Mode On')        
     return print(json.dumps(json.loads(ret), indent=4))
@@ -51,9 +67,19 @@ def onMaintenance():
 def offMaintenance():          
     try:
         '''유지보수 모드 설정 noout, nobackfill, norecover 해제'''
-        run(['ceph', 'osd', 'unset', 'noout'], universal_newlines=True)
-        run(['ceph', 'osd', 'unset', 'nobackfill'], universal_newlines=True)
-        run(['ceph', 'osd', 'unset', 'norecover'], universal_newlines=True)    
+        rc = call(['ceph osd unset noout'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        if rc == 0:
+            rc = call(['ceph osd unset nobackfill'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            if rc == 0:
+                rc = call(['ceph osd unset norecover'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) 
+                if rc == 0:
+                    ret = createReturn(code=200, val='success', retname='Maintenance Mode Off')
+                else :
+                    ret = createReturn(code=500, val='unset norecover ERROR', retname='Maintenance Mode Off')   
+            else :
+                ret = createReturn(code=500, val='unset nobackfill ERROR', retname='Maintenance Mode Off')      
+        else :
+            ret = createReturn(code=500, val='unset noout ERROR', retname='Maintenance Mode Off')
         
         ret = createReturn(code=200, val='success', retname='Maintenance Mode Off')
     except Exception as e:
@@ -61,16 +87,12 @@ def offMaintenance():
     return print(json.dumps(json.loads(ret), indent=4))
 
 if __name__ == '__main__':
-    '''parser 생성'''
     args = parseArgs()    
     verbose = (5 - args.verbose) * 10
 
-    '''로깅을 위한 logger 생성, 모든 인자에 default 인자가 있음.
-    logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')'''    
     if args.action == 'set_noout':
         '''유지보수 모드 설정'''
-        ret = onMaintenance()        
+        onMaintenance()        
     elif args.action == 'unset_noout':
         '''유지보수 모드 해제'''
-        ret = offMaintenance()
-    '''print(ret)'''
+        offMaintenance()

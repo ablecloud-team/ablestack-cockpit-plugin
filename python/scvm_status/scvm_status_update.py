@@ -142,14 +142,14 @@ if __name__ == '__main__':
 
     if args.action == 'start':
         '''스토리지 가상머신 시작 요청'''
-        ret = startStorageVM();    
+        startStorageVM();    
     elif args.action == 'stop':
         '''스토리지 가상머신 정지 요청'''
-        ret = stopStorageVM();
+        stopStorageVM();
     elif args.action == 'delete':
         '''스토리지 가상머신 삭제 요청'''
-        ret = deleteStorageVM();
+        deleteStorageVM();
     elif args.action == 'resource':
         '''스토리지 가상머신 자원변경 요청'''
-        ret = updateStorageVM(args.cpu, args.memory); 
+        updateStorageVM(args.cpu, args.memory); 
     '''print(ret)'''
