@@ -10,6 +10,7 @@
 this.ccvm_instance = new CloudCenterVirtualMachine()
 ccvm_instance = this.ccvm_instance
 $(document).ccvm_instance = ccvm_instance
+pluginpath = '/usr/share/cockpit/ablestack'
 
 $(document).ready(function(){
     $('#dropdown-menu-storage-cluster-status').hide();
@@ -214,7 +215,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         cockpit.spawn(['grep', '-c', 'ccvm-mngt', '/etc/hosts'], {'host': 'localhost'})
         .then(data=>{
             if(data){
-                cockpit.spawn(['cat', '/root/.ssh/ablecloud.pub'], {'host': 'localhost'})
+                cockpit.spawn(['cat', '/root/.ssh/id_rsa.pub'], {'host': 'localhost'})
                 .then(data=>{
                     sessionStorage.setItem("ccfg_status", "true");
                     resolve();
