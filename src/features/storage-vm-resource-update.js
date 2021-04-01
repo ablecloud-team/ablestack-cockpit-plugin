@@ -16,7 +16,7 @@ $('#scvm-resource-update').click(function(){
     if(cpu == 0 && memory == 0) {//넘겨받은 cpu, memory 두 값이 전부 선택된것이 없을 때
         alert("CPU 또는 Memory 사용 정보를 선택하세요.")
     }else{//넘겨받은 cpu, memory 두 값중 하나라도 변경이 있을 시         
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_update.py", "resource", "-c", cpu, "-m", memory ])
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py", "resource", "-c", cpu, "-m", memory ])
         .then(function(data){            
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){
