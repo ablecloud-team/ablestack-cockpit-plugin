@@ -97,8 +97,14 @@ def statusDetail():
             output_mgr = json.loads(output_mgr)
             '''관리 데몬 호스트'''
             mgr = output_mgr['active_name'];
+            if mgr == "" :
+                active_mgr_cnt = 0;
+                mgr= "N/A"
+            else :
+                active_mgr_cnt = 1;
+
             '''관리 데몬 전체 갯수'''
-            mgr_cnt= int(output_json['mgrmap']['num_standbys']) + 1
+            mgr_cnt= active_mgr_cnt + int(output_json['mgrmap']['num_standbys'])
         else : 
             mgr= "N/A"
             mgr_cnt = "N/A"
