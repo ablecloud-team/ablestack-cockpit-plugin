@@ -24,7 +24,7 @@ $('#button-execution-modal-cloud-vm-start').on('click', function(){
     $('#div-modal-start-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터VM을 시작하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsStart'])
+    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStart'])
     .then(function(data){
         var retVal = JSON.parse(data);
 
@@ -57,7 +57,7 @@ $('#button-execution-modal-cloud-vm-stop').on('click', function(){
     $('#div-modal-stop-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터VM을 정지하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsStop'])
+    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/', 'pcsStop'])
     .then(function(data){
         var retVal = JSON.parse(data);
 
@@ -85,7 +85,7 @@ $('#button-execution-modal-cloud-vm-cleanup').on('click', function(){
     $('#div-modal-cleanup-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터 클러스터를 클린업하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsCleanup'])
+    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsCleanup'])
     .then(function(data){
         var retVal = JSON.parse(data);
 
@@ -118,7 +118,7 @@ $('#button-execution-modal-cloud-vm-migration').on('click', function(){
         $('#div-modal-migration-cloud-vm').hide();
         $('#div-modal-spinner-header-txt').text('클라우드센터VM을 마이그레이션하고 있습니다.');
         $('#div-modal-spinner').show();
-        cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsMigration', '--target', valSelect])
+        cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsMigration', '--target', valSelect])
         .then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
@@ -154,7 +154,7 @@ $('#cloud-cluster-connect').on('click', function(){
 // 클라우드 센터 클러스터 상태 조회 및 조회 결과값으로 화면 변경하는 함수
 function CardCloudClusterStatus(){
     return new Promise((resolve) => {
-        cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsDetail' ])
+        cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsDetail' ])
         .then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == '200'){
