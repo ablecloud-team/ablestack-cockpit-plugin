@@ -34,6 +34,7 @@ $('#button-close-modal-wizard-cluster-config-prepare').on('click', function () {
     $('#div-modal-wizard-cluster-config-prepare').hide();
 });
 
+
 /* 마법사 사이드 메뉴 버튼 클릭 이벤트 처리 시작 */
 
 $('#nav-button-cluster-config-overview').on('click', function () {
@@ -237,6 +238,9 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
             resetClusterConfigWizard();
             cur_step_wizard_cluster_config_prepare = "1";
             resetClusterConfigWizardWithData();
+
+            // 페이지 새로고침
+            location.reload();
         } else {
             $('#div-modal-wizard-cluster-config-finish').show();
             $('#nav-button-cluster-config-finish').addClass('pf-m-current');
@@ -299,14 +303,6 @@ $('#button-before-step-modal-wizard-cluster-config-prepare').on('click', functio
     }
 });
 
-// 취소 버튼 클릭 이벤트 처리
-$('#button-cancel-config-modal-wizard-cluster-config-prepare').on('click', function () {
-    resetClusterConfigWizard();
-    cur_step_wizard_cluster_config_prepare = "1";
-    resetClusterConfigWizardWithData();
-});
-
-
 /* 마법사 Footer 영역의 버튼 클릭 이벤트 처리 끝 */
 
 /* HTML Object에서 발생하는 이벤트 처리 시작 */
@@ -331,11 +327,12 @@ $('#form-radio-hosts-new').on('click', function () {
     $('#div-form-hosts-input-number').show();
     // "기존 파일 사용"에서 "신규 생성"을 클릭하면 초기화 된다.
     $('#form-textarea-cluster-config-new-host-profile').val("");
-    let hosts_text = "10.10.0.10\tccvm-mngt\n" +
+    let hosts_text = "10.10.10.10\tccvm-mngt\n" +
         "192.168.0.10\tccvm-svc\n" +
-        "10.10.0.11\tablestack1\n" +
-        "10.10.0.101\tcvm1-pn\n" +
-        "100.100.0.101\tscvm1-cn\n";
+        "10.10.10.1\tablecube1\n" +
+        "10.10.10.11\tscvm1-mngt\n" +
+        "100.100.10.11\tscvm1\n" +
+        "100.200.10.11\tscvm1-cn\n";
     $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
     $('#form-input-cluster-config-host-number').val(1);
 });
@@ -374,19 +371,22 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
     let host_ip_info;
     if (current_val <= 90) {
         target_textarea.val("");
-
-        host_ip_info = "10.10.0.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n";
+        host_ip_info = "10.10.10.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n";
+        for (let i = 1; i <= current_val; i++) {
+            let sum = 0 + i;
+            host_ip_info = host_ip_info + "10.10.10." + sum + "\tablecube" + i + "\n";
+        }
         for (let i = 1; i <= current_val; i++) {
             let sum = 10 + i;
-            host_ip_info = host_ip_info + "10.10.0." + sum + "\tablestack" + i + "\n";
+            host_ip_info = host_ip_info + "10.10.10." + sum + "\tscvm" + i + "-mngt\n";
         }
         for (let i = 1; i <= current_val; i++) {
-            let sum = 100 + i;
-            host_ip_info = host_ip_info + "10.10.0." + sum + "\tscvm" + i + "-pn\n";
+            let sum = 10 + i;
+            host_ip_info = host_ip_info + "100.100.0." + sum + "\tscvm" + i + "\n";
         }
         for (let i = 1; i <= current_val; i++) {
-            let sum = 100 + i;
-            host_ip_info = host_ip_info + "100.100.0." + sum + "\tscvm" + i + "-cn\n";
+            let sum = 10 + i;
+            host_ip_info = host_ip_info + "100.200.0." + sum + "\tscvm" + i + "-cn\n";
         }
         target_textarea.val(host_ip_info);
     } else {
@@ -576,9 +576,49 @@ $('#span-modal-wizard-cluster-config-finish-hosts-file-download').on('click', fu
     }
 });
 
+// textarea에서 "Tab"키 사용.
+$(".pf-c-form-control").keydown(function (e) {
+    if (e.keyCode === 9) { // tab was pressed
+        // get caret position/selection
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
+        var $this = $(this);
+        var value = $this.val();
+        // set textarea value to: text before caret + tab + text after caret
+        $this.val(value.substring(0, start)
+            + "\t"
+            + value.substring(end));
+        // put caret at right position again (add one for the tab)
+        this.selectionStart = this.selectionEnd = start + 1;
+        // prevent the focus lose
+        e.preventDefault();
+    }
+});
 
 /* HTML Object에서 발생하는 이벤트 처리 끝 */
 
+
+/* cluster cancel modal 관련 action 시작 */
+
+// 마법사 "취소 버튼 모달창" show, hide
+$('#button-cancel-config-modal-wizard-cluster-config-prepare').on('click', function () {
+    $('#div-modal-cancel-cluster-config-prepare-cancel').show();
+});
+$('#button-close-modal-cluster-config-prepare-cancel').on('click', function () {
+    $('#div-modal-cancel-cluster-config-prepare-cancel').hide();
+});
+$('#button-cancel-modal-cluster-config-prepare-cancel').on('click', function () {
+    $('#div-modal-cancel-cluster-config-prepare-cancel').hide();
+});
+// 마법사 "취소 버튼 모달창" 실행 버튼을 눌러 취소를 실행
+$('#button-execution-modal-cluster-config-prepare-cancel').on('click', function () {
+    resetClusterConfigWizard();
+    cur_step_wizard_cluster_config_prepare = "1";
+    resetClusterConfigWizardWithData();
+    $('#div-modal-cancel-cluster-config-prepare-cancel').hide();
+});
+
+/* cluster cancel modal 관련 action 끝 */
 
 /**
  * Meathod Name : resetClusterConfigWizard
@@ -646,11 +686,12 @@ function resetClusterConfigWizardWithData() {
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
     $('#div-form-hosts-input-number').show();
-    let hosts_text = "10.10.0.10\tccvm-mngt\n" +
+    let hosts_text = "10.10.10.10\tccvm-mngt\n" +
         "192.168.0.10\tccvm-svc\n" +
-        "10.10.0.11\tablestack1\n" +
-        "10.10.0.101\tcvm1-pn\n" +
-        "100.100.0.101\tscvm1-cn\n";
+        "10.10.10.1\tablecube1\n" +
+        "10.10.10.11\tscvm1-mngt\n" +
+        "100.100.10.11\tscvm1\n" +
+        "100.200.10.11\tscvm1-cn\n";
     $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
     $('#form-input-cluster-config-host-number').val(1);
     // 시간 서버
@@ -689,7 +730,7 @@ function resetClusterConfigWizardWithData() {
  **/
 
 function generateSshkey() {
-    return new Promise(function (resolve){
+    return new Promise(function (resolve) {
         resolve(cockpit.script(["ssh-keygen -t rsa -b 2048 -f /root/.ssh/id_rsa -N '' <<<y 2>&1 >/dev/null"]));
     });
 }
@@ -923,12 +964,20 @@ async function writeFile(text1, text2, file_type) {
             })
             .fail(function (error) {
             });
+        // 개인 키 파일 권한 변경
+        cockpit.script(["chmod 600 /root/.ssh/id_rsa"])
         cockpit.script(["touch /root/.ssh/id_rsa.pub"])
         cockpit.file("/root/.ssh/id_rsa.pub").replace(text2)
             .done(function (tag) {
             })
             .fail(function (error) {
             });
+        // 공개 키 파일 권한 변경
+        cockpit.script(["chmod 644 /root/.ssh/id_rsa.pub"])
+        // 공개 키 authorized_key 파일에 공개 키 내용 append
+        cockpit.script(["cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys"])
+        cockpit.script(["sort /root/.ssh/authorized_keys | uniq > /root/.ssh/authorized_keys.uniq"])
+        cockpit.script(["mv -f /root/.ssh/authorized_keys{.uniq,}"])
     } else if (file_type == 'hosts_file') {
         cockpit.script(["touch /etc/hosts"])
         cockpit.file("/etc/hosts").replace(text1)
