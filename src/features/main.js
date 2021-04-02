@@ -10,6 +10,7 @@
 this.ccvm_instance = new CloudCenterVirtualMachine()
 ccvm_instance = this.ccvm_instance
 $(document).ccvm_instance = ccvm_instance
+pluginpath = '/usr/share/cockpit/ablestack'
 
 $(document).ready(function(){
     $('#dropdown-menu-storage-cluster-status').hide();
@@ -55,6 +56,7 @@ $(document).ready(function(){
     Promise.all([checkConfigStatus(), checkStorageClusterStatus(), 
         checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
             checkDeployStatus();
+            saveHostInfo();
     });
 
 });
@@ -214,7 +216,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         cockpit.spawn(['grep', '-c', 'ccvm-mngt', '/etc/hosts'], {'host': 'localhost'})
         .then(data=>{
             if(data){
-                cockpit.spawn(['cat', '/root/.ssh/ablecloud.pub'], {'host': 'localhost'})
+                cockpit.spawn(['cat', '/root/.ssh/id_rsa.pub'], {'host': 'localhost'})
                 .then(data=>{
                     sessionStorage.setItem("ccfg_status", "true");
                     resolve();
@@ -489,4 +491,29 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
     }
     let alert_text = $('.pf-c-alert__description').text(description);
     alert_text.html(alert_text.html().replace(/\n/g, '<br/>'));
+}
+
+/**
+ * Meathod Name : saveHostInfo 
+ * Date Created : 2021.04.01
+ * Writer  : 박다정
+ * Description : 호스트 파일 정보를 세션스토리지에 저장
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.04.01 최초 작성
+ */
+ function saveHostInfo(){ 
+    cockpit.spawn(['cat', '/etc/hosts'],{'host':'localhost'})
+        .then(function(data){
+            var line = data.split("\n");
+            for(var i=0; i<line.length; i++){
+                var word = line[i].split("\t");
+                if(word.length>1){
+                    sessionStorage.setItem(word[1], word[0]); 
+                }
+            }
+        })
+        .catch(function(data){
+            //console.log("hosts 파일이 구성되어있지 않습니다.");
+        });
 }
