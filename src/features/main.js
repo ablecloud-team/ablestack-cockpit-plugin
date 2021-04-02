@@ -412,8 +412,8 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
     const step1 = sessionStorage.getItem("ccfg_status"); 
     const step2 = sessionStorage.getItem("scvm_status"); 
     const step3 = sessionStorage.getItem("sc_status");   
-    const step4 = sessionStorage.getItem("ccvm_status"); 
-    const step5 = sessionStorage.getItem("cc_status");   
+    const step4 = sessionStorage.getItem("cc_status"); 
+    const step5 = sessionStorage.getItem("ccvm_status");   
 
     // 배포 상태조회 
     if(step1!="true"){
