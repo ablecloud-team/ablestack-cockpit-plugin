@@ -548,40 +548,40 @@ function deployStorageCenterVM() {
                                                     //최종 화면 호출
                                                     showDivisionVMConfigFinish();
                                                 } else {
-                                                    setProgressFail(4);
-                                                    alert(pcs_config.val);            
+                                                    setScvmProgressFail(4);
+                                                    alert(result.val);            
                                                 }
                                             })
                                             .catch(function(data){
-                                                setProgressFail(4);
+                                                setScvmProgressFail(4);
                                                 alert("클러스터 구성 및 클라우드센터 가상머신 배포 실패 : "+data);
                                             });                                                        
                                     } else {
-                                        setProgressFail(3);
+                                        setScvmProgressFail(3);
                                         alert(create_scvm_xml_result.val);
                                     }
                                 })
                                 .catch(function(data){
-                                    setProgressFail(3);
+                                    setScvmProgressFail(3);
                                     alert("클라우드센터 가상머신 XML 생성 실패 : "+data);
                                 });                            
                         } else {
-                            setProgressFail(2);
+                            setScvmProgressFail(2);
                             alert(create_scvm_cloudinit_result.val);
                         }
                     })
                     .catch(function(data){
-                        setProgressFail(2);
+                        setScvmProgressFail(2);
                         alert("cloudinit iso 파일 생성 실패 : "+data);
                     });
 
             } else {
-                setProgressFail(1);
+                setScvmProgressFail(1);
                 alert(reset_storage_center_result.val);
             }
         })
         .catch(function(data){
-            setProgressFail(1);
+            setScvmProgressFail(1);
             alert("클러스터 구성 설정 초기화 작업 실패 : "+data);
         });
 }
@@ -1223,18 +1223,18 @@ function validateStorageVm(){
  */
  function setScvmProgressFail(setp_num){
     if( setp_num == 1 || setp_num == '1' ){   // 1단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step1",3);
-        setProgressStep("span-progress-step2",3);
-        setProgressStep("span-progress-step3",3);
-        setProgressStep("span-progress-step4",3);
+        seScvmProgressStep("span-progress-step1",3);
+        seScvmProgressStep("span-progress-step2",3);
+        seScvmProgressStep("span-progress-step3",3);
+        seScvmProgressStep("span-progress-step4",3);
     } else if(setp_num == 2 || setp_num == '2') {   // 2단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step2",3);
-        setProgressStep("span-progress-step3",3);
-        setProgressStep("span-progress-step4",3);
+        seScvmProgressStep("span-progress-step2",3);
+        seScvmProgressStep("span-progress-step3",3);
+        seScvmProgressStep("span-progress-step4",3);
     } else if(setp_num == 3 || setp_num == '3') {   // 3단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step3",3);
-        setProgressStep("span-progress-step4",3);
+        seScvmProgressStep("span-progress-step3",3);
+        seScvmProgressStep("span-progress-step4",3);
     } else if(setp_num == 4 || setp_num == '4') {   // 4단계 이하 단계 전부 중단된 처리
-        setProgressStep("span-progress-step4",3);
+        seScvmProgressStep("span-progress-step4",3);
     }
 }
