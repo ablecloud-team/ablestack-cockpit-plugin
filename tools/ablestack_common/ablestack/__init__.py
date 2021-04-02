@@ -3,4 +3,5 @@
 import ablestack.common as common
 from ablestack.common import createReturn, createLogger
 
-__all__ = ['common', 'createLogger', 'createReturn']
+pluginpath = '/usr/share/cockpit/ablestack'
+__all__ = ['common', 'createLogger', 'createReturn', pluginpath]
