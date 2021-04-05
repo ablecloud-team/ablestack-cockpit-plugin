@@ -27,6 +27,9 @@ $(document).ready(function () {
     $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', true);
 
     $('#nav-button-cluster-config-overview').addClass('pf-m-current');
+
+    checkHostsOs();
+    checkHostName();
 });
 
 // 타이틀 닫기 버튼 이벤트 처리
@@ -215,14 +218,15 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
             let pri_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val();
             let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val();
             let file_type = "ssh_key";
-            writeFile(pri_ssh_key_text, pub_ssh_key_text, file_type);
+            writeSshKeyFile(pri_ssh_key_text, pub_ssh_key_text, file_type);
 
             // hosts 파일
             radio_value = $('input[name=radio-hosts-file]:checked').val();
             putHostsValueIntoTextarea(radio_value);
             let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
-            file_type = "hosts_file";
-            writeFile(hosts_file_text, "", file_type);
+            let os_type = ($('#os-type').val()).trim();
+            let host_name = $('#host-name').val();
+            writeHostsFile(hosts_file_text, os_type, host_name);
 
             // time server 파일
             timeserver_type = $('input[name=radio-timeserver]:checked').val();
@@ -333,7 +337,7 @@ $('#form-radio-hosts-new').on('click', function () {
         "10.10.10.11\tscvm1-mngt\n" +
         "100.100.10.11\tscvm1\n" +
         "100.200.10.11\tscvm1-cn\n";
-    $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
+    $('#form-textarea-cluster-config-new-host-profile').val(hosts_centos_default_text+hosts_text);
     $('#form-input-cluster-config-host-number').val(1);
 });
 
@@ -947,45 +951,114 @@ function saveAsFile(id, str, filename) {
 
 
 /**
- * Meathod Name : writeFile
+ * Meathod Name : writeSshKeyFile
  * Date Created : 2021.03.17
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 완료를 누를 때 설정확인의 정보대로 파일(ssh-key, hosts)을 host에 업로드하거나 수정하는 함수
+ * Description : 클러스터 준비 마법사에서 완료를 누를 때 설정확인의 정보대로 파일(ssh-key)을 host에 업로드하거나 수정하는 함수
  * Parameter : text1, text2, file_type
  * Return  : 없음
  * History  : 2021.03.11 최초 작성
  **/
 
-async function writeFile(text1, text2, file_type) {
-    if (file_type == 'ssh_key') {
-        cockpit.script(["touch /root/.ssh/id_rsa"])
-        cockpit.file("/root/.ssh/id_rsa").replace(text1)
-            .done(function (tag) {
-            })
-            .fail(function (error) {
-            });
-        // 개인 키 파일 권한 변경
-        cockpit.script(["chmod 600 /root/.ssh/id_rsa"])
-        cockpit.script(["touch /root/.ssh/id_rsa.pub"])
-        cockpit.file("/root/.ssh/id_rsa.pub").replace(text2)
-            .done(function (tag) {
-            })
-            .fail(function (error) {
-            });
-        // 공개 키 파일 권한 변경
-        cockpit.script(["chmod 644 /root/.ssh/id_rsa.pub"])
-        // 공개 키 authorized_key 파일에 공개 키 내용 append
-        cockpit.script(["cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys"])
-        cockpit.script(["sort /root/.ssh/authorized_keys | uniq > /root/.ssh/authorized_keys.uniq"])
-        cockpit.script(["mv -f /root/.ssh/authorized_keys{.uniq,}"])
-    } else if (file_type == 'hosts_file') {
+async function writeSshKeyFile(text1, text2) {
+    cockpit.script(["touch /root/.ssh/id_rsa"])
+    cockpit.file("/root/.ssh/id_rsa").replace(text1)
+        .done(function (tag) {
+        })
+        .fail(function (error) {
+        });
+    // 개인 키 파일 권한 변경
+    cockpit.script(["chmod 600 /root/.ssh/id_rsa"])
+    cockpit.script(["touch /root/.ssh/id_rsa.pub"])
+    cockpit.file("/root/.ssh/id_rsa.pub").replace(text2)
+        .done(function (tag) {
+        })
+        .fail(function (error) {
+        });
+    // 공개 키 파일 권한 변경
+    cockpit.script(["chmod 644 /root/.ssh/id_rsa.pub"])
+    // 공개 키 authorized_key 파일에 공개 키 내용 append
+    cockpit.script(["cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys"])
+    cockpit.script(["sort /root/.ssh/authorized_keys | uniq > /root/.ssh/authorized_keys.uniq"])
+    cockpit.script(["mv -f /root/.ssh/authorized_keys{.uniq,}"])
+    cockpit.script(["chmod 644 /root/.ssh/authorized_keys"])
+}
+
+
+
+
+/**
+ * Meathod Name : writeHostsFile
+ * Date Created : 2021.03.17
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 완료를 누를 때 설정확인의 정보대로 파일(hosts)을 host에 업로드하거나 수정하는 함수
+ * Parameter : text1, os_type
+ * Return  : 없음
+ * History  : 2021.03.11 최초 작성
+ **/
+
+async function writeHostsFile(text1, os_type, host_name) {
+    if (os_type.match("centos")) {
+        let hosts_centos_default_text = "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4\n" +
+            "::1         localhost localhost.localdomain localhost6 localhost6.localdomain6\n\n";
         cockpit.script(["touch /etc/hosts"])
-        cockpit.file("/etc/hosts").replace(text1)
+        cockpit.file("/etc/hosts").replace(hosts_centos_default_text + text1)
+            .done(function (tag) {
+            })
+            .fail(function (error) {
+            });
+    } else if (os_type.match("ubuntu")) {
+        host_name = host_name.trim();
+        let hosts_ubuntu_default_text = "127.0.0.1\tlocalhost\n" +
+            "127.0.1.1\t"+host_name+"\t"+host_name+"\n\n";
+        cockpit.script(["touch /etc/hosts"])
+        cockpit.file("/etc/hosts").replace(hosts_ubuntu_default_text + text1)
             .done(function (tag) {
             })
             .fail(function (error) {
             });
     }
+}
+
+
+/**
+ * Meathod Name : checkHostsOs
+ * Date Created : 2021.04.05
+ * Writer  : 류홍욱
+ * Description : 호스트 OS를 체크하는 함수
+ * Parameter : 없음
+ * Return  : string
+ * History  : 2021.04.05
+ */
+
+function checkHostsOs() {
+    cockpit.script(["awk -F= '$1==\"ID\" { print $2 ;}' /etc/os-release"])
+        .then(function (data) {
+            let os_type = data.replaceAll("\"", "");
+            $('#os-type').val(os_type);
+        })
+        .catch(function (error) {
+        });
+}
+
+
+/**
+ * Meathod Name : checkHostName
+ * Date Created : 2021.04.05
+ * Writer  : 류홍욱
+ * Description : 호스트 name을 체크하는 함수
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.04.05
+ */
+
+function checkHostName() {
+    cockpit.script(["hostname"])
+        .then(function (data) {
+            $('#host-name').val(data);
+        })
+        .catch(function (error) {
+        });
 }
 
 
@@ -1076,6 +1149,9 @@ function validateClusterConfigPrepare(timeserver_type) {
     } else if ($('#div-textarea-cluster-config-confirm-hosts-file').val().trim() == "") {
         alert("Hosts 파일 정보를 확인해 주세요.");
         validate_check = false;
+    } else if (checkSpace($('#form-textarea-cluster-config-new-host-profile').val()) == false) {
+        alert("Hosts 파일 작성 시 'Tab 키'만 사용 가능합니다.");
+        validate_check = false;
     } else if (timeserver_type == "external") {
         if (timeserver_ip_check_external_1 == false) {
             alert("시간 서버 1번 IP정보를 확인해 주세요.");
@@ -1101,3 +1177,6 @@ function validateClusterConfigPrepare(timeserver_type) {
     }
     return validate_check;
 }
+
+
+
