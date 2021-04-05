@@ -55,7 +55,6 @@ def onMaintenance():
                 ret = createReturn(code=500, val='set nobackfill ERROR', retname='Maintenance Mode On')      
         else :
             ret = createReturn(code=500, val='set noout ERROR', retname='Maintenance Mode On')
-           
     except Exception as e:
         ret = createReturn(code=500, val='ERROR', retname='Maintenance Mode On')        
     return print(json.dumps(json.loads(ret), indent=4))
@@ -80,7 +79,7 @@ def offMaintenance():
                 ret = createReturn(code=500, val='unset nobackfill ERROR', retname='Maintenance Mode Off')      
         else :
             ret = createReturn(code=500, val='unset noout ERROR', retname='Maintenance Mode Off')
-        
+            
         ret = createReturn(code=200, val='success', retname='Maintenance Mode Off')
     except Exception as e:
         ret = createReturn(code=500, val='ERROR', retname='Maintenance Mode Off')        

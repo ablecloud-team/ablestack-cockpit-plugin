@@ -57,7 +57,6 @@ json 형태의 return값 확인
 (자원변경)
 # python3 /usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py resource -c 2 -m 2
 
-
 ```
 
 
@@ -73,5 +72,3 @@ json 형태의 return값 확인
     "type": "dict"
 }
 ```
-
-

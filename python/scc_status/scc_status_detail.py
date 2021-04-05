@@ -122,7 +122,6 @@ def statusDetail():
             available= "N/A"
             used = "N/A"
             usage_percentage = "N/A"
-        
         ret_val = {
             'cluster_status': cluster_status, 
             'osd': osd, 
