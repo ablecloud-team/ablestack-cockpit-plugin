@@ -48,7 +48,7 @@ def statusDeteil():
     manageNicType = ''
     manageNicParent = ''
     manageNicIp = ''
-    manageNicGw = 'XXX'
+    manageNicGw = ''
     storageServerNicType = ''
     storageServerNicParent = ''
     storageServerNicIp = ''
@@ -149,6 +149,14 @@ def statusDeteil():
             manageNicIp = 'N/A'
             manageNicParent = 'N/A'
             manageNicType = 'N/A'
+
+        '''management Nic Gw정보 확인'''
+        rc = call(["ping -c 1 scvm"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        if rc == 0:                
+            output = check_output(["ssh scvm /usr/sbin/route -n | grep -P '^0.0.0.0|UG' | awk '{print $2}' "], universal_newlines=True, shell=True, env=env)
+            manageNicGw = output.strip();            
+        else : 
+            manageNicGw = 'N/A'
 
         '''scvm 서버용 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
         rc = call(["cat /etc/hosts | grep scvm$"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
