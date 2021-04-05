@@ -142,7 +142,7 @@ class CloudCenterVirtualMachine {
                     $('#card-action-cloud-vm-connect').removeClass('pf-m-disabled')
                     resolve();
                 }else{
-                    sessionStorage.setItem("ccvm_status", "no signal");
+                    sessionStorage.setItem("ccvm_status", "HEALTH_ERR");
                     resolve();
                 }
             })
