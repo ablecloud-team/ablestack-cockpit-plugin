@@ -57,7 +57,7 @@ $(document).ready(function(){
         checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
             checkDeployStatus();
             saveHostInfo();
-    });
+        });
 
 });
 // document.ready 영역 끝
@@ -147,6 +147,7 @@ $('#menu-item-unset-maintenance-mode').on('click',function(){
 // 스토리지센터 VM 시작 버튼 클릭시 modal의 설명 세팅
 $('#menu-item-set-storage-center-vm-start').on('click',function(){  
     $('#modal-description-scvm-status').html("<p>스토리지 센터 가상머신을 '시작' 하시겠습니까?</p>");
+    $('#button-storage-vm-status-update').html("시작");
     $('#scvm-status-update-cmd').val("start");
     $('#div-modal-storage-vm-status-update').show();
 });
@@ -154,6 +155,7 @@ $('#menu-item-set-storage-center-vm-start').on('click',function(){
 // 스토리지센터 VM 정지 버튼 클릭시 modal의 설명 세팅
 $('#menu-item-set-storage-center-vm-stop').on('click',function(){
     $('#modal-description-scvm-status').html("<p>스토리지 센터 가상머신을 '정지' 하시겠습니까?</p>");
+    $('#button-storage-vm-status-update').html("정지");
     $('#scvm-status-update-cmd').val("stop");
     $('#div-modal-storage-vm-status-update').show();
 });
@@ -161,12 +163,16 @@ $('#menu-item-set-storage-center-vm-stop').on('click',function(){
 // 스토리지센터 VM 삭제 버튼 클릭시 modal의 설명 세팅
 $('#menu-item-set-storage-center-vm-delete').on('click',function(){
     $('#modal-description-scvm-status').html("<p>스토리지 센터 가상머신을 '삭제' 하시겠습니까?</p>");
+    $('#button-storage-vm-status-update').html("삭제");
     $('#scvm-status-update-cmd').val("delete");
     $('#div-modal-storage-vm-status-update').show();    
 });
 
 // 스토리지센터 VM 자원변경 버튼 클릭시 modal의 설명 세팅
 $('#menu-item-set-storage-center-vm-resource-update').on('click', function(){    
+    //현재 cpu, memory 값은 선택이 되지 않도록 disabled
+    $("#form-select-storage-vm-cpu-update option[value="+ sessionStorage.getItem("scvm_cpu") +"]").prop('disabled',true);
+    $("#form-select-storage-vm-memory-update option[value="+ sessionStorage.getItem("scvm_momory").split(' ')[0] +"]").prop('disabled',true);    
     $('#div-modal-storage-vm-resource-update').show();
 });
 
@@ -249,7 +255,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
     return new Promise((resolve) => {
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scc_status/scc_status_detail.py", "detail" ])
         .then(function(data){
-            var retVal = JSON.parse(data);
+            var retVal = JSON.parse(data);            
             sessionStorage.setItem("sc_status", retVal.val.cluster_status); //스토리지 클러스터 상태값 세션스토리지에 저장
             sessionStorage.setItem("storage_cluster_maintenance_status", retVal.val.maintenance_status); //스토리지 클러스터 유지보수 상태값 세션스토리지에 저장
             //스토리지 클러스터 유지보수 상태 확인 후 버튼 disabled 여부 세팅
@@ -270,10 +276,33 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
             }else if(retVal.val.cluster_status == "HEALTH_ERR"){
                 $("#scc-cluster-css").attr('class','pf-c-label pf-m-red');
                 $("#scc-cluster-icon").attr('class','fas fa-fw fa-exclamation-triangle');            
-            }
+            }            
             
-            //json으로 넘겨 받은 값들 세팅
-            $('#scc-status').text(retVal.val.cluster_status);
+            //json으로 넘겨 받은 값들 세팅            
+            if(retVal.val.cluster_status != "HEALTH_OK"){
+                //json key중 'message'이라는 key의 value값 가져옴
+                const recurse = (obj, arr=[]) => {
+                    Object.entries(obj).forEach(([key, val]) => {
+                      if (key === 'message') {
+                        arr.push(val);
+                      }
+                      if (typeof val === 'object') {
+                        recurse(val, arr);
+                      }
+                    });
+                    return arr;
+                };
+                //health상태가 warn, error일경우 message 정보 확인하기 위함.
+                var messArr = recurse(retVal);
+                var inMessHtml = "";
+                for(var i in messArr){
+                    inMessHtml = inMessHtml + "<br> - "  + messArr[i];
+                }
+                //console.log(inHtml);
+                $('#scc-status').html("HEALTH "+ retVal.val.cluster_status.split('_')[1] + inMessHtml);
+            }else{
+                $('#scc-status').html("HEALTH "+ retVal.val.cluster_status.split('_')[1]);                
+            }
             $('#scc-osd').text("전체 " + retVal.val.osd + "개의 디스크 중 " + retVal.val.osd_up + "개 작동 중");
             $('#scc-gw').text("RBD GW " + retVal.val.mon_gw1 + "개 제공중(quorum : " + retVal.val.mon_gw2 + ")");
             $('#scc-mgr').text(retVal.val.mgr + "(전체 " + retVal.val.mgr_cnt + "개 실행중)");
@@ -319,12 +348,23 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         .then(function(data){        
             var retVal = JSON.parse(data);
             sessionStorage.setItem("scvm_status", retVal.val.scvm_status);//스트리지센터 가상머신 상태값 세션스토리지에 저장
+            sessionStorage.setItem("scvm_cpu", retVal.val.vcpu);//스트리지센터 가상머신 상태값 세션스토리지에 저장
+            sessionStorage.setItem("scvm_momory", retVal.val.memory);//스트리지센터 가상머신 상태값 세션스토리지에 저장
+
             //json으로 넘겨 받은 값들 세팅
-            $('#scvm-status').text(retVal.val.scvm_status.toUpperCase());
+            var scvm_status = retVal.val.scvm_status;
+            if(scvm_status == "running"){
+                scvm_status = "Running";
+            }else if(scvm_status == "shut off"){
+                scvm_status = "Stopped";
+            }else{
+                scvm_status = "HEALTH ERR";
+            }
+            $('#scvm-status').text(scvm_status);
             $('#scvm-cpu').text(retVal.val.vcpu + " vCore");
             //$('#scvm-cpu').text(retVal.val.vcpu + "vCore(" + retVal.val.socket + " Socket, "+retVal.val.core+" Core)");
             $('#scvm-memory').text(retVal.val.memory);
-            $('#scvm-rdisk').text(retVal.val.rdisk);
+            $('#scvm-rdisk').text(retVal.val.rootDiskSize + "(사용가능 " + retVal.val.rootDiskAvail + " / 사용률 " + retVal.val.rootDiskUsePer + ")");
             $('#scvm-manage-nic-type').text("NIC Type : " + retVal.val.manageNicType + " (Parent : " + retVal.val.manageNicParent + ")");
             $('#scvm-manage-nic-ip').text("IP : " + retVal.val.manageNicIp);
             $('#scvm-manage-nic-gw').text("GW : " + retVal.val.manageNicGw);
@@ -345,74 +385,31 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                 $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item');            
             }
 
-
-
-
-            
-            
-            if(sessionStorage.getItem("sc_status") == "HEALTH_ERR"){                
-                if(retVal.val.scvm_status == "running"){
-                    $("#scvm-css").attr('class','pf-c-label pf-m-green');
-                    $("#scvm-icon").attr('class','fas fa-fw fa-check-circle'); 
-                    if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true" ){
-
-
-
-                    }else{
-
-
-
-                    }
-                }else{
-
-
-
-                }
-            }else{
-                if(retVal.val.scvm_status == "HEALTH_ERR"){
-                    if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true" ){
-
-
-
-                    }else{
-
-
-                        
-                    }
-                }else{
-
-
-
-                }
-            }
-
-
-
-
-
-
             //스토리지 센터 가상머신 toggle세팅
             if(retVal.val.scvm_status == "running"){ //가상머신 상태가 running일 경우
                 $("#scvm-css").attr('class','pf-c-label pf-m-green');
                 $("#scvm-icon").attr('class','fas fa-fw fa-check-circle');    
                 $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
-                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');            
-                if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true"){ //스토리지 클러스터 유지보수 상태값이 true일 경우
-                    $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item');
-                }else{
-                    $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled'); 
-                }    
-            }else{ //가상머신 상태가 running이 아닐 경우
-                $("#scvm-css").attr('class','pf-c-label');
-                $("#scvm-icon").attr('class','fas fa-fw fa-times-circle');            
-                $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');    
-                if(sessionStorage.getItem("storage_cluster_maintenance_status") =="true"){ //스토리지 클러스터 유지보수 상태값이 true일 경우
-                    $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item');
-                    $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item');                            
-                }else{        
-                    $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');  
-                    $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');       
+                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+                $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item');
+                if(sessionStorage.getItem("sc_status") == "HEALTH_ERR"){ //가상머신 상태 running && sc상태 Error 일때
+                    $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item');                    
+                }else{ //가상머신 상태 running && sc상태 ok, warn 일때
+                    $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');                   
                 }
+                if(sessionStorage.getItem("storage_cluster_maintenance_status") == "true"){ //가상머신 상태 running && sc 유지보수모드일때
+                    $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item');                        
+                }else{//가상머신 상태 running && sc 유지보수모드 아닐때
+                    $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');                        
+                }
+            }else{ //가상머신 상태가 running이 아닐 경우
+                $("#scvm-css").attr('class','pf-c-label pf-m-red');
+                $("#scvm-icon").attr('class','fas fa-fw fa-exclamation-triangle');                
+                $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item');
+                $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+                $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item');
+                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item');
+                $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
             }
             resolve();
         })
