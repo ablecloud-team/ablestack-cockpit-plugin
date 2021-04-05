@@ -213,10 +213,10 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  */
  function checkConfigStatus(){
     return new Promise((resolve) => {
-        cockpit.spawn(['grep', '-c', 'ccvm-mngt', '/etc/hosts'], {'host': 'localhost'})
+        cockpit.spawn(['grep', '-c', 'ccvm-mngt', '/etc/hosts'])
         .then(data=>{
             if(data){
-                cockpit.spawn(['cat', '/root/.ssh/id_rsa.pub'], {'host': 'localhost'})
+                cockpit.spawn(['cat', '/root/.ssh/id_rsa.pub'])
                 .then(data=>{
                     sessionStorage.setItem("ccfg_status", "true");
                     resolve();
@@ -412,8 +412,8 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
     const step1 = sessionStorage.getItem("ccfg_status"); 
     const step2 = sessionStorage.getItem("scvm_status"); 
     const step3 = sessionStorage.getItem("sc_status");   
-    const step4 = sessionStorage.getItem("ccvm_status"); 
-    const step5 = sessionStorage.getItem("cc_status");   
+    const step4 = sessionStorage.getItem("cc_status"); 
+    const step5 = sessionStorage.getItem("ccvm_status");   
 
     // 배포 상태조회 
     if(step1!="true"){
@@ -503,7 +503,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  * History  : 2021.04.01 최초 작성
  */
  function saveHostInfo(){ 
-    cockpit.spawn(['cat', '/etc/hosts'],{'host':'localhost'})
+    cockpit.spawn(['cat', '/etc/hosts'])
         .then(function(data){
             var line = data.split("\n");
             for(var i=0; i<line.length; i++){
