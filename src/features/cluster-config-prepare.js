@@ -28,6 +28,7 @@ $(document).ready(function () {
 
     $('#nav-button-cluster-config-overview').addClass('pf-m-current');
 
+    // Hosts 파일 단계에서 Host OS 종류와 Host명을 불러오는 함수
     checkHostsOs();
     checkHostName();
 });
@@ -337,7 +338,7 @@ $('#form-radio-hosts-new').on('click', function () {
         "10.10.10.11\tscvm1-mngt\n" +
         "100.100.10.11\tscvm1\n" +
         "100.200.10.11\tscvm1-cn\n";
-    $('#form-textarea-cluster-config-new-host-profile').val(hosts_centos_default_text+hosts_text);
+    $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
     $('#form-input-cluster-config-host-number').val(1);
 });
 
@@ -634,7 +635,6 @@ $('#button-execution-modal-cluster-config-prepare-cancel').on('click', function 
  * History  : 2021.03.03 최초 작성
  **/
 
-
 function resetClusterConfigWizard() {
     $('#nav-button-cluster-config-overview').removeClass('pf-m-current');
     $('#nav-button-cluster-config-ssh-key').removeClass('pf-m-current');
@@ -663,7 +663,6 @@ function resetClusterConfigWizard() {
  * Return  : 없음
  * History  : 2021.03.30 최초 작성
  **/
-
 
 function resetClusterConfigWizardWithData() {
     // 입력된 모든 데이터를 초기화한다.
@@ -721,6 +720,7 @@ function resetClusterConfigWizardWithData() {
 
     $('#div-modal-wizard-cluster-config-prepare').hide();
 }
+
 
 /**
  * Meathod Name : generateSshkey
@@ -833,6 +833,7 @@ function fileExtensionChecker(file_name) {
     ;
 }
 
+
 /**
  * Meathod Name : checkClusterConfigPrepareFileName
  * Date Created : 2021.03.19
@@ -862,6 +863,7 @@ function checkClusterConfigPrepareFileName(file_name, file_type) {
     }
 }
 
+
 /**
  * Meathod Name : putSshKeyValueIntoTextarea
  * Date Created : 2021.03.22
@@ -886,6 +888,7 @@ function putSshKeyValueIntoTextarea(radio_value) {
     }
 }
 
+
 /**
  * Meathod Name : putHostsValueIntoTextarea
  * Date Created : 2021.03.22
@@ -907,6 +910,7 @@ function putHostsValueIntoTextarea(radio_value) {
         $('#div-textarea-cluster-config-confirm-hosts-file').val($('#form-textarea-cluster-config-existing-host-profile').val());
     }
 }
+
 
 /**
  * Meathod Name : putTimeServerValueIntoTextarea
@@ -930,6 +934,7 @@ function putTimeServerValueIntoTextarea(radio_value) {
     $('#div-cluster-config-confirm-time-server-2').text($('#form-input-cluster-config-time-server-ip-2').val());
     $('#div-cluster-config-confirm-time-server-3').text($('#form-input-cluster-config-time-server-ip-3').val());
 }
+
 
 /**
  * Meathod Name : saveAsFile
@@ -985,8 +990,6 @@ async function writeSshKeyFile(text1, text2) {
 }
 
 
-
-
 /**
  * Meathod Name : writeHostsFile
  * Date Created : 2021.03.17
@@ -1010,7 +1013,7 @@ async function writeHostsFile(text1, os_type, host_name) {
     } else if (os_type.match("ubuntu")) {
         host_name = host_name.trim();
         let hosts_ubuntu_default_text = "127.0.0.1\tlocalhost\n" +
-            "127.0.1.1\t"+host_name+"\t"+host_name+"\n\n";
+            "127.0.1.1\t" + host_name + "\t" + host_name + "\n\n";
         cockpit.script(["touch /etc/hosts"])
         cockpit.file("/etc/hosts").replace(hosts_ubuntu_default_text + text1)
             .done(function (tag) {
