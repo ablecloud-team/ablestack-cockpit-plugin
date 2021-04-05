@@ -42,7 +42,9 @@ def statusDeteil():
     socket = 'XXX'
     core = 'XXX'
     memory = ''
-    rdisk = ''
+    rootDiskSize = ''
+    rootDiskAvail = ''
+    rootDiskUsePer = ''
     manageNicType = ''
     manageNicParent = ''
     manageNicIp = ''
@@ -89,21 +91,36 @@ def statusDeteil():
                 memory = str(memory_mib) + " MiB"
             elif memory_mib >=1024:
                 memory_gib = memory_mib / 1024
-                memory = str(memory_gib) + " GiB"
+                memory = str(round(memory_gib)) + " GiB"
             elif memory_gib >=1024:
                 memory_tib = memory_gib / 1024
-                memory = str(memory_tib) + " TiB"    
+                memory = str(round(memory_tib)) + " TiB"    
         else :
             memory = 'N/A'
 
         '''scvm root disk 크기 조회 시 리턴값 0이면 정상, 아니면 비정상'''
-        rc = call(['virsh vol-info  /var/lib/libvirt/images/scvm.qcow2 | grep Capacity'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
+        rc = call(["virsh domblkinfo --domain scvm --human --all | grep vda |awk '{print $2 $3}'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
         if rc == 0:
-            '''디스크 크기 출력값 확인'''
-            output = check_output(["virsh vol-info  /var/lib/libvirt/images/scvm.qcow2 | grep Capacity"], universal_newlines=True, shell=True, env=env)
-            rdisk = output.split("Capacity:")[1].strip()
+            '''디스크 크기 출력값 확인'''         
+            output = check_output(["virsh domblkinfo --domain scvm --human --all | grep vda |awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
+            rootDiskSize = round(float(output),2)
+            output = check_output(["virsh domblkinfo --domain scvm --human --all | grep vda |awk '{print $3}'"], universal_newlines=True, shell=True, env=env)
+            rootDiskSize = str(rootDiskSize) + " " + output.strip()
+
+            '''scvm 에 접속해 df -h 값 세팅'''            
+            rc = call(["ping -c 1 scvm"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            if rc == 0:                
+                output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $4}'"], universal_newlines=True, shell=True, env=env)
+                rootDiskAvail = output.strip();
+                output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $5}'"], universal_newlines=True, shell=True, env=env)
+                rootDiskUsePer = output.strip();                
+            else : 
+                rootDiskAvail = 'N/A'
+                rootDiskUsePer = 'N/A'
         else :
-            rdisk = 'N/A'        
+            rootDiskSize = 'N/A'     
+            rootDiskAvail = 'N/A'
+            rootDiskUsePer = 'N/A'
         
         '''scvm 관리 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
         rc = call(["cat /etc/hosts | grep scvm-mngt"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
@@ -196,7 +213,9 @@ def statusDeteil():
             'socket': socket, 
             'core': core,
             'memory': memory,
-            'rdisk': rdisk,
+            'rootDiskSize': rootDiskSize,
+            'rootDiskAvail': rootDiskAvail,
+            'rootDiskUsePer': rootDiskUsePer,
             'manageNicType': manageNicType,
             'manageNicParent': manageNicParent,
             'manageNicIp': manageNicIp,
@@ -218,7 +237,9 @@ def statusDeteil():
             'socket': socket, 
             'core': core,
             'memory': memory,
-            'rdisk': rdisk,
+            'rootDiskSize': rootDiskSize,
+            'rootDiskAvail': rootDiskAvail,
+            'rootDiskUsePer': rootDiskUsePer,
             'manageNicType': manageNicType,
             'manageNicParent': manageNicParent,
             'manageNicIp': manageNicIp,
