@@ -2,12 +2,12 @@
 
 ##사용법(가상머신 상태를 조회)
 ```shell
-# python /usr/share/cockpit/ablestack/python/storage_center_cluster_status/scvm_status_detail.py detail
+# python /usr/share/cockpit/ablestack/python/scc_status/scvm_status_detail.py detail
 
 ```
 
 ```
-python3 /usr/share/cockpit/ablestack/python/storage_center_cluster_status/scvm_status_detail.py detail
+python3 /usr/share/cockpit/ablestack/python/scc_status/scvm_status_detail.py detail
 
 json 형태의 return값 확인
 {
@@ -46,16 +46,16 @@ json 형태의 return값 확인
 ##사용법(가상머신 상태변경- 시작, 정지, 삭제, 자원변경)
 ```shell
 (시작)
-# python3 /usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_update.py start
+# python3 /usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py start
 
 (정지)
-# python3 /usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_update.py stop
+# python3 /usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py stop
 
 (삭제)
-# python3 /usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_update.py delete
+# python3 /usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py delete
 
 (자원변경)
-# python3 /usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_update.py resource -c 2 -m 2
+# python3 /usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py resource -c 2 -m 2
 
 
 ```
@@ -63,7 +63,7 @@ json 형태의 return값 확인
 
 
 ```
-예시 : python3 /usr/share/cockpit/ablestack/python/storage_center_vm_status/scvm_status_update.py resource -c 2 -m 2
+예시 : python3 /usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py resource -c 2 -m 2
 
 json 형태의 return값 확인
 {
