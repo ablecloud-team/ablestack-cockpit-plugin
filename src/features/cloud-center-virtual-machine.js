@@ -68,7 +68,7 @@ class CloudCenterVirtualMachine {
 
         else
 
-            return (bytes / Math.pow(1024, Math.floor(e))).toFixed(2) + " " + s[e];
+            return (bytes / Math.pow(1024, Math.floor(e))) + " " + s[e];
 
     }
 
@@ -98,7 +98,7 @@ class CloudCenterVirtualMachine {
     */
     checkVIRSHOK(data, message) {
         return new Promise((resolve) => {
-            console.log("ok: " + data)
+            console.log("ok(cloud-center-virtual-machine: " + data)
             console.log("ok: " + message)
             const obj = JSON.parse(data)
             let status_span = $("#description-cloud-vm-status");
@@ -114,7 +114,7 @@ class CloudCenterVirtualMachine {
                         ccvm_instance.byteCalculation(ccvm_instance.toBytes(vm['Max memory']))
                     );
                     $("#div-cloud-vm-disk-text").text(
-                        ccvm_instance.byteCalculation(vm['DISK_CAP']) +" (" + ccvm_instance.byteCalculation(vm['DISK_PHY']) + " used)"
+                        vm['DISK_CAP'] + " ( " +vm['DISK_PHY'] + " Avail )"
                     );
                     $("#div-cloud-vm-nic-type-text").text(
                         "NIC Type : " + vm['nictype'] + " (Parent : " + vm['nicbridge'] + ")"
@@ -123,15 +123,19 @@ class CloudCenterVirtualMachine {
                         "IP : " + vm['ip']
                     );
                     $("#div-cloud-vm-nic-gw-text").text(
-                        "GW : " + "N/A"
+                        "GW : " + vm['GW']
                     );
                     if (vm.State == "running") {
-                        let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'green', 'running');
+                        let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'green', 'Running');
                         status_span[0].children[0].replaceWith(a)
                     } else {
-                        let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'red', 'shut down');
+                        let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'red', 'Stopped');
                         status_span[0].children[0].replaceWith(a)
                     }
+                    $('#ccvm-low-info').text('클라우드센터 가상머신이 배포되었습니다.')
+                    $('#ccvm-low-info').attr('style','color: var(--pf-global--success-color--100)')
+                    $('#span-cloud-vm-status').attr('class','pf-c-label pf-m-green');
+                    $('#ccvm_status_icon').attr('class','fas fa-fw fa-check-circle');
                     sessionStorage.setItem("ccvm_status", vm.State.toUpperCase()); 
                     ccvm_instance.cpus=vm['CPU(s)']
                     ccvm_instance.mem=vm['Max memory']
@@ -173,7 +177,7 @@ class CloudCenterVirtualMachine {
     checkPCSOK(data, message) {
         return new Promise((resolve) => {
             ccvm_instance= new CloudCenterVirtualMachine()
-            console.log("ok: " + data)
+            console.log("ok(checkPCSOK): " + data)
             console.log("ok: " + message)
             const obj = JSON.parse(data)
             /*
@@ -203,7 +207,6 @@ class CloudCenterVirtualMachine {
                 }
                 ccvm_instance.runningHost = obj['val']['started']
                 ccvm_instance.clusterdHost = obj['val']['clustered_host']
-                console.log(ccvm_instance)
                 cockpit.spawn(['/usr/bin/python3',
                 '/usr/share/cockpit/ablestack/python/host/virshlist.py',
                 ], {'host': ccvm_instance.runningHost, 'env': 'LANG="en_US.UTF-8"'})

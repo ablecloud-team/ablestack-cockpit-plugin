@@ -4,7 +4,6 @@
  * Writer  : 이석민
  * Description : main.html에서 발생하는 이벤트 처리를 위한 JavaScript
 **/
-var pcsStatus = null;
 var role = '';
 /** cloud vm start 관련 action start */
 $('#button-cloud-cluster-start').on('click', function(){
@@ -158,19 +157,25 @@ function CardCloudClusterStatus(){
         .then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == '200'){
-                var nodeText = '';
+                var nodeText = '(';
                 var selectHtml = '<option selected="" value="null">노드를 선택해주세요.</option>';
                 $('#form-select-cloud-vm-migration-node option').remove();
             
                 for(var i=0; i<Object.keys(retVal.val.clustered_host).length; i++){
-                    nodeText = nodeText + '[' +retVal.val.clustered_host[i] + ']';
+                    nodeText = nodeText +retVal.val.clustered_host[i];
                     if(retVal.val.clustered_host[i] != retVal.val.started){
                         selectHtml = selectHtml + '<option value="' + retVal.val.clustered_host[i] + '">' + retVal.val.clustered_host[i] + '</option>';
+                    }
+                    if(i == (Object.keys(retVal.val.clustered_host).length - 1)){
+
+                        nodeText = nodeText + ')';
+                    }else{
+                        nodeText = nodeText + ',';
                     }
                 }
                 $('#cccs_back_color').attr('class','pf-c-label pf-m-green');
                 $('#cccs_cluster_icon').attr('class','fas fa-fw fa-check-circle');
-                $('#cccs_status').text('Health OK');
+                $('#cccs_status').text('HEALTH OK');
                 $('#cccs_node_info').text('총 ' + Object.keys(retVal.val.clustered_host).length + '노드로 구성됨 : ' + nodeText);
                 sessionStorage.setItem("cc_status", "HEALTH_OK"); 
                 if(retVal.val.active == 'true'){
@@ -192,7 +197,7 @@ function CardCloudClusterStatus(){
                     $('#button-cloud-cluster-connect').prop('disabled', true);
                 }
                 $('#cccs-low-info').text('클라우드센터 클러스터가 구성되었습니다.');
-                $('#cccs-low-info').attr("style","color: var(--pf-global--success-color--100)")
+                $('#cccs-low-info').attr('style','color: var(--pf-global--success-color--100)')
             }else if(retVal.code == '400' && retVal.val == 'cluster is not configured.'){
                 $('#cccs_status').text('Health Err.');
                 $('#cccs_back_color').attr('class','pf-c-label pf-m-red');
