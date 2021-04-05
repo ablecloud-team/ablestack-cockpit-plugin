@@ -9,8 +9,13 @@ $('#button-close1, #button-close2').on('click', function(){
     $('#div-modal-storage-vm-resource-update').hide();
 });
 
-//변경 버튼 클릭 이벤트
-$('#scvm-resource-update').click(function(){    
+//실행 버튼 클릭 이벤트
+$('#scvm-resource-update').click(function(){
+    $('#dropdown-menu-storage-vm-status').toggle();
+    $('#div-modal-storage-vm-resource-update').hide();
+    $('#div-modal-spinner-header-txt').text('스토리지센터 가상머신 자원 변경중입니다.');
+    $('#div-modal-spinner').show();
+
     var cpu = $('#form-select-storage-vm-cpu-update option:selected').val();
     var memory = $('#form-select-storage-vm-memory-update option:selected').val();    
     if(cpu == 0 && memory == 0) {//넘겨받은 cpu, memory 두 값이 전부 선택된것이 없을 때
