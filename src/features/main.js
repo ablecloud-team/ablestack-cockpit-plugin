@@ -56,7 +56,6 @@ $(document).ready(function(){
     Promise.all([checkConfigStatus(), checkStorageClusterStatus(), 
         checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
             checkDeployStatus();
-            saveHostInfo();
         });
 
 });
@@ -103,17 +102,24 @@ $('#button-open-modal-wizard-cloud-vm').on('click', function(){
 });
 
 $('#button-link-storage-center-dashboard').on('click', function(){
-    // 스토리지센터 연결
-    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/url/create_address.py", "storageCenter"])
-    .then(function(data){
-        var retVal = JSON.parse(data);        
-        if(retVal.code == 200){
-            window.open(retVal.val);
-        }
-    })
-    .catch(function(data){
-        //console.log(":::Error:::");        
-    });
+    const mgr = sessionStorage.getItem("mgr");
+    const mgr_ip = sessionStorage.getItem(mgr+'-mngt');
+    if(mgr==undefined||mgr==""){
+        // storageCenter url 링크 주소 가져오기
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/url/create_address.py", "storageCenter", "-H"])
+        .then(function(data){
+            var retVal = JSON.parse(data);        
+            if(retVal.code == 200){
+                // 스토리지센터 연결
+                window.open(retVal.val);
+            }
+        })
+        .catch(function(data){
+            // console.log(":::Error:::");        
+        });
+    }else{
+        window.open('https://'+mgr_ip+':8443');
+    }
 });
 
 $('#button-link-cloud-center').on('click', function(){
@@ -178,18 +184,24 @@ $('#menu-item-set-storage-center-vm-resource-update').on('click', function(){
 
 // 스토리지센터 연결 버튼 클릭시 URL 세팅
 $('#menu-item-linkto-storage-center').on('click', function(){
-    // storageCenter url 링크 주소 가져오기
-    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/url/create_address.py", "storageCenter", "-H" ])
-    .then(function(data){
-        var retVal = JSON.parse(data);        
-        if(retVal.code == 200){
-            // 스토리지 센터 VM 연결
-            window.open(retVal.val);
-        }
-    })
-    .catch(function(data){
-        // console.log(":::Error:::");        
-    });
+    const mgr = sessionStorage.getItem("mgr");
+    const mgr_ip = sessionStorage.getItem(mgr+'-mngt');
+    if(mgr==undefined||mgr==""){
+        // storageCenter url 링크 주소 가져오기
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/url/create_address.py", "storageCenter", "-H"])
+        .then(function(data){
+            var retVal = JSON.parse(data);        
+            if(retVal.code == 200){
+                // 스토리지센터 연결
+                window.open(retVal.val);
+            }
+        })
+        .catch(function(data){
+            // console.log(":::Error:::");        
+        });
+    }else{
+        window.open('https://'+mgr_ip+':8443');
+    }
 });
 
 // 스토리지센터VM 연결 버튼 클릭시 URL 세팅
@@ -225,7 +237,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                 cockpit.spawn(['cat', '/root/.ssh/id_rsa.pub'])
                 .then(data=>{
                     sessionStorage.setItem("ccfg_status", "true");
-                    resolve();
+                    saveHostInfo();
                 })
                 .catch(err=>{
                     // ssh-key 파일 없음
@@ -540,13 +552,14 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  * Meathod Name : saveHostInfo 
  * Date Created : 2021.04.01
  * Writer  : 박다정
- * Description : 호스트 파일 정보를 세션스토리지에 저장
+ * Description : 호스트 파일 정보와 ceph mgr 정보를 세션스토리지에 저장
  * Parameter : 없음
  * Return  : 없음
  * History  : 2021.04.01 최초 작성
  */
  function saveHostInfo(){ 
-    cockpit.spawn(['cat', '/etc/hosts'])
+    return new Promise((resolve) => {
+        cockpit.spawn(['cat', '/etc/hosts'])
         .then(function(data){
             var line = data.split("\n");
             for(var i=0; i<line.length; i++){
@@ -555,8 +568,27 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                     sessionStorage.setItem(word[1], word[0]); 
                 }
             }
+            for(var j=1; j<line.length; j++){
+                if(sessionStorage.getItem("scvm"+j)!=null){
+                    cockpit.spawn(['ssh', '-o', 'StrictHostKeyChecking=no','scvm'+j,'ceph', 'mgr','stat'])
+                    .then(data2=>{
+                        var retVal = JSON.parse(data2);
+                        if(retVal.active_name!=""){
+                            var index = retVal.active_name.indexOf(["."]);
+                            sessionStorage.setItem("mgr",retVal.active_name.substring(0,index));
+                        }
+                    })
+                    .catch(err=>{
+                        console.log("scvm"+j+" ceph mgr 조회되지 않음");
+                    })
+                }else
+                    break;              
+            }
+            resolve();
         })
         .catch(function(data){
+            resolve();
             //console.log("hosts 파일이 구성되어있지 않습니다.");
         });
+    });
 }
