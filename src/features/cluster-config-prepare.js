@@ -333,7 +333,6 @@ $('#form-radio-hosts-new').on('click', function () {
     // "기존 파일 사용"에서 "신규 생성"을 클릭하면 초기화 된다.
     $('#form-textarea-cluster-config-new-host-profile').val("");
     let hosts_text = "10.10.10.10\tccvm-mngt\n" +
-        "192.168.0.10\tccvm-svc\n" +
         "10.10.10.1\tablecube1\n" +
         "10.10.10.11\tscvm1-mngt\n" +
         "100.100.10.11\tscvm1\n" +
@@ -376,7 +375,7 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
     let host_ip_info;
     if (current_val <= 90) {
         target_textarea.val("");
-        host_ip_info = "10.10.10.10\tccvm-mngt\n" + "192.168.0.10\tccvm-svc\n";
+        host_ip_info = "10.10.10.10\tccvm-mngt\n";
         for (let i = 1; i <= current_val; i++) {
             let sum = 0 + i;
             host_ip_info = host_ip_info + "10.10.10." + sum + "\tablecube" + i + "\n";
@@ -581,24 +580,6 @@ $('#span-modal-wizard-cluster-config-finish-hosts-file-download').on('click', fu
     }
 });
 
-// textarea에서 "Tab"키 사용.
-$(".pf-c-form-control").keydown(function (e) {
-    if (e.keyCode === 9) { // tab was pressed
-        // get caret position/selection
-        var start = this.selectionStart;
-        var end = this.selectionEnd;
-        var $this = $(this);
-        var value = $this.val();
-        // set textarea value to: text before caret + tab + text after caret
-        $this.val(value.substring(0, start)
-            + "\t"
-            + value.substring(end));
-        // put caret at right position again (add one for the tab)
-        this.selectionStart = this.selectionEnd = start + 1;
-        // prevent the focus lose
-        e.preventDefault();
-    }
-});
 
 /* HTML Object에서 발생하는 이벤트 처리 끝 */
 
@@ -690,7 +671,6 @@ function resetClusterConfigWizardWithData() {
     $('#div-form-hosts-file').hide();
     $('#div-form-hosts-input-number').show();
     let hosts_text = "10.10.10.10\tccvm-mngt\n" +
-        "192.168.0.10\tccvm-svc\n" +
         "10.10.10.1\tablecube1\n" +
         "10.10.10.11\tscvm1-mngt\n" +
         "100.100.10.11\tscvm1\n" +
