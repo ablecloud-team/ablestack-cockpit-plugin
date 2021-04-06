@@ -58,11 +58,6 @@ $(document).ready(function(){
             checkDeployStatus();
         });
 
-    // 호스트 및 mgr 정보 세션 스토리지 저장
-    setTimeout(function(){
-        saveHostInfo();
-    },2000);
-
 });
 // document.ready 영역 끝
 
@@ -242,6 +237,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                 cockpit.spawn(['cat', '/root/.ssh/id_rsa.pub'])
                 .then(data=>{
                     sessionStorage.setItem("ccfg_status", "true");
+                    saveHostInfo();
                     resolve();
                 })
                 .catch(err=>{
@@ -574,7 +570,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         }    
         for(var j=1; j<line.length; j++){
             if(sessionStorage.getItem("scvm"+j)!=null){
-                //ssh cmd error 30초-1분 후 alert, reload 추가 필요.. 
+                //pending 상태가 지속될 경우 에러처리 필요함
                 cockpit.spawn(['ssh', '-o', 'StrictHostKeyChecking=no','scvm'+j,'ceph', 'mgr','stat'])
                 .then(data2=>{
                     if(data2.includes('active_name')==true){
