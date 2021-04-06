@@ -234,6 +234,14 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
             modifyTimeServer(timeserver_confirm_ip_list, timeserver_type, timeserver_current_host_num);
 
             $('#nav-button-cluster-config-finish').removeClass('pf-m-disabled');
+            $('#nav-button-cluster-config-overview').addClass('pf-m-disabled');
+            $('#nav-button-cluster-config-ssh-key').addClass('pf-m-disabled');
+            $('#nav-button-cluster-config-ip-info').addClass('pf-m-disabled');
+            $('#nav-button-cluster-config-time-server').addClass('pf-m-disabled');
+            $('#nav-button-cluster-config-review').addClass('pf-m-disabled');
+            $('#button-before-step-modal-wizard-cluster-config-prepare').hide();
+            $('#button-cancel-config-modal-wizard-cluster-config-prepare').hide();
+
             $('#button-next-step-modal-wizard-cluster-config-prepare').html('종료');
             $('#div-modal-wizard-cluster-config-finish').show();
             $('#nav-button-cluster-config-finish').addClass('pf-m-current');
@@ -597,9 +605,9 @@ $('#button-cancel-modal-cluster-config-prepare-cancel').on('click', function () 
 // 마법사 "취소 버튼 모달창" 실행 버튼을 눌러 취소를 실행
 $('#button-execution-modal-cluster-config-prepare-cancel').on('click', function () {
     resetClusterConfigWizard();
-    cur_step_wizard_cluster_config_prepare = "1";
     resetClusterConfigWizardWithData();
     $('#div-modal-cancel-cluster-config-prepare-cancel').hide();
+    cur_step_wizard_cluster_config_prepare = "1";
 });
 
 /* cluster cancel modal 관련 action 끝 */
@@ -643,7 +651,7 @@ function resetClusterConfigWizard() {
  * History  : 2021.03.30 최초 작성
  **/
 
-function resetClusterConfigWizardWithData() {
+async function resetClusterConfigWizardWithData() {
     // 입력된 모든 데이터를 초기화한다.
     $('#nav-button-cluster-config-overview').addClass('pf-m-current');
     $('#nav-button-cluster-config-ssh-key').removeClass('pf-m-current');
@@ -695,6 +703,16 @@ function resetClusterConfigWizardWithData() {
     $('#button-accordion-timeserver').removeClass("pf-m-expanded");
     $('#div-accordion-timeserver').fadeOut();
     $('#div-accordion-timeserver').removeClass("pf-m-expanded");
+    // 클래스 원복
+    $('#nav-button-cluster-config-finish').addClass('pf-m-disabled');
+    $('#nav-button-cluster-config-overview').removeClass('pf-m-disabled');
+    $('#nav-button-cluster-config-ssh-key').removeClass('pf-m-disabled');
+    $('#nav-button-cluster-config-ip-info').removeClass('pf-m-disabled');
+    $('#nav-button-cluster-config-time-server').removeClass('pf-m-disabled');
+    $('#nav-button-cluster-config-review').removeClass('pf-m-disabled');
+    $('#button-before-step-modal-wizard-cluster-config-prepare').show();
+    $('#button-before-step-modal-wizard-cluster-config-prepare').show();
+    $('#button-cancel-config-modal-wizard-cluster-config-prepare').show();
 
     $('#div-modal-wizard-cluster-config-prepare').hide();
 }
@@ -963,7 +981,7 @@ async function writeSshKeyFile(text1, text2) {
     // 공개 키 authorized_key 파일에 공개 키 내용 append 및 중복 내용 제거
     cockpit.script(["cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys"])
     cockpit.script(["sort /root/.ssh/authorized_keys | uniq > /root/.ssh/authorized_keys.uniq"])
-    cockpit.script(["mv -f /root/.ssh/authorized_keys{.uniq,}"])
+    cockpit.script(["mv -f /root/.ssh/authorized_keys{.uniq}"])
     cockpit.script(["chmod 644 /root/.ssh/authorized_keys"])
     cockpit.script(["rm -f /root/.ssh/authorized_keys.uniq"])
 }
@@ -1064,15 +1082,18 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
     // 외부 시간 서버
     if (file_type == "external") {
         // chrony.conf 파일 서버 리스트 부분 초기화
+        cockpit.script(["sed -i '/^#allow /d' /" + chrony_file_root + ""])
         cockpit.script(["sed -i '/^allow /d' /" + chrony_file_root + ""])
-        cockpit.script(["sed -i '/allow /d' /" + chrony_file_root + ""])
+        // cockpit.script(["sed -i '/allow /d' /" + chrony_file_root + ""])
         cockpit.script(["sed -i '/^local stratum /d' /" + chrony_file_root + ""])
         cockpit.script(["sed -i '/local stratum /d' /" + chrony_file_root + ""])
-        cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\#allow 192.168.0.0/16\" /" + chrony_file_root + ""])
+        // cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\#allow 192.168.0.0/16\" /" + chrony_file_root + ""])
         cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\#local stratum 10\" /" + chrony_file_root + ""])
         for (let i in timeserver_confirm_ip_text) {
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[i] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
         }
+        let allow_ip = "100.100.0.0/24";
+        cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
     }
     // 로컬 시간 서버
     if (file_type == "internal") {
@@ -1093,9 +1114,10 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
         }
         // 공통 수정 부분
-        let allow_ip = timeserver_confirm_ip_text[0];
-        allow_ip = allow_ip.split('.');
-        allow_ip = allow_ip[0] + "." + allow_ip[1] + ".0.0/24";
+        // let allow_ip = timeserver_confirm_ip_text[0];
+        // allow_ip = allow_ip.split('.');
+        // allow_ip = allow_ip[0] + "." + allow_ip[1] + ".0.0/24";
+        let allow_ip = "100.100.0.0/24";
         cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
         cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\local stratum 10\" /" + chrony_file_root + ""])
     }
