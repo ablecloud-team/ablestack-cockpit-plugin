@@ -274,7 +274,7 @@ $('#button-before-step-modal-wizard-cluster-config-prepare').on('click', functio
         $('#nav-button-cluster-config-overview').addClass('pf-m-current');
 
         $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
-        $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
+        $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', true);
 
         cur_step_wizard_cluster_config_prepare = "1";
     } else if (cur_step_wizard_cluster_config_prepare == "3") {
@@ -282,7 +282,7 @@ $('#button-before-step-modal-wizard-cluster-config-prepare').on('click', functio
         $('#nav-button-cluster-config-ssh-key').addClass('pf-m-current');
 
         $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
-        $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', true);
+        $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
         cur_step_wizard_cluster_config_prepare = "2";
 
