@@ -45,7 +45,7 @@ def resetCloud(args):
     success_bool = True    
     
     # 스토리지 가상머신용 qcow2 이미지 생성
-    os.system("yes|cp -f /var/lib/libvirt/images/ablestack-template.qcow2 /var/lib/libvirt/images/scvm.qcow2")
+    os.system("yes|cp -f /var/lib/libvirt/images/ablestack-template-back.qcow2 /var/lib/libvirt/images/scvm.qcow2")
 
     # virsh 초기화   
     check_err = os.system("virsh define /var/lib/libvirt/ablestack/vm/scvm/scvm.xml > /dev/null")
@@ -53,7 +53,7 @@ def resetCloud(args):
         success_bool = False
 
     check_err = os.system("virsh start scvm > /dev/null")
-    if ping_check != 0 :
+    if check_err != 0 :
         success_bool = False
 
     # 결과값 리턴

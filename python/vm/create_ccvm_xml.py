@@ -116,7 +116,7 @@ def createCcvmXml(args):
             slot_hex_num = generateDecToHex()
             br_num = 0
             
-            os.system("yes|cp -f /usr/share/cockpit/cockpit-plugin-ablestack/tools/xml-template/ccvm-xml-template.xml /var/lib/libvirt/ablestack/vm/ccvm/ccvm-temp.xml")
+            os.system("yes|cp -f "+pluginpath+"/tools/xml-template/ccvm-xml-template.xml /var/lib/libvirt/ablestack/vm/ccvm/ccvm-temp.xml")
             
             template_file = '/var/lib/libvirt/ablestack/vm/ccvm/ccvm-temp.xml'
 
@@ -128,18 +128,6 @@ def createCcvmXml(args):
                         line = line.replace('<!--memory-->', str(args.memory))
                     elif '<!--cpu-->' in line:
                         line = line.replace('<!--cpu-->', str(args.cpu))
-                    elif '<!--ccvm-root-disk-->' in line:
-                        crd_txt = "  <disk type='network' device='disk'>\n"
-                        crd_txt += "      <source protocol='rbd' name='rbd/ccvm'>\n"
-                        crd_txt += "        <host name='scvm' port='6789'/>\n"
-                        crd_txt += "      </source>\n"
-                        crd_txt += "      <auth username='admin'>\n"
-                        crd_txt += "        <secret type='ceph' uuid='11111111-1111-1111-1111-111111111111'/>\n"
-                        crd_txt += "      </auth>\n"
-                        crd_txt += "      <target dev='vdb' bus='virtio'/>\n"
-                        crd_txt += "    </disk>"
-
-                        line = line.replace('<!--ccvm-root-disk-->', crd_txt)
                     elif '<!--management_network_bridge-->' in line:
                         mnb_txt = "    <interface type='bridge'>\n"
                         mnb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
