@@ -98,6 +98,7 @@ $('#nav-button-cluster-config-review').on('click', function () {
     $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
     $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
+    $('#button-next-step-modal-wizard-cluster-config-prepare').html('완료');
     cur_step_wizard_cluster_config_prepare = "5";
 
     // 변경된 키 내용을 설정 확인에 반영
@@ -120,7 +121,7 @@ $('#nav-button-cluster-config-finish').on('click', function () {
     $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
     $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
-    $('#button-next-step-modal-wizard-cluster-config-prepare').html('완료');
+    $('#button-next-step-modal-wizard-cluster-config-prepare').html('종료');
 
     cur_step_wizard_cluster_config_prepare = "6";
 
@@ -185,6 +186,7 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
         $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
         $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
+        $('#button-next-step-modal-wizard-cluster-config-prepare').html('완료');
         cur_step_wizard_cluster_config_prepare = "5";
 
         // 변경된 키 내용을 설정 확인에 반영
@@ -198,16 +200,6 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
         putTimeServerValueIntoTextarea(timeserver_type);
 
     } else if (cur_step_wizard_cluster_config_prepare == "5") {
-        $('#div-modal-wizard-cluster-config-finish').show();
-        $('#nav-button-cluster-config-finish').addClass('pf-m-current');
-
-        $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
-        $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
-
-        $('#button-next-step-modal-wizard-cluster-config-prepare').html('완료');
-
-        cur_step_wizard_cluster_config_prepare = "6";
-    } else if (cur_step_wizard_cluster_config_prepare == "6") {
 
         // 유효성 검증 후 완료 버튼을 누르면 선택한 내용대로 파일이 호스트에 저장
         let timeserver_type = $('input[name=radio-timeserver]:checked').val();
@@ -240,23 +232,28 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
                 return item !== null && item !== undefined && item !== '';
             });
             modifyTimeServer(timeserver_confirm_ip_list, timeserver_type, timeserver_current_host_num);
-            resetClusterConfigWizard();
-            cur_step_wizard_cluster_config_prepare = "1";
-            resetClusterConfigWizardWithData();
 
-            // 페이지 새로고침
-            location.reload();
-        } else {
+            $('#nav-button-cluster-config-finish').removeClass('pf-m-disabled');
+            $('#button-next-step-modal-wizard-cluster-config-prepare').html('종료');
             $('#div-modal-wizard-cluster-config-finish').show();
             $('#nav-button-cluster-config-finish').addClass('pf-m-current');
-
             $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
             $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
-
-            $('#button-next-step-modal-wizard-cluster-config-prepare').html('완료');
-
             cur_step_wizard_cluster_config_prepare = "6";
+        }else {
+            $('#button-next-step-modal-wizard-cluster-config-prepare').html('완료');
+            $('#div-modal-wizard-cluster-config-review').show();
+            $('#nav-button-cluster-config-review').addClass('pf-m-current');
+            $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
+            $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
+            cur_step_wizard_cluster_config_prepare = "5";
         }
+    } else if (cur_step_wizard_cluster_config_prepare == "6") {
+            resetClusterConfigWizard();
+            resetClusterConfigWizardWithData();
+            cur_step_wizard_cluster_config_prepare = "1";
+            // 페이지 새로고침
+            location.reload();
     }
 });
 
@@ -304,6 +301,7 @@ $('#button-before-step-modal-wizard-cluster-config-prepare').on('click', functio
         $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
         $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
+        $('#nav-button-cluster-config-finish').addClass('pf-m-disabled');
         cur_step_wizard_cluster_config_prepare = "5";
     }
 });
