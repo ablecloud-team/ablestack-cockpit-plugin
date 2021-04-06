@@ -360,7 +360,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_detail.py", "detail" ])
         .then(function(data){        
             var retVal = JSON.parse(data);
-            sessionStorage.setItem("scvm_status", retVal.val.scvm_status);//스트리지센터 가상머신 상태값 세션스토리지에 저장
+            sessionStorage.setItem("scvm_status", retVal.val.scvm_status.toUpperCase());//스트리지센터 가상머신 상태값 세션스토리지에 저장
             sessionStorage.setItem("scvm_cpu", retVal.val.vcpu);//스트리지센터 가상머신 상태값 세션스토리지에 저장
             sessionStorage.setItem("scvm_momory", retVal.val.memory);//스트리지센터 가상머신 상태값 세션스토리지에 저장
 
