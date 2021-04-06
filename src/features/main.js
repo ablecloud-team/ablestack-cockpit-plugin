@@ -575,14 +575,14 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                 .then(data2=>{
                     if(data2.includes('active_name')==true){
                         var retVal = JSON.parse(data2);
-                            if(retVal.active_name!=""){
-                                var index = retVal.active_name.indexOf(["."]);
-                                sessionStorage.setItem("mgr",retVal.active_name.substring(0,index));       
-                            }
+                        if(retVal.active_name!=""){
+                            var index = retVal.active_name.indexOf(["."]);
+                            sessionStorage.setItem("mgr",retVal.active_name.substring(0,index));       
+                        }
                     }
                 })
                 .catch(err=>{
-                    console.log("storage center virtual machine ssh command err  :"+err);
+                    console.log("storage center virtual machine"+j+" ssh command err  :"+err);
                 })    
             }else
                 break;           
