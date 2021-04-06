@@ -982,11 +982,12 @@ async function writeSshKeyFile(text1, text2) {
         });
     // 공개 키 파일 권한 변경
     cockpit.script(["chmod 644 /root/.ssh/id_rsa.pub"])
-    // 공개 키 authorized_key 파일에 공개 키 내용 append
+    // 공개 키 authorized_key 파일에 공개 키 내용 append 및 중복 내용 제거
     cockpit.script(["cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys"])
     cockpit.script(["sort /root/.ssh/authorized_keys | uniq > /root/.ssh/authorized_keys.uniq"])
     cockpit.script(["mv -f /root/.ssh/authorized_keys{.uniq,}"])
     cockpit.script(["chmod 644 /root/.ssh/authorized_keys"])
+    cockpit.script(["rm -f /root/.ssh/authorized_keys.uniq"])
 }
 
 
@@ -1049,7 +1050,7 @@ function checkHostsOs() {
  * Meathod Name : checkHostName
  * Date Created : 2021.04.05
  * Writer  : 류홍욱
- * Description : 호스트 name을 체크하는 함수
+ * Description : 호스트 이름을 체크하는 함수
  * Parameter : 없음
  * Return  : 없음
  * History  : 2021.04.05
