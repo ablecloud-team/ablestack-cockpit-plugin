@@ -687,6 +687,7 @@ async function resetClusterConfigWizardWithData() {
     $('#form-radio-timeserver-ext').prop('checked', true);
     $('#form-radio-timeserver-int').prop('checked', false);
     $('input[name=form-input-cluster-config-timeserver]').val("");
+    $('#div-timeserver-host-num').hide();
     $('#form-radio-timeserver-host-num-1').prop('checked', true);
     $('#form-radio-timeserver-host-num-2').prop('checked', false);
     $('#form-radio-timeserver-host-num-3').prop('checked', false);
@@ -703,7 +704,7 @@ async function resetClusterConfigWizardWithData() {
     $('#button-accordion-timeserver').removeClass("pf-m-expanded");
     $('#div-accordion-timeserver').fadeOut();
     $('#div-accordion-timeserver').removeClass("pf-m-expanded");
-    // 클래스 원복
+    // nav, button등 이벤트에 적용된 속성 원복
     $('#nav-button-cluster-config-finish').addClass('pf-m-disabled');
     $('#nav-button-cluster-config-overview').removeClass('pf-m-disabled');
     $('#nav-button-cluster-config-ssh-key').removeClass('pf-m-disabled');
