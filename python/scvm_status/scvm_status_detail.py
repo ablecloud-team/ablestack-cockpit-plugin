@@ -98,33 +98,26 @@ def statusDeteil():
         else :
             memory = 'N/A'
 
-        '''scvm root disk 크기 조회 시 리턴값 0이면 정상, 아니면 비정상'''
-        rc = call(["virsh domblkinfo --domain scvm --human --all | grep vda |awk '{print $2 $3}'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
-        if rc == 0:
-            '''디스크 크기 출력값 확인'''         
-            output = check_output(["virsh domblkinfo --domain scvm --human --all | grep vda |awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
-            rootDiskSize = round(float(output),2)
-            output = check_output(["virsh domblkinfo --domain scvm --human --all | grep vda |awk '{print $3}'"], universal_newlines=True, shell=True, env=env)
-            rootDiskSize = str(rootDiskSize) + " " + output.strip()
-
-            '''scvm 에 접속해 df -h 값 세팅'''            
-            rc = call(["ping -c 1 scvm"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-            if rc == 0:                
-                output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $4}'"], universal_newlines=True, shell=True, env=env)
-                rootDiskAvail = output.strip();
-                if rootDiskAvail == "" :
-                    rootDiskAvail = "N/A"
-                output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $5}'"], universal_newlines=True, shell=True, env=env)
-                rootDiskUsePer = output.strip();                
-                if rootDiskUsePer == "" :
-                    rootDiskUsePer = "N/A"
-            else : 
-                rootDiskAvail = 'N/A'
-                rootDiskUsePer = 'N/A'
-        else :
+        '''scvm root disk 크기 조회 시 ssh 사용전 ping test'''                    
+        rc = call(["ping -c 1 scvm"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        if rc == 0:                
+            '''scvm 에 접속해 df -h 값 세팅''' 
+            rootDiskSize = check_output(["ssh scvm df -h | grep 'root' | awk '{print $2}'"], universal_newlines=True, shell=True, env=env)                
+            if rootDiskSize == "" :
+                rootDiskSize = "N/A"
+            output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $4}'"], universal_newlines=True, shell=True, env=env)
+            rootDiskAvail = output.strip();
+            if rootDiskAvail == "" :
+                rootDiskAvail = "N/A"
+            output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $5}'"], universal_newlines=True, shell=True, env=env)
+            rootDiskUsePer = output.strip();                
+            if rootDiskUsePer == "" :
+                rootDiskUsePer = "N/A"
+        else : 
             rootDiskSize = 'N/A'     
             rootDiskAvail = 'N/A'
             rootDiskUsePer = 'N/A'
+        
         
         '''scvm 관리 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
         rc = call(["cat /etc/hosts | grep scvm-mngt"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
