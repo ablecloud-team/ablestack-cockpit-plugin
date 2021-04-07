@@ -243,6 +243,7 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
             $('#button-cancel-config-modal-wizard-cluster-config-prepare').hide();
 
             $('#button-next-step-modal-wizard-cluster-config-prepare').html('종료');
+
             $('#div-modal-wizard-cluster-config-finish').show();
             $('#nav-button-cluster-config-finish').addClass('pf-m-current');
             $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
@@ -586,6 +587,24 @@ $('#span-modal-wizard-cluster-config-finish-hosts-file-download').on('click', fu
     }
 });
 
+// textarea에서 "Tab"키 사용.
+$(".pf-c-form-control").keydown(function (e) {
+    if (e.keyCode === 9) { // tab was pressed
+        // get caret position/selection
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
+        var $this = $(this);
+        var value = $this.val();
+        // set textarea value to: text before caret + tab + text after caret
+        $this.val(value.substring(0, start)
+            + "\t"
+            + value.substring(end));
+        // put caret at right position again (add one for the tab)
+        this.selectionStart = this.selectionEnd = start + 1;
+        // prevent the focus lose
+        e.preventDefault();
+    }
+});
 
 /* HTML Object에서 발생하는 이벤트 처리 끝 */
 
@@ -650,8 +669,8 @@ function resetClusterConfigWizard() {
  * Return  : 없음
  * History  : 2021.03.30 최초 작성
  **/
-
 async function resetClusterConfigWizardWithData() {
+
     // 입력된 모든 데이터를 초기화한다.
     $('#nav-button-cluster-config-overview').addClass('pf-m-current');
     $('#nav-button-cluster-config-ssh-key').removeClass('pf-m-current');
