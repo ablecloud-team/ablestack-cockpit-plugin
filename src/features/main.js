@@ -56,7 +56,6 @@ $(document).ready(function(){
     Promise.all([checkConfigStatus(), checkStorageClusterStatus(), 
         checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
             checkDeployStatus();
-            saveHostInfo();
         });
 
 });
@@ -103,17 +102,24 @@ $('#button-open-modal-wizard-cloud-vm').on('click', function(){
 });
 
 $('#button-link-storage-center-dashboard').on('click', function(){
-    // 스토리지센터 연결
-    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/url/create_address.py", "storageCenter"])
-    .then(function(data){
-        var retVal = JSON.parse(data);        
-        if(retVal.code == 200){
-            window.open(retVal.val);
-        }
-    })
-    .catch(function(data){
-        //console.log(":::Error:::");        
-    });
+    const mgr = sessionStorage.getItem("mgr");
+    const mgr_ip = sessionStorage.getItem(mgr+'-mngt');
+    if(mgr==undefined||mgr==""){
+        // storageCenter url 링크 주소 가져오기
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/url/create_address.py", "storageCenter", "-H"])
+        .then(function(data){
+            var retVal = JSON.parse(data);        
+            if(retVal.code == 200){
+                // 스토리지센터 연결
+                window.open(retVal.val);
+            }
+        })
+        .catch(function(data){
+            // console.log(":::Error:::");        
+        });
+    }else{
+        window.open('https://'+mgr_ip+':8443');
+    }
 });
 
 $('#button-link-cloud-center').on('click', function(){
@@ -178,18 +184,24 @@ $('#menu-item-set-storage-center-vm-resource-update').on('click', function(){
 
 // 스토리지센터 연결 버튼 클릭시 URL 세팅
 $('#menu-item-linkto-storage-center').on('click', function(){
-    // storageCenter url 링크 주소 가져오기
-    cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/url/create_address.py", "storageCenter", "-H" ])
-    .then(function(data){
-        var retVal = JSON.parse(data);        
-        if(retVal.code == 200){
-            // 스토리지 센터 VM 연결
-            window.open(retVal.val);
-        }
-    })
-    .catch(function(data){
-        // console.log(":::Error:::");        
-    });
+    const mgr = sessionStorage.getItem("mgr");
+    const mgr_ip = sessionStorage.getItem(mgr+'-mngt');
+    if(mgr==undefined||mgr==""){
+        // storageCenter url 링크 주소 가져오기
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/url/create_address.py", "storageCenter", "-H"])
+        .then(function(data){
+            var retVal = JSON.parse(data);        
+            if(retVal.code == 200){
+                // 스토리지센터 연결
+                window.open(retVal.val);
+            }
+        })
+        .catch(function(data){
+            // console.log(":::Error:::");        
+        });
+    }else{
+        window.open('https://'+mgr_ip+':8443');
+    }
 });
 
 // 스토리지센터VM 연결 버튼 클릭시 URL 세팅
@@ -225,6 +237,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                 cockpit.spawn(['cat', '/root/.ssh/id_rsa.pub'])
                 .then(data=>{
                     sessionStorage.setItem("ccfg_status", "true");
+                    saveHostInfo();
                     resolve();
                 })
                 .catch(err=>{
@@ -255,7 +268,9 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
     return new Promise((resolve) => {
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scc_status/scc_status_detail.py", "detail" ])
         .then(function(data){
-            var retVal = JSON.parse(data);            
+            var retVal = JSON.parse(data);
+            var sc_status = "Health Err";
+            var inMessHtml = "";
             sessionStorage.setItem("sc_status", retVal.val.cluster_status); //스토리지 클러스터 상태값 세션스토리지에 저장
             sessionStorage.setItem("storage_cluster_maintenance_status", retVal.val.maintenance_status); //스토리지 클러스터 유지보수 상태값 세션스토리지에 저장
             //스토리지 클러스터 유지보수 상태 확인 후 버튼 disabled 여부 세팅
@@ -268,12 +283,15 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
             }
             //스토리지 클러스터 상태값에 따라 icon 및 색상 변경을 위한 css 설정 값 세팅 
             if(retVal.val.cluster_status == "HEALTH_OK"){
+                sc_status = "Health Ok";
                 $("#scc-cluster-css").attr('class','pf-c-label pf-m-green');
-                $("#scc-cluster-icon").attr('class','fas fa-fw fa-check-circle');            
+                $("#scc-cluster-icon").attr('class','fas fa-fw fa-check-circle');
             }else if(retVal.val.cluster_status == "HEALTH_WARN"){
+                sc_status = "Health Warn";
                 $("#scc-cluster-css").attr('class','pf-c-label pf-m-orange');
                 $("#scc-cluster-icon").attr('class','fas fa-fw fa-exclamation-triangle');            
             }else if(retVal.val.cluster_status == "HEALTH_ERR"){
+                sc_status = "Health Err";
                 $("#scc-cluster-css").attr('class','pf-c-label pf-m-red');
                 $("#scc-cluster-icon").attr('class','fas fa-fw fa-exclamation-triangle');            
             }            
@@ -294,20 +312,30 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                 };
                 //health상태가 warn, error일경우 message 정보 확인하기 위함.
                 var messArr = recurse(retVal);
-                var inMessHtml = "";
                 for(var i in messArr){
                     inMessHtml = inMessHtml + "<br> - "  + messArr[i];
                 }
                 //console.log(inHtml);
-                $('#scc-status').html("HEALTH "+ retVal.val.cluster_status.split('_')[1] + inMessHtml);
+                $('#scc-status').html(sc_status + inMessHtml);
             }else{
-                $('#scc-status').html("HEALTH "+ retVal.val.cluster_status.split('_')[1]);                
+                $('#scc-status').html(sc_status);                
             }
-            $('#scc-osd').text("전체 " + retVal.val.osd + "개의 디스크 중 " + retVal.val.osd_up + "개 작동 중");
-            $('#scc-gw').text("RBD GW " + retVal.val.mon_gw1 + "개 제공중(quorum : " + retVal.val.mon_gw2 + ")");
-            $('#scc-mgr').text(retVal.val.mgr + "(전체 " + retVal.val.mgr_cnt + "개 실행중)");
-            $('#scc-pools').text(retVal.val.pools + " pools");
-            $('#scc-usage').text("전체 " + retVal.val.avail + " 중 " +retVal.val.used + " 사용 중 (사용률 " + retVal.val.usage_percentage+ " %)" );
+            if(retVal.val.osd !="N/A" && retVal.val.osd_up !="N/A" ){
+                $('#scc-osd').text("전체 " + retVal.val.osd + "개의 디스크 중 " + retVal.val.osd_up + "개 작동 중");
+            }
+            if(retVal.val.mon_gw1 !="N/A" && retVal.val.mon_gw2 !="N/A" ){
+                $('#scc-gw').text("RBD GW " + retVal.val.mon_gw1 + "개 제공중(quorum : " + retVal.val.mon_gw2 + ")");
+            }
+            if(retVal.val.mgr !="N/A" && retVal.val.mgr_cnt !="N/A" ){            
+                $('#scc-mgr').text(retVal.val.mgr + "(전체 " + retVal.val.mgr_cnt + "개 실행중)");
+            }
+            if(retVal.val.pools !="N/A"){
+                $('#scc-pools').text(retVal.val.pools + " pools");
+            }
+            if(retVal.val.avail !="N/A" && retVal.val.used !="N/A" && retVal.val.usage_percentage !="N/A" ){
+                $('#scc-usage').text("전체 " + retVal.val.avail + " 중 " +retVal.val.used + " 사용 중 (사용률 " + retVal.val.usage_percentage+ " %)" );
+            }
+            
             // 스토리지 클러스터 미배포 상태일경우 display세팅
             if(retVal.val.cluster_status == "HEALTH_ERR"){
                 $('#scc-status-check').text("스토리지센터 클러스터가 구성되지 않았습니다.");            
@@ -358,22 +386,49 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
             }else if(scvm_status == "shut off"){
                 scvm_status = "Stopped";
             }else{
-                scvm_status = "HEALTH ERR";
+                scvm_status = "Health Err";
             }
             $('#scvm-status').text(scvm_status);
-            $('#scvm-cpu').text(retVal.val.vcpu + " vCore");
+            if(retVal.val.vcpu !="N/A"){
+                $('#scvm-cpu').text(retVal.val.vcpu + " vCore");
+            }
             //$('#scvm-cpu').text(retVal.val.vcpu + "vCore(" + retVal.val.socket + " Socket, "+retVal.val.core+" Core)");
-            $('#scvm-memory').text(retVal.val.memory);
-            $('#scvm-rdisk').text(retVal.val.rootDiskSize + "(사용가능 " + retVal.val.rootDiskAvail + " / 사용률 " + retVal.val.rootDiskUsePer + ")");
-            $('#scvm-manage-nic-type').text("NIC Type : " + retVal.val.manageNicType + " (Parent : " + retVal.val.manageNicParent + ")");
-            $('#scvm-manage-nic-ip').text("IP : " + retVal.val.manageNicIp);
-            $('#scvm-manage-nic-gw').text("GW : " + retVal.val.manageNicGw);
-            $('#scvm-storage-server-nic-type').text("서버용 NIC Type : " + retVal.val.storageServerNicType + " (Parent : " + retVal.val.storageServerNicParent + ")");
-            $('#scvm-storage-server-nic-ip').text("서버용 IP : " + retVal.val.storageServerNicIp);
-            $('#scvm-storage-replication-nic-type').text("복제용 NIC Type : " + retVal.val.storageReplicationNicType + " (Parent : " + retVal.val.storageReplicationNicParent + ")");
-            $('#scvm-storage-replication-nic-ip').text("복제용 IP : " + retVal.val.storageReplicationNicIp);
-            $('#scvm-storage-datadisk-type').text("Disk Type : " + retVal.val.dataDiskType);
-            
+            if(retVal.val.memory !="N/A"){
+                $('#scvm-memory').text(retVal.val.memory);
+            }
+            if(retVal.val.rootDiskSize !="N/A" && retVal.val.rootDiskAvail !="N/A" && retVal.val.rootDiskUsePer !="N/A"){
+                $('#scvm-rdisk').text(retVal.val.rootDiskSize + "(사용가능 " + retVal.val.rootDiskAvail + " / 사용률 " + retVal.val.rootDiskUsePer + ")");
+            }
+            if(retVal.val.manageNicType !="N/A" && retVal.val.manageNicParent !="N/A"){
+                $('#scvm-manage-nic-type').text("NIC Type : " + retVal.val.manageNicType + " (Parent : " + retVal.val.manageNicParent + ")");
+            }
+            if(retVal.val.manageNicIp !="N/A"){
+                $('#scvm-manage-nic-ip').text("IP : " + retVal.val.manageNicIp);
+            }             
+            if(retVal.val.manageNicGw !="N/A"){
+                $('#scvm-manage-nic-gw').text("GW : " + retVal.val.manageNicGw);
+            }
+            if(retVal.val.storageServerNicType !="N/A"){
+                $('#scvm-storage-server-nic-type').text("서버용 NIC Type : " + retVal.val.storageServerNicType);
+                if( retVal.val.storageServerNicParent !="N/A"){
+                    $('#scvm-storage-server-nic-type').text("서버용 NIC Type : " + retVal.val.storageServerNicType + " (Parent : " + retVal.val.storageServerNicParent + ")");
+                }
+            }
+            if(retVal.val.storageServerNicIp !="N/A"){
+                $('#scvm-storage-server-nic-ip').text("서버용 IP : " + retVal.val.storageServerNicIp);
+            }
+            if(retVal.val.storageReplicationNicType !="N/A"){
+                $('#scvm-storage-replication-nic-type').text("복제용 NIC Type : " + retVal.val.storageReplicationNicType);
+                if( retVal.val.storageReplicationNicParent !="N/A"){
+                    $('#scvm-storage-replication-nic-type').text("복제용 NIC Type : " + retVal.val.storageReplicationNicType + " (Parent : " + retVal.val.storageReplicationNicParent + ")");
+                }
+            }
+            if(retVal.val.storageReplicationNicIp !="N/A"){
+                $('#scvm-storage-replication-nic-ip').text("복제용 IP : " + retVal.val.storageReplicationNicIp);
+            }
+            if(retVal.val.dataDiskType !="N/A"){
+                $('#scvm-storage-datadisk-type').text("Disk Type : " + retVal.val.dataDiskType);
+            }
             // 스토리지센터 가상머신 미배포 상태일경우 display세팅
             if(retVal.val.scvm_status == "HEALTH_ERR"){
                 $('#scvm-deploy-status-check').text("스토리지센터 가상머신이 배포되지 않았습니다.");            
@@ -540,23 +595,42 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  * Meathod Name : saveHostInfo 
  * Date Created : 2021.04.01
  * Writer  : 박다정
- * Description : 호스트 파일 정보를 세션스토리지에 저장
+ * Description : 호스트 파일 정보와 mgr 정보를 세션스토리지에 저장
  * Parameter : 없음
  * Return  : 없음
  * History  : 2021.04.01 최초 작성
  */
  function saveHostInfo(){ 
     cockpit.spawn(['cat', '/etc/hosts'])
-        .then(function(data){
-            var line = data.split("\n");
-            for(var i=0; i<line.length; i++){
-                var word = line[i].split("\t");
-                if(word.length>1){
-                    sessionStorage.setItem(word[1], word[0]); 
-                }
+    .then(function(data){
+        var line = data.split("\n");
+        for(var i=0; i<line.length; i++){
+            var word = line[i].split("\t");
+            if(word.length>1){
+                sessionStorage.setItem(word[1], word[0]); 
             }
-        })
-        .catch(function(data){
-            //console.log("hosts 파일이 구성되어있지 않습니다.");
-        });
+        }    
+        for(var j=1; j<line.length; j++){
+            if(sessionStorage.getItem("scvm"+j)!=null){
+                //pending 상태가 지속될 경우 에러처리 필요함
+                cockpit.spawn(['ssh', '-o', 'StrictHostKeyChecking=no','scvm'+j,'ceph', 'mgr','stat'])
+                .then(data2=>{
+                    if(data2.includes('active_name')==true){
+                        var retVal = JSON.parse(data2);
+                        if(retVal.active_name!=""){
+                            var index = retVal.active_name.indexOf(["."]);
+                            sessionStorage.setItem("mgr",retVal.active_name.substring(0,index));       
+                        }
+                    }
+                })
+                .catch(err=>{
+                    console.log("storage center virtual machine"+j+" ssh command err  :"+err);
+                })    
+            }else
+                break;           
+        }
+    })
+    .catch(function(error){
+        console.log("Hosts file is not configured :"+error);
+    });  
 }

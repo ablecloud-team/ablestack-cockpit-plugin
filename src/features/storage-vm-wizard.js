@@ -622,7 +622,7 @@ function showDivisionVMConfigFinish() {
  * History  : 2021.03.16 최초 작성
  */
 function setDiskInfo(){
-    var cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/disk/disk_action.py","list"];
+    var cmd = ["python3","/usr/share/cockpit/ablestack/python/disk/disk_action.py","list"];
 
     // rp = raid passthrough, lp = lun passthrough
     disk_setup_type = $('input[name="form-radio-storage-vm-disk-type"]:checked').val()
@@ -654,9 +654,15 @@ function setDiskInfo(){
             var lun_pci_list = result.val.blockdevices;
             if(lun_pci_list.length > 0){
                 for(var i = 0 ; i < lun_pci_list.length ; i ++ ){
+                    
+                    var partition_text = '';
+                    if( lun_pci_list[i].children != undefined){
+                        partition_text = '( Partition exists count : '+lun_pci_list[i].children.length+' )';
+                    }
+
                     el += '<div class="pf-c-check">';
                     el += '<input class="pf-c-check__input" type="checkbox" id="form-checkbox-disk'+i+'" name="form-checkbox-disk" value=/dev/'+lun_pci_list[i].name+' />';
-                    el += '<label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-disk'+i+'">/dev/'+lun_pci_list[i].name+' '+lun_pci_list[i].state+' '+lun_pci_list[i].size+' '+lun_pci_list[i].model+' '+'</label>';
+                    el += '<label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-disk'+i+'">/dev/'+lun_pci_list[i].name+' '+lun_pci_list[i].state+' '+lun_pci_list[i].size+' '+lun_pci_list[i].model+' '+partition_text+'</label>';
                     el += '</div>';    
                 }
             }else{
@@ -721,7 +727,7 @@ $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
  * History  : 2021.03.16 최초 작성
  */
  function setNicPassthrough(select_box_id){
-    var cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/nic/network_action.py","list"];
+    var cmd = ["python3","/usr/share/cockpit/ablestack/python/nic/network_action.py","list"];
 
     cockpit.spawn(cmd).then(function(data){
         
@@ -755,7 +761,7 @@ $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
  */
 function setReviewInfo(){
 
-    xml_create_cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/create_scvm_xml.py"];
+    xml_create_cmd = ["python3","/usr/share/cockpit/ablestack/python/vm/create_scvm_xml.py"];
 
     //cpu
     var cpu = $('select#form-select-storage-vm-cpu option:checked').val();
