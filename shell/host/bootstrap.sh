@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+#########################################
+#Copyright (c) 2021 ABLECLOUD Co. Ltd.
+#
+#ceph 스토리지를 초기화(bootstrap)하는 스크립트
+#
+#최초작성자 : 윤여천 책임(ycyun@ablecloud.io)
+#최초작성일 : 2021-04-05
+#########################################
 set -x
 #scvm의 PN-ip를 갖는 host목록 생성
 conffile=/root/ceph.conf
@@ -25,7 +33,7 @@ sed -i 's/, $//' "$conffile"
 #container image id추출
 image=$(/bin/podman inspect --format {{.ID}},{{.RepoDigests}} docker-archive:/usr/share/ablestack/ablestack.tar:localhost/ceph/daemon:ablestack | cut -d "," -f 2 | sed 's/\[//' | sed 's/]//' )
 cephadm --image "$image" bootstrap \
-        --initial-dashboard-user ablestack \
+        --initial-dashboard-user ablecloud \
         --initial-dashboard-password Ablecloud1! \
         --ssh-private-key /root/.ssh/id_rsa \
         --ssh-public-key /root/.ssh/id_rsa.pub \
@@ -47,6 +55,7 @@ cephadm --image "$image" bootstrap \
 crontab<<EOF
 * * * * * /usr/local/bin/ipcorrector
 EOF
+
 for host in $allhosts
 do
   scp -o StrictHostKeyChecking=no /etc/ceph/* $host:/etc/ceph/
