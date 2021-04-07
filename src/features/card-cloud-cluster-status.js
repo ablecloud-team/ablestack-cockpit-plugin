@@ -175,7 +175,7 @@ function CardCloudClusterStatus(){
                 }
                 $('#cccs_back_color').attr('class','pf-c-label pf-m-green');
                 $('#cccs_cluster_icon').attr('class','fas fa-fw fa-check-circle');
-                $('#cccs_status').text('Health OK');
+                $('#cccs_status').text('HEALTH OK');
                 $('#cccs_node_info').text('총 ' + Object.keys(retVal.val.clustered_host).length + '노드로 구성됨 : ' + nodeText);
                 sessionStorage.setItem("cc_status", "HEALTH_OK"); 
                 if(retVal.val.active == 'true'){

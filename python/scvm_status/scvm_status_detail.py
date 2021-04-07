@@ -37,25 +37,25 @@ def parseArgs():
 주요 기능 : 스토리지 가상머신 상태 상세조회
 '''
 def statusDeteil():
-    scvm_status = ''
-    vcpu = ''
-    socket = 'XXX'
-    core = 'XXX'
-    memory = ''
-    rootDiskSize = ''
-    rootDiskAvail = ''
-    rootDiskUsePer = ''
-    manageNicType = ''
-    manageNicParent = ''
-    manageNicIp = ''
-    manageNicGw = ''
-    storageServerNicType = ''
-    storageServerNicParent = ''
-    storageServerNicIp = ''
-    storageReplicationNicType = ''
-    storageReplicationNicParent = ''
-    storageReplicationNicIp = ''
-    dataDiskType = 'XXX'
+    scvm_status = 'HEALTH_ERR'
+    vcpu = 'N/A'
+    socket = 'N/A'
+    core = 'N/A'
+    memory = 'N/A'
+    rootDiskSize = 'N/A'
+    rootDiskAvail = 'N/A'
+    rootDiskUsePer = 'N/A'
+    manageNicType = 'N/A'
+    manageNicParent = 'N/A'
+    manageNicIp = 'N/A'
+    manageNicGw = 'N/A'
+    storageServerNicType = 'N/A'
+    storageServerNicParent = 'N/A'
+    storageServerNicIp = 'N/A'
+    storageReplicationNicType = 'N/A'
+    storageReplicationNicParent = 'N/A'
+    storageReplicationNicIp = 'N/A'
+    dataDiskType = 'N/A'
 
     try:
         '''scvm 상태값 조회 시 리턴값이 0이면 정상, 아니면 비정상'''
@@ -98,45 +98,41 @@ def statusDeteil():
         else :
             memory = 'N/A'
 
-        '''scvm root disk 크기 조회 시 리턴값 0이면 정상, 아니면 비정상'''
-        rc = call(["virsh domblkinfo --domain scvm --human --all | grep vda |awk '{print $2 $3}'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
-        if rc == 0:
-            '''디스크 크기 출력값 확인'''         
-            output = check_output(["virsh domblkinfo --domain scvm --human --all | grep vda |awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
-            rootDiskSize = round(float(output),2)
-            output = check_output(["virsh domblkinfo --domain scvm --human --all | grep vda |awk '{print $3}'"], universal_newlines=True, shell=True, env=env)
-            rootDiskSize = str(rootDiskSize) + " " + output.strip()
-
-            '''scvm 에 접속해 df -h 값 세팅'''            
-            rc = call(["ping -c 1 scvm"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-            if rc == 0:                
-                output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $4}'"], universal_newlines=True, shell=True, env=env)
-                rootDiskAvail = output.strip();
-                output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $5}'"], universal_newlines=True, shell=True, env=env)
-                rootDiskUsePer = output.strip();                
-            else : 
-                rootDiskAvail = 'N/A'
-                rootDiskUsePer = 'N/A'
-        else :
+        '''scvm root disk 크기 조회 시 ssh 사용전 ping test'''                    
+        rc = call(["ping -c 1 scvm"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        if rc == 0:                
+            '''scvm 에 접속해 df -h 값 세팅''' 
+            rootDiskSize = check_output(["ssh scvm df -h | grep 'root' | awk '{print $2}'"], universal_newlines=True, shell=True, env=env)                
+            if rootDiskSize == "" :
+                rootDiskSize = "N/A"
+            output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $4}'"], universal_newlines=True, shell=True, env=env)
+            rootDiskAvail = output.strip();
+            if rootDiskAvail == "" :
+                rootDiskAvail = "N/A"
+            output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $5}'"], universal_newlines=True, shell=True, env=env)
+            rootDiskUsePer = output.strip();                
+            if rootDiskUsePer == "" :
+                rootDiskUsePer = "N/A"
+        else : 
             rootDiskSize = 'N/A'     
             rootDiskAvail = 'N/A'
             rootDiskUsePer = 'N/A'
         
+        
         '''scvm 관리 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
         rc = call(["cat /etc/hosts | grep scvm-mngt"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:
-            output = check_output(["cat /etc/hosts | grep scvm-mngt"], universal_newlines=True, shell=True, env=env)
-            manageNicIp = output.split(' ')[0]
-            rc = call(["virsh domifaddr --domain scvm --source agent --full | grep " + manageNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            output = check_output(["cat /etc/hosts | grep scvm-mngt | awk '{print $1}'"], universal_newlines=True, shell=True, env=env)
+            manageNicIp = output.strip()
+            rc = call(["virsh domifaddr --domain scvm --source agent --full | grep -w " + manageNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             if rc == 0:
-                output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep " + manageNicIp], universal_newlines=True, shell=True, env=env)
-                manageNicMacAddr = ' '.join(output.split()).split()[1]
+                manageNicMacAddr = check_output(["virsh domifaddr --domain scvm --source agent --full | grep -w " + manageNicIp + "| awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
                 rc = call(["virsh domiflist --domain scvm | grep " + manageNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)            
                 if rc == 0: 
                     '''관리 nic mac address로 추가 정보 확인'''
                     output = check_output(["virsh domiflist --domain scvm | grep " + manageNicMacAddr], universal_newlines=True, shell=True, env=env)
-                    manageNicParent = ' '.join(output.split()).split()[2]   
-                    manageNicType = ' '.join(output.split()).split()[3]
+                    manageNicParent = ' '.join(output.split()).split()[2]
+                    manageNicType = ' '.join(output.split()).split()[1]
                 else :                
                     manageNicParent = 'N/A'
                     manageNicType = 'N/A'
@@ -153,29 +149,30 @@ def statusDeteil():
         '''management Nic Gw정보 확인'''
         rc = call(["ping -c 1 scvm"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:                
-            output = check_output(["ssh scvm /usr/sbin/route -n | grep -P '^0.0.0.0|UG' | awk '{print $2}' "], universal_newlines=True, shell=True, env=env)
-            manageNicGw = output.strip();            
+            output = check_output(["ssh scvm /usr/sbin/route -n | grep -P '^0.0.0.0|UG' | awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
+            manageNicGw = output.strip();
+            if manageNicGw == "" :
+                manageNicGw = "N/A"    
         else : 
             manageNicGw = 'N/A'
 
         '''scvm 서버용 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
         rc = call(["cat /etc/hosts | grep scvm$"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:
-            output = check_output(["cat /etc/hosts | grep scvm$"], universal_newlines=True, shell=True, env=env)
-            storageServerNicIp = output.split(' ')[0]
-            rc = call(["virsh domifaddr --domain scvm --source agent --full | grep " + storageServerNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            output = check_output(["cat /etc/hosts | grep scvm$ | awk '{print $1}'"], universal_newlines=True, shell=True, env=env)
+            storageServerNicIp = output.strip();
+            rc = call(["virsh domifaddr --domain scvm --source agent --full | grep -w " + storageServerNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             if rc == 0:
-                output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep " + storageServerNicIp], universal_newlines=True, shell=True, env=env)
-                storageServerNicMacAddr = ' '.join(output.split()).split()[1]
+                storageServerNicMacAddr = check_output(["virsh domifaddr --domain scvm --source agent --full | grep -w " + storageServerNicIp + "| awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
                 rc = call(["virsh domiflist --domain scvm | grep " + storageServerNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)            
                 if rc == 0: 
-                    '''관리 nic mac address로 추가 정보 확인'''
+                    '''서버용 nic mac address로 추가 정보 확인'''
                     output = check_output(["virsh domiflist --domain scvm | grep " + storageServerNicMacAddr], universal_newlines=True, shell=True, env=env)
                     storageServerNicParent = ' '.join(output.split()).split()[2]   
-                    storageServerNicType = ' '.join(output.split()).split()[3]
+                    storageServerNicType = ' '.join(output.split()).split()[1]
                 else :                
                     storageServerNicParent = 'N/A'
-                    storageServerNicType = 'N/A'
+                    storageServerNicType = 'NIC Passthrough'
             else :
                 storageServerNicMacAddr = 'N/A'
                 storageServerNicParent = 'N/A'
@@ -189,21 +186,20 @@ def statusDeteil():
         '''scvm 복제용 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
         rc = call(["cat /etc/hosts | grep scvm-cn"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:
-            output = check_output(["cat /etc/hosts | grep scvm-cn"], universal_newlines=True, shell=True, env=env)
-            storageReplicationNicIp = output.split(' ')[0]
-            rc = call(["virsh domifaddr --domain scvm --source agent --full | grep " + storageReplicationNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            output = check_output(["cat /etc/hosts | grep scvm-cn | awk '{print $1}'"], universal_newlines=True, shell=True, env=env)
+            storageReplicationNicIp = output.strip();
+            rc = call(["virsh domifaddr --domain scvm --source agent --full | grep -w " + storageReplicationNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             if rc == 0:
-                output = check_output(["virsh domifaddr --domain scvm --source agent --full | grep " + storageReplicationNicIp], universal_newlines=True, shell=True, env=env)
-                storageReplicationNicMacAddr = ' '.join(output.split()).split()[1]
-                rc = call(["virsh domiflist --domain scvm | grep " + storageReplicationNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)            
+                storageReplicationNicMacAddr = check_output(["virsh domifaddr --domain scvm --source agent --full | grep -w " + storageReplicationNicIp + "| awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
+                rc = call(["virsh domiflist --domain scvm | grep " + storageReplicationNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
                 if rc == 0: 
-                    '''관리 nic mac address로 추가 정보 확인'''
+                    '''복제용 nic mac address로 추가 정보 확인'''
                     output = check_output(["virsh domiflist --domain scvm | grep " + storageReplicationNicMacAddr], universal_newlines=True, shell=True, env=env)
                     storageReplicationNicParent = ' '.join(output.split()).split()[2]   
-                    storageReplicationNicType = ' '.join(output.split()).split()[3]
+                    storageReplicationNicType = ' '.join(output.split()).split()[1]
                 else :                
                     storageReplicationNicParent = 'N/A'
-                    storageReplicationNicType = 'N/A'
+                    storageReplicationNicType = 'NIC Passthrough'
             else :
                 storageReplicationNicMacAddr = 'N/A'
                 storageReplicationNicParent = 'N/A'

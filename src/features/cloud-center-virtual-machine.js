@@ -98,6 +98,7 @@ class CloudCenterVirtualMachine {
     */
     checkVIRSHOK(data, message) {
         return new Promise((resolve) => {
+
             console.log("ok(cloud-center-virtual-machine): " + data)
             console.log("ok: " + message)
             const obj = JSON.parse(data)
@@ -198,6 +199,7 @@ class CloudCenterVirtualMachine {
             */
             let status_span = $("#description-cloud-vm-status");
             if (obj.code == 200) {
+
                 // let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', '가상머신 확인중...');
                 // status_span[0].children[0].replaceWith(a);
                 // if (obj.val.started == undefined ){
