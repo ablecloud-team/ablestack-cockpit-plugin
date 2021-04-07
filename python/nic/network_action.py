@@ -64,8 +64,9 @@ def listNetworkInterface(H=False):
     for out in outputs[1:]:
         fs = out.split()
         item={}
-        for i in range(0,len(fs)-1):
+        for i in range(0,3):
             item[fields[i]] = fs[i]
+        item[fields[-1]] = fs[-1]
         if 'bridge' in item['TYPE']:
             bridges.append(item)
         elif 'ether' in item['TYPE']:
