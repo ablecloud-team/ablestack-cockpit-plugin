@@ -98,7 +98,7 @@ class CloudCenterVirtualMachine {
     */
     checkVIRSHOK(data, message) {
         return new Promise((resolve) => {
-            console.log("ok(cloud-center-virtual-machine: " + data)
+            console.log("ok(cloud-center-virtual-machine): " + data)
             console.log("ok: " + message)
             const obj = JSON.parse(data)
             let status_span = $("#description-cloud-vm-status");
@@ -197,19 +197,23 @@ class CloudCenterVirtualMachine {
                 }
             */
             let status_span = $("#description-cloud-vm-status");
+            console.log(obj);
             if (obj.code == 200) {
-                let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', '가상머신 확인중...');
-                status_span[0].children[0].replaceWith(a)
-                if (obj['val']['started'] == undefined ){
-                        let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', '가상머신이 동작중이지 않습니다..');
-                        status_span[0].children[0].replaceWith(a)
-                        return
-                }
-                ccvm_instance.runningHost = obj['val']['started']
-                ccvm_instance.clusterdHost = obj['val']['clustered_host']
-                cockpit.spawn(['/usr/bin/python3',
-                '/usr/share/cockpit/ablestack/python/host/virshlist.py',
-                ], {'host': ccvm_instance.runningHost, 'env': 'LANG="en_US.UTF-8"'})
+                // let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', '가상머신 확인중...');
+                console.log('obj.code : ' + obj.code);
+                // status_span[0].children[0].replaceWith(a);
+                console.log('obj.val.started : ' + obj.val.started);
+                // if (obj.val.started == undefined ){
+                //         let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', '가상머신이 동작중이지 않습니다..');
+                //         status_span[0].children[0].replaceWith(a)
+                //         return
+                // }
+                ccvm_instance.runningHost = obj.val.started;
+                ccvm_instance.clusterdHost = obj.val.clustered_host;
+
+                console.log('yes|ccvm_instance.runningHost : ' + ccvm_instance.runningHost);
+                var remotePcsStatus = ['/usr/bin/ssh', ccvm_instance.runningHost, '/usr/bin/python3', '/usr/share/cockpit/ablestack/python/host/virshlist.py'];
+                cockpit.spawn(remotePcsStatus)
                     .then(ccvm_instance.checkVIRSHOK)
                     .catch(ccvm_instance.checkVIRSHERR)
             } else if(obj.code == 500) {
@@ -229,9 +233,9 @@ class CloudCenterVirtualMachine {
     */
     checkPCSERR(data, message) {
         return new Promise((resolve) => {
-            console.log("err: " + data)
+            console.log("err(checkPCSERR): " + data)
             console.log("err: " + message)
-            let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'red', 'checkPCSERR:<br>'+data);
+            let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'red', 'Health Err');
             let status_span = $("#description-cloud-vm-status");
             status_span[0].children[0].replaceWith(a)
             resolve();
@@ -247,7 +251,7 @@ class CloudCenterVirtualMachine {
     checkCCVM() {
 
         cockpit.spawn(['/usr/bin/python3',
-            pluginpath + '/python/pcs/main.py',
+            '/usr/share/cockpit/ablestack/python/pcs/main.py',
             'status', '--resource', ccvm_instance.resource], {'host': 'localhost'})
             .then(ccvm_instance.checkPCSOK)
             .catch(ccvm_instance.checkPCSERR)
