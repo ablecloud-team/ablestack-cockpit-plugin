@@ -24,7 +24,7 @@
                 <!-- ui 영역 시작 -->
                 <!-- ABLESTACK 상태 요약 및 바로가기 ALERT Ribbon 영역 시작 -->
                 <section class="pf-c-page__main-section pf-m-no-padding">
-                    <div class="pf-c-alert pf-m-warning" aria-label="Warning alert">
+                    <div class="pf-c-alert pf-m-warning" aria-label="Warning alert" id="ribbon">
                         <div class="pf-c-alert__icon">
                             <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
                         </div>
@@ -104,7 +104,7 @@
                                                             <span class="pf-c-description-list__text">디스크</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scc-osd">전체 N/A개의 디스크 중 N/A개 작동 중</div>
+                                                            <div class="pf-c-description-list__text" id="scc-osd">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -112,7 +112,7 @@
                                                             <span class="pf-c-description-list__text">게이트웨이</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scc-gw">RBD GW N/A개 제공 중</div>
+                                                            <div class="pf-c-description-list__text" id="scc-gw">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -120,7 +120,7 @@
                                                             <span class="pf-c-description-list__text">관리데몬</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scc-mgr">N/A(전체 N/A개가 실행 중)</div>
+                                                            <div class="pf-c-description-list__text" id="scc-mgr">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -128,7 +128,7 @@
                                                             <span class="pf-c-description-list__text">스토리지 풀</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scc-pools">N/A개의 풀</div>
+                                                            <div class="pf-c-description-list__text" id="scc-pools">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -136,7 +136,7 @@
                                                             <span class="pf-c-description-list__text">스토리지 용량</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scc-usage">전체 N/A TB 중 N/A TB 사용 중(사용률 N/A %)</div>
+                                                            <div class="pf-c-description-list__text" id="scc-usage">N/A</div>
                                                         </dd>
                                                     </div>
                                                 </dl>
@@ -312,7 +312,7 @@
                                                             <span class="pf-c-description-list__text">CPU</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scvm-cpu">N/A vCore <!--(N/A Socket, N/A Core) 데이터 없음--></div>
+                                                            <div class="pf-c-description-list__text" id="scvm-cpu">N/A <!--(N/A Socket, N/A Core) 데이터 없음--></div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -320,7 +320,7 @@
                                                             <span class="pf-c-description-list__text">Memory</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scvm-memory">N/A GiB</div>
+                                                            <div class="pf-c-description-list__text" id="scvm-memory">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -328,7 +328,7 @@
                                                             <span class="pf-c-description-list__text">ROOT Disk 크기</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scvm-rdisk">N/A GiB</div>
+                                                            <div class="pf-c-description-list__text" id="scvm-rdisk">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -336,7 +336,7 @@
                                                             <span class="pf-c-description-list__text">관리 NIC</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scvm-manage-nic-type">NIC Type : N/A (Parent : N/A)</div>
+                                                            <div class="pf-c-description-list__text" id="scvm-manage-nic-type">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -344,24 +344,23 @@
                                                             <span class="pf-c-description-list__text">&nbsp;</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scvm-manage-nic-ip">IP : N/A</div>
+                                                            <div class="pf-c-description-list__text" id="scvm-manage-nic-ip">N/A</div>
                                                         </dd>
-                                                    </div>
-                                                    <!-- 추출할 데이터 없음-->
-                                                    <!-- <div class="pf-c-description-list__group">
+                                                    </div>                                                    
+                                                    <div class="pf-c-description-list__group">
                                                         <dt class="pf-c-description-list__term">
                                                             <span class="pf-c-description-list__text">&nbsp;</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scvm-manage-nic-gw">GW : N/A</div>
+                                                            <div class="pf-c-description-list__text" id="scvm-manage-nic-gw">N/A</div>
                                                         </dd>
-                                                    </div> -->
+                                                    </div>
                                                     <div class="pf-c-description-list__group">
                                                         <dt class="pf-c-description-list__term">
                                                             <span class="pf-c-description-list__text">스토리지 NIC</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scvm-storage-server-nic-type">서버용 NIC Type : N/A (Parent : N/A)</div>
+                                                            <div class="pf-c-description-list__text" id="scvm-storage-server-nic-type">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -369,7 +368,7 @@
                                                             <span class="pf-c-description-list__text">&nbsp;</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scvm-storage-server-nic-ip">서버용 IP : N/A</div>
+                                                            <div class="pf-c-description-list__text" id="scvm-storage-server-nic-ip">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -377,7 +376,7 @@
                                                             <span class="pf-c-description-list__text">&nbsp;</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scvm-storage-replication-nic-type">복제용 NIC Type : N/A (Parent : N/A)</div>
+                                                            <div class="pf-c-description-list__text" id="scvm-storage-replication-nic-type">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -385,7 +384,7 @@
                                                             <span class="pf-c-description-list__text">&nbsp;</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text" id="scvm-storage-replication-nic-ip">복제용 IP : N/A</div>
+                                                            <div class="pf-c-description-list__text" id="scvm-storage-replication-nic-ip">N/A</div>
                                                         </dd>
                                                     </div>                                                    
                                                     <!-- 추출할 데이터 없음-->
@@ -443,7 +442,7 @@
                                                                 <span class="pf-c-label pf-m-red" id="span-cloud-vm-status">
                                                                     <span class="pf-c-label__content" id="span-cloud-vm-status-content">
                                                                         <span class="pf-c-label__icon">
-                                                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                                                            <i id="ccvm_status_icon" class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
                                                                         </span>Status Err
                                                                     </span>
                                                                 </span>
@@ -534,7 +533,7 @@
                                             </section>
                                         </div>
                                         <div class="pf-c-divider" role="separator"></div>
-                                        <div class="pf-c-card__footer" style="color: var(--pf-global--danger-color--100);">클라우드센터 가상머신이 배포되지 않았습니다.</div>
+                                        <div id="ccvm-low-info" class="pf-c-card__footer" style="color: var(--pf-global--danger-color--100);">클라우드센터 가상머신이 배포되지 않았습니다.</div>
                                     </div>
                                     <!-- 클라우드센터VM 상태 카드 영역 끝 -->                       
                                 </div>

@@ -622,7 +622,7 @@ function showDivisionVMConfigFinish() {
  * History  : 2021.03.16 최초 작성
  */
 function setDiskInfo(){
-    var cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/disk/disk_action.py","list"];
+    var cmd = ["python3","/usr/share/cockpit/ablestack/python/disk/disk_action.py","list"];
 
     // rp = raid passthrough, lp = lun passthrough
     disk_setup_type = $('input[name="form-radio-storage-vm-disk-type"]:checked').val()
@@ -727,7 +727,7 @@ $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
  * History  : 2021.03.16 최초 작성
  */
  function setNicPassthrough(select_box_id){
-    var cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/nic/network_action.py","list"];
+    var cmd = ["python3","/usr/share/cockpit/ablestack/python/nic/network_action.py","list"];
 
     cockpit.spawn(cmd).then(function(data){
         
@@ -761,7 +761,7 @@ $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
  */
 function setReviewInfo(){
 
-    xml_create_cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/create_scvm_xml.py"];
+    xml_create_cmd = ["python3","/usr/share/cockpit/ablestack/python/vm/create_scvm_xml.py"];
 
     //cpu
     var cpu = $('select#form-select-storage-vm-cpu option:checked').val();
