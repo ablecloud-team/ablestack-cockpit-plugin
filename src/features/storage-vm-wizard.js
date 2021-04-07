@@ -8,6 +8,7 @@
 // 변수 선언
 var cur_step_wizard_vm_config = "1";
 var xml_create_cmd;
+var completed = false;
 
 // Document.ready 시작
 $(document).ready(function(){
@@ -60,6 +61,10 @@ $(document).ready(function(){
 // 이벤트 처리 함수
 $('#button-close-modal-wizard-storage-vm').on('click', function(){
     $('#div-modal-wizard-storage-vm').hide();
+    if(completed){
+        //상태값 초기화 겸 페이지 리로드
+        location.reload();
+    }
 });
 
 // '다음' 버튼 클릭 시 이벤트를 처리하기 위한 함수
@@ -242,6 +247,7 @@ $('#button-before-step-modal-wizard-vm-config').on('click', function(){
 });
 
 // 취소 버튼 클릭 이벤트 처리
+/*
 $('#button-cancel-config-modal-wizard-vm-config').on('click', function(){
     hideAllMainBody();
     resetCurrentMode();
@@ -257,7 +263,7 @@ $('#button-cancel-config-modal-wizard-vm-config').on('click', function(){
     // 모달 창을 닫는다.
     $('#div-modal-wizard-storage-vm').hide();
 });
-
+*/
 // 마법사 Side 버튼 이벤트 처리
 $('#nav-button-overview').on('click', function(){
     hideAllMainBody();
@@ -426,6 +432,23 @@ $('#button-accordion-storage-vm-ssh-key').on('click', function(){
     }
 });
 
+// 마법사 "취소 버튼 모달창" show, hide
+$('#button-cancel-config-modal-wizard-vm-config').on('click', function () {
+    $('#div-modal-cancel-storage-wizard-cancel').show();
+});
+$('#button-close-modal-storage-wizard-cancel').on('click', function () {
+    $('#div-modal-cancel-storage-wizard-cancel').hide();
+});
+$('#button-cancel-modal-storage-wizard-cancel').on('click', function () {
+    $('#div-modal-cancel-storage-wizard-cancel').hide();
+});
+// 마법사 "취소 버튼 모달창" 실행 버튼을 눌러 취소를 실행
+$('#button-execution-modal-storage-wizard-cancel').on('click', function () {
+    $('#div-modal-cancel-storage-wizard-cancel').hide();
+    $('#div-modal-wizard-storage-vm').hide();
+    //상태값 초기화 겸 페이지 리로드
+    location.reload();
+});
 
 /**
  * Meathod Name : hideAllMainBody  
@@ -519,7 +542,7 @@ function deployStorageCenterVM() {
                                         ,"--cn-ip",cn_ip
                                         ,"--cn-prefix",cn_prefix
                                     ];
-                                    
+
                 cockpit.spawn(create_scvm_cloudinit_cmd)
                     .then(function(data){
                         //결과 값 json으로 return
@@ -608,7 +631,8 @@ function showDivisionVMConfigFinish() {
     $('#button-next-step-modal-wizard-vm-config').hide();
     $('#button-before-step-modal-wizard-vm-config').hide();
     $('#button-cancel-config-modal-wizard-vm-config').hide();
-
+    
+    completed = true;
     cur_step_wizard_vm_config = "9";
 }
 
@@ -1173,6 +1197,7 @@ function validateStorageVm(){
     //textarea 초기화
     $("#form-textarea-storage-vm-hosts-file").val("");
     //input 초기화
+    $("#form-input-storage-vm-hosts-file").val("");
     $("#form-input-storage-vm-hostname").val("");
     $("#form-input-storage-vm-mgmt-ip").val("");
     $("#form-input-storage-vm-mgmt-vlan").val("");
@@ -1222,7 +1247,7 @@ function validateStorageVm(){
  * Date Created : 2021.03.30
  * Writer  : 배태주
  * Description : 스토리지센터 가상머신 배포 진행중 실패 단계에 따른 중단됨 UI 처리
- * Parameter : 없음
+ * Parameter : setp_num
  * Return  : 없음
  * History  : 2021.03.30 최초 작성
  */
