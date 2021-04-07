@@ -10,10 +10,15 @@ $('#button-close1, #button-close2').on('click', function(){
 });
 
 // 변경 버튼 클릭 이벤트
-$('#button-maintenance-mode-update').on('click', function(){    
+$('#button-maintenance-mode-update').on('click', function(){
+    $('#dropdown-menu-storage-cluster-status').toggle();
+    $('#div-modal-storage-cluster-maintenance-update').hide();
+    $('#div-modal-spinner-header-txt').text('스토리지 클러스터 유지보수모드 변경중입니다.');
+    $('#div-modal-spinner').show();
+
     var cmd = $('#scc-maintenance-update-cmd').val();    
-    if(cmd == "unset"){//유지보수 모드 해제 시 이벤트 요청
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_update.py", "unset_noout" ])
+    if(cmd == "unset"){//유지보수 모드 해제 시 이벤트 요청        
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scc_status/scc_status_update.py", "unset_noout" ])
         .then(function(data){            
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){
@@ -28,8 +33,8 @@ $('#button-maintenance-mode-update').on('click', function(){
             alert("정상적으로 처리되지 않았습니다.")
             //console.log(":::Error:::");            
         });    
-    }else if(cmd == "set"){//유지보수 모드 설정 시 이벤트 요청
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_update.py", "set_noout" ])
+    }else if(cmd == "set"){//유지보수 모드 설정 시 이벤트 요청        
+        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scc_status/scc_status_update.py", "set_noout" ])
         .then(function(data){            
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){

@@ -1,13 +1,15 @@
 #스토리지 클러스터 상태를 조회 및 상태 변경 기능입니다.
 
 ##사용법(스토리지클러스터 상태를 조회)
-```shell
-# python3 /usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_detail.py detail
+```
+shell
+# python3 /usr/share/cockpit/ablestack/python/scc_status/scc_status_detail.py detail
 
 ```
 
 ```
-python3 /usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_detail.py detail
+python3 /usr/share/cockpit/ablestack/python/scc_status/scc_status_detail.py detail
+
 
 json 형태의 return값 확인
 {
@@ -119,14 +121,9 @@ json 형태의 return값 확인
 ##사용법(스토리지 클러스터 유지보수모드 상태 변경)
 ```shell
 (유지보수모드 세팅)
-# python3 /usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_update.py set
+# python3 /usr/share/cockpit/ablestack/python/scc_status/scc_status_update.py set
 
 (유지보수모드 해제)
-# python3 /usr/share/cockpit/ablestack/python/storage_center_cluster_status/scc_status_update.py unset
-
+# python3 /usr/share/cockpit/ablestack/python/scc_status/scc_status_update.py unset
 
 ```
-
-
-
-
