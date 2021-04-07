@@ -569,7 +569,8 @@ function deployCloudCenterVM() {
                                                     ,"-f2","/var/lib/libvirt/ablestack/vm/ccvm/ablecloud","-t2", $("#form-textarea-cloud-vm-ssh-private-key-file").val() // ssh 개인 key 파일
                                                     ,"-f3","/var/lib/libvirt/ablestack/vm/ccvm/ablecloud.pub","-t3", $("#form-textarea-cloud-vm-ssh-public-key-file").val() // ssh 공개 key 파일
                                                     ,'--hostname',host_name
-                                                    , '-hns', host1_name, host2_name, host3_name
+                                                    ,'-hns', host1_name, host2_name, host3_name
+                                                    ,'--mgmt-nic','ens20'
                                                     ,'--mgmt-ip',mgmt_ip
                                                     ,'--mgmt-prefix',mgmt_prefix
                                                     ,'--mgmt-gw',mngt_gw
@@ -580,7 +581,7 @@ function deployCloudCenterVM() {
                                 var sn_ip = $('#form-input-cloud-vm-svc-nic-ip').val().split("/")[0];
                                 var sn_prefix = $('#form-input-cloud-vm-svc-nic-ip').val().split("/")[1];
                                 var sn_gw = $('#form-input-cloud-vm-svc-gw').val();
-                                create_ccvm_cloudinit_cmd.push('--sn-ip',sn_ip,'--sn-prefix',sn_prefix,'--sn-gw',sn_gw)
+                                create_ccvm_cloudinit_cmd.push('--sn-nic','ens21','--sn-ip',sn_ip,'--sn-prefix',sn_prefix,'--sn-gw',sn_gw)
                             }
 
                             cockpit.spawn(create_ccvm_cloudinit_cmd)

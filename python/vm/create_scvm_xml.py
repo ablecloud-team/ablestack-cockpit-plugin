@@ -106,7 +106,7 @@ def createScvmXml(args):
         br_num = 0
         
         # 생성할 가상머신 xml 템플릿
-        os.system("yes|cp -f /usr/share/cockpit/cockpit-plugin-ablestack/tools/xml-template/scvm-xml-template.xml /var/lib/libvirt/ablestack/vm/scvm/scvm-temp.xml")
+        os.system("yes|cp -f "+pluginpath+"/tools/xml-template/scvm-xml-template.xml /var/lib/libvirt/ablestack/vm/scvm/scvm-temp.xml")
             
         template_file = '/var/lib/libvirt/ablestack/vm/scvm/scvm-temp.xml'
 

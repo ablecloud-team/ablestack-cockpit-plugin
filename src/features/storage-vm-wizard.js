@@ -654,9 +654,15 @@ function setDiskInfo(){
             var lun_pci_list = result.val.blockdevices;
             if(lun_pci_list.length > 0){
                 for(var i = 0 ; i < lun_pci_list.length ; i ++ ){
+                    
+                    var partition_text = '';
+                    if( lun_pci_list[i].children != undefined){
+                        partition_text = '( Partition exists count : '+lun_pci_list[i].children.length+' )';
+                    }
+
                     el += '<div class="pf-c-check">';
                     el += '<input class="pf-c-check__input" type="checkbox" id="form-checkbox-disk'+i+'" name="form-checkbox-disk" value=/dev/'+lun_pci_list[i].name+' />';
-                    el += '<label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-disk'+i+'">/dev/'+lun_pci_list[i].name+' '+lun_pci_list[i].state+' '+lun_pci_list[i].size+' '+lun_pci_list[i].model+' '+'</label>';
+                    el += '<label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-disk'+i+'">/dev/'+lun_pci_list[i].name+' '+lun_pci_list[i].state+' '+lun_pci_list[i].size+' '+lun_pci_list[i].model+' '+partition_text+'</label>';
                     el += '</div>';    
                 }
             }else{
