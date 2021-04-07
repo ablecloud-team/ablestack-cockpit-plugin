@@ -136,3 +136,23 @@ function checkFileSize(file) {
         return false;
     }
 }
+
+
+/**
+ * Meathod Name : checkSpace
+ * Date Created : 2021.04.05
+ * Writer  : 류홍욱
+ * Description : 문자열의 Space 여부를 체크하는 함수. (Tab은 허용)
+ * Parameter : str (문자열)
+ * Return  : boolean
+ * History  : 2021.04.05
+ */
+
+function checkSpace(str) {
+	if(str.search(" ") != -1) {
+	// (Space 값 존재 시 false를 리턴)
+  	return false;
+  } else {
+  	return true;
+  }
+}

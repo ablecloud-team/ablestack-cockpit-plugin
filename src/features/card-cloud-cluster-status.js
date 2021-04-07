@@ -4,7 +4,6 @@
  * Writer  : 이석민
  * Description : main.html에서 발생하는 이벤트 처리를 위한 JavaScript
 **/
-var pcsStatus = null;
 var role = '';
 /** cloud vm start 관련 action start */
 $('#button-cloud-cluster-start').on('click', function(){
@@ -24,7 +23,7 @@ $('#button-execution-modal-cloud-vm-start').on('click', function(){
     $('#div-modal-start-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터VM을 시작하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsStart'])
+    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStart'])
     .then(function(data){
         var retVal = JSON.parse(data);
 
@@ -57,7 +56,7 @@ $('#button-execution-modal-cloud-vm-stop').on('click', function(){
     $('#div-modal-stop-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터VM을 정지하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsStop'])
+    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/', 'pcsStop'])
     .then(function(data){
         var retVal = JSON.parse(data);
 
@@ -85,7 +84,7 @@ $('#button-execution-modal-cloud-vm-cleanup').on('click', function(){
     $('#div-modal-cleanup-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터 클러스터를 클린업하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsCleanup'])
+    cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsCleanup'])
     .then(function(data){
         var retVal = JSON.parse(data);
 
@@ -118,7 +117,7 @@ $('#button-execution-modal-cloud-vm-migration').on('click', function(){
         $('#div-modal-migration-cloud-vm').hide();
         $('#div-modal-spinner-header-txt').text('클라우드센터VM을 마이그레이션하고 있습니다.');
         $('#div-modal-spinner').show();
-        cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsMigration', '--target', valSelect])
+        cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsMigration', '--target', valSelect])
         .then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
@@ -154,23 +153,29 @@ $('#cloud-cluster-connect').on('click', function(){
 // 클라우드 센터 클러스터 상태 조회 및 조회 결과값으로 화면 변경하는 함수
 function CardCloudClusterStatus(){
     return new Promise((resolve) => {
-        cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/card-cloud-cluster-status.py', 'pcsDetail' ])
+        cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsDetail' ])
         .then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == '200'){
-                var nodeText = '';
+                var nodeText = '(';
                 var selectHtml = '<option selected="" value="null">노드를 선택해주세요.</option>';
                 $('#form-select-cloud-vm-migration-node option').remove();
             
                 for(var i=0; i<Object.keys(retVal.val.clustered_host).length; i++){
-                    nodeText = nodeText + '[' +retVal.val.clustered_host[i] + ']';
+                    nodeText = nodeText +retVal.val.clustered_host[i];
                     if(retVal.val.clustered_host[i] != retVal.val.started){
                         selectHtml = selectHtml + '<option value="' + retVal.val.clustered_host[i] + '">' + retVal.val.clustered_host[i] + '</option>';
+                    }
+                    if(i == (Object.keys(retVal.val.clustered_host).length - 1)){
+
+                        nodeText = nodeText + ')';
+                    }else{
+                        nodeText = nodeText + ',';
                     }
                 }
                 $('#cccs_back_color').attr('class','pf-c-label pf-m-green');
                 $('#cccs_cluster_icon').attr('class','fas fa-fw fa-check-circle');
-                $('#cccs_status').text('Health OK');
+                $('#cccs_status').text('HEALTH OK');
                 $('#cccs_node_info').text('총 ' + Object.keys(retVal.val.clustered_host).length + '노드로 구성됨 : ' + nodeText);
                 sessionStorage.setItem("cc_status", "HEALTH_OK"); 
                 if(retVal.val.active == 'true'){
@@ -192,7 +197,7 @@ function CardCloudClusterStatus(){
                     $('#button-cloud-cluster-connect').prop('disabled', true);
                 }
                 $('#cccs-low-info').text('클라우드센터 클러스터가 구성되었습니다.');
-                $('#cccs-low-info').attr("style","color: var(--pf-global--success-color--100)")
+                $('#cccs-low-info').attr('style','color: var(--pf-global--success-color--100)')
             }else if(retVal.code == '400' && retVal.val == 'cluster is not configured.'){
                 $('#cccs_status').text('Health Err.');
                 $('#cccs_back_color').attr('class','pf-c-label pf-m-red');
