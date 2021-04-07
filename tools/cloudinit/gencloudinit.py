@@ -295,7 +295,7 @@ def genUserFromFile(pubkeyfile: str, privkeyfile: str, hostsfile: str):
                     'encoding': 'base64',
                     'content': base64.encodebytes(privkey.encode()),
                     'owner': 'ablecloud:ablecloud',
-                    'path': '/home/ablecloud/.ssh/id_rsa.pub',
+                    'path': '/home/ablecloud/.ssh/id_rsa',
                     'permissions': '0600'
                 },
                 {
@@ -363,10 +363,23 @@ def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_p
         ['/usr/bin/systemctl', 'enable', '--now', 'cockpit.socket'],
         ['/usr/bin/systemctl', 'enable', '--now', 'cockpit.service']
     ]
-    if master:
-        yam2['bootcmd'].append(
-            [f'{pluginpath}/shell/host/bootstrap.sh']
-        )
+    # if master:
+    #     yam2['bootcmd'].append(
+    #         [f'/usr/bin/script', '-c', '/root/bootstrap.sh', 'bootstrap.log']
+    #     )
+
+    with open(f'{pluginpath}/shell/host/bootstrap.sh', 'rt') as bootstrapfile:
+        bootstrap = bootstrapfile.read()
+
+    yam2['write_files'].append(
+        {
+            'encoding': 'base64',
+            'content': base64.encodebytes(bootstrap.encode()),
+            'owner': 'root:root',
+            'path': '/root/bootstrap.sh',
+            'permissions': '0777'
+        }
+    )
     with open(f'{tmpdir}/user-data', 'wt') as f:
         f.write('#cloud-config\n')
         f.write(yaml.dump(yam2).replace("\n\n", "\n"))
