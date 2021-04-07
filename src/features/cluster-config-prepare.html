@@ -92,6 +92,8 @@
                                         <div class="pf-c-form__group-control pf-m-inline">
                                             <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cluster-config-ssh-key-pri-file" name="form-input-cluster-config-ssh-key-file" disabled/>
                                         </div>
+                                    </div>
+                                    <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-config-ssh-key-pub-file">
                                                 <span class="pf-c-form__label-text">SSH 공개 키 파일</span>
@@ -133,7 +135,7 @@
                                                     <i class="fas fa-minus" aria-hidden="true"></i>
                                                   </span>
                                                 </button>
-                                                <input class="pf-c-form-control" type="number" value="1" id="form-input-cluster-config-host-number" name="form-input-cluster-config-host-number" aria-label="Number input" />
+                                                <input class="pf-c-form-control" type="number" value="1" id="form-input-cluster-config-host-number" name="form-input-cluster-config-host-number" style="padding-right:10px;" aria-label="Number input" />
                                                 <button class="pf-c-button pf-m-control" id="form-input-cluster-config-host-number-plus" type="button" aria-label="Plus">
                                                   <span class="pf-c-number-input__icon">
                                                     <i class="fas fa-plus" aria-hidden="true"></i>
@@ -169,7 +171,7 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-new-host-profile">10.10.0.10&#9;ccvm-mngt&#10;192.168.0.10&#9;ccvm-svc&#10;10.10.0.11&#9;ablestack1&#10;10.10.0.101&#9;cvm1-pn&#10;100.100.0.101&#9;scvm1-cn&#10;</textarea>
+                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-new-host-profile">10.10.10.10&#9;ccvm-mngt&#10;192.168.0.10&#9;ccvm-svc&#10;10.10.10.1&#9;ablecube1&#10;10.10.10.11&#9;scvm1-mngt&#10;100.100.10.11&#9;scvm1&#10;100.200.10.11&#9;scvm1-cn&#10;</textarea>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-file">
@@ -182,11 +184,19 @@
                                             <input class="pf-c-form-control" style="width:60%" type="file" id="form-input-cluster-config-hosts-file" name="form-input-cluster-config-hosts-file"/>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-existing-host-profile" readonly></textarea>
+                                            <textarea class="pf-c-form-control" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-existing-host-profile"></textarea>
                                         </div>
                                     </div>
                                 </section>
                             </form>
+                            <div class="pf-c-alert pf-m-info pf-m-inline" aria-label="Cluster Prepare Hosts" style="margin-left:15px;margin-top:32px">
+                                <div class="pf-c-alert__icon">
+                                    <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                </div>
+                                <p class="pf-c-alert__title pf-m-truncate">
+                                    <strong><span class="pf-screen-reader">Info alert:</span>호스트 프로파일 작성 시 IP 및 Host Name, Alias 구분은 탭(Tab)을 사용해야합니다.</strong>
+                                </p>
+                            </div>
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cluster-config-time-server">
                             <p>
@@ -422,6 +432,9 @@
                                     <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-hosts-file-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                             </div>
+                            <div id="os-type" hidden>
+                            <div id="host-name" hidden>
+                            </div>
                         </div>
                     </main>
                 </div>
@@ -433,6 +446,29 @@
                     </div>
                 </footer>
             </div>
+            <!-- 모달 영역 시작  -->
+
+            <!-- 클러스터 준비 마법사 취소: Modal 영역 시작 -->
+            <div id="div-modal-cancel-cluster-config-prepare-cancel" class="pf-c-backdrop" style="display:none" >
+                <div class="pf-l-bullseye">
+                    <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Cluster prepare cancel">
+                        <button id="button-close-modal-cluster-config-prepare-cancel" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                        <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">클러스터 구성 준비 취소</span></h1></header>
+                        <div class="pf-c-modal-box__body">
+                            <div>클러스터 구성 준비를 취소하시겠습니까? 입력된 데이터는 초기화 됩니다.</div>
+                        </div>
+                        <footer class="pf-c-modal-box__footer">
+                            <button id="button-execution-modal-cluster-config-prepare-cancel" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                            <button id="button-cancel-modal-cluster-config-prepare-cancel" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">아니요</button>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            <!-- 클러스터 준비 마법사 취소: Modal 영역 끝 -->
+
+            <!-- 모달 영역 끝  -->
         </div>
     </div>
 </div>
