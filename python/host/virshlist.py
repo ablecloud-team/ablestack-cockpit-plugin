@@ -53,10 +53,11 @@ for vm in vms:
         vm['blk'] = ret
         for line in ret[:]:
             if 'root' in line:
-                items = line.split(maxsplit=4)
+                items = line.split(maxsplit=5)
                 vm['DISK_CAP'] = items[1]
                 vm['DISK_ALLOC'] = items[2]
                 vm['DISK_PHY'] = items[3]
+                vm['DISK_USAGE_RATE'] = items[4]
         if vm['State'] == "running":
             ret = virsh_cmd('domifaddr', domain=vm['Name'], source='agent', interface='ens20',
                             full=True).stdout.decode().splitlines()
