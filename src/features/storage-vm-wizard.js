@@ -493,7 +493,7 @@ function deployStorageCenterVM() {
             var reset_storage_center_result = JSON.parse(data);
             if(reset_storage_center_result.code=="200") { //정상
                 //=========== 2. cloudinit iso 파일 생성 ===========
-                // host 파일 /var/lib/libvirt/ablestack/vm/scvm/cloudinit 경로에 hosts, ssh key 파일 저장
+                // host 파일 /usr/share/cockpit/ablestack/tools/vmconfig/scvm/cloudinit 경로에 hosts, ssh key 파일 저장
                 seScvmProgressStep("span-progress-step1",2);
                 seScvmProgressStep("span-progress-step2",1);
 
@@ -507,9 +507,9 @@ function deployStorageCenterVM() {
                 var cn_prefix = $('#form-input-storage-vm-cluster-ip').val().split("/")[1];
                 
                 var create_scvm_cloudinit_cmd = ['python3', pluginpath + '/python/vm/create_scvm_cloudinit.py'
-                                        ,"-f1","/var/lib/libvirt/ablestack/vm/scvm/hosts","-t1", $("#form-textarea-storage-vm-hosts-file").val() // hosts 파일
-                                        ,"-f2","/var/lib/libvirt/ablestack/vm/scvm/ablecloud","-t2", $("#form-textarea-storage-vm-ssh-private-key-file").val() // ssh 개인 key 파일
-                                        ,"-f3","/var/lib/libvirt/ablestack/vm/scvm/ablecloud.pub","-t3", $("#form-textarea-storage-vm-ssh-public-key-file").val() // ssh 공개 key 파일
+                                        ,"-f1",pluginpath+"/tools/vmconfig/scvm/hosts","-t1", $("#form-textarea-storage-vm-hosts-file").val() // hosts 파일
+                                        ,"-f2",pluginpath+"/tools/vmconfig/scvm/id_rsa","-t2", $("#form-textarea-storage-vm-ssh-private-key-file").val() // ssh 개인 key 파일
+                                        ,"-f3",pluginpath+"/tools/vmconfig/scvm/id_rsa.pub","-t3", $("#form-textarea-storage-vm-ssh-public-key-file").val() // ssh 공개 key 파일
                                         ,"--hostname",host_name
                                         ,"--mgmt-ip",mgmt_ip
                                         ,"--mgmt-prefix",mgmt_prefix
@@ -622,7 +622,7 @@ function showDivisionVMConfigFinish() {
  * History  : 2021.03.16 최초 작성
  */
 function setDiskInfo(){
-    var cmd = ["python3","/usr/share/cockpit/ablestack/python/disk/disk_action.py","list"];
+    var cmd = ["python3",pluginpath + "/python/disk/disk_action.py","list"];
 
     // rp = raid passthrough, lp = lun passthrough
     disk_setup_type = $('input[name="form-radio-storage-vm-disk-type"]:checked').val()
@@ -727,7 +727,7 @@ $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
  * History  : 2021.03.16 최초 작성
  */
  function setNicPassthrough(select_box_id){
-    var cmd = ["python3","/usr/share/cockpit/ablestack/python/nic/network_action.py","list"];
+    var cmd = ["python3",pluginpath + "/python/nic/network_action.py","list"];
 
     cockpit.spawn(cmd).then(function(data){
         
@@ -760,8 +760,7 @@ $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
  * History  : 2021.03.17 최초 작성
  */
 function setReviewInfo(){
-
-    xml_create_cmd = ["python3","/usr/share/cockpit/ablestack/python/vm/create_scvm_xml.py"];
+    xml_create_cmd = ["python3",pluginpath + "/python/vm/create_scvm_xml.py"];
 
     //cpu
     var cpu = $('select#form-select-storage-vm-cpu option:checked').val();

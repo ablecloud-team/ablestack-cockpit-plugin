@@ -555,7 +555,7 @@ function deployCloudCenterVM() {
                         var reset_cloud_center_result = JSON.parse(data);
                         if(reset_cloud_center_result.code=="200") { //정상
                             //=========== 3. cloudinit iso 파일 생성 ===========
-                            // host 파일 /var/lib/libvirt/ablestack/vm/ccvm/cloudinit 경로에 hosts, ssh key 파일 저장
+                            // host 파일 /usr/share/cockpit/ablestack/tools/vmconfig/ccvm/cloudinit 경로에 hosts, ssh key 파일 저장
                             setProgressStep("span-ccvm-progress-step2",2);
                             setProgressStep("span-ccvm-progress-step3",1);
 
@@ -565,9 +565,9 @@ function deployCloudCenterVM() {
                             var mngt_gw = $('#form-input-cloud-vm-mngt-gw').val();
                             
                             create_ccvm_cloudinit_cmd = ['python3', pluginpath + '/python/vm/create_ccvm_cloudinit.py'
-                                                    ,"-f1","/var/lib/libvirt/ablestack/vm/ccvm/hosts","-t1", $("#form-textarea-cloud-vm-hosts-file").val() // hosts 파일
-                                                    ,"-f2","/var/lib/libvirt/ablestack/vm/ccvm/ablecloud","-t2", $("#form-textarea-cloud-vm-ssh-private-key-file").val() // ssh 개인 key 파일
-                                                    ,"-f3","/var/lib/libvirt/ablestack/vm/ccvm/ablecloud.pub","-t3", $("#form-textarea-cloud-vm-ssh-public-key-file").val() // ssh 공개 key 파일
+                                                    ,"-f1",pluginpath+"/tools/vmconfig/ccvm/hosts","-t1", $("#form-textarea-cloud-vm-hosts-file").val() // hosts 파일
+                                                    ,"-f2",pluginpath+"/tools/vmconfig/ccvm/id_rsa","-t2", $("#form-textarea-cloud-vm-ssh-private-key-file").val() // ssh 개인 key 파일
+                                                    ,"-f3",pluginpath+"/tools/vmconfig/ccvm/id_rsa.pub","-t3", $("#form-textarea-cloud-vm-ssh-public-key-file").val() // ssh 공개 key 파일
                                                     ,'--hostname',host_name
                                                     ,'-hns', host1_name, host2_name, host3_name
                                                     ,'--mgmt-nic','ens20'
@@ -857,7 +857,7 @@ function setCcvmSshPrivateKeyInfo(ssh_private_key){
 function setCcvmReviewInfo(){
 
     //클라우드센터 가상머신 XML 생성 커맨드 기본 텍스트
-    xml_create_cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/create_ccvm_xml.py"];
+    xml_create_cmd = ["python3",pluginpath + "/python/vm/create_ccvm_xml.py"];
     
     //-----장애조치 클러스터 설정-----
     //클러스터 호스트1, 호스트2, 호스트3 이름
