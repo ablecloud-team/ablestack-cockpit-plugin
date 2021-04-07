@@ -633,6 +633,19 @@ function showDivisionVMConfigFinish() {
     $('#button-cancel-config-modal-wizard-vm-config').hide();
     
     completed = true;
+
+	$('#nav-button-finish').removeClass('pf-m-disabled');
+    $('#nav-button-overview').addClass('pf-m-disabled');
+    $('#nav-button-vm-config').addClass('pf-m-disabled');
+    $('#nav-button-compute').addClass('pf-m-disabled');
+    $('#nav-button-disk').addClass('pf-m-disabled');
+    $('#nav-button-network').addClass('pf-m-disabled');
+    $('#nav-button-additional').addClass('pf-m-disabled');
+    $('#nav-button-ssh-key').addClass('pf-m-disabled');
+    $('#nav-button-review').addClass('pf-m-disabled');
+    $('#button-before-step-modal-wizard-vm-config').hide();
+    $('#button-cancel-config-modal-wizard-vm-config').hide();
+
     cur_step_wizard_vm_config = "9";
 }
 
@@ -1131,10 +1144,27 @@ function validateStorageVm(){
     }else if($('#form-input-storage-vm-ssh-public-key-file').val() == ""){
         alert("SSH 공개 Key 파일을 입력해주세요.");
         valicateCheck = false;
+    }else if(!checkHostFormat($("#form-input-storage-vm-hostname").val())){
+        alert("호스트명 입력 형식을 확인해주세요.");
+        valicateCheck = false;
+    }else if(!checkCidrFormat($("#form-input-storage-vm-mgmt-ip").val())){
+        alert("관리 NIC IP 형식을 확인해주세요.");
+        valicateCheck = false;
+    }else if(!checkIp($("#form-input-storage-vm-mgmt-gw").val())){
+        alert("관리 NIC Gateway 형식을 확인해주세요.");
+        valicateCheck = false;
+    }else if(!checkCidrFormat($("#form-input-storage-vm-public-ip").val())){
+        alert("스토리지 서버 NIC IP 형식을 확인해주세요.");
+        valicateCheck = false;
+    }else if(!checkCidrFormat($("#form-input-storage-vm-cluster-ip").val())){
+        alert("스토리지 복제 NIC IP 형식을 확인해주세요.");
+        valicateCheck = false;
+    }else if(!checkSpace($("#form-textarea-storage-vm-hosts-file").val())){
+        alert("Hosts 파일 작성 시 'Tab 키'만 사용 가능합니다.");
+        valicateCheck = false;
     }
 
     return valicateCheck;
-
 }
 
 /**
