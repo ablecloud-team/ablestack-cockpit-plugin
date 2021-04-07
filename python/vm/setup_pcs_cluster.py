@@ -52,7 +52,7 @@ def resetCloud(args):
     #=========== pcs cluster 구성 ===========
     # ceph 이미지 등록
 
-    os.system("qemu-img convert -f qcow2 -O rbd /var/lib/libvirt/images/centos8-template.qcow2 rbd:rbd/ccvm")
+    os.system("qemu-img convert -f qcow2 -O rbd /var/lib/libvirt/images/ablestack-template-back.qcow2 rbd:rbd/ccvm")
 
     # 클러스터 구성
     result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'config', '--cluster', 'cloudcenter_cluster', '--hosts', args.host_names[0], args.host_names[1], args.host_names[2] ).stdout.decode())
@@ -60,7 +60,7 @@ def resetCloud(args):
         success_bool = False
 
     # 리소스 생성
-    result = json.loads(python3('/usr/share/cockpit/cockpit-lugin-ablestack/python/pcs/main.py', 'create', '--resource', 'cloudcenter_res', '--xml', '/var/lib/libvirt/ablestack/vm/ccvm/ccvm.xml' ).stdout.decode())
+    result = json.loads(python3(pluginpath+'/python/pcs/main.py', 'create', '--resource', 'cloudcenter_res', '--xml', '/var/lib/libvirt/ablestack/vm/ccvm/ccvm.xml' ).stdout.decode())
     if result['code'] not in [200]:
         success_bool = False
 
