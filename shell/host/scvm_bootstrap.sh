@@ -55,7 +55,8 @@ cephadm --image "$image" bootstrap \
 crontab<<EOF
 * * * * * /usr/local/bin/ipcorrector
 EOF
-
+sed -e '/mon host/d' /etc/ceph/ceph.conf | sed -e 's/mon_host/mon host/' > /etc/ceph/ceph.conf_
+cp /etc/ceph/ceph.conf_ /etc/ceph/ceph.conf
 for host in $allhosts
 do
   scp -o StrictHostKeyChecking=no /etc/ceph/* $host:/etc/ceph/
