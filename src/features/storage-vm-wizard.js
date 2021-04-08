@@ -506,10 +506,13 @@ function resetCurrentMode() {
  */
 function deployStorageCenterVM() {
 
+    var console_log = true;
+
     //=========== 1. 스토리지센터 가상머신 초기화 작업 ===========
     // 설정 초기화 ( 필요시 python까지 종료 )
     seScvmProgressStep("span-progress-step1",1);
     var reset_storage_center_cmd = ['python3', pluginpath + '/python/vm/reset_storage_center.py'];
+    if(console_log){console.log(reset_storage_center_cmd);}
     cockpit.spawn(reset_storage_center_cmd)
         .then(function(data){
             //결과 값 json으로 return
@@ -542,7 +545,7 @@ function deployStorageCenterVM() {
                                         ,"--cn-ip",cn_ip
                                         ,"--cn-prefix",cn_prefix
                                     ];
-
+                if(console_log){console.log(create_scvm_cloudinit_cmd);}
                 cockpit.spawn(create_scvm_cloudinit_cmd)
                     .then(function(data){
                         //결과 값 json으로 return
@@ -551,6 +554,7 @@ function deployStorageCenterVM() {
                             //=========== 3. 스토리지센터 가상머신 구성 ===========
                             seScvmProgressStep("span-progress-step2",2);
                             seScvmProgressStep("span-progress-step3",1);
+                            if(console_log){console.log(xml_create_cmd);}
                             cockpit.spawn(xml_create_cmd)
                                 .then(function(data){
                                     //결과 값 json으로 return
@@ -561,6 +565,7 @@ function deployStorageCenterVM() {
                                         seScvmProgressStep("span-progress-step3",2);
                                         seScvmProgressStep("span-progress-step4",1);
                                         var pcs_config = ['python3', pluginpath + '/python/vm/setup_storage_vm.py'];
+                                        if(console_log){console.log(pcs_config);}
                                         cockpit.spawn(pcs_config)
                                             .then(function(data){
                                                 //결과 값 json으로 return

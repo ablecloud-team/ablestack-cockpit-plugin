@@ -539,8 +539,10 @@ function deployCloudCenterVM() {
 
     //=========== 1. 클러스터 구성 host 네트워크 연결 테스트 ===========
     setProgressStep("span-ccvm-progress-step1",1);
+    var console_log = true;
 
     var host_ping_test_cmd = ['python3', pluginpath + '/python/vm/host_ping_test.py', '-hns', host1_name, host2_name, host3_name];
+    if(console_log){console.log(host_ping_test_cmd);}
     cockpit.spawn(host_ping_test_cmd)
         .then(function(data){
             //결과 값 json으로 return
@@ -551,6 +553,7 @@ function deployCloudCenterVM() {
                 setProgressStep("span-ccvm-progress-step1",2);
                 setProgressStep("span-ccvm-progress-step2",1);
                 var reset_cloud_center_cmd = ['python3', pluginpath + '/python/vm/reset_cloud_center.py'];
+                if(console_log){console.log(reset_cloud_center_cmd);}
                 cockpit.spawn(reset_cloud_center_cmd)
                     .then(function(data){
                         //결과 값 json으로 return
@@ -585,7 +588,7 @@ function deployCloudCenterVM() {
                                 var sn_gw = $('#form-input-cloud-vm-svc-gw').val();
                                 create_ccvm_cloudinit_cmd.push('--sn-nic','ens21','--sn-ip',sn_ip,'--sn-prefix',sn_prefix,'--sn-gw',sn_gw)
                             }
-
+                            if(console_log){console.log(create_ccvm_cloudinit_cmd);}
                             cockpit.spawn(create_ccvm_cloudinit_cmd)
                                 .then(function(data){
                                     //결과 값 json으로 return
@@ -595,6 +598,7 @@ function deployCloudCenterVM() {
                                         setProgressStep("span-ccvm-progress-step3",2);
                                         setProgressStep("span-ccvm-progress-step4",1);
                                         xml_create_cmd.push("-hns",host1_name,host2_name,host3_name);
+                                        if(console_log){console.log(xml_create_cmd);}
                                         cockpit.spawn(xml_create_cmd)
                                             .then(function(data){
                                                 //결과 값 json으로 return
@@ -605,6 +609,7 @@ function deployCloudCenterVM() {
                                                     setProgressStep("span-ccvm-progress-step4",2);
                                                     setProgressStep("span-ccvm-progress-step5",1);
                                                     var pcs_config = ['python3', pluginpath + '/python/vm/setup_pcs_cluster.py', '-hns', host1_name, host2_name, host3_name];
+                                                    if(console_log){console.log(pcs_config);}
                                                     cockpit.spawn(pcs_config)
                                                         .then(function(data){
                                                             //결과 값 json으로 return
