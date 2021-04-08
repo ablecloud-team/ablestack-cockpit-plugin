@@ -40,11 +40,13 @@
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
       <source file='/var/lib/libvirt/images/scvm.qcow2'/>
-      <backingStore/>
+      <backingStore type='file'>
+        <format type='qcow2'/>
+        <source file='/var/lib/libvirt/images/ablestack-template.qcow2'/>
+        <backingStore/>
+      </backingStore>
       <target dev='vda' bus='virtio'/>
-      <boot order='1'/>
-      <alias name='virtio-disk0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
+      <address type='pci' domain='0x0000' bus='0x04' slot='0x01' function='0x0'/>
     </disk>
 <!--lun_passthrough-->
     <controller type='usb' index='0' model='ich9-ehci1'>
