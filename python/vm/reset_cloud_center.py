@@ -69,26 +69,26 @@ def resetCloud(args):
     os.system("virsh undefine ccvm")
 
     # 작업폴더 생성
-    os.system("mkdir -p /var/lib/libvirt/ablestack/vm/ccvm")
+    os.system("mkdir -p "+pluginpath+"/tools/vmconfig/ccvm")
     '''
     # cloudinit iso 삭제
-    os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/ccvm-cloudinit.iso")
+    os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso")
     
     # vm xml 템플릿 삭제
-    os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/ccvm.xml")
+    os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
     
     # cloudinit iso에 사용할 hosts 삭제
-    os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/hosts")
+    os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/hosts")
 
-    # cloudinit iso에 사용할 개인키 : ablecloud 삭제
-    os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/ablecloud")
+    # cloudinit iso에 사용할 개인키 : id_rsa 삭제
+    os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/id_rsa")
 
-    # cloudinit iso에 사용할 공개키 : ablecloud.pub 삭제
-    os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/ablecloud.pub")
+    # cloudinit iso에 사용할 공개키 : id_rsa.pub 삭제
+    os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/id_rsa.pub")
     '''
 
     # 확인후 폴더 밑 내용 다 삭제해도 무관하면 아래 코드 수행
-    os.system("rm -rf /var/lib/libvirt/ablestack/vm/ccvm/*")
+    os.system("rm -rf "+pluginpath+"/tools/vmconfig/ccvm/*")
     
     # 결과값 리턴
     if success_bool:
