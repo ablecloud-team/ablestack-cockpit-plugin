@@ -60,7 +60,7 @@ def resetCloud(args):
         success_bool = False
 
     # 리소스 생성
-    result = json.loads(python3(pluginpath+'/python/pcs/main.py', 'create', '--resource', 'cloudcenter_res', '--xml', '/var/lib/libvirt/ablestack/vm/ccvm/ccvm.xml' ).stdout.decode())
+    result = json.loads(python3(pluginpath+'/python/pcs/main.py', 'create', '--resource', 'cloudcenter_res', '--xml', pluginpath+'/tools/vmconfig/ccvm/ccvm.xml' ).stdout.decode())
     if result['code'] not in [200]:
         success_bool = False
 

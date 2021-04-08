@@ -25,7 +25,7 @@ $(".tab-available").keydown(function (e) {
  * History  : 2021.03.18 wizard ui 공통 함수로 분리
  */
  function setNicBridge(select_box_id){
-    var cmd = ["python3","/usr/share/cockpit/ablestack/python/nic/network_action.py","list"];
+    var cmd = ["python3",pluginpath + "/python/nic/network_action.py","list"];
 
     cockpit.spawn(cmd).then(function(data){
         
