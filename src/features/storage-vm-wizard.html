@@ -304,7 +304,7 @@
                                             <input class="pf-c-check__input" style="margin-top:12px;margin-right:5px" type="checkbox" id="form-input-storage-vm-additional-file" name="form-input-storage-vm-additional-file" checked/>
                                             <label class="pf-c-check__label" style="margin-top:8px;margin-left:0px" for="form-input-storage-vm-additional-file">Hosts 파일 사용</label>
                                             <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-storage-vm-hosts-file" name="form-input-storage-vm-hosts-file"/>
-                                            <textarea class="pf-c-form-control" style="width:90%;height:110px;margin-top:10px" type="text" id="form-textarea-storage-vm-hosts-file"></textarea>
+                                            <textarea class="pf-c-form-control tab-available" style="width:90%;height:110px;margin-top:10px" type="text" id="form-textarea-storage-vm-hosts-file"></textarea>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
@@ -676,11 +676,32 @@
                 </div>
                 </footer>
             </div>
+
+            <!-- 스토리지센터 가상머신 배포 마법사 취소: Modal 영역 시작 -->
+            <div id="div-modal-cancel-storage-wizard-cancel" class="pf-c-backdrop" style="display:none" >
+                <div class="pf-l-bullseye">
+                    <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="storage wizard cancel">
+                        <button id="button-close-modal-storage-wizard-cancel" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                        <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">스토리지센터 가상머신 배포 취소</span></h1></header>
+                        <div class="pf-c-modal-box__body">
+                            <div>스토리지센터 가상머신 배포를 취소하시겠습니까? 입력된 데이터는 초기화 됩니다.</div>
+                        </div>
+                        <footer class="pf-c-modal-box__footer">
+                            <button id="button-execution-modal-storage-wizard-cancel" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                            <button id="button-cancel-modal-storage-wizard-cancel" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">아니요</button>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            <!-- 클러스터 준비 마법사 취소: Modal 영역 끝 -->
         </div>
     </div>
 </div>
 
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
 <script src="./src/common/wizard-common.js"></script>
+<script src="./src/common/validation.js"></script>
 <script src="./src/features/storage-vm-wizard.js"></script>
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
