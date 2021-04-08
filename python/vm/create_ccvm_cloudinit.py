@@ -39,9 +39,11 @@ def createArgumentParser():
     parser.add_argument('-t3', '--text3', metavar='[public key file3 text]', type=str, help='input Value to public key text', required=True)
     parser.add_argument('--hostname', metavar='hostname', help="VM의 이름")
     parser.add_argument('--mgmt-ip', metavar='Management IP', help="관리 네트워크 IP")
+    parser.add_argument('--mgmt-nic', metavar='Management NIC', help="관리 네트워크 NIC")
     parser.add_argument('--mgmt-prefix', metavar='Management prefix', help="관리 네트워크 prefix")
     parser.add_argument('--mgmt-gw', metavar='Management gw', help="관리 네트워크 gw")
     parser.add_argument('--sn-ip', metavar='Service IP', help="서비스 네트워크 IP")
+    parser.add_argument('--sn-nic', metavar='Service nic', help="서비스 네트워크 nic")
     parser.add_argument('--sn-prefix', metavar='Service prefix', help="서비스 네트워크 prefix")
     parser.add_argument('--sn-gw', metavar='Service gw', help="서비스 네트워크 gw")
     parser.add_argument('-hns', '--host-names', metavar=('[hostname1]','[hostname2]','[hostname3]'), type=str, nargs=3, help='input Value to three host names', required=True)
@@ -67,28 +69,26 @@ def resetCloud(args):
     cmd += "\nEOF"
     os.system(cmd)
 
-    # cloudinit iso에 사용할 개인키 : ablecloud 파일 생성
+    # cloudinit iso에 사용할 개인키 : id_rsa 파일 생성
     cmd = "cat > "+args.file2+"<< EOF\n"
     cmd += args.text2
     cmd += "\nEOF"
     os.system(cmd)
 
-    # cloudinit iso에 사용할 공개키 : ablecloud.pub 생성
+    # cloudinit iso에 사용할 공개키 : id_rsa.pub 생성
     cmd = "cat > "+args.file3+"<< EOF\n"
     cmd += args.text3
     cmd += "\nEOF"
     os.system(cmd)
 
-    # cloudinit iso 생성 (/var/lib/libvirt/ablestack/vm/ccvm/ccvm-cloudinit.iso)   
-    result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--dns','8.8.8.8',['--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--sn-gw',args.sn_gw],'--iso-path','/var/lib/libvirt/ablestack/vm/ccvm/ccvm-cloudinit.iso','ccvm'
-
-    ).stdout.decode())
+    # cloudinit iso 생성 (/usr/share/cockpit/ablestack/tools/vmconfig/ccvm/ccvm-cloudinit.iso)   
+    result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--dns','8.8.8.8','--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--sn-gw',args.sn_gw,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())
     if result['code'] not in [200]:
         success_bool = False
     else:
         for host_name in args.host_names:
-            os.system("ssh root@"+host_name+" 'mkdir -p /var/lib/libvirt/ablestack/vm/ccvm'")
-            os.system("scp /var/lib/libvirt/ablestack/vm/ccvm/ccvm-cloudinit.iso root@"+host_name+":/var/lib/libvirt/ablestack/vm/ccvm/ccvm-cloudinit.iso")
+            os.system("ssh root@"+host_name+" 'mkdir -p "+pluginpath+"/tools/vmconfig/ccvm'")
+            os.system("scp "+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso")
 
     # 결과값 리턴
     if success_bool:
