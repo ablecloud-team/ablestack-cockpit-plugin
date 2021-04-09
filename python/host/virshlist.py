@@ -48,7 +48,7 @@ for vm in vms:
             v = items[1].strip()
             vm[k] = v
         # ret = virsh_cmd("domblkinfo", domain=vm['Name'], all=True, _env=env).stdout.decode().splitlines()
-        ret = ssh('ccvm-mngt', '/usr/bin/df', '-h').stdout.decode().splitlines()
+        ret = ssh('-o', 'StrictHostKeyChecking=no', 'ccvm-mngt', '/usr/bin/df', '-h').stdout.decode().splitlines()
         ret.reverse()
         vm['blk'] = ret
         for line in ret[:]:
@@ -72,7 +72,7 @@ for vm in vms:
                     items = line.split()
                     vm['nictype'] = items[1]
                     vm['nicbridge'] = items[2]
-        ret = ssh('ccvm-mngt', '/usr/sbin/route', '-n', '|', 'grep', '-P', '"^0.0.0.0|UG"').stdout.decode().splitlines()
+        ret = ssh('-o', 'StrictHostKeyChecking=no', 'ccvm-mngt', '/usr/sbin/route', '-n', '|', 'grep', '-P', '"^0.0.0.0|UG"').stdout.decode().splitlines()
         for line in ret[:]:
             items = line.split()
             vm['GW'] = items[1]
