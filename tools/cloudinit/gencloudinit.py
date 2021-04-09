@@ -80,6 +80,7 @@ def argumentParser():
     tmp_parser.add_argument('--cn-nic', metavar='Cluster NIC',  help="클러스터 네트워크 NIC         (scvm만)")
     tmp_parser.add_argument('--cn-ip', metavar='Cluster IP',    help="클러스터 네트워크 IP          (scvm만)")
     tmp_parser.add_argument('--cn-prefix', metavar='Service prefix', help="클러스터 네트워크 prefix (scvm만)", default=24)
+    tmp_parser.add_argument('--master', action='store_const', dest='master', const=True, metavar='SCVM Master', help="SCVM의 마스터로 지정 (scvm만)", default=False)
 
     # ccvm_parser.add_argument('--hostname', metavar='hostname', help="VM의 이름")
     # ccvm_parser.add_argument('--mgmt-nic', metavar='Management NIC', help="관리 네트워크 nic의 이름")
@@ -294,7 +295,7 @@ def genUserFromFile(pubkeyfile: str, privkeyfile: str, hostsfile: str):
                     'encoding': 'base64',
                     'content': base64.encodebytes(privkey.encode()),
                     'owner': 'ablecloud:ablecloud',
-                    'path': '/home/ablecloud/.ssh/id_rsa.pub',
+                    'path': '/home/ablecloud/.ssh/id_rsa',
                     'permissions': '0600'
                 },
                 {
@@ -343,7 +344,7 @@ scvm용 네트워크설정(스토리지 네트워크 추가)하는 부분
 :param :cn_ip  :str  CN의 IP
 :return yaml 파일
 """
-def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_prefix=24):
+def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_prefix=24, master=False):
     with open(f'{tmpdir}/network-config.mgmt', 'rt') as f:
         yam = yaml.load(f)
     yam['network']['config'].append({'mtu': 9000, 'name': pn_nic,
@@ -358,7 +359,27 @@ def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_p
         f.write(yaml.dump(yam))
     with open(f'{tmpdir}/user-data', 'rt') as f:
         yam2 = yaml.load(f)
-    yam2['bootcmd'] = [['/usr/bin/systemctl', 'enable', '--now', 'cockpit.socket'], ['/usr/bin/systemctl', 'enable', '--now', 'cockpit.service']]
+    yam2['bootcmd'] = [
+        ['/usr/bin/systemctl', 'enable', '--now', 'cockpit.socket'],
+        ['/usr/bin/systemctl', 'enable', '--now', 'cockpit.service']
+    ]
+    # if master:
+    #     yam2['bootcmd'].append(
+    #         [f'/usr/bin/script', '-c', '/root/bootstrap.sh', 'bootstrap.log']
+    #     )
+
+    with open(f'{pluginpath}/shell/host/bootstrap.sh', 'rt') as bootstrapfile:
+        bootstrap = bootstrapfile.read()
+
+    yam2['write_files'].append(
+        {
+            'encoding': 'base64',
+            'content': base64.encodebytes(bootstrap.encode()),
+            'owner': 'root:root',
+            'path': '/root/bootstrap.sh',
+            'permissions': '0777'
+        }
+    )
     with open(f'{tmpdir}/user-data', 'wt') as f:
         f.write('#cloud-config\n')
         f.write(yaml.dump(yam2).replace("\n\n", "\n"))
@@ -416,7 +437,7 @@ def main(args):
     if args.type == 'ccvm':
         ret = ccvmGen(sn_nic=args.sn_nic, sn_ip=args.sn_ip, sn_prefix=args.sn_prefix, sn_gw=args.sn_gw)
     elif args.type == 'scvm':
-        ret = scvmGen(pn_nic=args.pn_nic, pn_ip=args.pn_ip, pn_prefix=args.pn_prefix, cn_nic=args.cn_nic, cn_ip=args.cn_ip, cn_prefix=args.cn_prefix)
+        ret = scvmGen(pn_nic=args.pn_nic, pn_ip=args.pn_ip, pn_prefix=args.pn_prefix, cn_nic=args.cn_nic, cn_ip=args.cn_ip, cn_prefix=args.cn_prefix, master=args.master)
     ret = genCloudInit(filename=args.iso_path)
     return ret
 
