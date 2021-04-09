@@ -1,3 +1,19 @@
+// textarea에서 "Tab"키 사용.
+$(".tab-available").keydown(function (e) {
+    if (e.keyCode === 9) {
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
+        var $this = $(this);
+        var value = $this.val();
+        $this.val(value.substring(0, start)
+            + "\t"
+            + value.substring(end));
+        this.selectionStart = this.selectionEnd = start + 1;
+        e.preventDefault();
+    }
+});
+
+
 /**
  * Meathod Name : setNicBridge
  * Date Created : 2021.03.16
@@ -9,7 +25,7 @@
  * History  : 2021.03.18 wizard ui 공통 함수로 분리
  */
  function setNicBridge(select_box_id){
-    var cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/nic/network_action.py","list"];
+    var cmd = ["python3",pluginpath + "/python/nic/network_action.py","list"];
 
     cockpit.spawn(cmd).then(function(data){
         

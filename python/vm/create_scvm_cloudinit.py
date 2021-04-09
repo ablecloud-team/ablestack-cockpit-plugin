@@ -65,20 +65,20 @@ def resetCloud(args):
     cmd += "\nEOF"
     os.system(cmd)
 
-    # cloudinit iso에 사용할 개인키 : ablecloud 파일 생성
+    # cloudinit iso에 사용할 개인키 : id_rsa 파일 생성
     cmd = "cat > "+args.file2+"<< EOF\n"
     cmd += args.text2
     cmd += "\nEOF"
     os.system(cmd)
 
-    # cloudinit iso에 사용할 공개키 : ablecloud.pub 생성
+    # cloudinit iso에 사용할 공개키 : id_rsa.pub 생성
     cmd = "cat > "+args.file3+"<< EOF\n"
     cmd += args.text3
     cmd += "\nEOF"
     os.system(cmd)
 
-    # cloudinit iso 생성 (/var/lib/libvirt//ablestack/vm/scvm/scvm-cloudinit.iso)
-    result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic','ens20','--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--dns','8.8.8.8','--pn-nic','ens21','--pn-ip',args.pn_ip,'--pn-prefix',args.pn_prefix,'--cn-nic','ens22','--cn-ip',args.cn_ip,'--cn-prefix',args.cn_prefix,'--iso-path','/var/lib/libvirt/ablestack/vm/scvm/scvm-cloudinit.iso','scvm').stdout.decode())
+    # cloudinit iso 생성 (/usr/share/cockpit/ablestack/tools/vmconfig/scvm/scvm-cloudinit.iso)
+    result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic','ens20','--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--dns','8.8.8.8','--pn-nic','ens21','--pn-ip',args.pn_ip,'--pn-prefix',args.pn_prefix,'--cn-nic','ens22','--cn-ip',args.cn_ip,'--cn-prefix',args.cn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/scvm/scvm-cloudinit.iso','scvm').stdout.decode())
     if result['code'] not in [200]:
         success_bool = False
 
