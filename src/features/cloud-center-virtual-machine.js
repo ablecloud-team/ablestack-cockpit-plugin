@@ -127,6 +127,7 @@ class CloudCenterVirtualMachine {
                         "GW : " + vm['GW']
                     );
                     if (vm.State == "running") {
+                        $('#ccvm_status_icon').attr('class','fas fa-fw fa-check-circle');
                         let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'green', 'Running');
                         status_span[0].children[0].replaceWith(a)
                     } else {
