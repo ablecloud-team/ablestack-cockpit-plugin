@@ -677,6 +677,26 @@
                 </footer>
             </div>
 
+            <!-- 스토리지센터 가상머신 배포 마법사 진행: Modal 영역 시작 -->
+            <div id="div-modal-storage-wizard-confirm" class="pf-c-backdrop" style="display:none" >
+                <div class="pf-l-bullseye">
+                    <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="storage wizard confirm">
+                        <button id="button-close-modal-storage-wizard-confirm" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                        <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">스토리지센터 가상머신 배포 진행</span></h1></header>
+                        <div class="pf-c-modal-box__body">
+                            <div>스토리지센터 가상머신 배포를 진행하시겠습니까?</div>
+                        </div>
+                        <footer class="pf-c-modal-box__footer">
+                            <button id="button-execution-modal-storage-wizard-confirm" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                            <button id="button-cancel-modal-storage-wizard-confirm" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">아니요</button>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            <!-- 스토리지센터 가상머신 배포 마법사 진행: Modal 영역 끝 -->
+            
             <!-- 스토리지센터 가상머신 배포 마법사 취소: Modal 영역 시작 -->
             <div id="div-modal-cancel-storage-wizard-cancel" class="pf-c-backdrop" style="display:none" >
                 <div class="pf-l-bullseye">
@@ -695,7 +715,7 @@
                     </div>
                 </div>
             </div>
-            <!-- 클러스터 준비 마법사 취소: Modal 영역 끝 -->
+            <!-- 스토리지센터 가상머신 배포 마법사 취소: Modal 영역 끝 -->
         </div>
     </div>
 </div>
