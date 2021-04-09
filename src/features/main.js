@@ -633,7 +633,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
     .catch(function(error){
         console.log("Hosts file is not configured :"+error);
     });  
-}
+} 
 
 //30초마다 화면 정보 갱신
 setInterval(() => {
