@@ -1,1 +1,0 @@
-Debian 계열(Ubuntu) 운영체제를 위한 ABLESTACK Cockpit Plugin 패키지를 빌드하기 위한 스펙 파일을 관리하는 디렉토리
