@@ -89,21 +89,15 @@ def stopStorageVM():
 def deleteStorageVM():
     try:
         '''스토리지 가상머신 강제 정지 명령 후 리턴값 0은 정상, 아닐경우 이미 정지 상태거나 없는경우'''
-        call(['virsh destroy scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
-        
+        call(['virsh destroy scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         '''스토리지 가상머신 삭제 명령 후 리턴값 0은 정상, 아닐경우 비정상'''
-        rc = call(['virsh undefine scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
-        if rc == 0:
-            while True:   
-                rc = call(['virsh domstate scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
-                if rc > 0 :
-                    break;
-                retVal = True
-                retCode = 200            
-        else :
-            retVal = False
-            retCode = 500
-        ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM Delete')
+        call(['virsh undefine scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        while True:   
+            rc = call(['virsh domstate scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            if rc > 0 :
+                break;        
+
+        ret = createReturn(code=200, val=True, retname='Storage Center VM Delete')
     except Exception as e:
         ret = createReturn(code=500, val='virsh destroy, undefine error', retname='Storage Center VM Delete Error')    
     return print(json.dumps(json.loads(ret), indent=4))

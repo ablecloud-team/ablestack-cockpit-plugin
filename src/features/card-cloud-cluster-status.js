@@ -23,7 +23,7 @@ $('#button-execution-modal-cloud-vm-start').on('click', function(){
     $('#div-modal-start-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터VM을 시작하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStart'])
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStart'])
     .then(function(data){
         var retVal = JSON.parse(data);
 
