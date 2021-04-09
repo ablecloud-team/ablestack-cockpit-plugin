@@ -25,14 +25,14 @@ function checkIp(ip_address) {
  * Description : netmask 유효성 체크 (예 :255.255.255.255)
  * Parameter : obj
  * Return  : boolean
- * History  : 2021.03.28 최초 작성
+ * History  : 2021.04.09 수정
  */
 
 function checkNetmaskFormat(obj){
-  let netmaskFormatCheckBoolean = false;
-  let netmaskFormat = /^(255?)\.(255?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-  if(obj.replace(/[ㄱ-ㅎㅏ-ㅣ가-힣`~!@#$%^&*()\-\\_=+|;:'",/<>?]/g, "").match(netmaskFormat)) netmaskFormatCheckBoolean = true;
-  return netmaskFormatCheckBoolean;
+  let netmask_format_check_boolean = false;
+  let netmask_format = /^(255?)\.(255?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  if(netmask_format.test(obj)) netmask_format_check_boolean = true;
+  return netmask_format_check_boolean;
 }
 
 
@@ -43,14 +43,14 @@ function checkNetmaskFormat(obj){
  * Description : cidr 유효성 체크
  * Parameter : obj (예: 192.168.0.0/16)
  * Return  : boolean
- * History  : 2021.03.28 최초 작성
+ * History  : 2021.04.09 수정
  */
 
 function checkCidrFormat(obj){
-  let cidrFormatCheckBoolean = false;
-  let cidrkFormat = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$/;
-  if(obj.replace(/[ㄱ-ㅎㅏ-ㅣ가-힣`~!@#$%^&*()\-\\_=+|;:'",<>?]/g, "").match(cidrkFormat)) cidrFormatCheckBoolean = true;
-  return cidrFormatCheckBoolean;
+  let cidr_format_check_boolean = false;
+  let cidr_format = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$/;
+  if(cidr_format.test(obj)) cidr_format_check_boolean = true;
+  return cidr_format_check_boolean;
 }
 
 
@@ -65,10 +65,10 @@ function checkCidrFormat(obj){
  */
 
 function checkVlan(obj) {
-  let vlanFormatCheckBoolean = false;
-  let vlanFormat = /^[0-9]*$/;
-  if(obj.match(vlanFormat) && obj >= 1 && obj <= 4094) vlanFormatCheckBoolean = true;
-  return vlanFormatCheckBoolean;
+  let vlan_format_check_boolean = false;
+  let vlan_format = /^[0-9]*$/;
+  if(obj.match(vlan_format) && obj >= 1 && obj <= 4094) vlan_format_check_boolean = true;
+  return vlan_format_check_boolean;
 }
 
 
@@ -82,10 +82,10 @@ function checkVlan(obj) {
  * History  : 2021.03.29 최초 작성
  */
 function checkFirstChar(obj){
-  let firstCharCheckBoolean = false;
-  let firStrChk = /^[a-zA-Z]{1}/;  // 첫번째 문자 알파벳 여부 체크 정규식
-  if(firStrChk.test(obj)) firstCharCheckBoolean = true;
-  return firstCharCheckBoolean;
+  let first_char_check_boolean = false;
+  let fir_str_chk = /^[a-zA-Z]{1}/;  // 첫번째 문자 알파벳 여부 체크 정규식
+  if(fir_str_chk.test(obj)) first_char_check_boolean = true;
+  return first_char_check_boolean;
 }
 
 
@@ -96,22 +96,22 @@ function checkFirstChar(obj){
  * Description : 호스트 이름 검사(첫번때 입력 문자에 따라 호스트 이름을 검사)
  * Parameter : obj (hostname)
  * Return  : boolean
- * History  : 2021.03.29 최초 작성
+ * History  : 2021.04.09 수정
  */
 function checkHostFormat(obj){
-  let hostFormatCheckBoolean = false;
+  let host_format_check_boolean = false;
 
   // 첫번째 입력 문자가 숫자일 때, IP 형식으로 입력되는지 검사
   if(!checkFirstChar(obj)){
-    let hostFormat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-    if(obj.replace(/[ㄱ-ㅎㅏ-ㅣ가-힣`~!@#$%^&*()\-\\_=+|;:'",<>?]/g, "").match(hostFormat)) hostFormatCheckBoolean = true;
+    let host_format = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    if(host_format.test(obj)) host_format_check_boolean = true;
   }
   // 첫번째 입력 문자가 숫자가 아닐 때 DNS 형식으로 입력되는지 검사
   else{
-    let hostFormat = /[^a-zA-Z0-9\-\.]/;
-    if(!hostFormat.test(obj)) hostFormatCheckBoolean = true;
+    let host_format = /[^a-zA-Z0-9\-\.]/;
+    if(!host_format.test(obj)) host_format_check_boolean = true;
   }
-  return hostFormatCheckBoolean;
+  return host_format_check_boolean;
 }
 
 
