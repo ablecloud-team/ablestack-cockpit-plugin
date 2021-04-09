@@ -210,7 +210,7 @@ class CloudCenterVirtualMachine {
                 ccvm_instance.runningHost = obj.val.started;
                 ccvm_instance.clusterdHost = obj.val.clustered_host;
 
-                var remotePcsStatus = ['/usr/bin/ssh', ccvm_instance.runningHost, '/usr/bin/python3', '/usr/share/cockpit/ablestack/python/host/virshlist.py'];
+                var remotePcsStatus = ['/usr/bin/ssh', '-o', 'StrictHostKeyChecking=no', ccvm_instance.runningHost, '/usr/bin/python3', '/usr/share/cockpit/ablestack/python/host/virshlist.py'];
                 cockpit.spawn(remotePcsStatus)
                     .then(ccvm_instance.checkVIRSHOK)
                     .catch(ccvm_instance.checkVIRSHERR)
@@ -247,10 +247,7 @@ class CloudCenterVirtualMachine {
 
     */
     checkCCVM() {
-
-        cockpit.spawn(['/usr/bin/python3',
-            '/usr/share/cockpit/ablestack/python/pcs/main.py',
-            'status', '--resource', ccvm_instance.resource], {'host': 'localhost'})
+        cockpit.spawn(['/usr/bin/python3', '/usr/share/cockpit/ablestack/python/pcs/main.py', 'status', '--resource', 'cloudcenter_res'])
             .then(ccvm_instance.checkPCSOK)
             .catch(ccvm_instance.checkPCSERR)
 
@@ -263,9 +260,8 @@ class CloudCenterVirtualMachine {
     */
     changeOffering(cpu, memory) {
         ccvm_instance.clusterdHost.forEach(function (host){
-        cockpit.spawn(['/usr/bin/python3',
-            '/usr/share/cockpit/ablestack/python/host/virshedit.py',
-            'edit', '--cpu', cpu, '--memory', memory, '--xml', ccvm_instance.xml], {'host': host})
+        cockpit.spawn(['/usr/bin/ssh', '-o', 'StrictHostKeyChecking=no', ccvm_instance.runningHost,
+            '/usr/bin/python3', '/usr/share/cockpit/ablestack/python/host/virshedit.py', 'edit', '--cpu', cpu, '--memory', memory, '--xml', ccvm_instance.xml])
             .then(ccvm_instance.createAlertModal)
             .catch(ccvm_instance.createAlertModal)
         })
