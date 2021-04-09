@@ -44,7 +44,7 @@ $(".tab-available").keydown(function (e) {
         $('#'+select_box_id).append(el);
 
     }).catch(function(){
-        alert("error");
+        alert("setNicBridge error");
     });
 }
 
@@ -53,30 +53,35 @@ $(".tab-available").keydown(function (e) {
  * Date Created : 2021.03.18
  * Writer  : 배태주
  * Description : hosts file을 읽어 편집하는 기능
- * Parameter : input, callBackFunction
+ * Parameter : input, file_name, callBackFunction
  * Return  : 없음
  * History  : 2021.03.18 최초 작성
 **/
-function setHostsFileReader(input, callBackFunction) {
+function setHostsFileReader(input, file_name, callBackFunction) {
     input.on("change", function(event) { 
-        if(input.val() != ""){
-            try {
-                // FileList
-                let file_list = input.files || event.target.files;
-                // File
-                let file = file_list[0];
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    var text = e.target.result
-                    var host_array = readHostsFileCallBack(text);
-                    callBackFunction(host_array, text);
-                };
-                reader.readAsText(file);
-            } catch (err) {
-                console.error(err);
+        // FileList
+        let file_list = input.files || event.target.files;
+        // File
+        let file = file_list[0];
+        if(file.name == file_name){
+            if(input.val() != ""){
+                try {
+                    let reader = new FileReader();
+                    reader.onload = function (e) {
+                        var text = e.target.result
+                        var host_array = readHostsFileCallBack(text);
+                        callBackFunction(host_array, text);
+                    };
+                    reader.readAsText(file);
+                } catch (err) {
+                    console.error(err);
+                }
+            } else {
+                callBackFunction("");
             }
         } else {
-            callBackFunction("");
+            alert(file_name+" 파일만 업로드할 수 있습니다.");
+            input.val("");
         }
     });
 }
@@ -145,25 +150,31 @@ function setHostsFileReader(input, callBackFunction) {
  * Return  : 없음
  * History  : 2021.03.18 최초 작성
 **/
-function setSshKeyFileReader(input, callBackFunction) {
+function setSshKeyFileReader(input, file_name, callBackFunction) {
     input.on("change", function(event) { 
-        if(input.val() != ""){
-            try {
-                // FileList
-                let file_list = input.files || event.target.files;
-                // File
-                let file = file_list[0];
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    var text = e.target.result
-                    callBackFunction(text);
-                };
-                reader.readAsText(file);
-            } catch (err) {
-                console.error(err);
+        // FileList
+        let file_list = input.files || event.target.files;
+        // File
+        let file = file_list[0];
+        if(file.name == file_name){
+            if(input.val() != ""){
+                try {
+
+                    let reader = new FileReader();
+                    reader.onload = function (e) {
+                        var text = e.target.result
+                        callBackFunction(text);
+                    };
+                    reader.readAsText(file);
+                } catch (err) {
+                    console.error(err);
+                }
+            } else {
+                callBackFunction("");
             }
         } else {
-            callBackFunction("");
+            alert(file_name+" 파일만 업로드할 수 있습니다.");
+            input.val("");
         }
     });
 }

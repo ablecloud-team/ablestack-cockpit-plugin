@@ -12,6 +12,7 @@ import logging
 import json
 import sys
 import os
+import time
 
 from ablestack import *
 from sh import python3
@@ -51,7 +52,6 @@ def resetCloud(args):
 
     #=========== pcs cluster 구성 ===========
     # ceph 이미지 등록
-
     os.system("qemu-img convert -f qcow2 -O rbd /var/lib/libvirt/images/ablestack-template-back.qcow2 rbd:rbd/ccvm")
 
     # 클러스터 구성
@@ -65,7 +65,15 @@ def resetCloud(args):
         success_bool = False
 
     #ccvm이 정상적으로 생성 되었는지 확인
-    domid_check = os.system("virsh domid ccvm > /dev/null")
+    domid_check = ""
+    cnt_num = 0
+    while True:
+        time.sleep(1)
+        cnt_num += 1
+        domid_check = os.system("virsh domid ccvm > /dev/null")
+        if domid_check == 0 or cnt_num > 60:
+            break
+
     if domid_check != 0:
         success_bool = False
 
