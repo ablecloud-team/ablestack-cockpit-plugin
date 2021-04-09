@@ -247,7 +247,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                 })
             }
         })
-        .catch(err=>{
+        .catch(err=>{            
             // hosts 파일 구성 되지않음
             sessionStorage.setItem("ccfg_status", "false"); 
             resolve();
@@ -371,7 +371,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  * History  : 2021.03.31 최초 작성
  */
  function checkStorageVmStatus(){
-    return new Promise((resolve) => {
+    return new Promise((resolve) => {        
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_detail.py", "detail" ])
         .then(function(data){        
             var retVal = JSON.parse(data);
@@ -511,8 +511,8 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
     const step2 = sessionStorage.getItem("scvm_status"); 
     const step3 = sessionStorage.getItem("sc_status");   
     const step4 = sessionStorage.getItem("cc_status"); 
-    const step5 = sessionStorage.getItem("ccvm_status");   
-
+    const step5 = sessionStorage.getItem("ccvm_status");    
+    console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5);
     // 배포 상태조회 
     if(step1!="true"){
         // 클러스터 구성준비 버튼 show
@@ -634,3 +634,12 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         console.log("Hosts file is not configured :"+error);
     });  
 }
+
+//30초마다 화면 정보 갱신
+setInterval(() => {
+        // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
+        Promise.all([checkConfigStatus(), checkStorageClusterStatus(), 
+            checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
+                checkDeployStatus();
+            });
+}, 30000);
