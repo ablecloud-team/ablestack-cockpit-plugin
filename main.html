@@ -72,9 +72,10 @@
                                                             <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-unset-maintenance-mode" >유지보수 모드 해제</button>
                                                         </li>
                                                         <li class="pf-c-divider" role="separator"></li>
-                                                        <li>
-                                                            <a class="pf-c-dropdown__menu-item pf-m-disabled" href="#" aria-disabled="true" tabindex="-1" id="menu-item-linkto-storage-center">스토리지센터 연결</a>
-                                                        </li>
+                                                        <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 있을때 표시-->
+                                                        <li id="after-bootstrap-run"></li>
+                                                        <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 없을때 표시-->
+                                                        <li id="before-bootstrap-run"></li>
                                                     </ul>
                                                 </div>
                                             </div>
