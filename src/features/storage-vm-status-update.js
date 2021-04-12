@@ -22,8 +22,9 @@ $('#button-storage-vm-status-update').on('click', function(){
         .then(function(data){
             //console.log(data);
             var retVal = JSON.parse(data);
-            if(retVal.code == "200"){
-                console.log(data)
+            if(retVal.code == "200"){                
+                console.log(data);
+                alert("스토리지 센터 가상머신이 정지되었습니다.");
                 location.reload();
             }else{
                 alert("정상적으로 처리되지 않았습니다.");
@@ -38,8 +39,9 @@ $('#button-storage-vm-status-update').on('click', function(){
         .then(function(data){  
             //console.log(data);
             var retVal = JSON.parse(data);
-            if(retVal.code == "200"){
-                console.log(data) 
+            if(retVal.code == "200"){                
+                console.log(data);
+                alert("스토리지 센터 가상머신이 시작되었습니다.");
                 location.reload();
             }else{
                 alert("정상적으로 처리되지 않았습니다.");
@@ -55,7 +57,8 @@ $('#button-storage-vm-status-update').on('click', function(){
             //console.log(data);
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){  
-                console.log(data)         
+                console.log(data);
+                alert("스토리지 센터 가상머신이 삭제되었습니다.");
                 location.reload();    
             }else{
                 alert("정상적으로 처리되지 않았습니다.");
@@ -70,7 +73,8 @@ $('#button-storage-vm-status-update').on('click', function(){
         // /root/bootstrap.sh 파일을 실행함.
         cockpit.spawn(["sh", "/usr/share/cockpit/ablestack/shell/host/bootstrap_run.sh"])
         .then(function(data){
-            console.log(data)
+            alert("스토리지 센터 가상머신에서 bootstrap.sh 파일이 정상적으로 실행되었습니다.");
+            console.log(data);
             location.reload();
         })
         .catch(function(data){
