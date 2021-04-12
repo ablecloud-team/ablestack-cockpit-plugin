@@ -29,14 +29,7 @@
   </pm>
   <devices>
     <emulator>/usr/libexec/qemu-kvm</emulator>
-    <disk type="file" device="cdrom">
-      <driver name="qemu" type="raw"/>
-      <source file="/usr/share/cockpit/ablestack/tools/vmconfig/ccvm/ccvm-cloudinit.iso"/>
-      <target dev="hda" bus="ide"/>
-      <readonly/>
-      <shareable/>
-      <address type="drive" controller="0" bus="0" target="0" unit="0"/>
-    </disk>
+<!--ccvm_cloudinit-->
     <disk type='network' device='disk'>
       <source protocol='rbd' name='rbd/ccvm'>
         <host name='scvm' port='6789'/>

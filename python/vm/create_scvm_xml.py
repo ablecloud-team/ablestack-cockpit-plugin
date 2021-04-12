@@ -118,6 +118,17 @@ def createScvmXml(args):
                     line = line.replace('<!--memory-->', str(args.memory))
                 elif '<!--cpu-->' in line:
                     line = line.replace('<!--cpu-->', str(args.cpu))
+                elif '<!--scvm_cloudinit-->' in line:
+                    sci_txt = "    <disk type='file' device='cdrom'>\n"
+                    sci_txt += "      <driver name='qemu' type='raw'/>\n"
+                    sci_txt += "      <source file='"+pluginpath+"/tools/vmconfig/scvm/scvm-cloudinit.iso'/>\n"
+                    sci_txt += "      <target dev='hda' bus='ide'/>\n"
+                    sci_txt += "      <readonly/>\n"
+                    sci_txt += "      <shareable/>\n"
+                    sci_txt += "      <address type='drive' controller='0' bus='0' target='0' unit='0'/>\n"
+                    sci_txt += "    </disk>"
+
+                    line = line.replace('<!--scvm_cloudinit-->', sci_txt)
                 elif '<!--lun_passthrough-->' in line:
                     if 'lun_passthrough' == args.disk_type:
                         lpl_txt = ""
@@ -309,6 +320,9 @@ def createScvmXml(args):
         # 작업파일 삭제 및 이름 변경
         os.system("mv "+pluginpath+"/tools/vmconfig/scvm/scvm-temp.xml "+pluginpath+"/tools/vmconfig/scvm/scvm.xml")
         os.system("rm -f "+pluginpath+"/tools/vmconfig/scvm/scvm-temp.xml.bak")
+
+        # 폴더 권한 수정
+        os.system("chmod 755 -R "+pluginpath+"/tools/vmconfig/scvm")
 
         # 결과값 리턴
         return createReturn(code=200, val={})        
