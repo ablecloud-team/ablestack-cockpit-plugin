@@ -27,11 +27,10 @@ $('#button-maintenance-mode-update').on('click', function(){
             }else{                
                 alert("정상적으로 처리되지 않았습니다.")
             }
-            $('#div-modal-storage-cluster-maintenance-update').hide();
         })
         .catch(function(data){             
             alert("정상적으로 처리되지 않았습니다.")
-            //console.log(":::Error:::");            
+            console.log(":::scc maintenance update unset Error::: " +data);
         });    
     }else if(cmd == "set"){//유지보수 모드 설정 시 이벤트 요청        
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scc_status/scc_status_update.py", "set_noout" ])
@@ -43,11 +42,10 @@ $('#button-maintenance-mode-update').on('click', function(){
             }else{                
                 alert("정상적으로 처리되지 않았습니다.")
             }
-            $('#div-modal-storage-cluster-maintenance-update').hide();
         })
         .catch(function(data){            
             alert("정상적으로 처리되지 않았습니다.")
-            //console.log(":::Error:::"+data);
+            console.log(":::scc maintenance update set Error::: " +data);
         });        
     }    
 });
