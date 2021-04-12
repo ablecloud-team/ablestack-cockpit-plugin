@@ -24,15 +24,14 @@ $('#scvm-resource-update').click(function(){
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py", "resource", "-c", cpu, "-m", memory ])
         .then(function(data){            
             var retVal = JSON.parse(data);
-            if(retVal.code == "200"){
-                //정상적으로 변경 되었을 시 해당 modal html 숨김                
-                $('#div-modal-storage-vm-resource-update').hide();   
+            if(retVal.code == "200"){ 
                 location.reload();
             }else{
                 alert("정상적으로 처리되지 않았습니다.")
             }
         })
-        .catch(function(data){ 
+        .catch(function(data){
+            console.log(":::scvm resource update Error::: "+data);
             alert("정상적으로 처리되지 않았습니다.")            
         });
     }
