@@ -58,15 +58,15 @@ def resetCloud(args):
     result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'destroy').stdout.decode())
     if result['code'] not in [200,400]:
         success_bool = False
-    
+
     # ceph rbd 이미지 삭제
     result = os.system("rbd ls -p rbd | grep ccvm > /dev/null")
     if result == 0:
         os.system("rbd rm rbd/ccvm")
 
     # virsh 초기화
-    os.system("virsh destroy ccvm")
-    os.system("virsh undefine ccvm")
+    os.system("virsh destroy ccvm > /dev/null")
+    os.system("virsh undefine ccvm > /dev/null")
 
     # 작업폴더 생성
     os.system("mkdir -p "+pluginpath+"/tools/vmconfig/ccvm")

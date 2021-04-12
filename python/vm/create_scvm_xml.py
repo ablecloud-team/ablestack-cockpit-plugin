@@ -123,13 +123,13 @@ def createScvmXml(args):
                         lpl_txt = ""
                         num = 0
                         for lun in args.lun_passthrough_list:
-                            lpl_txt += "\t\t<disk type='file' device='disk'>\n"
-                            lpl_txt += "\t\t\t<driver name='qemu' type='raw'/>\n"
-                            lpl_txt += "\t\t\t<source file='" + lun + "'/>\n"
-                            lpl_txt += "\t\t\t<target dev='sd"+ alphabet[num] +"' bus='scsi'/>\n"
-                            lpl_txt += "\t\t\t<alias name='scsi0-0-0-"+ str(num) +"'/>\n"
-                            lpl_txt += "\t\t\t<address type='drive' controller='0' bus='0' target='0' unit='"+ str(num) +"'/>\n"
-                            lpl_txt += "\t\t</disk>\n"
+                            lpl_txt += "    <disk type='block' device='lun'>\n"
+                            lpl_txt += "      <driver name='qemu' type='raw'/>\n"
+                            lpl_txt += "      <source dev='" + lun + "'/>\n"
+                            lpl_txt += "      <target dev='sd"+ alphabet[num] +"' bus='scsi'/>\n"
+                            lpl_txt += "      <alias name='scsi0-0-0-"+ str(num) +"'/>\n"
+                            lpl_txt += "      <address type='drive' controller='0' bus='0' target='0' unit='"+ str(num) +"'/>\n"
+                            lpl_txt += "    </disk>\n"
                             num += 1
 
                         line = line.replace('<!--lun_passthrough-->', lpl_txt)
@@ -137,27 +137,27 @@ def createScvmXml(args):
                         # <!--lun_passthrough--> 주석제거
                         line = ''
                 elif '<!--management_network_bridge-->' in line:
-                    mnb_txt = "\t\t<interface type='bridge'>\n"
-                    mnb_txt += "\t\t\t<mac address='" + generateMacAddress() + "'/>\n"
-                    mnb_txt += "\t\t\t<source bridge='" + args.management_network_bridge + "'/>\n"
-                    mnb_txt += "\t\t\t<target dev='vnet" + str(br_num) + "'/>\n"
-                    mnb_txt += "\t\t\t<model type='virtio'/>\n"
-                    mnb_txt += "\t\t\t<alias name='net" + str(br_num) + "'/>\n"
-                    mnb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
-                    mnb_txt += "\t\t</interface>\n"
+                    mnb_txt = "    <interface type='bridge'>\n"
+                    mnb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
+                    mnb_txt += "      <source bridge='" + args.management_network_bridge + "'/>\n"
+                    mnb_txt += "      <target dev='vnet" + str(br_num) + "'/>\n"
+                    mnb_txt += "      <model type='virtio'/>\n"
+                    mnb_txt += "      <alias name='net" + str(br_num) + "'/>\n"
+                    mnb_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
+                    mnb_txt += "    </interface>\n"
 
                     br_num += 1
                     line = line.replace('<!--management_network_bridge-->', mnb_txt)
                 elif '<!--server_network_bridge-->' in line:
                     if 'bridge' == args.storage_traffic_network_type:
-                        snb_txt = "\t\t<interface type='bridge'>\n"
-                        snb_txt += "\t\t\t<mac address='" + generateMacAddress() + "'/>\n"
-                        snb_txt += "\t\t\t<source bridge='" + args.server_network_bridge + "'/>\n"
-                        snb_txt += "\t\t\t<target dev='vnet" + str(br_num) + "'/>\n"
-                        snb_txt += "\t\t\t<model type='virtio'/>\n"
-                        snb_txt += "\t\t\t<alias name='net" + str(br_num) + "'/>\n"
-                        snb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
-                        snb_txt += "\t\t</interface>\n"
+                        snb_txt = "    <interface type='bridge'>\n"
+                        snb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
+                        snb_txt += "      <source bridge='" + args.server_network_bridge + "'/>\n"
+                        snb_txt += "      <target dev='vnet" + str(br_num) + "'/>\n"
+                        snb_txt += "      <model type='virtio'/>\n"
+                        snb_txt += "      <alias name='net" + str(br_num) + "'/>\n"
+                        snb_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
+                        snb_txt += "    </interface>\n"
                         
                         br_num += 1
                         line = line.replace('<!--server_network_bridge-->', snb_txt)
@@ -167,14 +167,14 @@ def createScvmXml(args):
 
                 elif '<!--replication_network_bridge-->' in line:
                     if 'bridge' == args.storage_traffic_network_type:
-                        rnb_txt = "\t\t<interface type='bridge'>\n"
-                        rnb_txt += "\t\t\t<mac address='" + generateMacAddress() + "'/>\n"
-                        rnb_txt += "\t\t\t<source bridge='" + args.replication_network_bridge + "'/>\n"
-                        rnb_txt += "\t\t\t<target dev='vnet" + str(br_num) + "'/>\n"
-                        rnb_txt += "\t\t\t<model type='virtio'/>\n"
-                        rnb_txt += "\t\t\t<alias name='net" + str(br_num) + "'/>\n"
-                        rnb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
-                        rnb_txt += "\t\t</interface>\n"
+                        rnb_txt = "    <interface type='bridge'>\n"
+                        rnb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
+                        rnb_txt += "      <source bridge='" + args.replication_network_bridge + "'/>\n"
+                        rnb_txt += "      <target dev='vnet" + str(br_num) + "'/>\n"
+                        rnb_txt += "      <model type='virtio'/>\n"
+                        rnb_txt += "      <alias name='net" + str(br_num) + "'/>\n"
+                        rnb_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
+                        rnb_txt += "    </interface>\n"
                         
                         br_num += 1
                         line = line.replace('<!--replication_network_bridge-->', rnb_txt)
@@ -195,14 +195,14 @@ def createScvmXml(args):
                             slot_num = rpl2[0]
                             fun_num = rpl2[1]
                             
-                            rpl_txt += "\t\t<hostdev mode='subsystem' type='pci' managed='yes'>\n"
-                            rpl_txt += "\t\t\t<driver name='vfio'/>\n"
-                            rpl_txt += "\t\t\t<source>\n"
-                            rpl_txt += "\t\t\t\t<address domain='0x0000' bus='0x"+ bus_num +"' slot='0x"+ slot_num +"' function='0x"+ fun_num +"'/>\n"
-                            rpl_txt += "\t\t\t</source>\n"
-                            rpl_txt += "\t\t\t<alias name='hostdev"+ str(host_dev_num) +"'/>\n"
-                            rpl_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num.pop(0) +"' function='0x0'/>\n"
-                            rpl_txt += "\t\t</hostdev>\n"
+                            rpl_txt += "    <hostdev mode='subsystem' type='pci' managed='yes'>\n"
+                            rpl_txt += "      <driver name='vfio'/>\n"
+                            rpl_txt += "      <source>\n"
+                            rpl_txt += "        <address domain='0x0000' bus='0x"+ bus_num +"' slot='0x"+ slot_num +"' function='0x"+ fun_num +"'/>\n"
+                            rpl_txt += "      </source>\n"
+                            rpl_txt += "      <alias name='hostdev"+ str(host_dev_num) +"'/>\n"
+                            rpl_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num.pop(0) +"' function='0x0'/>\n"
+                            rpl_txt += "    </hostdev>\n"
                             host_dev_num += 1
                         line = line.replace('<!--raid_passthrough-->', rpl_txt)
                     else:    
@@ -231,25 +231,25 @@ def createScvmXml(args):
                         rnp_slot_num = rnp2[0]
                         rnp_fun_num = rnp2[1]
 
-                        np_txt = "\t\t<hostdev mode='subsystem' type='pci' managed='yes'>\n"
-                        np_txt += "\t\t\t<driver name='vfio'/>\n"
-                        np_txt += "\t\t\t<source>\n"
-                        np_txt += "\t\t\t\t<address domain='0x" + snp_domain_num + "' bus='0x"+ snp_bus_num +"' slot='0x"+ snp_slot_num +"' function='0x"+ snp_fun_num +"'/>\n"
-                        np_txt += "\t\t\t</source>\n"
-                        np_txt += "\t\t\t<alias name='hostdev"+ str(host_dev_num) +"'/>\n"
-                        np_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
-                        np_txt += "\t\t</hostdev>\n"
+                        np_txt = "    <hostdev mode='subsystem' type='pci' managed='yes'>\n"
+                        np_txt += "      <driver name='vfio'/>\n"
+                        np_txt += "      <source>\n"
+                        np_txt += "        <address domain='0x" + snp_domain_num + "' bus='0x"+ snp_bus_num +"' slot='0x"+ snp_slot_num +"' function='0x"+ snp_fun_num +"'/>\n"
+                        np_txt += "      </source>\n"
+                        np_txt += "      <alias name='hostdev"+ str(host_dev_num) +"'/>\n"
+                        np_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
+                        np_txt += "    </hostdev>\n"
                         host_dev_num += 1
                         slot_hex_num.pop(0)
 
-                        np_txt += "\t\t<hostdev mode='subsystem' type='pci' managed='yes'>\n"
-                        np_txt += "\t\t\t<driver name='vfio'/>\n"
-                        np_txt += "\t\t\t<source>\n"
-                        np_txt += "\t\t\t\t<address domain='0x" + rnp_domain_num + "' bus='0x"+ rnp_bus_num +"' slot='0x"+ rnp_slot_num +"' function='0x"+ rnp_fun_num +"'/>\n"
-                        np_txt += "\t\t\t</source>\n"
-                        np_txt += "\t\t\t<alias name='hostdev"+ str(host_dev_num) +"'/>\n"
-                        np_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
-                        np_txt += "\t\t</hostdev>\n"
+                        np_txt += "    <hostdev mode='subsystem' type='pci' managed='yes'>\n"
+                        np_txt += "      <driver name='vfio'/>\n"
+                        np_txt += "      <source>\n"
+                        np_txt += "        <address domain='0x" + rnp_domain_num + "' bus='0x"+ rnp_bus_num +"' slot='0x"+ rnp_slot_num +"' function='0x"+ rnp_fun_num +"'/>\n"
+                        np_txt += "      </source>\n"
+                        np_txt += "      <alias name='hostdev"+ str(host_dev_num) +"'/>\n"
+                        np_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
+                        np_txt += "    </hostdev>\n"
                         host_dev_num += 1
                         slot_hex_num.pop(0)
 
@@ -276,25 +276,25 @@ def createScvmXml(args):
                             rnp_slot_num = rnp2[0]
                             rnp_fun_num = rnp2[1]
 
-                            npb_txt += "\t\t<hostdev mode='subsystem' type='pci' managed='yes'>\n"
-                            npb_txt += "\t\t\t<driver name='vfio'/>\n"
-                            npb_txt += "\t\t\t<source>\n"
-                            npb_txt += "\t\t\t\t<address domain='0x" + snp_domain_num + "' bus='0x"+ snp_bus_num +"' slot='0x"+ snp_slot_num +"' function='0x"+ snp_fun_num +"'/>\n"
-                            npb_txt += "\t\t\t</source>\n"
-                            npb_txt += "\t\t\t<alias name='hostdev"+ str(host_dev_num) +"'/>\n"
-                            npb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
-                            npb_txt += "\t\t</hostdev>\n"
+                            npb_txt += "    <hostdev mode='subsystem' type='pci' managed='yes'>\n"
+                            npb_txt += "      <driver name='vfio'/>\n"
+                            npb_txt += "      <source>\n"
+                            npb_txt += "        <address domain='0x" + snp_domain_num + "' bus='0x"+ snp_bus_num +"' slot='0x"+ snp_slot_num +"' function='0x"+ snp_fun_num +"'/>\n"
+                            npb_txt += "      </source>\n"
+                            npb_txt += "      <alias name='hostdev"+ str(host_dev_num) +"'/>\n"
+                            npb_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
+                            npb_txt += "    </hostdev>\n"
                             host_dev_num += 1
                             slot_hex_num.pop(0)
                             
-                            npb_txt += "\t\t<hostdev mode='subsystem' type='pci' managed='yes'>\n"
-                            npb_txt += "\t\t\t<driver name='vfio'/>\n"
-                            npb_txt += "\t\t\t<source>\n"
-                            npb_txt += "\t\t\t\t<address domain='0x" + rnp_domain_num + "' bus='0x"+ rnp_bus_num +"' slot='0x"+ rnp_slot_num +"' function='0x"+ rnp_fun_num +"'/>\n"
-                            npb_txt += "\t\t\t</source>\n"
-                            npb_txt += "\t\t\t<alias name='hostdev"+ str(host_dev_num) +"'/>\n"
-                            npb_txt += "\t\t\t<address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
-                            npb_txt += "\t\t</hostdev>\n"
+                            npb_txt += "    <hostdev mode='subsystem' type='pci' managed='yes'>\n"
+                            npb_txt += "      <driver name='vfio'/>\n"
+                            npb_txt += "      <source>\n"
+                            npb_txt += "        <address domain='0x" + rnp_domain_num + "' bus='0x"+ rnp_bus_num +"' slot='0x"+ rnp_slot_num +"' function='0x"+ rnp_fun_num +"'/>\n"
+                            npb_txt += "      </source>\n"
+                            npb_txt += "      <alias name='hostdev"+ str(host_dev_num) +"'/>\n"
+                            npb_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='"+ slot_hex_num[0] +"' function='0x0'/>\n"
+                            npb_txt += "    </hostdev>\n"
                             host_dev_num += 1
                             slot_hex_num.pop(0)
 

@@ -47,13 +47,13 @@ $(document).ready(function(){
     setNicPassthrough('form-select-storage-vm-cluster-nic1');
 
     //hosts 파일 선택 이벤트 세팅
-    setHostsFileReader($('#form-input-storage-vm-hosts-file'), setScvmNetworkInfo);
+    setHostsFileReader($('#form-input-storage-vm-hosts-file'), 'hosts', setScvmNetworkInfo);
 
     //ssh 개인 key 파일 선택 이벤트 세팅
-    setSshKeyFileReader($('#form-input-storage-vm-ssh-private-key-file'), setScvmSshPrivateKeyInfo);
+    setSshKeyFileReader($('#form-input-storage-vm-ssh-private-key-file'), 'id_rsa', setScvmSshPrivateKeyInfo);
 
     //ssh 공개 key 파일 선택 이벤트 세팅
-    setSshKeyFileReader($('#form-input-storage-vm-ssh-public-key-file'), setScvmSshPublicKeyInfo);
+    setSshKeyFileReader($('#form-input-storage-vm-ssh-public-key-file'), 'id_rsa.pub', setScvmSshPublicKeyInfo);
 
 });
 // document ready 끝
@@ -142,20 +142,7 @@ $('#button-next-step-modal-wizard-vm-config').on('click', function(){
         cur_step_wizard_vm_config = "7";
     }
     else if (cur_step_wizard_vm_config == "7") {
-        if(validateStorageVm()){
-            // 배포 버튼을 누르면 배포 진행 단계로 이동한다.
-            hideAllMainBody();
-            resetCurrentMode();
-
-            $('#div-modal-wizard-vm-config-deploy').show();
-            $('#button-next-step-modal-wizard-vm-config').attr('disabled', true);
-            $('#button-before-step-modal-wizard-vm-config').attr('disabled', true);
-            $('#nav-button-finish').addClass('pf-m-current');
-
-            cur_step_wizard_vm_config = "8";
-
-            deployStorageCenterVM();
-        }
+        $('#div-modal-storage-wizard-confirm').show();
     }
     else if (cur_step_wizard_vm_config == "8") {
 
@@ -432,6 +419,33 @@ $('#button-accordion-storage-vm-ssh-key').on('click', function(){
     }
 });
 
+// 마법사 "배포 실행 버튼 모달창"
+$('#button-cancel-modal-storage-wizard-confirm').on('click', function () {
+    $('#div-modal-storage-wizard-confirm').hide();
+});
+$('#button-close-modal-storage-wizard-confirm').on('click', function () {
+    $('#div-modal-storage-wizard-confirm').hide();
+});
+// 마법사 "배포 버튼 모달창" 실행 버튼을 눌러 가상머신 배포
+$('#button-execution-modal-storage-wizard-confirm').on('click', function () {
+    $('#div-modal-storage-wizard-confirm').hide();
+    if(validateStorageVm()){
+        // 배포 버튼을 누르면 배포 진행 단계로 이동한다.
+        hideAllMainBody();
+        resetCurrentMode();
+
+        $('#div-modal-wizard-vm-config-deploy').show();
+        $('#button-next-step-modal-wizard-vm-config').attr('disabled', true);
+        $('#button-before-step-modal-wizard-vm-config').attr('disabled', true);
+        
+        $('#nav-button-finish').addClass('pf-m-current');
+
+        cur_step_wizard_vm_config = "8";
+
+        deployStorageCenterVM();
+    }
+});
+
 // 마법사 "취소 버튼 모달창" show, hide
 $('#button-cancel-config-modal-wizard-vm-config').on('click', function () {
     $('#div-modal-cancel-storage-wizard-cancel').show();
@@ -507,6 +521,21 @@ function resetCurrentMode() {
 function deployStorageCenterVM() {
 
     var console_log = true;
+
+    // 하단 버튼 숨김
+    $('#button-next-step-modal-wizard-vm-config').hide();
+    $('#button-before-step-modal-wizard-vm-config').hide();
+    $('#button-cancel-config-modal-wizard-vm-config').hide();
+
+    // 왼쪽 사이드 버튼 전부 비활성화 
+    $('#nav-button-overview').addClass('pf-m-disabled');
+    $('#nav-button-vm-config').addClass('pf-m-disabled');
+    $('#nav-button-compute').addClass('pf-m-disabled');
+    $('#nav-button-disk').addClass('pf-m-disabled');
+    $('#nav-button-network').addClass('pf-m-disabled');
+    $('#nav-button-additional').addClass('pf-m-disabled');
+    $('#nav-button-ssh-key').addClass('pf-m-disabled');
+    $('#nav-button-review').addClass('pf-m-disabled');
 
     //=========== 1. 스토리지센터 가상머신 초기화 작업 ===========
     // 설정 초기화 ( 필요시 python까지 종료 )
@@ -628,28 +657,10 @@ function showDivisionVMConfigFinish() {
     resetCurrentMode();
 
     $('#div-modal-wizard-vm-config-finish').show();
-    $('#button-next-step-modal-wizard-vm-config').attr('disabled', true);
-    $('#button-before-step-modal-wizard-vm-config').attr('disabled', true);
     $('#nav-button-finish').addClass('pf-m-current');
     $('#nav-button-finish').removeClass('pf-m-disabled');
-
-    $('#button-next-step-modal-wizard-vm-config').hide();
-    $('#button-before-step-modal-wizard-vm-config').hide();
-    $('#button-cancel-config-modal-wizard-vm-config').hide();
     
     completed = true;
-
-	$('#nav-button-finish').removeClass('pf-m-disabled');
-    $('#nav-button-overview').addClass('pf-m-disabled');
-    $('#nav-button-vm-config').addClass('pf-m-disabled');
-    $('#nav-button-compute').addClass('pf-m-disabled');
-    $('#nav-button-disk').addClass('pf-m-disabled');
-    $('#nav-button-network').addClass('pf-m-disabled');
-    $('#nav-button-additional').addClass('pf-m-disabled');
-    $('#nav-button-ssh-key').addClass('pf-m-disabled');
-    $('#nav-button-review').addClass('pf-m-disabled');
-    $('#button-before-step-modal-wizard-vm-config').hide();
-    $('#button-cancel-config-modal-wizard-vm-config').hide();
 
     cur_step_wizard_vm_config = "9";
 }

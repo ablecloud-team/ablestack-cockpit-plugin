@@ -413,7 +413,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  * History  : 2021.03.31 최초 작성
  */
  function checkStorageVmStatus(){
-    return new Promise((resolve) => {        
+    return new Promise((resolve) => {
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_detail.py", "detail" ])
         .then(function(data){        
             var retVal = JSON.parse(data);
@@ -555,6 +555,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
     const step4 = sessionStorage.getItem("cc_status"); 
     const step5 = sessionStorage.getItem("ccvm_status");    
     console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5);
+
     // 배포 상태조회 
     if(step1!="true"){
         // 클러스터 구성준비 버튼 show
