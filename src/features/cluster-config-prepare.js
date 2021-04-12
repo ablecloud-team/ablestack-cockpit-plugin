@@ -393,11 +393,11 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
         }
         for (let i = 1; i <= current_val; i++) {
             let sum = 10 + i;
-            host_ip_info = host_ip_info + "100.100.0." + sum + "\tscvm" + i + "\n";
+            host_ip_info = host_ip_info + "100.100.10." + sum + "\tscvm" + i + "\n";
         }
         for (let i = 1; i <= current_val; i++) {
             let sum = 10 + i;
-            host_ip_info = host_ip_info + "100.200.0." + sum + "\tscvm" + i + "-cn\n";
+            host_ip_info = host_ip_info + "100.200.10." + sum + "\tscvm" + i + "-cn\n";
         }
         target_textarea.val(host_ip_info);
     } else {
