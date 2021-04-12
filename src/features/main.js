@@ -511,7 +511,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
             resolve();
         })
         .catch(function(data){
-            //console.log(":::Error:::");
+            console.log(":::checkStorageVmStatus Error:::" + data);
             $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
             $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
             $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
@@ -523,9 +523,9 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         });
         //스토리지 클러스터 배포 여부 확인 후 스토리지센터 가상머신 삭제 버튼 disabled 여부 세팅
         if(sessionStorage.getItem("sc_status") == "HEALTH_ERR"){
-            $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item');
+            $("#menu-item-set-storage-center-vm-delete").removeClass('class','pf-m-disabled');
         }else{
-            $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            $("#menu-item-set-storage-center-vm-delete").addClass('class','pf-m-disabled');
         }
     });
 }
