@@ -22,6 +22,7 @@ $('#button-maintenance-mode-update').on('click', function(){
         .then(function(data){            
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){
+                alert("유지보수 모드가 해제되었습니다.")
                 sessionStorage.setItem("storage_cluster_maintenance_status", "false"); //유지보수모드 해제 요청 후 세션스토리지에 상태값 재세팅
                 location.reload();                
             }else{                
@@ -37,6 +38,7 @@ $('#button-maintenance-mode-update').on('click', function(){
         .then(function(data){            
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){
+                alert("유지보수 모드가 설정되었습니다.")
                 sessionStorage.setItem("storage_cluster_maintenance_status", "true"); //유지보수모드 해제 요청 후 세션스토리지에 상태값 재세팅
                 location.reload();                
             }else{                
