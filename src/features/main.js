@@ -499,13 +499,21 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                 }else{//가상머신 상태 running && sc 유지보수모드 아닐때
                     $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');                        
                 }
-            }else{ //가상머신 상태가 running이 아닐 경우
+            }else if(retVal.val.scvm_status == "shut off"){ //가상머신 상태가 shut off일 경우
                 $("#scvm-css").attr('class','pf-c-label pf-m-red');
                 $("#scvm-icon").attr('class','fas fa-fw fa-exclamation-triangle');                
                 $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item');
                 $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
                 $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item');
                 $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item');
+                $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+            }else{//가상머신 상태가 health_err일 경우
+                $("#scvm-css").attr('class','pf-c-label pf-m-red');
+                $("#scvm-icon").attr('class','fas fa-fw fa-exclamation-triangle');                
+                $("#menu-item-set-storage-center-vm-start").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+                $("#menu-item-set-storage-center-vm-stop").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+                $("#menu-item-set-storage-center-vm-delete").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
+                $("#menu-item-set-storage-center-vm-resource-update").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
                 $("#menu-item-linkto-storage-center-vm").attr('class','pf-c-dropdown__menu-item pf-m-disabled');
             }
             resolve();
