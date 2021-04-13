@@ -18,70 +18,58 @@ $('#button-storage-vm-status-update').on('click', function(){
 
     var cmd = $('#scvm-status-update-cmd').val();    
     if(cmd == "stop"){//스토리지센터VM 정지 버튼 클릭시
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py", "stop" ])
+        cockpit.spawn(["python3", pluginpath+"/python/scvm_status/scvm_status_update.py", "stop" ])
         .then(function(data){
             //console.log(data);
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){                
                 console.log(data);
-                //alert("스토리지 센터 가상머신이 정지되었습니다.");
                 location.reload();
             }else{
                 console.log(":::scvm stop Error::: "+ data);
-                //alert("정상적으로 처리되지 않았습니다.");
             }            
         })
-        .catch(function(data){ 
-            //alert("정상적으로 처리되지 않았습니다.");
+        .catch(function(data){
             console.log(":::scvm stop Error::: " + data);            
         });    
     }else if(cmd == "start"){//스토리지센터VM 시작 버튼 클릭시
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py", "start" ])
+        cockpit.spawn(["python3", pluginpath+"/python/scvm_status/scvm_status_update.py", "start" ])
         .then(function(data){  
             //console.log(data);
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){                
                 console.log(data);
-                //alert("스토리지 센터 가상머신이 시작되었습니다.");
                 location.reload();
             }else{
                 console.log(":::scvm start Error::: "+ data);
-                //alert("정상적으로 처리되지 않았습니다.");
             }
         })
         .catch(function(data){
-            //alert("정상적으로 처리되지 않았습니다.");
             console.log(":::scvm delete Error::: "+data);
         });        
     }else if(cmd == "delete"){//스토리지센터VM 삭제 버튼 클릭시
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py", "delete" ])
+        cockpit.spawn(["python3", pluginpath+"/python/scvm_status/scvm_status_update.py", "delete" ])
         .then(function(data){  
             //console.log(data);
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){  
                 console.log(data);
-                //alert("스토리지 센터 가상머신이 삭제되었습니다.");
                 location.reload();    
             }else{
                 console.log(":::scvm delete Error::: "+ data);
-                //alert("정상적으로 처리되지 않았습니다.");
             }
         })
         .catch(function(data){
-            //alert("정상적으로 처리되지 않았습니다.");
             console.log(":::scvm delete Error:::"+data);
         });        
-    }else if(cmd == "bootstrap"){//스토리지센터VM 삭제 버튼 클릭시
-        // bootstrap파일을 실행여부 확인을 위한 bootstrap_run_check 빈파일 생성 후
+    }else if(cmd == "bootstrap"){//SCC bootstrap실행 버튼 클릭시        
         // /root/bootstrap.sh 파일을 실행함.
-        cockpit.spawn(["sh", "/usr/share/cockpit/ablestack/shell/host/bootstrap_run.sh"])
+        cockpit.spawn(["sh", pluginpath+"/shell/host/scvm_bootstrap_run.sh"])
         .then(function(data){
-            //alert("스토리지 센터 가상머신에서 bootstrap.sh 파일이 정상적으로 실행되었습니다.");
             console.log(data);
             location.reload();
         })
         .catch(function(data){
-            //alert("정상적으로 처리되지 않았습니다.");
             console.log("bootstrap_run_check() Error : " + data);        
         });
     }
