@@ -701,4 +701,4 @@ setInterval(() => {
             checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
                 checkDeployStatus();
             });
-}, 10000);
+}, 30000);
