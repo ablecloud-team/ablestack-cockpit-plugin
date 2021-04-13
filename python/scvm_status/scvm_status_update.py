@@ -99,8 +99,7 @@ def deleteStorageVM():
 
         rc = call(['ls /etc/ceph/'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:
-            call(["rm -rf /etc/ceph/*"], universal_newlines=True, shell=True, env=env)
-            call(["rm -rf /usr/share/cockpit/bootstrap_run_check"], universal_newlines=True, shell=True, env=env)
+            call(["rm -rf /etc/ceph/*"], universal_newlines=True, shell=True, env=env)            
             retVal = True
             retCode = 200
         else :
