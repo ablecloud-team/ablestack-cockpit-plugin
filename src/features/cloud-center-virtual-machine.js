@@ -200,9 +200,8 @@ class CloudCenterVirtualMachine {
             */
             let status_span = $("#description-cloud-vm-status");
             if (obj.code == 200) {
-
-                // let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', '가상머신 확인중...');
-                // status_span[0].children[0].replaceWith(a);
+                let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', "상태 체크 중 &bull;&bull;&bull;&nbsp;&nbsp;&nbsp;<svg class='pf-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
+                status_span[0].children[0].replaceWith(a);                
                 // if (obj.val.started == undefined ){
                 //         let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', '가상머신이 동작중이지 않습니다..');
                 //         status_span[0].children[0].replaceWith(a)

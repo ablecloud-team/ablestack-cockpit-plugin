@@ -24,14 +24,15 @@ $('#button-storage-vm-status-update').on('click', function(){
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){                
                 console.log(data);
-                alert("스토리지 센터 가상머신이 정지되었습니다.");
+                //alert("스토리지 센터 가상머신이 정지되었습니다.");
                 location.reload();
             }else{
-                alert("정상적으로 처리되지 않았습니다.");
+                console.log(":::scvm stop Error::: "+ data);
+                //alert("정상적으로 처리되지 않았습니다.");
             }            
         })
         .catch(function(data){ 
-            alert("정상적으로 처리되지 않았습니다.");
+            //alert("정상적으로 처리되지 않았습니다.");
             console.log(":::scvm stop Error::: " + data);            
         });    
     }else if(cmd == "start"){//스토리지센터VM 시작 버튼 클릭시
@@ -41,14 +42,15 @@ $('#button-storage-vm-status-update').on('click', function(){
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){                
                 console.log(data);
-                alert("스토리지 센터 가상머신이 시작되었습니다.");
+                //alert("스토리지 센터 가상머신이 시작되었습니다.");
                 location.reload();
             }else{
-                alert("정상적으로 처리되지 않았습니다.");
+                console.log(":::scvm start Error::: "+ data);
+                //alert("정상적으로 처리되지 않았습니다.");
             }
         })
         .catch(function(data){
-            alert("정상적으로 처리되지 않았습니다.");
+            //alert("정상적으로 처리되지 않았습니다.");
             console.log(":::scvm delete Error::: "+data);
         });        
     }else if(cmd == "delete"){//스토리지센터VM 삭제 버튼 클릭시
@@ -58,14 +60,15 @@ $('#button-storage-vm-status-update').on('click', function(){
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){  
                 console.log(data);
-                alert("스토리지 센터 가상머신이 삭제되었습니다.");
+                //alert("스토리지 센터 가상머신이 삭제되었습니다.");
                 location.reload();    
             }else{
-                alert("정상적으로 처리되지 않았습니다.");
+                console.log(":::scvm delete Error::: "+ data);
+                //alert("정상적으로 처리되지 않았습니다.");
             }
         })
         .catch(function(data){
-            alert("정상적으로 처리되지 않았습니다.");
+            //alert("정상적으로 처리되지 않았습니다.");
             console.log(":::scvm delete Error:::"+data);
         });        
     }else if(cmd == "bootstrap"){//스토리지센터VM 삭제 버튼 클릭시
@@ -73,15 +76,14 @@ $('#button-storage-vm-status-update').on('click', function(){
         // /root/bootstrap.sh 파일을 실행함.
         cockpit.spawn(["sh", "/usr/share/cockpit/ablestack/shell/host/bootstrap_run.sh"])
         .then(function(data){
-            alert("스토리지 센터 가상머신에서 bootstrap.sh 파일이 정상적으로 실행되었습니다.");
+            //alert("스토리지 센터 가상머신에서 bootstrap.sh 파일이 정상적으로 실행되었습니다.");
             console.log(data);
             location.reload();
         })
         .catch(function(data){
-            alert("정상적으로 처리되지 않았습니다.");
+            //alert("정상적으로 처리되지 않았습니다.");
             console.log("bootstrap_run_check() Error : " + data);        
         });
-         
     }
     $('#scvm-status-update-cmd').val("");
 });

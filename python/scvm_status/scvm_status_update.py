@@ -95,9 +95,18 @@ def deleteStorageVM():
         while True:   
             rc = call(['virsh domstate scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             if rc > 0 :
-                break;        
+                break;
 
-        ret = createReturn(code=200, val=True, retname='Storage Center VM Delete')
+        rc = call(['ls /etc/ceph/'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        if rc == 0:
+            call(["rm -rf /etc/ceph/*"], universal_newlines=True, shell=True, env=env)
+            retVal = True
+            retCode = 200
+        else :
+            retVal = False
+            retCode = 500
+
+        ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM Delete')
     except Exception as e:
         ret = createReturn(code=500, val='virsh destroy, undefine error', retname='Storage Center VM Delete Error')    
     return print(json.dumps(json.loads(ret), indent=4))

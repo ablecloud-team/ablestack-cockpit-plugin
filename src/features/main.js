@@ -293,6 +293,11 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  */
  function checkStorageClusterStatus(){
     return new Promise((resolve) => {
+        //초기 상태 체크 중 표시        
+        $('#scc-status').html("상태 체크 중 &bull;&bull;&bull;&nbsp;&nbsp;&nbsp;<svg class='pf-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
+        $("#scc-css").attr('class','pf-c-label pf-m-orange');
+        $("#scc-icon").attr('class','fas fa-fw fa-exclamation-triangle');
+        
         //bootstrap.sh을 실행했는지 여부 확인
         ///usr/share/cockpit/bootstrap_run_check 파일 생성여부 확인으로 파악
         cockpit.spawn(["cat", "/usr/share/cockpit/bootstrap_run_check"])
@@ -309,7 +314,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         //스토리지 클러스터 상태 상세조회(ceph -s => json형식)
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scc_status/scc_status_detail.py", "detail" ])
         .then(function(data){
-            var retVal = JSON.parse(data);
+            var retVal = JSON.parse(data);            
             var sc_status = "Health Err";
             var inMessHtml = "";
             sessionStorage.setItem("sc_status", retVal.val.cluster_status); //스토리지 클러스터 상태값 세션스토리지에 저장
@@ -328,19 +333,19 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
                 $('#scc-status-check').text("스토리지센터 클러스터가 구성되었습니다.");
                 $('#scc-status-check').attr("style","color: var(--pf-global--success-color--100)");
                 $("#menu-item-linkto-storage-center").removeClass('pf-m-disabled'); 
-                $("#scc-cluster-css").attr('class','pf-c-label pf-m-green');
-                $("#scc-cluster-icon").attr('class','fas fa-fw fa-check-circle');
+                $("#scc-css").attr('class','pf-c-label pf-m-green');
+                $("#scc-icon").attr('class','fas fa-fw fa-check-circle');
             }else if(retVal.val.cluster_status == "HEALTH_WARN"){
                 sc_status = "Health Warn";
                 $('#scc-status-check').text("스토리지센터 클러스터가 구성되었습니다.");
                 $('#scc-status-check').attr("style","color: var(--pf-global--success-color--100)");
                 $("#menu-item-linkto-storage-center").removeClass('pf-m-disabled'); 
-                $("#scc-cluster-css").attr('class','pf-c-label pf-m-orange');
-                $("#scc-cluster-icon").attr('class','fas fa-fw fa-exclamation-triangle');            
+                $("#scc-css").attr('class','pf-c-label pf-m-orange');
+                $("#scc-icon").attr('class','fas fa-fw fa-exclamation-triangle');            
             }else if(retVal.val.cluster_status == "HEALTH_ERR"){
                 sc_status = "Health Err";
-                $("#scc-cluster-css").attr('class','pf-c-label pf-m-red');
-                $("#scc-cluster-icon").attr('class','fas fa-fw fa-exclamation-triangle');
+                $("#scc-css").attr('class','pf-c-label pf-m-red');
+                $("#scc-icon").attr('class','fas fa-fw fa-exclamation-triangle');
                 $("#menu-item-set-maintenance-mode").addClass('pf-m-disabled');
                 $("#menu-item-unset-maintenance-mode").addClass('pf-m-disabled');
                 $('#scc-status-check').text("스토리지센터 클러스터가 구성되지 않았습니다.");            
@@ -414,8 +419,14 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
  */
  function checkStorageVmStatus(){
     return new Promise((resolve) => {
+        //초기 상태 체크 중 표시
+        $('#scvm-status').html("상태 체크 중 &bull;&bull;&bull;&nbsp;&nbsp;&nbsp;<svg class='pf-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
+        $("#scvm-css").attr('class','pf-c-label pf-m-orange');
+        $("#scvm-icon").attr('class','fas fa-fw fa-exclamation-triangle');
+
+        //scvm 상태 조회
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_detail.py", "detail" ])
-        .then(function(data){        
+        .then(function(data){
             var retVal = JSON.parse(data);
             sessionStorage.setItem("scvm_status", retVal.val.scvm_status.toUpperCase());//스트리지센터 가상머신 상태값 세션스토리지에 저장
             sessionStorage.setItem("scvm_cpu", retVal.val.vcpu);//스트리지센터 가상머신 상태값 세션스토리지에 저장
@@ -690,4 +701,4 @@ setInterval(() => {
             checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
                 checkDeployStatus();
             });
-}, 30000);
+}, 10000);
