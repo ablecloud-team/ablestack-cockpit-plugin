@@ -187,8 +187,13 @@ $('#menu-item-set-storage-center-vm-resource-update').on('click', function(){
     $('#div-modal-storage-vm-resource-update').show();
 });
 
+//div-modal-status-alert modal 닫기
+$('#modal-status-alert-button-close1, #modal-status-alert-button-close2').on('click', function(){
+    $('#div-modal-status-alert').hide();
+});
+
 /**
- * Meathod Name : bootstrap_run_check  
+ * Meathod Name : scvm_bootstrap_run  
  * Date Created : 2021.04.10
  * Writer  : 최진성
  * Description : scvm /root/bootstrap.sh  파일 실행
@@ -196,13 +201,44 @@ $('#menu-item-set-storage-center-vm-resource-update').on('click', function(){
  * Return  : 없음
  * History  : 2021.04.10 최초 작성
  */
- function bootstrap_run(){
-    $('#modal-title-scvm-status').text("스토리지 센터 가상머신 Bootstrap 실행");
-    $('#modal-description-scvm-status').html("<p>스토리지 센터 가상머신의 Bootstrap.sh 파일을 실행 하시겠습니까??</p>");
-    $('#button-storage-vm-status-update').html("실행");
-    $('#scvm-status-update-cmd').val("bootstrap");
-    $('#div-modal-storage-vm-status-update').show();
+ function scvm_bootstrap_run(){
+    $("#modal-status-alert-title").html("스토리지 센터 가상머신 상태 체크")
+    $("#modal-status-alert-body").html("스토리지 센터 가상머신에 cloudinit 실행이 완료되지 않아<br>Bootstrap을 실행할 수 없습니다.<br><br>잠시 후 다시 실행해 주세요.")
+    //scvm ping 체크
+    cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "ping", "--target",  "scvm"])
+    .then(function(data){
+        var retVal = JSON.parse(data);        
+        if(retVal.code == 200){
+            //scvm 의 cloudinit 실행이 완료되었는지 확인하기 위한 명렁
+            cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "status", "--target",  "scvm"])
+            .then(function(data){
+                var retVal = JSON.parse(data);
+                console.log(retVal.val);
+                //cloudinit status: done 일때
+                if(retVal.code == 200 && retVal.val == "status: done"){
+                    $('#modal-title-scvm-status').text("스토리지 센터 가상머신 Bootstrap 실행");
+                    $('#modal-description-scvm-status').html("<p>스토리지 센터 가상머신의 Bootstrap.sh 파일을 실행 하시겠습니까??</p>");
+                    $('#button-storage-vm-status-update').html("실행");
+                    $('#scvm-status-update-cmd').val("bootstrap");
+                    $('#div-modal-storage-vm-status-update').show();                    
+                }else{
+                    $('#div-modal-status-alert').show();
+                }
+            })
+            .catch(function(data){
+                $('#div-modal-status-alert').show();
+                console.log(":::scvm_bootstrap_run() Error :::" + data);        
+            });            
+        }else{
+            $('#div-modal-status-alert').show();
+        }    
+    })
+    .catch(function(data){
+        $('#div-modal-status-alert').show();
+        console.log(":::scvm_bootstrap_run() Error :::" + data);        
+    });       
 }
+
 /**
  * Meathod Name : scc_link_go
  * Date Created : 2021.04.10
@@ -212,7 +248,7 @@ $('#menu-item-set-storage-center-vm-resource-update').on('click', function(){
  * Return  : 없음
  * History  : 2021.04.10 최초 작성
  */
-function scc_link_go(){
+ function scc_link_go(){
     const mgr = sessionStorage.getItem("mgr");
     const mgr_ip = sessionStorage.getItem(mgr+'-mngt');
     if(mgr==undefined||mgr==""){
@@ -302,25 +338,29 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         $("#scc-css").attr('class','pf-c-label pf-m-orange');
         $("#scc-icon").attr('class','fas fa-fw fa-exclamation-triangle');
         
-        //bootstrap.sh을 실행했는지 여부 확인
-        ///usr/share/cockpit/bootstrap_run_check 파일 생성여부 확인으로 파악
-        cockpit.spawn(["cat", "/usr/share/cockpit/bootstrap_run_check"])
-        .then(function(data){
-            console.log("bootstrap.sh 파일을 실행한 기록이 존재합니다.  : " + data)
-            sessionStorage.setItem("bootstrap_status","true");
-            $("#after-bootstrap-run").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-linkto-storage-center' onclick='scc_link_go()'>스토리지센터 연결</a>");
-            $("#before-bootstrap-run").html("");
+        //bootstrap.sh을 실행했는지 여부 확인        
+        cockpit.spawn(["python3", pluginpath+"/python/ablestack_json/ablestackJson.py", "status"])
+        .then(function(data){            
+            var retVal = JSON.parse(data);            
+            if(retVal.val.bootstrap.scvm == "false"){ //bootstrap.sh 실행 전
+                $("#scvm-after-bootstrap-run").html("");
+                $("#scvm-before-bootstrap-run").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-bootstrap-run' onclick='scvm_bootstrap_run()'>Bootstrap 실행</a>");
+            }else{  //bootstrap.sh 실행 후
+                $("#scvm-after-bootstrap-run").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-linkto-storage-center' onclick='scc_link_go()'>스토리지센터 연결</a>");
+                $("#scvm-before-bootstrap-run").html("");
+            }
+            sessionStorage.setItem("scvm_bootstrap_status","false");            
         })
         .catch(function(data){
-            console.log("bootstrap.sh 파일을 실행한 기록이 없습니다.  : " + data);
-            sessionStorage.setItem("bootstrap_status","false");
-            $("#after-bootstrap-run").html("");
-            $("#before-bootstrap-run").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-bootstrap-run' onclick='bootstrap_run()'>Bootstrap 실행</a>");
+            console.log(" bootstrap.sh을 실행했는지 여부 확인 Error ::: " + data);
+            sessionStorage.setItem("scvm_bootstrap_status","");
+            $("#scvm-after-bootstrap-run").html("");
+            $("#scvm-before-bootstrap-run").html("");
         });
         //스토리지 클러스터 상태 상세조회(ceph -s => json형식)
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scc_status/scc_status_detail.py", "detail" ])
+        cockpit.spawn(["python3", pluginpath+"/python/scc_status/scc_status_detail.py", "detail" ])
         .then(function(data){
-            var retVal = JSON.parse(data);            
+            var retVal = JSON.parse(data);
             var sc_status = "Health Err";
             var inMessHtml = "";
             sessionStorage.setItem("sc_status", retVal.val.cluster_status); //스토리지 클러스터 상태값 세션스토리지에 저장
@@ -431,7 +471,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         $("#scvm-icon").attr('class','fas fa-fw fa-exclamation-triangle');
 
         //scvm 상태 조회
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_detail.py", "detail" ])
+        cockpit.spawn(["python3", pluginpath+"/python/scvm_status/scvm_status_detail.py", "detail" ])
         .then(function(data){
             var retVal = JSON.parse(data);
             sessionStorage.setItem("scvm_status", retVal.val.scvm_status.toUpperCase());//스트리지센터 가상머신 상태값 세션스토리지에 저장
@@ -572,14 +612,14 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
        - 클라우드센터 클러스터 상태 = HEALTH_ERR1(구성x), HEALTH_ERR2(리소스 구성x), HEALTH_OK
        - 클라우드센터 가상머신 상태 = HEALTH_ERR(배포x), RUNNING, SHUT OFF 등 
     */
-    const step1 = sessionStorage.getItem("ccfg_status"); 
-    const step2 = sessionStorage.getItem("scvm_status");
-    const step3 = sessionStorage.getItem("bootstrap_status");
-    const step4 = sessionStorage.getItem("sc_status");   
-    const step5 = sessionStorage.getItem("cc_status"); 
-    const step6 = sessionStorage.getItem("ccvm_status");    
-    console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6);
-
+       const step1 = sessionStorage.getItem("ccfg_status"); 
+       const step2 = sessionStorage.getItem("scvm_status");
+       const step3 = sessionStorage.getItem("bootstrap_status");
+       const step4 = sessionStorage.getItem("sc_status");   
+       const step5 = sessionStorage.getItem("cc_status"); 
+       const step6 = sessionStorage.getItem("ccvm_status");    
+       console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6);
+   
     // 배포 상태조회 
     if(step1!="true"){
         // 클러스터 구성준비 버튼 show
