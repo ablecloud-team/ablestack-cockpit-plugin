@@ -586,7 +586,7 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
         }else{
             if(step3=="false"){
                 //모든 버튼 hide
-                showRibbon('warning','스토리지센터 대시보드에 연결할 수 있도록 스토리지센터 VM 부트스트랩 실행을 진행하십시오.')
+                showRibbon('warning','스토리지센터 대시보드에 연결할 수 있도록 스토리지센터 VM Bootstrap 실행 작업을 진행하십시오.')
             }else{
                 if(step4=="HEALTH_ERR"||step4==null){
                     // 스토리지센터 연결 버튼 show
