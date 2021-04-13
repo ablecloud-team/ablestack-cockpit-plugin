@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #########################################
-#Copyright (c) 2021 ABLECLOUD Co. Ltd.
+# Copyright (c) 2021 ABLECLOUD Co. Ltd.
 #
-#ssk host key를 스캔하는 스크립트
+# ssh host key를 스캔하는 스크립트
 #
-#최초작성자 : 윤여천 책임(ycyun@ablecloud.io)
-#최초작성일 : 2021-04-13
+# 최초작성자 : 윤여천 책임(ycyun@ablecloud.io)
+# 최초작성일 : 2021-04-13
 #########################################
 hostsfile=/etc/hosts
 
