@@ -128,6 +128,17 @@ def createCcvmXml(args):
                         line = line.replace('<!--memory-->', str(args.memory))
                     elif '<!--cpu-->' in line:
                         line = line.replace('<!--cpu-->', str(args.cpu))
+                    elif '<!--ccvm_cloudinit-->' in line:
+                        cci_txt = "    <disk type='file' device='cdrom'>\n"
+                        cci_txt += "      <driver name='qemu' type='raw'/>\n"
+                        cci_txt += "      <source file='"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso'/>\n"
+                        cci_txt += "      <target dev='hda' bus='ide'/>\n"
+                        cci_txt += "      <readonly/>\n"
+                        cci_txt += "      <shareable/>\n"
+                        cci_txt += "      <address type='drive' controller='0' bus='0' target='0' unit='0'/>\n"
+                        cci_txt += "    </disk>"
+                        
+                        line = line.replace('<!--ccvm_cloudinit-->', cci_txt)
                     elif '<!--management_network_bridge-->' in line:
                         mnb_txt = "    <interface type='bridge'>\n"
                         mnb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
@@ -161,6 +172,9 @@ def createCcvmXml(args):
                     sys.stdout.write(line)
 
             os.system("scp "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
+
+            # pcs 클러스터 할 호스트 전체의 폴더 권한 수정
+            os.system("ssh root@"+host_name+" 'chmod 755 -R "+pluginpath+"/tools/vmconfig/ccvm'")
 
         #작업파일 지우기
         os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml "+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml.bak "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml.bak")
