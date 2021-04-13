@@ -429,6 +429,16 @@ $('#form-radio-timeserver-int').on('click', function () {
     $('input[name=form-input-cluster-config-timeserver]').val("");
 });
 
+// 시간서버 동기화 테스트
+$('#form-button-timeserver-test').on('click', function () {
+
+
+
+
+    $('#stacked-labels-1-simple-form-info-helper-contact').show();
+    $('#stacked-labels-2-simple-form-info-helper-contact').show();
+})
+
 // 아코디언 개체의 버튼 클릭 이벤트 처리
 $('#button-accordion-ssh-key').on('click', function () {
     if ($('#button-accordion-ssh-key').attr("aria-expanded") == "false") {
@@ -1159,7 +1169,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
  * Meathod Name : findNumberOne
  * Date Created : 2021.04.13
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 타임서버 단계에서 hosts file의 scvm ip 값을 추출하기 위한 찾기 함수
+ * Description : 클러스터 준비 마법사 타임서버 단계에서 hosts file의 scvm ip 값을 추출하기 위한 함수
  * Parameter : element
  * Return  : boolean
  * History  : 2021.04.13 최초 작성
@@ -1168,6 +1178,22 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
 function findNumberOne(element)  {
   	if(element === "scvm") return true;
 }
+
+
+/**
+ * Meathod Name : testTimeServer
+ * Date Created : 2021.04.13
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사 타임서버 단계에서 chrony 테스트 결과 값을 반환하는 함수
+ * Parameter : element
+ * Return  : boolean
+ * History  : 2021.04.13 최초 작성
+ */
+
+function testTimeServer()  {
+
+}
+
 
 /**
  * Meathod Name : validateClusterConfigPrepare
