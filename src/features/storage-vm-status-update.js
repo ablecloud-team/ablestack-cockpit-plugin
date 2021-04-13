@@ -62,10 +62,9 @@ $('#button-storage-vm-status-update').on('click', function(){
         .catch(function(data){
             console.log(":::scvm delete Error:::"+data);
         });        
-    }else if(cmd == "bootstrap"){//스토리지센터VM 삭제 버튼 클릭시
-        // bootstrap파일을 실행여부 확인을 위한 bootstrap_run_check 빈파일 생성 후
+    }else if(cmd == "bootstrap"){//SCC bootstrap실행 버튼 클릭시        
         // /root/bootstrap.sh 파일을 실행함.
-        cockpit.spawn(["sh", pluginpath+"/shell/host/bootstrap_run.sh"])
+        cockpit.spawn(["sh", pluginpath+"/shell/host/scvm_bootstrap_run.sh"])
         .then(function(data){
             console.log(data);
             location.reload();
