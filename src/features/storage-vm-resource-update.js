@@ -24,15 +24,17 @@ $('#scvm-resource-update').click(function(){
         cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py", "resource", "-c", cpu, "-m", memory ])
         .then(function(data){            
             var retVal = JSON.parse(data);
-            if(retVal.code == "200"){ 
+            if(retVal.code == "200"){
+                //alert("스토리지 센터 가상머신의 자원이 변경되었습니다.")
                 location.reload();
-            }else{
-                alert("정상적으로 처리되지 않았습니다.")
+            }else{                
+                console.log(":::scvm resource update Error::: "+ data);
+                //alert("정상적으로 처리되지 않았습니다.")
             }
         })
         .catch(function(data){
-            console.log(":::scvm resource update Error::: "+data);
-            alert("정상적으로 처리되지 않았습니다.")            
+            console.log(":::scvm resource update Error::: "+ data);
+            //alert("정상적으로 처리되지 않았습니다.")            
         });
     }
 });
