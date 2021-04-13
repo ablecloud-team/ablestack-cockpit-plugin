@@ -1102,9 +1102,6 @@ function validateStorageVm(){
     var svnt = $('input[type=radio][name=form-radio-storage-vm-nic-type]:checked').val();
     var uniq_nic_cnt = Array.from(new Set([$('select#form-select-storage-vm-public-nic1 option:checked').val(),$('select#form-select-storage-vm-cluster-nic1 option:checked').val(),$('select#form-select-storage-vm-public-nic2 option:checked').val(),$('select#form-select-storage-vm-cluster-nic2 option:checked').val()]));
 
-    alert(aaa);
-    alert(aaa.length);
-
     var disk_select_cnt = 0;
     $('input[type=checkbox][name="form-checkbox-disk"]').each(function() {
         if(this.checked){
