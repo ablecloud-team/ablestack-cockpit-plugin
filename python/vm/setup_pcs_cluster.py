@@ -45,7 +45,7 @@ def createArgumentParser():
 
     return parser
 
-def resetCloud(args):
+def setupPcsCluster(args):
     
     success_bool = True
 
@@ -96,5 +96,5 @@ if __name__ == '__main__':
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
     # 실제 로직 부분 호출 및 결과 출력
-    ret = resetCloud(args)
+    ret = setupPcsCluster(args)
     print(ret)
