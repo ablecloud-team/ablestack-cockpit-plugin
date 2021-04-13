@@ -18,7 +18,7 @@ $('#button-maintenance-mode-update').on('click', function(){
 
     var cmd = $('#scc-maintenance-update-cmd').val();    
     if(cmd == "unset"){//유지보수 모드 해제 시 이벤트 요청        
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scc_status/scc_status_update.py", "unset_noout" ])
+        cockpit.spawn(["python3", pluginpath+"/python/scc_status/scc_status_update.py", "unset_noout" ])
         .then(function(data){            
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){
@@ -32,7 +32,7 @@ $('#button-maintenance-mode-update').on('click', function(){
             console.log(":::scc maintenance update unset Error::: " +data);
         });    
     }else if(cmd == "set"){//유지보수 모드 설정 시 이벤트 요청        
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scc_status/scc_status_update.py", "set_noout" ])
+        cockpit.spawn(["python3", pluginpath+"/python/scc_status/scc_status_update.py", "set_noout" ])
         .then(function(data){            
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){

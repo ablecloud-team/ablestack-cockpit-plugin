@@ -18,7 +18,7 @@ $('#button-storage-vm-status-update').on('click', function(){
 
     var cmd = $('#scvm-status-update-cmd').val();    
     if(cmd == "stop"){//스토리지센터VM 정지 버튼 클릭시
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py", "stop" ])
+        cockpit.spawn(["python3", pluginpath+"/python/scvm_status/scvm_status_update.py", "stop" ])
         .then(function(data){
             //console.log(data);
             var retVal = JSON.parse(data);
@@ -33,7 +33,7 @@ $('#button-storage-vm-status-update').on('click', function(){
             console.log(":::scvm stop Error::: " + data);            
         });    
     }else if(cmd == "start"){//스토리지센터VM 시작 버튼 클릭시
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py", "start" ])
+        cockpit.spawn(["python3", pluginpath+"/python/scvm_status/scvm_status_update.py", "start" ])
         .then(function(data){  
             //console.log(data);
             var retVal = JSON.parse(data);
@@ -48,7 +48,7 @@ $('#button-storage-vm-status-update').on('click', function(){
             console.log(":::scvm delete Error::: "+data);
         });        
     }else if(cmd == "delete"){//스토리지센터VM 삭제 버튼 클릭시
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py", "delete" ])
+        cockpit.spawn(["python3", pluginpath+"/python/scvm_status/scvm_status_update.py", "delete" ])
         .then(function(data){  
             //console.log(data);
             var retVal = JSON.parse(data);
@@ -65,7 +65,7 @@ $('#button-storage-vm-status-update').on('click', function(){
     }else if(cmd == "bootstrap"){//스토리지센터VM 삭제 버튼 클릭시
         // bootstrap파일을 실행여부 확인을 위한 bootstrap_run_check 빈파일 생성 후
         // /root/bootstrap.sh 파일을 실행함.
-        cockpit.spawn(["sh", "/usr/share/cockpit/ablestack/shell/host/bootstrap_run.sh"])
+        cockpit.spawn(["sh", pluginpath+"/shell/host/bootstrap_run.sh"])
         .then(function(data){
             console.log(data);
             location.reload();
