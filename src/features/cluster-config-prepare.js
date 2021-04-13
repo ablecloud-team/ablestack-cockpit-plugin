@@ -669,6 +669,8 @@ async function resetClusterConfigWizardWithData() {
     $('input[name=form-input-cluster-config-ssh-key-file]').val("");
     $('textarea[name=div-textarea-cluster-config-temp-new-ssh-key-file]').val("");
     $('textarea[name=div-textarea-cluster-config-temp-existing-ssh-key-file]').val("");
+    cockpit.script(["rm -f /root/.ssh/temp_id_rsa"])
+    cockpit.script(["rm -f /root/.ssh/temp_id_rsa.pub"])
     // hosts
     $('#form-radio-hosts-new').prop('checked', true);
     $('#form-radio-hosts-file').prop('checked', false);
@@ -1084,7 +1086,6 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
     cockpit.script(["sed -i '/^server /d' /" + chrony_file_root + ""])
     cockpit.script(["sed -i '/^pool /d' /" + chrony_file_root + ""])
 
-    // chrony.conf 파일에서 서버 추가하는 부분
     // 외부 시간 서버
     if (file_type == "external") {
         // chrony.conf 파일 서버 리스트 부분 초기화
@@ -1098,7 +1099,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
         for (let i in timeserver_confirm_ip_text) {
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[i] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
         }
-        let allow_ip = "100.100.0.0/24";
+        let allow_ip = "100.100.0.0/16";
         cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
     }
     // 로컬 시간 서버
@@ -1120,15 +1121,14 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
         }
         // 공통 수정 부분
-        let allow_ip = timeserver_confirm_ip_text[0];
-        allow_ip = allow_ip.split('.');
-        allow_ip = allow_ip[0] + "." + allow_ip[1] + "." + allow_ip[2] + ".0/24";
+        let allow_ip = "100.100.0.0/16";
         cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
         cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\local stratum 10\" /" + chrony_file_root + ""])
         // chronyd restart
         cockpit.script(["systemctl restart chronyd"])
     }
 }
+
 
 
 /**
