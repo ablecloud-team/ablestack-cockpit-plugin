@@ -65,3 +65,5 @@ done
 cloudstack-setup-management  2>&1 | tee -a $LOGFILE
 
 systemctl enable --now cloudstack-management
+
+rm -rf /root/bootstrap.sh

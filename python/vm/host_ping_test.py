@@ -13,6 +13,7 @@ import sys
 import os
 
 from ablestack import *
+from sh import python3
 
 def createArgumentParser():
     '''
@@ -40,25 +41,28 @@ def createArgumentParser():
 
     return parser
 
-def resetCloud(args):
+def hostPingTest(args):
     try:
         # 3대의 호스트에 ping 테스트
         ret_val = []
         ret_text = ""
         for host in args.host_names:
             item = {}
-            ping_check = os.system("ping -c 1 -W 1 "+ host + "> /dev/null")
+            ping_check = os.system("ping -c 1 -W 1 "+ host + " > /dev/null")
             if ping_check == 0 :
                 item["host"] = host
                 item["status"] = 'up'
+                
             else:
                 item["host"] = host
                 item["status"] = 'down'
                 ret_text += host+"와 네트워크 테스트 실패하였습니다\n"
 
             ret_val.append(item)
-        # 인증된 서버인지 여부를 확인할 수 있는지? 향후 추가 개발 필요
-        # ex : ssh root@host date 명령을 수행시 인증이 되어있으면 바로 응답이 오는데 인증이 되어있지 않으면 정상응답이 오지 않음
+
+        # ex : ssh root@host echo 명령을 수행시 인증이 되어있으면 바로 응답이 오는데 인증이 되어있지 않으면 정상응답이 오지 않음
+        # 핑거프린트 해결을 위해 ssh-scan.py 호출
+        python3(pluginpath+'/python/host/ssh-scan.py')
 
         if ret_text == "":
             return createReturn(code=200, val="host ping test success")
@@ -83,5 +87,5 @@ if __name__ == '__main__':
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
     # 실제 로직 부분 호출 및 결과 출력
-    ret = resetCloud(args)
+    ret = hostPingTest(args)
     print(ret)

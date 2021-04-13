@@ -37,7 +37,7 @@ sed -i 's/, $//' "$conffile"
 image=$(/bin/podman inspect --format {{.ID}},{{.RepoDigests}} docker-archive:/usr/share/ablestack/ablestack.tar:$imagename | cut -d "," -f 2 | sed 's/\[//' | sed 's/]//' )
 cephadm --image "$image" bootstrap \
         --initial-dashboard-user ablecloud \
-        --initial-dashboard-password Ablecloud1! \
+        --initial-dashboard-password password \
         --ssh-private-key /root/.ssh/id_rsa \
         --ssh-public-key /root/.ssh/id_rsa.pub \
         --no-minimize-config \

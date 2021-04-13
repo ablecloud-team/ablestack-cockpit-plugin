@@ -153,6 +153,11 @@ $('#cloud-cluster-connect').on('click', function(){
 // 클라우드 센터 클러스터 상태 조회 및 조회 결과값으로 화면 변경하는 함수
 function CardCloudClusterStatus(){
     return new Promise((resolve) => {
+        //초기 상태 체크 중 표시
+        $('#cccs-status').html("상태 체크 중 &bull;&bull;&bull;&nbsp;&nbsp;&nbsp;<svg class='pf-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
+        $("#cccs-back-color").attr('class','pf-c-label pf-m-orange');
+        $("#cccs-cluster-icon").attr('class','fas fa-fw fa-exclamation-triangle');
+
         cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsDetail' ])
         .then(function(data){
             cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ablestack_json/ablestackJson.py', 'status', '--depth1', 'bootstrap', '--depth2', 'ccvm' ])
@@ -191,14 +196,14 @@ function CardCloudClusterStatus(){
                         nodeText = nodeText + ',';
                     }
                 }
-                $('#cccs_back_color').attr('class','pf-c-label pf-m-green');
-                $('#cccs_cluster_icon').attr('class','fas fa-fw fa-check-circle');
-                $('#cccs_status').text('Health Ok');
-                $('#cccs_node_info').text('총 ' + Object.keys(retVal.val.clustered_host).length + '노드로 구성됨 : ' + nodeText);
+                $('#cccs-back-color').attr('class','pf-c-label pf-m-green');
+                $('#cccs-cluster-icon').attr('class','fas fa-fw fa-check-circle');
+                $('#cccs-status').text('Health Ok');
+                $('#cccs-node-info').text('총 ' + Object.keys(retVal.val.clustered_host).length + '노드로 구성됨 : ' + nodeText);
                 sessionStorage.setItem("cc_status", "HEALTH_OK"); 
                 if(retVal.val.active == 'true'){
-                    $('#cccs_resource_status').text('실행중');
-                    $('#cccs_execution_node').text(retVal.val.started);
+                    $('#cccs-resource-status').text('실행중');
+                    $('#cccs-execution-node').text(retVal.val.started);
                     $('#button-cloud-cluster-start').prop('disabled', true);
                     $('#button-cloud-cluster-stop').prop('disabled', false);
                     $('#button-cloud-cluster-cleanup').prop('disabled', false);
@@ -206,8 +211,8 @@ function CardCloudClusterStatus(){
                     $('#button-cloud-cluster-connect').prop('disabled', false);
                     $('#form-select-cloud-vm-migration-node').append(selectHtml);
                 }else if(retVal.val.active == 'false'){
-                    $('#cccs_resource_status').text('정지됨');
-                    $('#cccs_execution_node').text('N/A');
+                    $('#cccs-resource-status').text('정지됨');
+                    $('#cccs-execution-node').text('N/A');
                     $('#button-cloud-cluster-start').prop('disabled', false);
                     $('#button-cloud-cluster-stop').prop('disabled', true);
                     $('#button-cloud-cluster-cleanup').prop('disabled', false);
@@ -217,15 +222,15 @@ function CardCloudClusterStatus(){
                 $('#cccs-low-info').text('클라우드센터 클러스터가 구성되었습니다.');
                 $('#cccs-low-info').attr('style','color: var(--pf-global--success-color--100)')
             }else if(retVal.code == '400' && retVal.val == 'cluster is not configured.'){
-                $('#cccs_status').text('Health Err');
-                $('#cccs_back_color').attr('class','pf-c-label pf-m-red');
-                $('#cccs_cluster_icon').attr('class','fas fa-fw fa-exclamation-triangle');
+                $('#cccs-status').text('Health Err');
+                $('#cccs-back-color').attr('class','pf-c-label pf-m-red');
+                $('#cccs-cluster-icon').attr('class','fas fa-fw fa-exclamation-triangle');
                 $('#cccs-low-info').text('클라우드센터 클러스터가 구성되지 않았습니다.');
                 sessionStorage.setItem("cc_status", "HEALTH_ERR1"); 
             }else if(retVal.code == '400' && retVal.val == 'resource not found.'){
-                $('#cccs_status').text('Health Err');
-                $('#cccs_back_color').attr('class','pf-c-label pf-m-red');
-                $('#cccs_cluster_icon').attr('class','fas fa-fw fa-exclamation-triangle');
+                $('#cccs-status').text('Health Err');
+                $('#cccs-back-color').attr('class','pf-c-label pf-m-red');
+                $('#cccs-cluster-icon').attr('class','fas fa-fw fa-exclamation-triangle');
                 $('#cccs-low-info').text('클라우드센터 클러스터는 구성되었으나 리소스 구성이 되지 않았습니다.');
                 sessionStorage.setItem("cc_status", "HEALTH_ERR2"); 
             }else{

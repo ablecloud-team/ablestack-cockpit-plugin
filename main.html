@@ -73,9 +73,9 @@
                                                         </li>
                                                         <li class="pf-c-divider" role="separator"></li>
                                                         <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 있을때 표시-->
-                                                        <li id="after-bootstrap-run"></li>
+                                                        <li id="scvm-after-bootstrap-run"></li>
                                                         <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 없을때 표시-->
-                                                        <li id="before-bootstrap-run"></li>
+                                                        <li id="scvm-before-bootstrap-run"></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -90,11 +90,11 @@
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
                                                             <div class="pf-c-description-list__text">
-                                                                <span class="pf-c-label pf-m-red" id="scc-cluster-css">
+                                                                <span class="pf-c-label pf-m-red" id="scc-css">
                                                                     <span class="pf-c-label__content">
                                                                         <span class="pf-c-label__icon">
-                                                                            <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true" id="scc-cluster-icon"></i>
-                                                                        </span><div id="scc-status">Health Err</div>
+                                                                            <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true" id="scc-icon"></i>
+                                                                        </span><div id="scc-status">Health Err</div>                                                                
                                                                     </span>
                                                                 </span>
                                                             </div>
@@ -192,11 +192,11 @@
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
                                                             <div class="pf-c-description-list__text">
-                                                                <span id="cccs_back_color" class="pf-c-label pf-m-red">
+                                                                <span id="cccs-back-color" class="pf-c-label pf-m-red">
                                                                     <span class="pf-c-label__content">
                                                                         <span class="pf-c-label__icon">
-                                                                            <i id="cccs_cluster_icon" class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
-                                                                        </span><div id="cccs_status">Health Err</div>
+                                                                            <i id="cccs-cluster-icon" class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
+                                                                        </span><div id="cccs-status">Health Err</div>
                                                                     </span>
                                                                 </span>
                                                             </div>
@@ -207,7 +207,7 @@
                                                             <span class="pf-c-description-list__text">노드구성</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div id="cccs_node_info" class="pf-c-description-list__text">N/A</div>
+                                                            <div id="cccs-node-info" class="pf-c-description-list__text">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -215,7 +215,7 @@
                                                             <span class="pf-c-description-list__text">리소스 상태</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div id="cccs_resource_status" class="pf-c-description-list__text">N/A</div>
+                                                            <div id="cccs-resource-status" class="pf-c-description-list__text">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -223,7 +223,7 @@
                                                             <span class="pf-c-description-list__text">VM실행노드</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div id="cccs_execution_node" class="pf-c-description-list__text">N/A</div>
+                                                            <div id="cccs-execution-node" class="pf-c-description-list__text">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -652,9 +652,9 @@
                     <div class="pf-c-modal-box__body">
                         <div id="div-modal-spinner-body-txt"></div>
                     </div>
-                    <div class="pf-c-modal-box__footer">
+                    <div>
                         <div class="ws-core-c-spinner ws-preview">
-                            <div class="pf-u-text-align-center">
+                            <div align="center">
                                 <span class="pf-c-spinner" role="progressbar" aria-valuetext="Loading...">
                                     <span class="pf-c-spinner__clipper"></span> 
                                     <span class="pf-c-spinner__lead-ball"></span>
@@ -667,7 +667,43 @@
             </div>
         </div>
         <!-- 실행중 : Modal 영역 끝 -->
-
+        <!-- 실행완료 : Modal 영역 시작 -->
+        <div id="div-modal-start-cloud-vm" class="pf-c-backdrop" style="display:none">
+            <div class="pf-l-bullseye">
+                <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Cloud VM start">
+                    <button id="button-close-modal-cloud-vm-start" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                    <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">클라우드센터VM 시작</span></h1></header>
+                    <div class="pf-c-modal-box__body">
+                        <div>클라우드센터VM을 시작하시겠습니까?</div>
+                    </div>
+                    <footer class="pf-c-modal-box__footer">
+                        <button id="button-execution-modal-cloud-vm-start" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                        <button id="button-cancel-modal-cloud-vm-start" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+        <!-- 실행완료 : Modal 영역 끝 -->
+        <!-- 상태 alert : Modal 영역 시작 -->
+        <div id="div-modal-status-alert" class="pf-c-backdrop" style="display:none;">
+            <div class="pf-l-bullseye">
+                <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-labelledby="modal-sm-title" aria-describedby="modal-sm-description">
+                <button class="pf-c-button pf-m-plain" type="button" aria-label="Close dialog" id="modal-status-alert-button-close1">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <header class="pf-c-modal-box__header">
+                    <h1 class="pf-c-modal-box__title" id="modal-status-alert-title"></h1>
+                </header>
+                <div class="pf-c-modal-box__body" id="modal-status-alert-body"></div>
+                <footer class="pf-c-modal-box__footer">
+                    <button class="pf-c-button pf-m-primary" type="button" id="modal-status-alert-button-close2">확인</button>
+                </footer>
+                </div>
+            </div>
+        </div>
+        <!-- 상태 alert : Modal 영역 끝 -->
         <!-- 스토리지센터 VM 자원변경 : ./src/features/storage-vm-resource-update.html을 내용으로 load -->
         <div class="pf-c-backdrop" id="div-modal-storage-vm-resource-update"></div>
 
@@ -689,6 +725,6 @@
         <script src="./src/features/main.js"></script>
         <script src="./src/features/card-cloud-cluster-status.js"></script>
         <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
-
+        
     </body>
 </html>
