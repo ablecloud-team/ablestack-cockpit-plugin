@@ -612,13 +612,13 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
        - 클라우드센터 클러스터 상태 = HEALTH_ERR1(구성x), HEALTH_ERR2(리소스 구성x), HEALTH_OK
        - 클라우드센터 가상머신 상태 = HEALTH_ERR(배포x), RUNNING, SHUT OFF 등 
     */
-       const step1 = sessionStorage.getItem("ccfg_status"); 
-       const step2 = sessionStorage.getItem("scvm_status");
-       const step3 = sessionStorage.getItem("bootstrap_status");
-       const step4 = sessionStorage.getItem("sc_status");   
-       const step5 = sessionStorage.getItem("cc_status"); 
-       const step6 = sessionStorage.getItem("ccvm_status");    
-       console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6);
+    const step1 = sessionStorage.getItem("ccfg_status");
+    const step2 = sessionStorage.getItem("scvm_status");
+    const step3 = sessionStorage.getItem("bootstrap_status");
+    const step4 = sessionStorage.getItem("sc_status");
+    const step5 = sessionStorage.getItem("cc_status");
+    const step6 = sessionStorage.getItem("ccvm_status");
+    console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6);
    
     // 배포 상태조회 
     if(step1!="true"){
