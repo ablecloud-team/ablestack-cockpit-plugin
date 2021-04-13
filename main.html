@@ -73,9 +73,9 @@
                                                         </li>
                                                         <li class="pf-c-divider" role="separator"></li>
                                                         <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 있을때 표시-->
-                                                        <li id="after-bootstrap-run"></li>
+                                                        <li id="scvm-after-bootstrap-run"></li>
                                                         <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 없을때 표시-->
-                                                        <li id="before-bootstrap-run"></li>
+                                                        <li id="scvm-before-bootstrap-run"></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -691,6 +691,24 @@
             </div>
         </div>
         <!-- 실행완료 : Modal 영역 끝 -->
+        <!-- 상태 alert : Modal 영역 시작 -->
+        <div id="div-modal-status-alert" class="pf-c-backdrop" style="display:none;">
+            <div class="pf-l-bullseye">
+                <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-labelledby="modal-sm-title" aria-describedby="modal-sm-description">
+                <button class="pf-c-button pf-m-plain" type="button" aria-label="Close dialog" id="modal-status-alert-button-close1">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <header class="pf-c-modal-box__header">
+                    <h1 class="pf-c-modal-box__title" id="modal-status-alert-title"></h1>
+                </header>
+                <div class="pf-c-modal-box__body" id="modal-status-alert-body"></div>
+                <footer class="pf-c-modal-box__footer">
+                    <button class="pf-c-button pf-m-primary" type="button" id="modal-status-alert-button-close2">확인</button>
+                </footer>
+                </div>
+            </div>
+        </div>
+        <!-- 상태 alert : Modal 영역 끝 -->
         <!-- 스토리지센터 VM 자원변경 : ./src/features/storage-vm-resource-update.html을 내용으로 load -->
         <div class="pf-c-backdrop" id="div-modal-storage-vm-resource-update"></div>
 
