@@ -1139,10 +1139,10 @@ function validateStorageVm(){
     }else if(svnt != "npb" && $('select#form-select-storage-vm-cluster-nic1 option:checked').val() == ""){
         alert("복제용 NIC 1번을 입력해주세요.");
         valicate_check = false;
-    }else if(svnt == "np" || $('select#form-select-storage-vm-public-nic1 option:checked').val() == $('select#form-select-storage-vm-cluster-nic1 option:checked').val()){
+    }else if(svnt == "np" && $('select#form-select-storage-vm-public-nic1 option:checked').val() == $('select#form-select-storage-vm-cluster-nic1 option:checked').val()){
         alert("NIC Passthrough 스토리지 트래픽 구성 값을 다르게 입력해주세요.");
         valicate_check = false;
-    }else if(svnt == "npb" || uniq_nic_cnt == 4){
+    }else if(svnt == "npb" && uniq_nic_cnt == 4){
         alert("NIC Passthrough Bonding 스토리지 트래픽 구성 값을 다르게 입력해주세요.");
         valicate_check = false;
     }else if($('#form-input-storage-vm-hosts-file').val() == ""){
