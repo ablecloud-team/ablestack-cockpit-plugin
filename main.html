@@ -176,9 +176,8 @@
                                                             <button id="button-cloud-cluster-migration" class="pf-c-dropdown__menu-item" type="button">클라우드센터VM 마이그레이션</button>
                                                         </li>
                                                         <li class="pf-c-divider" role="separator"></li>
-                                                        <li>
-                                                            <a id="cloud-cluster-connect" class="pf-c-dropdown__menu-item " href="#" aria-disabled="true" tabindex="-1">클라우드센터 연결</a>
-                                                        </li>
+                                                        <li id="ccvm-after-bootstrap-run"></li>
+                                                        <li id="ccvm-before-bootstrap-run"></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -414,15 +413,11 @@
                                             <div class="pf-c-card__actions">
                                                 <div class="pf-c-dropdown">
                                                     <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-cloud-vm-status" aria-expanded="false" type="button" aria-label="Actions">
-                                                        <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+                                                        <i class="fas fa-ellipmodal-status-alert-titlesis-v" aria-hidden="true"></i>
                                                     </button>
                                                     <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-cloud-vm-status" id="dropdown-menu-cloud-vm-status">
                                                         <li>
                                                             <button class="pf-c-dropdown__menu-item" id="card-action-cloud-vm-change" type="button" disabled>클라우드센터VM 자원변경</button>
-                                                        </li>
-                                                        <li class="pf-c-divider" role="separator"></li>
-                                                        <li>
-                                                            <a class="pf-c-dropdown__menu-item pf-m-disabled" id="card-action-cloud-vm-connect" href="#" aria-disabled="true" tabindex="-1">클라우드센터VM 연결</a>
                                                         </li>
                                                     </ul>
                                                 </div>
