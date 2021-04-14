@@ -132,6 +132,7 @@ def statusDeteil():
             manageNicIp = output.strip()
             rc = call(["virsh domifaddr --domain scvm --source agent --full | grep -w " + manageNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             if rc == 0:
+                manageNicIp = check_output(["virsh domifaddr --domain scvm --source agent --full | grep -w " + manageNicIp + "| awk '{print $4}'"], universal_newlines=True, shell=True, env=env)
                 manageNicMacAddr = check_output(["virsh domifaddr --domain scvm --source agent --full | grep -w " + manageNicIp + "| awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
                 rc = call(["virsh domiflist --domain scvm | grep " + manageNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)            
                 if rc == 0: 

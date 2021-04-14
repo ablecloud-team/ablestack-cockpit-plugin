@@ -71,6 +71,6 @@ done
 
 for host in $scvms
 do
-  echo ceph orch host add $(grep $host /etc/hosts | awk {'print $2'}) $host
+  ceph orch host add $(grep $host /etc/hosts | awk {'print $2'}) $host
 done
 exit
