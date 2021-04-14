@@ -102,26 +102,20 @@ $('#button-open-modal-wizard-cloud-vm').on('click', function(){
 });
 
 $('#button-link-storage-center-dashboard').on('click', function(){
-    const mgr = sessionStorage.getItem("mgr");
-    const mgr_ip = sessionStorage.getItem(mgr+'-mngt');
-    if(mgr==undefined||mgr==""){
-        // storageCenter url 링크 주소 가져오기
-        cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "storageCenter"])
-            .then(function(data){
-                var retVal = JSON.parse(data);
-                if(retVal.code == 200){
-                    // 스토리지센터 연결
-                    window.open(retVal.val);
-                }else{
-                    alert(retVal.val);
-                }
-            })
-            .catch(function(data){
-                // console.log(":::Error:::");
-            });
-    }else{
-        window.open('https://'+mgr_ip+':8443');
-    }
+    // storageCenter url 링크 주소 가져오기
+    cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "storageCenter"])
+    .then(function(data){
+        var retVal = JSON.parse(data);
+        if(retVal.code == 200){
+            // 스토리지센터 연결
+            window.open(retVal.val);
+        }else{
+            console.log(retVal.val);
+        }
+    })
+    .catch(function(data){
+        console.log(":::Error:::");
+    });
 });
 
 $('#button-link-cloud-center').on('click', function(){
@@ -248,27 +242,21 @@ function scvm_bootstrap_run(){
  * Return  : 없음
  * History  : 2021.04.10 최초 작성
  */
-function scc_link_go(){
-    const mgr = sessionStorage.getItem("mgr");
-    const mgr_ip = sessionStorage.getItem(mgr+'-mngt');
-    if(mgr==undefined||mgr==""){
-        // storageCenter url 링크 주소 가져오기
-        cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "storageCenter"])
-            .then(function(data){
-                var retVal = JSON.parse(data);
-                if(retVal.code == 200){
-                    // 스토리지센터 연결
-                    window.open(retVal.val);
-                }else{
-                    alert(retVal.val);
-                }
-            })
-            .catch(function(data){
-                console.log(":::scc_link_go() Error :::" + data);
-            });
-    }else{
-        window.open('https://'+mgr_ip+':8443');
-    }
+ function scc_link_go(){
+    // storageCenter url 링크 주소 가져오기
+    cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "storageCenter"])
+    .then(function(data){
+        var retVal = JSON.parse(data);        
+        if(retVal.code == 200){
+            // 스토리지센터 연결
+            window.open(retVal.val);
+        }else{
+            console.log(retVal.val);
+        }
+    })
+    .catch(function(data){
+        console.log(":::scc_link_go() Error :::" + data);        
+    });
 }
 
 // 스토리지센터VM 연결 버튼 클릭시 URL 세팅
@@ -340,23 +328,23 @@ function checkStorageClusterStatus(){
 
         //bootstrap.sh을 실행했는지 여부 확인        
         cockpit.spawn(["python3", pluginpath+"/python/ablestack_json/ablestackJson.py", "status"])
-            .then(function(data){
-                var retVal = JSON.parse(data);
-                if(retVal.val.bootstrap.scvm == "false"){ //bootstrap.sh 실행 전
-                    $("#scvm-after-bootstrap-run").html("");
-                    $("#scvm-before-bootstrap-run").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-bootstrap-run' onclick='scvm_bootstrap_run()'>Bootstrap 실행</a>");
-                }else{  //bootstrap.sh 실행 후
-                    $("#scvm-after-bootstrap-run").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-linkto-storage-center' onclick='scc_link_go()'>스토리지센터 연결</a>");
-                    $("#scvm-before-bootstrap-run").html("");
-                }
-                sessionStorage.setItem("scvm_bootstrap_status","false");
-            })
-            .catch(function(data){
-                console.log(" bootstrap.sh을 실행했는지 여부 확인 Error ::: " + data);
-                sessionStorage.setItem("scvm_bootstrap_status","");
+        .then(function(data){            
+            var retVal = JSON.parse(data);            
+            if(retVal.val.bootstrap.scvm == "false"){ //bootstrap.sh 실행 전
+                sessionStorage.setItem("scvm_bootstrap_status","false");      
                 $("#scvm-after-bootstrap-run").html("");
+                $("#scvm-before-bootstrap-run").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-bootstrap-run' onclick='scvm_bootstrap_run()'>Bootstrap 실행</a>");
+            }else{  //bootstrap.sh 실행 후
+                sessionStorage.setItem("scvm_bootstrap_status","true"); 
+                $("#scvm-after-bootstrap-run").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-linkto-storage-center' onclick='scc_link_go()'>스토리지센터 연결</a>");
                 $("#scvm-before-bootstrap-run").html("");
-            });
+            }      
+        })
+        .catch(function(data){
+            console.log(" bootstrap.sh을 실행했는지 여부 확인 Error ::: " + data);
+            $("#scvm-after-bootstrap-run").html("");
+            $("#scvm-before-bootstrap-run").html("");
+        });
         //스토리지 클러스터 상태 상세조회(ceph -s => json형식)
         cockpit.spawn(["python3", pluginpath+"/python/scc_status/scc_status_detail.py", "detail" ])
             .then(function(data){
@@ -611,15 +599,16 @@ function checkDeployStatus(){
        - 스토리지센터 클러스터 상태 = HEALTH_ERR(구성x), HEALTH_OK, HEALTH_WARN 등 
        - 클라우드센터 클러스터 상태 = HEALTH_ERR1(구성x), HEALTH_ERR2(리소스 구성x), HEALTH_OK
        - 클라우드센터 가상머신 상태 = HEALTH_ERR(배포x), RUNNING, SHUT OFF 등 
+       - 클라우드센터 가상머신 부트스트랩 실행 상태 = false, true
     */
     const step1 = sessionStorage.getItem("ccfg_status");
     const step2 = sessionStorage.getItem("scvm_status");
-    const step3 = sessionStorage.getItem("bootstrap_status");
+    const step3 = sessionStorage.getItem("scvm_bootstrap_status");
     const step4 = sessionStorage.getItem("sc_status");
     const step5 = sessionStorage.getItem("cc_status");
     const step6 = sessionStorage.getItem("ccvm_status");
-    console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6);
-
+    const step7 = sessionStorage.getItem("ccvm_bootstrap_status");
+    console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6 + ", step7 :: " + step7);  
     // 배포 상태조회 
     if(step1!="true"){
         // 클러스터 구성준비 버튼 show
@@ -632,7 +621,7 @@ function checkDeployStatus(){
             $('#button-open-modal-wizard-storage-vm').show()
             showRibbon('warning','스토리지센터 및 클라우드센터 VM이 배포되지 않았습니다. 스토리지센터 VM 배포를 진행하십시오.')
         }else{
-            if(step3=="false"){
+            if(step3!="true"){
                 //모든 버튼 hide
                 showRibbon('warning','스토리지센터 대시보드에 연결할 수 있도록 스토리지센터 VM Bootstrap 실행 작업을 진행하십시오.')
             }else{
@@ -658,25 +647,29 @@ function checkDeployStatus(){
                             $('#button-link-storage-center-dashboard').show()
                             showRibbon('warning','클라우드센터 VM이 배포되지 않았습니다. 클라우드센터 VM 배포를 진행하십시오.')
                         }else{
-                            // 스토리지센터 연결 버튼, 클라우드센터 연결 버튼 show
-                            $('#button-link-storage-center-dashboard').show()
-                            $('#button-link-cloud-center').show()
-                            showRibbon('success','ABLESTACK 스토리지센터 및 클라우드센터 VM이 배포되었으며, 가상어플라이언스 상태가 정상입니다.')
-                            // 운영 상태조회
-                            let msg ="";
-                            if(step2!="RUNNING"){
-                                msg += '스토리지센터 가상머신이 '+step2+' 상태 입니다.\n'
-                                showRibbon('warning', msg);
+                            if(step7!="true"){
+                                //모든 버튼 hide
+                                showRibbon('warning','클라우드 센터에 연결할 수 있도록 클라우드센터 VM Bootstrap 실행 작업을 진행하십시오.')
+                            }else{
+                                // 스토리지센터 연결 버튼, 클라우드센터 연결 버튼 show
+                                $('#button-link-storage-center-dashboard').show()
+                                $('#button-link-cloud-center').show()
+                                showRibbon('success','ABLESTACK 스토리지센터 및 클라우드센터 VM이 배포되었으며, 가상어플라이언스 상태가 정상입니다.')
+                                // 운영 상태조회
+                                let msg ="";
+                                if(step2!="RUNNING"){
+                                    msg += '스토리지센터 가상머신이 '+step2+' 상태 입니다.\n'
+                                    showRibbon('warning', msg);
+                                }
+                                if(step4!="HEALTH_OK"){
+                                    msg += '스토리지센터 클러스터가 '+step4+' 상태 입니다.\n'
+                                    showRibbon('warning', msg);
+                                }
+                                if(step6!="RUNNING"){
+                                    msg += '클라우드센터 가상머신이 '+step6+' 상태 입니다.\n'
+                                    showRibbon('warning', msg);
+                                }   
                             }
-                            if(step4!="HEALTH_OK"){
-                                msg += '스토리지센터 클러스터가 '+step4+' 상태 입니다.\n'
-                                showRibbon('warning', msg);
-                            }
-                            if(step6!="RUNNING"){
-                                msg += '클라우드센터 가상머신이 '+step6+' 상태 입니다.\n'
-                                showRibbon('warning', msg);
-                            }
-
                         }
                     }
                 }
@@ -707,7 +700,7 @@ function showRibbon(status, description) {
  * Meathod Name : saveHostInfo
  * Date Created : 2021.04.01
  * Writer  : 박다정
- * Description : 호스트 파일 정보와 mgr 정보를 세션스토리지에 저장
+ * Description : 호스트 파일 정보를 세션스토리지에 저장
  * Parameter : 없음
  * Return  : 없음
  * History  : 2021.04.01 최초 작성
@@ -722,30 +715,12 @@ function saveHostInfo(){
                     sessionStorage.setItem(word[1], word[0]);
                 }
             }
-            for(var j=1; j<line.length; j++){
-                if(sessionStorage.getItem("scvm"+j)!=null){
-                    //pending 상태가 지속될 경우 에러처리 필요함
-                    cockpit.spawn(['ssh', '-o', 'StrictHostKeyChecking=no','scvm'+j,'ceph', 'mgr','stat'])
-                        .then(data2=>{
-                            if(data2.includes('active_name')==true){
-                                var retVal = JSON.parse(data2);
-                                if(retVal.active_name!=""){
-                                    var index = retVal.active_name.indexOf(["."]);
-                                    sessionStorage.setItem("mgr",retVal.active_name.substring(0,index));
-                                }
-                            }
-                        })
-                        .catch(err=>{
-                            console.log("storage center virtual machine"+j+" ssh command err  :"+err);
-                        })
-                }else
-                    break;
-            }
-        })
-        .catch(function(error){
-            console.log("Hosts file is not configured :"+error);
-        });
-}
+        }    
+    })
+    .catch(function(error){
+        console.log("Hosts file is not configured :"+error);
+    });  
+} 
 
 //30초마다 화면 정보 갱신
 setInterval(() => {

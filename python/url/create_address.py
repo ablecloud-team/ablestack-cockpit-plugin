@@ -7,11 +7,10 @@ Copyright (c) 2021 ABLECLOUD Co. Ltd
 ##!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import re
 import json
 import socket
 import logging
+import requests
 import argparse
 from subprocess import check_output
 from ablestack import *
@@ -39,8 +38,14 @@ def cloudCenter(action, H=False):
     ip = socket.gethostbyname('ccvm-mngt')
 
     if action == 'cloudCenter':
-        # 클라우드센터 
-        value = 'http://'+ip+':8080'
+        try:
+            # 클라우드센터 
+            value = "http://"+ip+":8080"
+            request = requests.get(value)
+
+        except:
+             # http 접속되지않는 경우
+            return createReturn(code=500, val="클라우드센터에 정상적으로 연결되지 않습니다. 클라우드센터 서비스 상태를 확인하거나, 잠시 후에 다시 시도해주십시오.")
 
     else:
         # 클라우드센터 가상머신
@@ -67,7 +72,7 @@ def storageCenter(action, H=False):
                 ip = socket.gethostbyname(mgr_name[0]+'-mngt')
                 value = 'https://'+ip+':8443'
             else: 
-                # ceph 명령어는 정상적으로 전송되지만 ceph mger module이 활성화되지 않은 경우
+                # ceph 명령어는 정상적으로 전송되지만 ceph mgr module이 활성화되지 않은 경우
                 return createReturn(code=500, val="ceph mgr module is not activated.")
                 
         except:
