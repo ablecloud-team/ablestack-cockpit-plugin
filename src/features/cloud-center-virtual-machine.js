@@ -213,15 +213,8 @@ class CloudCenterVirtualMachine {
                 //         return
                 // }
                 ccvm_instance.runningHost = obj.val.started;
-<<<<<<< .merge_file_x7nsks
-                ccvm_instance.clusterdHost = obj.val.clustered_host;
-
-                var remotePcsStatus = ['/usr/bin/ssh', '-o', 'StrictHostKeyChecking=no', ccvm_instance.runningHost, '/usr/bin/python3', pluginpath +'/python/host/virshlist.py'];
-                console.log(remotePcsStatus);
-=======
                 ccvm_instance.clusterdHost = obj.val.clustered_host;                
-                var remotePcsStatus = ['/usr/bin/ssh', '-o', 'StrictHostKeyChecking=no', ccvm_instance.runningHost, '/usr/bin/python3', pluginpath +'/python/host/virshlist.py'];                
->>>>>>> .merge_file_kywh3t
+                var remotePcsStatus = ['/usr/bin/ssh', '-o', 'StrictHostKeyChecking=no', ccvm_instance.runningHost, '/usr/bin/python3', pluginpath +'/python/host/virshlist.py'];
                 cockpit.spawn(remotePcsStatus)
                     .then(ccvm_instance.checkVIRSHOK)
                     .catch(ccvm_instance.checkVIRSHERR)
