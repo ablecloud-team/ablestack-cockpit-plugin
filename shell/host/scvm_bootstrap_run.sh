@@ -8,10 +8,10 @@
 #최초작성자 : 최진성 책임
 #최초작성일 : 2021-04-05
 #########################################
-hosts=$(grep able /etc/hosts | awk {'print $1'})
+hosts=$(grep able /etc/hosts | awk '{print $1}')
 for host in $hosts
 do
-  /usr/bin/ssh -o StrictHostKeyChecking=no $host touch /usr/share/cockpit/bootstrap_run_check
+  /usr/bin/ssh -o StrictHostKeyChecking=no $host python3 /usr/share/cockpit/ablestack/python/ablestack_json/ablestackJson.py update --depth1 bootstrap --depth2 scvm --value true
 done
 
 /usr/bin/ssh -o StrictHostKeyChecking=no scvm sh /root/bootstrap.sh

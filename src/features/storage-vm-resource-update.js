@@ -21,20 +21,17 @@ $('#scvm-resource-update').click(function(){
     if(cpu == 0 && memory == 0) {//넘겨받은 cpu, memory 두 값이 전부 선택된것이 없을 때
         alert("CPU 또는 Memory 사용 정보를 선택하세요.")
     }else{//넘겨받은 cpu, memory 두 값중 하나라도 변경이 있을 시         
-        cockpit.spawn(["python3", "/usr/share/cockpit/ablestack/python/scvm_status/scvm_status_update.py", "resource", "-c", cpu, "-m", memory ])
+        cockpit.spawn(["python3", pluginpath+"/python/scvm_status/scvm_status_update.py", "resource", "-c", cpu, "-m", memory ])
         .then(function(data){            
             var retVal = JSON.parse(data);
             if(retVal.code == "200"){
-                //alert("스토리지 센터 가상머신의 자원이 변경되었습니다.")
                 location.reload();
             }else{                
                 console.log(":::scvm resource update Error::: "+ data);
-                //alert("정상적으로 처리되지 않았습니다.")
             }
         })
         .catch(function(data){
-            console.log(":::scvm resource update Error::: "+ data);
-            //alert("정상적으로 처리되지 않았습니다.")            
+            console.log(":::scvm resource update Error::: "+ data);     
         });
     }
 });
