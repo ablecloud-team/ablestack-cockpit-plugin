@@ -429,16 +429,6 @@ $('#form-radio-timeserver-int').on('click', function () {
     $('input[name=form-input-cluster-config-timeserver]').val("");
 });
 
-// 시간서버 동기화 테스트
-$('#form-button-timeserver-test').on('click', function () {
-
-
-
-
-    $('#stacked-labels-1-simple-form-info-helper-contact').show();
-    $('#stacked-labels-2-simple-form-info-helper-contact').show();
-})
-
 // 아코디언 개체의 버튼 클릭 이벤트 처리
 $('#button-accordion-ssh-key').on('click', function () {
     if ($('#button-accordion-ssh-key').attr("aria-expanded") == "false") {
@@ -1109,7 +1099,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
     for (let i = 0; i < array_of_lines.length; i++) {
         array_result.push(array_of_lines[i].split('\t'));
     }
-    // 각 배열을 찾다가 찾는 문자열이 들어있는 배열의 위치를 추출
+    // 각 배열 검색하여 문자열이 들어있는 배열의 위치를 추출
     for (var i = 0; i < array_result.length; i++) {
         ip_addr1 = array_result[i].findIndex(findNumberOne);
         if (ip_addr1 != -1) {
@@ -1121,7 +1111,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
         ip_addr2 = "100.100.10.11"
     }
     ip_addr2 = ip_addr2.split('.');
-    allow_ip = ip_addr2[0] +'.'+ ip_addr2[1] +'.'+ ip_addr2[2] + '.0/24'
+    allow_ip = ip_addr2[0] +'.'+ ip_addr2[1] +'.0.0/16'
 
     // 외부 시간 서버
     if (file_type == "external") {
@@ -1177,21 +1167,6 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
 
 function findNumberOne(element)  {
   	if(element === "scvm") return true;
-}
-
-
-/**
- * Meathod Name : testTimeServer
- * Date Created : 2021.04.13
- * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사 타임서버 단계에서 chrony 테스트 결과 값을 반환하는 함수
- * Parameter : element
- * Return  : boolean
- * History  : 2021.04.13 최초 작성
- */
-
-function testTimeServer()  {
-
 }
 
 
