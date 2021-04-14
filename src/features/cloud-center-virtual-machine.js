@@ -204,9 +204,7 @@ class CloudCenterVirtualMachine {
                 }
             */
             let status_span = $("#description-cloud-vm-status");
-            if (obj.code == 200) {
-                let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', "상태 체크 중 &bull;&bull;&bull;&nbsp;&nbsp;&nbsp;<svg class='pf-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
-                status_span[0].children[0].replaceWith(a);                
+            if (obj.code == 200) {                
                 // if (obj.val.started == undefined ){
                 //         let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', '가상머신이 동작중이지 않습니다..');
                 //         status_span[0].children[0].replaceWith(a)
@@ -219,10 +217,12 @@ class CloudCenterVirtualMachine {
                     .then(ccvm_instance.checkVIRSHOK)
                     .catch(ccvm_instance.checkVIRSHERR)
             } else if(obj.code == 500) {
-                // let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'red', '리소스가 구성되지 않았습니다.');
-                // status_span[0].children[0].replaceWith(a)
+                let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'red', 'Health Err');
+                status_span[0].children[0].replaceWith(a)
                 resolve();
             } else{
+                let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'red', 'Health Err');
+                status_span[0].children[0].replaceWith(a)
                 resolve();
             }
         });
@@ -251,6 +251,10 @@ class CloudCenterVirtualMachine {
 
     */
     checkCCVM() {
+        ccvm_instance= new CloudCenterVirtualMachine()
+        let status_span = $("#description-cloud-vm-status");
+        let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', "상태 체크 중 &bull;&bull;&bull;&nbsp;&nbsp;&nbsp;<svg class='pf-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
+        status_span[0].children[0].replaceWith(a); 
         cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/pcs/main.py', 'status', '--resource', 'cloudcenter_res'])
             .then(ccvm_instance.checkPCSOK)
             .catch(ccvm_instance.checkPCSERR)
