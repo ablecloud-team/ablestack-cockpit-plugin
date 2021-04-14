@@ -490,7 +490,8 @@ function checkStorageVmStatus(){
                     $('#scvm-manage-nic-type').text("NIC Type : " + retVal.val.manageNicType + " (Parent : " + retVal.val.manageNicParent + ")");
                 }
                 if(retVal.val.manageNicIp !="N/A"){
-                    $('#scvm-manage-nic-ip').text("IP : " + retVal.val.manageNicIp);
+                    $('#scvm-manage-nic-ip').text("IP : " + retVal.val.manageNicIp.split("/")[0]);
+                    $('#scvm-manage-nic-ip-prefix').text("PREFIX : " + retVal.val.manageNicIp.split("/")[1]);
                 }
                 if(retVal.val.manageNicGw !="N/A"){
                     $('#scvm-manage-nic-gw').text("GW : " + retVal.val.manageNicGw);
@@ -707,20 +708,21 @@ function showRibbon(status, description) {
  */
 function saveHostInfo(){
     cockpit.spawn(['cat', '/etc/hosts'])
-        .then(function(data){
-            var line = data.split("\n");
-            for(var i=0; i<line.length; i++){
-                var word = line[i].split("\t");
-                if(word.length>1){
-                    sessionStorage.setItem(word[1], word[0]);
-                }
+    .then(function(data){
+        var line = data.split("\n");
+        for(var i=0; i<line.length; i++){
+            var word = line[i].split("\t");
+            if(word.length>1){
+                sessionStorage.setItem(word[1], word[0]);
             }
-        }    
+        }
     })
     .catch(function(error){
         console.log("Hosts file is not configured :"+error);
-    });  
-} 
+    });
+}
+
+
 
 //30초마다 화면 정보 갱신
 setInterval(() => {
