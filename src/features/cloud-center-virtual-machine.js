@@ -131,6 +131,9 @@ class CloudCenterVirtualMachine {
                     $("#div-cloud-vm-nic-gw-text").text(
                         "GW : " + vm['GW']
                     );
+                    $("#div-cloud-vm-nic-prefix-text").text(
+                        "PREFIX : " + vm['prefix']
+                    );
                     if (vm.State == "running") {                        
                         let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'green', 'Running');
                         status_span[0].children[0].replaceWith(a)                        
