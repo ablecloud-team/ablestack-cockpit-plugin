@@ -76,7 +76,7 @@ def generateDecToHex():
 def createSecretKey(host_names):
     
     # secret.xml 생성
-    cmd = "cat > /var/lib/libvirt/ablestack/vm/ccvm/secret.xml <<EOF\n"
+    cmd = "cat > "+pluginpath+"/tools/vmconfig/ccvm/secret.xml <<EOF\n"
     cmd += "<secret ephemeral='no' private='no'>\n"
     cmd += "    <uuid>11111111-1111-1111-1111-111111111111</uuid>\n"
     cmd += "    <usage type='ceph'>\n"
@@ -86,11 +86,11 @@ def createSecretKey(host_names):
     cmd += "EOF\n"
     os.system(cmd)
 
-    # 이미 3대의 호스트 /var/lib/libvirt/ablestack/vm/secret/secret.xml 경로에 secret.xml이 존재 한다고 가정
+    # 이미 3대의 호스트 /usr/share/cockpit/ablestack/tools/vmconfig/secret/secret.xml 경로에 secret.xml이 존재 한다고 가정
 
     for host_name in host_names:    
 
-        os.system("scp /var/lib/libvirt/ablestack/vm/ccvm/secret.xml root@"+host_name+":/var/lib/libvirt/ablestack/vm/ccvm/secret.xml")
+        os.system("scp "+pluginpath+"/tools/vmconfig/ccvm/secret.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/secret.xml")
 
         # virsh secret-list 11111111-1111-1111-1111-111111111111 값이 존재하는지 확인
         secret_val = subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-list | grep  11111111-1111-1111-1111-111111111111'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
@@ -101,24 +101,24 @@ def createSecretKey(host_names):
 
         if secret_val[0].decode() == '': # secret이 정의되어 있지 않으면 생성
 
-            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-define /var/lib/libvirt/ablestack/vm/ccvm/secret.xml'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-define '+pluginpath+'/tools/vmconfig/ccvm/secret.xml'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd=ecret_set_value_cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
         else: # secret이 정의되어 있으면 삭제후 재생성
             subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-undefine 11111111-1111-1111-1111-111111111111'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-define /var/lib/libvirt/ablestack/vm/ccvm/secret.xml'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-define '+pluginpath+'/tools/vmconfig/ccvm/secret.xml'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd=ecret_set_value_cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
 def createCcvmXml(args):
     try:
-        # 템플릿 파일을 /var/lib/libvirt/ablestack/vm/ccvm 경로로 복사
+        # 템플릿 파일을 /usr/share/cockpit/ablestack/tools/vmconfig/ccvm 경로로 복사
         for host_name in args.host_names:
 
             slot_hex_num = generateDecToHex()
             br_num = 0
             
-            os.system("yes|cp -f /usr/share/cockpit/cockpit-plugin-ablestack/tools/xml-template/ccvm-xml-template.xml /var/lib/libvirt/ablestack/vm/ccvm/ccvm-temp.xml")
+            os.system("yes|cp -f "+pluginpath+"/tools/xml-template/ccvm-xml-template.xml "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml")
             
-            template_file = '/var/lib/libvirt/ablestack/vm/ccvm/ccvm-temp.xml'
+            template_file = pluginpath+'/tools/vmconfig/ccvm/ccvm-temp.xml'
 
             with fileinput.FileInput(template_file, inplace=True, backup='.bak' ) as fi:
 
@@ -128,18 +128,17 @@ def createCcvmXml(args):
                         line = line.replace('<!--memory-->', str(args.memory))
                     elif '<!--cpu-->' in line:
                         line = line.replace('<!--cpu-->', str(args.cpu))
-                    elif '<!--ccvm-root-disk-->' in line:
-                        crd_txt = "  <disk type='network' device='disk'>\n"
-                        crd_txt += "      <source protocol='rbd' name='rbd/ccvm'>\n"
-                        crd_txt += "        <host name='scvm' port='6789'/>\n"
-                        crd_txt += "      </source>\n"
-                        crd_txt += "      <auth username='admin'>\n"
-                        crd_txt += "        <secret type='ceph' uuid='11111111-1111-1111-1111-111111111111'/>\n"
-                        crd_txt += "      </auth>\n"
-                        crd_txt += "      <target dev='vdb' bus='virtio'/>\n"
-                        crd_txt += "    </disk>"
-
-                        line = line.replace('<!--ccvm-root-disk-->', crd_txt)
+                    elif '<!--ccvm_cloudinit-->' in line:
+                        cci_txt = "    <disk type='file' device='cdrom'>\n"
+                        cci_txt += "      <driver name='qemu' type='raw'/>\n"
+                        cci_txt += "      <source file='"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso'/>\n"
+                        cci_txt += "      <target dev='hda' bus='ide'/>\n"
+                        cci_txt += "      <readonly/>\n"
+                        cci_txt += "      <shareable/>\n"
+                        cci_txt += "      <address type='drive' controller='0' bus='0' target='0' unit='0'/>\n"
+                        cci_txt += "    </disk>"
+                        
+                        line = line.replace('<!--ccvm_cloudinit-->', cci_txt)
                     elif '<!--management_network_bridge-->' in line:
                         mnb_txt = "    <interface type='bridge'>\n"
                         mnb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
@@ -172,10 +171,13 @@ def createCcvmXml(args):
                     # 라인 수정
                     sys.stdout.write(line)
 
-            os.system("scp /var/lib/libvirt/ablestack/vm/ccvm/ccvm-temp.xml root@"+host_name+":/var/lib/libvirt/ablestack/vm/ccvm/ccvm.xml")
+            os.system("scp "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
+
+            # pcs 클러스터 할 호스트 전체의 폴더 권한 수정
+            os.system("ssh root@"+host_name+" 'chmod 755 -R "+pluginpath+"/tools/vmconfig/ccvm'")
 
         #작업파일 지우기
-        os.system("rm -f /var/lib/libvirt/ablestack/vm/ccvm/ccvm-temp.xml /var/lib/libvirt/ablestack/vm/ccvm/ccvm.xml.bak /var/lib/libvirt/ablestack/vm/ccvm/ccvm-temp.xml.bak")
+        os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml "+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml.bak "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml.bak")
 
         # 결과값 리턴
         return createReturn(code=200, val={})        

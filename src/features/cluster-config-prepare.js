@@ -243,12 +243,13 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
             $('#button-cancel-config-modal-wizard-cluster-config-prepare').hide();
 
             $('#button-next-step-modal-wizard-cluster-config-prepare').html('종료');
+
             $('#div-modal-wizard-cluster-config-finish').show();
             $('#nav-button-cluster-config-finish').addClass('pf-m-current');
             $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
             $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
             cur_step_wizard_cluster_config_prepare = "6";
-        }else {
+        } else {
             $('#button-next-step-modal-wizard-cluster-config-prepare').html('완료');
             $('#div-modal-wizard-cluster-config-review').show();
             $('#nav-button-cluster-config-review').addClass('pf-m-current');
@@ -257,11 +258,11 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
             cur_step_wizard_cluster_config_prepare = "5";
         }
     } else if (cur_step_wizard_cluster_config_prepare == "6") {
-            resetClusterConfigWizard();
-            resetClusterConfigWizardWithData();
-            cur_step_wizard_cluster_config_prepare = "1";
-            // 페이지 새로고침
-            location.reload();
+        resetClusterConfigWizard();
+        resetClusterConfigWizardWithData();
+        cur_step_wizard_cluster_config_prepare = "1";
+        // 페이지 새로고침
+        location.reload();
     }
 });
 
@@ -392,11 +393,11 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
         }
         for (let i = 1; i <= current_val; i++) {
             let sum = 10 + i;
-            host_ip_info = host_ip_info + "100.100.0." + sum + "\tscvm" + i + "\n";
+            host_ip_info = host_ip_info + "100.100.10." + sum + "\tscvm" + i + "\n";
         }
         for (let i = 1; i <= current_val; i++) {
             let sum = 10 + i;
-            host_ip_info = host_ip_info + "100.200.0." + sum + "\tscvm" + i + "-cn\n";
+            host_ip_info = host_ip_info + "100.200.10." + sum + "\tscvm" + i + "-cn\n";
         }
         target_textarea.val(host_ip_info);
     } else {
@@ -650,8 +651,8 @@ function resetClusterConfigWizard() {
  * Return  : 없음
  * History  : 2021.03.30 최초 작성
  **/
-
 async function resetClusterConfigWizardWithData() {
+
     // 입력된 모든 데이터를 초기화한다.
     $('#nav-button-cluster-config-overview').addClass('pf-m-current');
     $('#nav-button-cluster-config-ssh-key').removeClass('pf-m-current');
@@ -668,6 +669,8 @@ async function resetClusterConfigWizardWithData() {
     $('input[name=form-input-cluster-config-ssh-key-file]').val("");
     $('textarea[name=div-textarea-cluster-config-temp-new-ssh-key-file]').val("");
     $('textarea[name=div-textarea-cluster-config-temp-existing-ssh-key-file]').val("");
+    cockpit.script(["rm -f /root/.ssh/temp_id_rsa"])
+    cockpit.script(["rm -f /root/.ssh/temp_id_rsa.pub"])
     // hosts
     $('#form-radio-hosts-new').prop('checked', true);
     $('#form-radio-hosts-file').prop('checked', false);
@@ -732,7 +735,7 @@ async function resetClusterConfigWizardWithData() {
 
 function generateSshkey() {
     return new Promise(function (resolve) {
-        resolve(cockpit.script(["ssh-keygen -t rsa -b 2048 -f /root/.ssh/id_rsa -N '' <<<y 2>&1 >/dev/null"]));
+        resolve(cockpit.script(["ssh-keygen -t rsa -b 2048 -f /root/.ssh/temp_id_rsa -N '' <<<y 2>&1 >/dev/null"]));
     });
 }
 
@@ -750,7 +753,7 @@ function generateSshkey() {
 async function readSshKeyFile() {
     await generateSshkey();
     // 개인키 읽어오기
-    cockpit.file("/root/.ssh/id_rsa").read()
+    cockpit.file("/root/.ssh/temp_id_rsa").read()
         .done(function (tag) {
             // console.log(tag);
             // ssh_key_textarea에 텍스트 삽입
@@ -759,7 +762,7 @@ async function readSshKeyFile() {
         .fail(function (error) {
         });
     // 공개키 읽어오기
-    cockpit.file("/root/.ssh/id_rsa.pub").read()
+    cockpit.file("/root/.ssh/temp_id_rsa.pub").read()
         .done(function (tag) {
             // console.log(tag);
             // ssh_key_textarea에 텍스트 삽입
@@ -985,6 +988,10 @@ async function writeSshKeyFile(text1, text2) {
     cockpit.script(["mv -f /root/.ssh/authorized_keys{.uniq}"])
     cockpit.script(["chmod 644 /root/.ssh/authorized_keys"])
     cockpit.script(["rm -f /root/.ssh/authorized_keys.uniq"])
+
+    // 임시 키 파일 삭제
+    cockpit.script(["rm -f /root/.ssh/temp_id_rsa"])
+    cockpit.script(["rm -f /root/.ssh/temp_id_rsa.pub"])
 }
 
 
@@ -1070,7 +1077,7 @@ function checkHostName() {
  * Description : 클러스터 준비 마법사에서 완료를 누를 때 설정확인 메뉴에서 확인했던 time server 정보대로 host에 업데이트하는 함수
  * Parameter : timeserver_confirm_ip_text(설정확인 단계에서의 ip주소 값), file_type(외부 또는 로컬서버) , timeserver_current_host_num(현재 설정 중인 호스트 번호)
  * Return  : 없음
- * History  : 2021.03.24 최초 작성
+ * History  : 2021.04.12 수정
  **/
 
 async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserver_current_host_num) {
@@ -1079,7 +1086,6 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
     cockpit.script(["sed -i '/^server /d' /" + chrony_file_root + ""])
     cockpit.script(["sed -i '/^pool /d' /" + chrony_file_root + ""])
 
-    // chrony.conf 파일에서 서버 추가하는 부분
     // 외부 시간 서버
     if (file_type == "external") {
         // chrony.conf 파일 서버 리스트 부분 초기화
@@ -1093,7 +1099,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
         for (let i in timeserver_confirm_ip_text) {
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[i] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
         }
-        let allow_ip = "100.100.0.0/24";
+        let allow_ip = "100.100.0.0/16";
         cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
     }
     // 로컬 시간 서버
@@ -1115,14 +1121,14 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
         }
         // 공통 수정 부분
-        // let allow_ip = timeserver_confirm_ip_text[0];
-        // allow_ip = allow_ip.split('.');
-        // allow_ip = allow_ip[0] + "." + allow_ip[1] + ".0.0/24";
-        let allow_ip = "100.100.0.0/24";
+        let allow_ip = "100.100.0.0/16";
         cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
         cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\local stratum 10\" /" + chrony_file_root + ""])
+        // chronyd restart
+        cockpit.script(["systemctl restart chronyd"])
     }
 }
+
 
 
 /**
@@ -1132,7 +1138,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
  * Description : 클러스터 준비 마법사에서 완료를 누를 때 유효성 검사하는 함수
  * Parameter : timeserver_type(시간서버 타입에 따라 필수 입력 값이 달라져 구분하기 위한 값)
  * Return  : 없음
- * History  : 2021.03.25 최초 작성
+ * History  : 2021.04.12 수정
  */
 function validateClusterConfigPrepare(timeserver_type) {
 
@@ -1141,9 +1147,9 @@ function validateClusterConfigPrepare(timeserver_type) {
     let timeserver_ip_check_external_1 = checkHostFormat($('#div-cluster-config-confirm-time-server-1').text());
     let timeserver_ip_check_external_2 = checkHostFormat($('#div-cluster-config-confirm-time-server-2').text());
     let timeserver_ip_check_external_3 = checkHostFormat($('#div-cluster-config-confirm-time-server-3').text());
-    let timeserver_ip_check_internal_1 = checkIp($('#div-cluster-config-confirm-time-server-1').text());
-    let timeserver_ip_check_internal_2 = checkIp($('#div-cluster-config-confirm-time-server-2').text());
-    let timeserver_ip_check_internal_3 = checkIp($('#div-cluster-config-confirm-time-server-3').text());
+    let timeserver_ip_check_internal_1 = checkHostFormat($('#div-cluster-config-confirm-time-server-1').text());
+    let timeserver_ip_check_internal_2 = checkHostFormat($('#div-cluster-config-confirm-time-server-2').text());
+    let timeserver_ip_check_internal_3 = checkHostFormat($('#div-cluster-config-confirm-time-server-3').text());
 
     if ($('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val().trim() == "") {
         alert("SSH 개인 키 파일 정보를 확인해 주세요.");
@@ -1170,13 +1176,13 @@ function validateClusterConfigPrepare(timeserver_type) {
         }
     } else if (timeserver_type == "internal") {
         if (timeserver_ip_check_internal_1 == false) {
-            alert("시간 서버 1번 IP정보를 확인해 주세요. IP 형식으로만 입력 가능합니다.");
+            alert("시간 서버 1번 정보를 확인해 주세요.");
             validate_check = false;
         } else if (timeserver_ip_check_internal_2 == false) {
-            alert("시간 서버 2번 IP정보를 확인해 주세요. IP 형식으로만 입력 가능합니다.");
+            alert("시간 서버 2번 정보를 확인해 주세요.");
             validate_check = false;
         } else if (timeserver_ip_check_internal_3 == false) {
-            alert("시간 서버 3번 IP정보를 확인해 주세요. IP 형식으로만 입력 가능합니다.");
+            alert("시간 서버 3번 정보를 확인해 주세요.");
             validate_check = false;
         }
     }

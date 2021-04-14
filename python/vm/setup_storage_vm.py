@@ -40,20 +40,23 @@ def createArgumentParser():
 
     return parser
 
-def resetCloud(args):
+def setupStorageVm(args):
 
     success_bool = True    
     
     # 스토리지 가상머신용 qcow2 이미지 생성
-    os.system("yes|cp -f /var/lib/libvirt/images/ablestack-template.qcow2 /var/lib/libvirt/images/scvm.qcow2")
+    os.system("yes|cp -f /var/lib/libvirt/images/ablestack-template-back.qcow2 /var/lib/libvirt/images/scvm.qcow2")
+
+    # scvm.qcow2 파일 권한 설정
+    os.system("chmod 666 /var/lib/libvirt/images/scvm.qcow2")
 
     # virsh 초기화   
-    check_err = os.system("virsh define /var/lib/libvirt/ablestack/vm/scvm/scvm.xml > /dev/null")
+    check_err = os.system("virsh define "+pluginpath+"/tools/vmconfig/scvm/scvm.xml > /dev/null")
     if check_err != 0 :
         success_bool = False
 
     check_err = os.system("virsh start scvm > /dev/null")
-    if ping_check != 0 :
+    if check_err != 0 :
         success_bool = False
 
     # 결과값 리턴
@@ -75,5 +78,5 @@ if __name__ == '__main__':
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
     # 실제 로직 부분 호출 및 결과 출력
-    ret = resetCloud(args)
+    ret = setupStorageVm(args)
     print(ret)

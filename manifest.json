@@ -5,10 +5,11 @@
         "cockpit": "224"
     },
 
-    "tools": {
+    "menu": {
         "ablestack": {
             "label": "ABLESTACK",
-            "path": "main.html"
+            "path": "main.html",
+            "order": "200"
         }
     },
 

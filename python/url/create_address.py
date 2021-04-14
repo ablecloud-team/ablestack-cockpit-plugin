@@ -7,11 +7,10 @@ Copyright (c) 2021 ABLECLOUD Co. Ltd
 ##!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import re
 import json
 import socket
 import logging
+import requests
 import argparse
 from subprocess import check_output
 from ablestack import *
@@ -39,8 +38,14 @@ def cloudCenter(action, H=False):
     ip = socket.gethostbyname('ccvm-mngt')
 
     if action == 'cloudCenter':
-        # 클라우드센터 
-        value = 'http://'+ip+':8080'
+        try:
+            # 클라우드센터 
+            value = "http://"+ip+":8080"
+            request = requests.get(value)
+
+        except:
+             # http 접속되지않는 경우
+            return createReturn(code=500, val="클라우드센터에 정상적으로 연결되지 않습니다. 클라우드센터 서비스 상태를 확인하거나, 잠시 후에 다시 시도해주십시오.")
 
     else:
         # 클라우드센터 가상머신
@@ -57,19 +62,22 @@ def cloudCenter(action, H=False):
 def storageCenter(action, H=False):
 
     if action == 'storageCenter':
-        # 스토리지센터
-        mgr = check_output(['ceph', 'mgr', 'services'], universal_newlines=True)
-        mgr_json = json.loads(mgr)
+        try:
+            # 스토리지센터
+            mgr = check_output(['ceph', 'mgr', 'stat'], universal_newlines=True)
+            mgr_json = json.loads(mgr)
         
-        if "dashboard" in mgr_json:
-            mgr_re = re.compile('{}(.*){}'.format(re.escape('//'), re.escape(':')))
-            mgr_name = mgr_re.findall(mgr)
-        
-            ip = socket.gethostbyname(mgr_name[0])
-            value = mgr_json['dashboard'].replace(mgr_name[0], ip)
-
-        else: 
-            return createReturn(code=500, val="ceph mgr module is not activated.")
+            if "active_name" in mgr_json and mgr_json['active_name'] is not None:
+                mgr_name = mgr_json['active_name'].split('.')
+                ip = socket.gethostbyname(mgr_name[0]+'-mngt')
+                value = 'https://'+ip+':8443'
+            else: 
+                # ceph 명령어는 정상적으로 전송되지만 ceph mgr module이 활성화되지 않은 경우
+                return createReturn(code=500, val="ceph mgr module is not activated.")
+                
+        except:
+             # ceph 설치가 되어있지 않은 경우
+            return createReturn(code=500, val="ceph command err.")
 
     else:
         # 스토리지센터 가상머신
