@@ -1099,7 +1099,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
         for (let i in timeserver_confirm_ip_text) {
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[i] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
         }
-        let allow_ip = "100.100.0.0/16";
+        let allow_ip = "0.0.0.0/0";
         cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
     }
     // 로컬 시간 서버
