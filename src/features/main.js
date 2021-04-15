@@ -603,6 +603,13 @@ function checkStorageVmStatus(){
  * History  : 2021.03.30 최초 작성
  */
 function checkDeployStatus(){
+    // 배포 상태 조회 전 버튼 hide 처리
+    $('#button-open-modal-wizard-storage-cluster').hide()
+    $('#button-open-modal-wizard-storage-vm').hide()
+    $('#button-open-modal-wizard-cloud-vm').hide()
+    $('#button-link-storage-center-dashboard').hide()
+    $('#button-link-cloud-center').hide()
+    $('#button-link-monitoring-center').hide()
     /*
        가상머신 배포 및 클러스터 구성 상태를 세션 스토리지에서 조회 
        - 클러스터 구성준비 상태 = false, true
