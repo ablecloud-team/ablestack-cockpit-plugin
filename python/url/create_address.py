@@ -80,9 +80,8 @@ def storageCenter(action, H=False):
             return createReturn(code=500, val="ceph command err.")
 
     else:
-        # 스토리지센터 가상머신
-        num = socket.gethostname()[-1:]
-        ip = socket.gethostbyname('scvm'+num+'-mngt')
+        # 스토리지센터 가상머신        
+        ip = socket.gethostbyname('scvm-mngt')
         value = 'https://'+ip+':9090'
 
     if H: 
