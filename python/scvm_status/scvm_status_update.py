@@ -44,9 +44,13 @@ def startStorageVM():
     try:
         '''스토리지 가상머신 시작 명령 후 리턴값 0은 정상, 아닐경우 비정상'''
         rc = call(['virsh start scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
-        if rc == 0:
+        if rc == 0:                
+            while True:
+                output = check_output(["virsh domstate scvm"], universal_newlines=True, shell=True, env=env)
+                if output.strip() == "running" :
+                    break;                
             retVal = True
-            retCode = 200
+            retCode = 200                
         else :
             retVal = False
             retCode = 500
@@ -64,6 +68,10 @@ def stopStorageVM():
         '''스토리지 가상머신 정지 명령 후 리턴값 0은 정상, 아닐경우 비정상'''
         rc = call(['virsh shutdown scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
         if rc == 0:
+            while True:   
+                output = check_output(["virsh domstate scvm"], universal_newlines=True, shell=True, env=env)
+                if output.strip() == "shut off" :
+                    break;                
             retVal = True
             retCode = 200
         else :
@@ -80,20 +88,24 @@ def stopStorageVM():
 '''
 def deleteStorageVM():
     try:
-        '''스토리지 가상머신 강제 정지 명령 후 리턴값 0은 정상, 아닐경우 비정상'''
-        rc = call(['virsh destroy scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+        '''스토리지 가상머신 강제 정지 명령 후 리턴값 0은 정상, 아닐경우 이미 정지 상태거나 없는경우'''
+        call(['virsh destroy scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        '''스토리지 가상머신 삭제 명령 후 리턴값 0은 정상, 아닐경우 비정상'''
+        call(['virsh undefine scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        while True:   
+            rc = call(['virsh domstate scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            if rc > 0 :
+                break;
+
+        rc = call(['ls /etc/ceph/'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:
-            '''스토리지 가상머신 삭제 명령 후 리턴값 0은 정상, 아닐경우 비정상'''
-            rc = call(['virsh undefine scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
-            if rc == 0:
-                retVal = True
-                retCode = 200
-            else :
-                retVal = False
-                retCode = 500
+            call(["rm -rf /etc/ceph/*"], universal_newlines=True, shell=True, env=env)            
+            retVal = True
+            retCode = 200
         else :
             retVal = False
-            retCode = 500        
+            retCode = 500
+
         ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM Delete')
     except Exception as e:
         ret = createReturn(code=500, val='virsh destroy, undefine error', retname='Storage Center VM Delete Error')    
@@ -142,14 +154,14 @@ if __name__ == '__main__':
 
     if args.action == 'start':
         '''스토리지 가상머신 시작 요청'''
-        ret = startStorageVM();    
+        startStorageVM();    
     elif args.action == 'stop':
         '''스토리지 가상머신 정지 요청'''
-        ret = stopStorageVM();
+        stopStorageVM();
     elif args.action == 'delete':
         '''스토리지 가상머신 삭제 요청'''
-        ret = deleteStorageVM();
+        deleteStorageVM();
     elif args.action == 'resource':
         '''스토리지 가상머신 자원변경 요청'''
-        ret = updateStorageVM(args.cpu, args.memory); 
+        updateStorageVM(args.cpu, args.memory); 
     '''print(ret)'''

@@ -8,6 +8,7 @@
 // 변수 선언
 var cur_step_wizard_cloud_vm = "1";
 var xml_create_cmd;
+var completed = false;
 
 /* Document Ready 이벤트 처리 시작 */
 
@@ -44,13 +45,13 @@ $(document).ready(function(){
     setNicBridge('form-select-cloud-vm-svc-parent');
 
     //hosts 파일 선택 이벤트 세팅
-    setHostsFileReader($('#form-input-cloud-vm-hosts-file'), setCcvmNetworkInfo);
+    setHostsFileReader($('#form-input-cloud-vm-hosts-file'), 'hosts', setCcvmNetworkInfo);
     
     //ssh 개인 key 파일 선택 이벤트 세팅
-    setSshKeyFileReader($('#form-input-cloud-vm-ssh-private-key-file'), setCcvmSshPrivateKeyInfo);
+    setSshKeyFileReader($('#form-input-cloud-vm-ssh-private-key-file'), 'id_rsa', setCcvmSshPrivateKeyInfo);
 
     //ssh 공개 key 파일 선택 이벤트 세팅
-    setSshKeyFileReader($('#form-input-cloud-vm-ssh-public-key-file'), setCcvmSshPublicKeyInfo);
+    setSshKeyFileReader($('#form-input-cloud-vm-ssh-public-key-file'), 'id_rsa.pub', setCcvmSshPublicKeyInfo);
 });
 
 /* Document Ready 이벤트 처리 끝 */
@@ -59,6 +60,10 @@ $(document).ready(function(){
 
 $('#button-close-modal-wizard-cloud-vm').on('click', function(){
     $('#div-modal-wizard-cloud-vm').hide();
+    if(completed){
+        //상태값 초기화 겸 페이지 리로드
+        location.reload();
+    }
 });
 
 /* Title 영역에서 발생하는 이벤트 처리 끝 */
@@ -275,10 +280,7 @@ $('#button-next-step-modal-wizard-cloud-vm').on('click', function(){
         cur_step_wizard_cloud_vm = "7";
     }
     else if (cur_step_wizard_cloud_vm == "7") {
-        if(validateCloudCenterVm()){
-            deployCloudCenterVM();
-            cur_step_wizard_cloud_vm = "8";
-        }        
+        $('#div-modal-cloud-wizard-confirm').show();
     }
     else if (cur_step_wizard_cloud_vm == "8") {
         $('#div-modal-wizard-cloud-vm').hide();
@@ -345,7 +347,6 @@ $('#button-before-step-modal-wizard-cloud-vm').on('click', function(){
         $('#div-modal-wizard-cloud-vm-additional').show();
         $('#nav-button-cloud-vm-additional').addClass('pf-m-current');
     
-        $('#button-next-step-modal-wizard-cloud-vm').html('배포');
         $('#button-next-step-modal-wizard-cloud-vm').attr('disabled', false);
         $('#button-before-step-modal-wizard-cloud-vm').attr('disabled', false);
         $('#button-cancel-config-modal-wizard-cloud-vm').attr('disabled', false);
@@ -377,10 +378,6 @@ $('#button-before-step-modal-wizard-cloud-vm').on('click', function(){
     
         cur_step_wizard_cloud_vm = "7";
     }
-});
-
-$('#button-cancel-config-modal-wizard-cloud-vm').on('click', function(){
-    $('#div-modal-wizard-cloud-vm').hide();
 });
 
 /* Footer 영역에서 발생하는 이벤트 처리 끝 */
@@ -470,6 +467,40 @@ $('#form-checkbox-svc-network').on('change', function(){
     }
 });
 
+// 마법사 "배포 실행 버튼 모달창"
+$('#button-cancel-modal-cloud-wizard-confirm').on('click', function () {
+    $('#div-modal-cloud-wizard-confirm').hide();
+});
+$('#button-close-modal-cloud-wizard-confirm').on('click', function () {
+    $('#div-modal-cloud-wizard-confirm').hide();
+});
+// 마법사 "배포 버튼 모달창" 실행 버튼을 눌러 가상머신 배포
+$('#button-execution-modal-cloud-wizard-confirm').on('click', function () {
+    $('#div-modal-cloud-wizard-confirm').hide();
+    if(validateCloudCenterVm()){
+        deployCloudCenterVM();
+        cur_step_wizard_cloud_vm = "8";
+    }
+});
+
+// 마법사 "취소 버튼 모달창" show, hide
+$('#button-cancel-config-modal-wizard-cloud-vm').on('click', function () {
+    $('#div-modal-cancel-cloud-wizard-cancel').show();
+});
+$('#button-close-modal-cloud-wizard-cancel').on('click', function () {
+    $('#div-modal-cancel-cloud-wizard-cancel').hide();
+});
+$('#button-cancel-modal-cloud-wizard-cancel').on('click', function () {
+    $('#div-modal-cancel-cloud-wizard-cancel').hide();
+});
+// 마법사 "취소 버튼 모달창" 실행 버튼을 눌러 취소를 실행
+$('#button-execution-modal-cloud-wizard-cancel').on('click', function () {
+    $('#div-modal-cancel-cloud-wizard-cancel').hide();
+    $('#div-modal-wizard-cloud-vm').hide();
+    //상태값 초기화 겸 페이지 리로드
+    location.reload();
+});
+
 /* HTML Object에서 발생하는 이벤트 처리 끝 */
 
 /* 함수 정의 시작 */
@@ -526,10 +557,27 @@ function deployCloudCenterVM() {
     $('#div-modal-wizard-cloud-vm-deploy').show();
     $('#nav-button-cloud-vm-finish').addClass('pf-m-current');
 
+    /*
     $('#button-next-step-modal-wizard-cloud-vm').html('완료');
     $('#button-next-step-modal-wizard-cloud-vm').attr('disabled', true);
     $('#button-before-step-modal-wizard-cloud-vm').attr('disabled', true);
     $('#button-cancel-config-modal-wizard-cloud-vm').attr('disabled', false);
+    */
+    
+    // 하단 버튼 숨김
+    $('#button-next-step-modal-wizard-cloud-vm').hide();
+    $('#button-before-step-modal-wizard-cloud-vm').hide();
+    $('#button-cancel-config-modal-wizard-cloud-vm').hide();
+
+    // 왼쪽 사이드 버튼 전부 비활성화 
+    $('#nav-button-cloud-vm-overview').addClass('pf-m-disabled');
+    $('#nav-button-cloud-vm-cluster').addClass('pf-m-disabled');
+    $('#nav-button-cloud-vm-appliance').addClass('pf-m-disabled');
+    $('#nav-button-cloud-vm-compute').addClass('pf-m-disabled');
+    $('#nav-button-cloud-vm-network').addClass('pf-m-disabled');
+    $('#nav-button-cloud-vm-additional').addClass('pf-m-disabled');
+    $('#nav-button-cloud-vm-ssh-key').addClass('pf-m-disabled');
+    $('#nav-button-cloud-vm-review').addClass('pf-m-disabled');
 
     var host1_name = $('#form-input-cloud-vm-failover-cluster-host1-name').val();
     var host2_name = $('#form-input-cloud-vm-failover-cluster-host2-name').val();
@@ -537,8 +585,10 @@ function deployCloudCenterVM() {
 
     //=========== 1. 클러스터 구성 host 네트워크 연결 테스트 ===========
     setProgressStep("span-ccvm-progress-step1",1);
+    var console_log = true;
 
     var host_ping_test_cmd = ['python3', pluginpath + '/python/vm/host_ping_test.py', '-hns', host1_name, host2_name, host3_name];
+    if(console_log){console.log(host_ping_test_cmd);}
     cockpit.spawn(host_ping_test_cmd)
         .then(function(data){
             //결과 값 json으로 return
@@ -549,13 +599,14 @@ function deployCloudCenterVM() {
                 setProgressStep("span-ccvm-progress-step1",2);
                 setProgressStep("span-ccvm-progress-step2",1);
                 var reset_cloud_center_cmd = ['python3', pluginpath + '/python/vm/reset_cloud_center.py'];
+                if(console_log){console.log(reset_cloud_center_cmd);}
                 cockpit.spawn(reset_cloud_center_cmd)
                     .then(function(data){
                         //결과 값 json으로 return
                         var reset_cloud_center_result = JSON.parse(data);
                         if(reset_cloud_center_result.code=="200") { //정상
                             //=========== 3. cloudinit iso 파일 생성 ===========
-                            // host 파일 /var/lib/libvirt/ablestack/vm/ccvm/cloudinit 경로에 hosts, ssh key 파일 저장
+                            // host 파일 /usr/share/cockpit/ablestack/tools/vmconfig/ccvm/cloudinit 경로에 hosts, ssh key 파일 저장
                             setProgressStep("span-ccvm-progress-step2",2);
                             setProgressStep("span-ccvm-progress-step3",1);
 
@@ -565,11 +616,12 @@ function deployCloudCenterVM() {
                             var mngt_gw = $('#form-input-cloud-vm-mngt-gw').val();
                             
                             create_ccvm_cloudinit_cmd = ['python3', pluginpath + '/python/vm/create_ccvm_cloudinit.py'
-                                                    ,"-f1","/var/lib/libvirt/ablestack/vm/ccvm/hosts","-t1", $("#form-textarea-cloud-vm-hosts-file").val() // hosts 파일
-                                                    ,"-f2","/var/lib/libvirt/ablestack/vm/ccvm/ablecloud","-t2", $("#form-textarea-cloud-vm-ssh-private-key-file").val() // ssh 개인 key 파일
-                                                    ,"-f3","/var/lib/libvirt/ablestack/vm/ccvm/ablecloud.pub","-t3", $("#form-textarea-cloud-vm-ssh-public-key-file").val() // ssh 공개 key 파일
+                                                    ,"-f1",pluginpath+"/tools/vmconfig/ccvm/hosts","-t1", $("#form-textarea-cloud-vm-hosts-file").val() // hosts 파일
+                                                    ,"-f2",pluginpath+"/tools/vmconfig/ccvm/id_rsa","-t2", $("#form-textarea-cloud-vm-ssh-private-key-file").val() // ssh 개인 key 파일
+                                                    ,"-f3",pluginpath+"/tools/vmconfig/ccvm/id_rsa.pub","-t3", $("#form-textarea-cloud-vm-ssh-public-key-file").val() // ssh 공개 key 파일
                                                     ,'--hostname',host_name
-                                                    , '-hns', host1_name, host2_name, host3_name
+                                                    ,'-hns', host1_name, host2_name, host3_name
+                                                    ,'--mgmt-nic','ens20'
                                                     ,'--mgmt-ip',mgmt_ip
                                                     ,'--mgmt-prefix',mgmt_prefix
                                                     ,'--mgmt-gw',mngt_gw
@@ -580,9 +632,9 @@ function deployCloudCenterVM() {
                                 var sn_ip = $('#form-input-cloud-vm-svc-nic-ip').val().split("/")[0];
                                 var sn_prefix = $('#form-input-cloud-vm-svc-nic-ip').val().split("/")[1];
                                 var sn_gw = $('#form-input-cloud-vm-svc-gw').val();
-                                create_ccvm_cloudinit_cmd.push('--sn-ip',sn_ip,'--sn-prefix',sn_prefix,'--sn-gw',sn_gw)
+                                create_ccvm_cloudinit_cmd.push('--sn-nic','ens21','--sn-ip',sn_ip,'--sn-prefix',sn_prefix,'--sn-gw',sn_gw)
                             }
-
+                            if(console_log){console.log(create_ccvm_cloudinit_cmd);}
                             cockpit.spawn(create_ccvm_cloudinit_cmd)
                                 .then(function(data){
                                     //결과 값 json으로 return
@@ -592,6 +644,7 @@ function deployCloudCenterVM() {
                                         setProgressStep("span-ccvm-progress-step3",2);
                                         setProgressStep("span-ccvm-progress-step4",1);
                                         xml_create_cmd.push("-hns",host1_name,host2_name,host3_name);
+                                        if(console_log){console.log(xml_create_cmd);}
                                         cockpit.spawn(xml_create_cmd)
                                             .then(function(data){
                                                 //결과 값 json으로 return
@@ -602,6 +655,7 @@ function deployCloudCenterVM() {
                                                     setProgressStep("span-ccvm-progress-step4",2);
                                                     setProgressStep("span-ccvm-progress-step5",1);
                                                     var pcs_config = ['python3', pluginpath + '/python/vm/setup_pcs_cluster.py', '-hns', host1_name, host2_name, host3_name];
+                                                    if(console_log){console.log(pcs_config);}
                                                     cockpit.spawn(pcs_config)
                                                         .then(function(data){
                                                             //결과 값 json으로 return
@@ -706,6 +760,7 @@ function showDivisionCloudVMConfigFinish() {
     resetCloudVMWizard();
 
     $('#div-modal-wizard-cloud-vm-finish').show();
+
     $('#nav-button-cloud-vm-finish').addClass('pf-m-current');
     $('#nav-button-cloud-vm-finish').removeClass('pf-m-disabled');
 
@@ -718,6 +773,8 @@ function showDivisionCloudVMConfigFinish() {
     $('#button-before-step-modal-wizard-cloud-vm').hide();
     $('#button-cancel-config-modal-wizard-cloud-vm').hide();
 
+    completed = true;
+    
     cur_step_wizard_cloud_vm = "8";
 }
 
@@ -856,7 +913,7 @@ function setCcvmSshPrivateKeyInfo(ssh_private_key){
 function setCcvmReviewInfo(){
 
     //클라우드센터 가상머신 XML 생성 커맨드 기본 텍스트
-    xml_create_cmd = ["python3","/usr/share/cockpit/cockpit-plugin-ablestack/python/vm/create_ccvm_xml.py"];
+    xml_create_cmd = ["python3",pluginpath + "/python/vm/create_ccvm_xml.py"];
     
     //-----장애조치 클러스터 설정-----
     //클러스터 호스트1, 호스트2, 호스트3 이름
@@ -1044,58 +1101,76 @@ function setCcvmReviewInfo(){
  */
 function validateCloudCenterVm(){
 
-    var valicateCheck = true;
+    var valicate_check = true;
 
     var svc_bool = $('input[type=checkbox][id="form-checkbox-svc-network"]').is(":checked");
 
     if($('#form-input-cloud-vm-failover-cluster-host1-name').val() == ""){ //host1 name
         alert("클러스터 호스트1의 이름을 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if ($('#form-input-cloud-vm-failover-cluster-host2-name').val() == "") { //host2 name
         alert("클러스터 호스트2의 이름을 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if ($('#form-input-cloud-vm-failover-cluster-host3-name').val() == "") { //host3 name
         alert("클러스터 호스트3의 이름을 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if ($('select#form-select-cloud-vm-compute-cpu-core option:checked').val() == "") { //cpu
         alert("CPU core를 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if ($('select#form-select-cloud-vm-compute-memory option:checked').val() == "") { //memory
         alert("Memory를 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if ($('select#form-select-cloud-vm-mngt-parent option:checked').val() == "") { //관리용 bridge
         alert("관리용네트워크를 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if (svc_bool && $('select#form-select-cloud-vm-svc-parent option:checked').val() == "") {//서비스용 bridge
         alert("서비스네트워크를 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if ($('#form-textarea-cloud-vm-hosts-file').val() == "") { //hosts 파일
         alert("Hosts 파일을 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if ($('#form-input-cloud-vm-hostname').val() == "") { //클라우드센터 가상머신 호스트명
         alert("클라우드센터 가상머신의 호스트명 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if ($('#form-input-cloud-vm-mngt-nic-ip').val() == "") { //관리 NIC IP
         alert("관리 NIC IP를 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if ($('#form-input-cloud-vm-mngt-gw').val() == "") { //관리 NIC Gateway
         alert("관리 NIC Gateway를 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if (svc_bool && $('#form-input-cloud-vm-svc-nic-ip').val() == "") { //서비스 NIC IP
         alert("서비스 NIC IP를 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if (svc_bool && $('#form-input-cloud-vm-svc-gw').val() == "") { //서비스 NIC Gateway
         alert("서비스 NIC Gateway를 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if ( $('#form-textarea-cloud-vm-ssh-private-key-file').val() == "") { //SSH 개인 Key 정보
         alert("SSH 개인 Key 파일을 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
     } else if ( $('#form-textarea-cloud-vm-ssh-public-key-file').val() == "") { //SSH 공개 Key 정보
         alert("SSH 공개 Key 파일을 입력해주세요.");
-        valicateCheck = false;
+        valicate_check = false;
+    } else if(!checkHostFormat($("#form-input-cloud-vm-hostname").val())){
+        alert("호스트명 입력 형식을 확인해주세요.");
+        valicate_check = false;
+    } else if(!checkCidrFormat($("#form-input-cloud-vm-mngt-nic-ip").val())){
+        alert("관리 NIC IP 형식을 확인해주세요.");
+        valicate_check = false;
+    } else if(!checkIp($("#form-input-cloud-vm-mngt-gw").val())){
+        alert("관리 NIC Gateway 형식을 확인해주세요.");
+        valicate_check = false;
+    } else if(svc_bool && !checkCidrFormat($("#form-input-cloud-vm-svc-nic-ip").val())){
+        alert("서비스 NIC IP 형식을 확인해주세요.");
+        valicate_check = false;
+    } else if(svc_bool && !checkIp($("#form-input-cloud-vm-svc-gw").val())){
+        alert("서비스 NIC Gateway 형식을 확인해주세요.");
+        valicate_check = false;
+    } else if(!checkSpace($("#form-textarea-cloud-vm-hosts-file").val())){
+        alert("Hosts 파일 작성 시 'Tab 키'만 사용 가능합니다.");
+        valicate_check = false;
     }
 
-    return valicateCheck;
+    return valicate_check;
 }
 
 /**

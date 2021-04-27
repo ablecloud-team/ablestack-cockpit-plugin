@@ -12,6 +12,7 @@ import logging
 import json
 import sys
 import os
+import time
 
 from ablestack import *
 from sh import python3
@@ -44,15 +45,14 @@ def createArgumentParser():
 
     return parser
 
-def resetCloud(args):
+def setupPcsCluster(args):
     
     success_bool = True
 
 
     #=========== pcs cluster 구성 ===========
     # ceph 이미지 등록
-
-    os.system("qemu-img convert -f qcow2 -O rbd /var/lib/libvirt/images/centos8-template.qcow2 rbd:rbd/ccvm")
+    os.system("qemu-img convert -f qcow2 -O rbd /var/lib/libvirt/images/ablestack-template-back.qcow2 rbd:rbd/ccvm")
 
     # 클러스터 구성
     result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'config', '--cluster', 'cloudcenter_cluster', '--hosts', args.host_names[0], args.host_names[1], args.host_names[2] ).stdout.decode())
@@ -60,12 +60,20 @@ def resetCloud(args):
         success_bool = False
 
     # 리소스 생성
-    result = json.loads(python3('/usr/share/cockpit/cockpit-lugin-ablestack/python/pcs/main.py', 'create', '--resource', 'cloudcenter_res', '--xml', '/var/lib/libvirt/ablestack/vm/ccvm/ccvm.xml' ).stdout.decode())
+    result = json.loads(python3(pluginpath+'/python/pcs/main.py', 'create', '--resource', 'cloudcenter_res', '--xml', pluginpath+'/tools/vmconfig/ccvm/ccvm.xml' ).stdout.decode())
     if result['code'] not in [200]:
         success_bool = False
 
     #ccvm이 정상적으로 생성 되었는지 확인
-    domid_check = os.system("virsh domid ccvm > /dev/null")
+    domid_check = ""
+    cnt_num = 0
+    while True:
+        time.sleep(1)
+        cnt_num += 1
+        domid_check = os.system("virsh domid ccvm > /dev/null")
+        if domid_check == 0 or cnt_num > 60:
+            break
+
     if domid_check != 0:
         success_bool = False
 
@@ -88,5 +96,5 @@ if __name__ == '__main__':
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
     # 실제 로직 부분 호출 및 결과 출력
-    ret = resetCloud(args)
+    ret = setupPcsCluster(args)
     print(ret)

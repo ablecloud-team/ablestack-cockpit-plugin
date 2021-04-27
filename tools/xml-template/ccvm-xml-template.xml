@@ -29,15 +29,16 @@
   </pm>
   <devices>
     <emulator>/usr/libexec/qemu-kvm</emulator>
-    <disk type="file" device="cdrom">
-      <driver name="qemu" type="raw"/>
-      <source file="/var/lib/libvirt/ablestack/vm/ccvm/ccvm-cloudinit.iso"/>
-      <target dev="hda" bus="ide"/>
-      <readonly/>
-      <shareable/>
-      <address type="drive" controller="0" bus="0" target="0" unit="0"/>
+<!--ccvm_cloudinit-->
+    <disk type='network' device='disk'>
+      <source protocol='rbd' name='rbd/ccvm'>
+        <host name='scvm' port='6789'/>
+      </source>
+      <auth username='admin'>
+        <secret type='ceph' uuid='11111111-1111-1111-1111-111111111111'/>
+      </auth>
+      <target dev='vda' bus='virtio'/>
     </disk>
-    <!--ccvm-root-disk-->
     <controller type='usb' index='0' model='ich9-ehci1'>
       <alias name='usb'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x7'/>
