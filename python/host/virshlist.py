@@ -48,7 +48,7 @@ for vm in vms:
             v = items[1].strip()
             vm[k] = v
         # ret = virsh_cmd("domblkinfo", domain=vm['Name'], all=True, _env=env).stdout.decode().splitlines()
-        ret = ssh('ccvm-mngt', '/usr/bin/df', '-h').stdout.decode().splitlines()
+        ret = ssh('-o', 'StrictHostKeyChecking=no', 'ccvm-mngt', '/usr/bin/df', '-h').stdout.decode().splitlines()
         ret.reverse()
         vm['blk'] = ret
         for line in ret[:]:
@@ -64,7 +64,10 @@ for vm in vms:
             for line in ret[:-1]:
                 if 'ipv4' in line and 'ens20' in line:
                     items = line.split(maxsplit=4)
-                    vm['ip'] = items[3]
+                    ipPrefix = items[3]
+                    ipSplit = ipPrefix.split('/')
+                    vm['ip'] = ipSplit[0]
+                    vm['prefix'] = ipSplit[1]
                     vm['mac'] = items[1]
             ret = virsh_cmd('domiflist', domain=vm['Name']).stdout.decode().splitlines()
             for line in ret[:-1]:
@@ -72,7 +75,7 @@ for vm in vms:
                     items = line.split()
                     vm['nictype'] = items[1]
                     vm['nicbridge'] = items[2]
-        ret = ssh('ccvm-mngt', '/usr/sbin/route', '-n', '|', 'grep', '-P', '"^0.0.0.0|UG"').stdout.decode().splitlines()
+        ret = ssh('-o', 'StrictHostKeyChecking=no', 'ccvm-mngt', '/usr/sbin/route', '-n', '|', 'grep', '-P', '"^0.0.0.0|UG"').stdout.decode().splitlines()
         for line in ret[:]:
             items = line.split()
             vm['GW'] = items[1]

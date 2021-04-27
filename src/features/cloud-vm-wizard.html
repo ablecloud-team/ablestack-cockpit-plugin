@@ -790,6 +790,7 @@
                                 </span>
                                 <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성 및 클라우드센터 가상머신 배포</span>
                             </div>
+                        </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-finish">
                             <div class="pf-c-content">
                                 <p>
@@ -814,12 +815,54 @@
                         <button class="pf-c-button pf-m-link" type="button" id="button-cancel-config-modal-wizard-cloud-vm">취소</button>
                     </div>
                 </footer>
-            </div>    
+            </div>
+
+            <!-- 클라우드센터 가상머신 배포 마법사 진행: Modal 영역 시작 -->
+            <div id="div-modal-cloud-wizard-confirm" class="pf-c-backdrop" style="display:none" >
+                <div class="pf-l-bullseye">
+                    <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="cloud wizard confirm">
+                        <button id="button-close-modal-cloud-wizard-confirm" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                        <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">클라우드센터 가상머신 배포 진행</span></h1></header>
+                        <div class="pf-c-modal-box__body">
+                            <div>클라우드센터 가상머신 배포를 진행하시겠습니까?</div>
+                        </div>
+                        <footer class="pf-c-modal-box__footer">
+                            <button id="button-execution-modal-cloud-wizard-confirm" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                            <button id="button-cancel-modal-cloud-wizard-confirm" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">아니요</button>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            <!-- 클라우드센터 가상머신 배포 마법사 진행: Modal 영역 끝 -->
+            
+            <!-- 클라우드센터 가상머신 배포 마법사 취소: Modal 영역 시작 -->
+            <div id="div-modal-cancel-cloud-wizard-cancel" class="pf-c-backdrop" style="display:none" >
+                <div class="pf-l-bullseye">
+                    <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="cloud wizard cancel">
+                        <button id="button-close-modal-cloud-wizard-cancel" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                        <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">클라우드센터 가상머신 배포 취소</span></h1></header>
+                        <div class="pf-c-modal-box__body">
+                            <div>클라우드센터 가상머신 배포를 취소하시겠습니까? 입력된 데이터는 초기화 됩니다.</div>
+                        </div>
+                        <footer class="pf-c-modal-box__footer">
+                            <button id="button-execution-modal-cloud-wizard-cancel" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                            <button id="button-cancel-modal-cloud-wizard-cancel" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">아니요</button>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            <!-- 클라우드센터 가상머신 배포 마법사 취소: Modal 영역 끝 -->
+
         </div>
     </div>
 </div>
 
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
 <script src="./src/common/wizard-common.js"></script>
+<script src="./src/common/validation.js"></script>
 <script src="./src/features/cloud-vm-wizard.js"></script>
 <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 

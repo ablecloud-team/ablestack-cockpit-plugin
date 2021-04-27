@@ -29,14 +29,7 @@
   </pm>
   <devices>
     <emulator>/usr/libexec/qemu-kvm</emulator>
-    <disk type="file" device="cdrom">
-      <driver name="qemu" type="raw"/>
-      <source file="/var/lib/libvirt/ablestack/vm/scvm/scvm-cloudinit.iso"/>
-      <target dev="hda" bus="ide"/>
-      <readonly/>
-      <shareable/>
-      <address type="drive" controller="0" bus="0" target="0" unit="0"/>
-    </disk>
+<!--scvm_cloudinit-->
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2'/>
       <source file='/var/lib/libvirt/images/scvm.qcow2'/>

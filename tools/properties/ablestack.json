@@ -1,0 +1,6 @@
+{
+  "bootstrap": {
+    "scvm" : "false",
+    "ccvm": "false"
+  }
+}

@@ -46,8 +46,8 @@ def resetStorageCenter(args):
     os.system("mkdir -p "+pluginpath+"/tools/vmconfig/scvm")
 
     # virsh 초기화
-    os.system("virsh destroy scvm")
-    os.system("virsh undefine scvm")
+    os.system("virsh destroy scvm > /dev/null")
+    os.system("virsh undefine scvm > /dev/null")
 
     # 스토리지센터 가상머신 qcow2 템플릿 삭제
     os.system("rm -rf /var/lib/libvirt/images/scvm.qcow2")

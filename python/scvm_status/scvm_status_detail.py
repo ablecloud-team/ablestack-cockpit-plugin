@@ -102,22 +102,28 @@ def statusDeteil():
         rc = call(["ping -c 1 scvm"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:                
             '''scvm 에 접속해 df -h 값 세팅''' 
-            rootDiskSize = check_output(["ssh scvm df -h | grep 'root' | awk '{print $2}'"], universal_newlines=True, shell=True, env=env)                
+            rootDiskSize = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm df -h | grep '\-root ' | awk '{print $2}'"], universal_newlines=True, shell=True, env=env)                
             if rootDiskSize == "" :
                 rootDiskSize = "N/A"
-            output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $4}'"], universal_newlines=True, shell=True, env=env)
+            output = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm df -h | grep '\-root ' | awk '{print $4}'"], universal_newlines=True, shell=True, env=env)
             rootDiskAvail = output.strip();
             if rootDiskAvail == "" :
                 rootDiskAvail = "N/A"
-            output = check_output(["ssh scvm df -h | grep 'root' | awk '{print $5}'"], universal_newlines=True, shell=True, env=env)
+            output = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm df -h | grep '\-root ' | awk '{print $5}'"], universal_newlines=True, shell=True, env=env)
             rootDiskUsePer = output.strip();                
             if rootDiskUsePer == "" :
                 rootDiskUsePer = "N/A"
+            
+            '''management Nic Gw정보 확인'''
+            output = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm /usr/sbin/route -n | grep -P '^0.0.0.0|UG' | awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
+            manageNicGw = output.strip();
+            if manageNicGw == "" :
+                manageNicGw = "N/A"
         else : 
             rootDiskSize = 'N/A'     
             rootDiskAvail = 'N/A'
             rootDiskUsePer = 'N/A'
-        
+            manageNicGw = 'N/A'
         
         '''scvm 관리 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
         rc = call(["cat /etc/hosts | grep scvm-mngt"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
@@ -127,6 +133,7 @@ def statusDeteil():
             rc = call(["virsh domifaddr --domain scvm --source agent --full | grep -w " + manageNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             if rc == 0:
                 manageNicMacAddr = check_output(["virsh domifaddr --domain scvm --source agent --full | grep -w " + manageNicIp + "| awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
+                manageNicIp = check_output(["virsh domifaddr --domain scvm --source agent --full | grep -w " + manageNicIp + "| awk '{print $4}'"], universal_newlines=True, shell=True, env=env)                
                 rc = call(["virsh domiflist --domain scvm | grep " + manageNicMacAddr], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)            
                 if rc == 0: 
                     '''관리 nic mac address로 추가 정보 확인'''
@@ -145,16 +152,6 @@ def statusDeteil():
             manageNicIp = 'N/A'
             manageNicParent = 'N/A'
             manageNicType = 'N/A'
-
-        '''management Nic Gw정보 확인'''
-        rc = call(["ping -c 1 scvm"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        if rc == 0:                
-            output = check_output(["ssh scvm /usr/sbin/route -n | grep -P '^0.0.0.0|UG' | awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
-            manageNicGw = output.strip();
-            if manageNicGw == "" :
-                manageNicGw = "N/A"    
-        else : 
-            manageNicGw = 'N/A'
 
         '''scvm 서버용 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
         rc = call(["cat /etc/hosts | grep scvm$"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
