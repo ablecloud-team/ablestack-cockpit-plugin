@@ -54,9 +54,9 @@ cephadm --image "$image" bootstrap \
         ceph config set client rbd_cache_target_dirty 536870912 && \
         ceph config set client rbd_cache_max_dirty_age 5.0
 
-crontab<<EOF
-* * * * * /usr/local/bin/ipcorrector
-EOF
+#crontab<<EOF
+#* * * * * /usr/local/bin/ipcorrector
+#EOF
 sed -e '/mon host/d' /etc/ceph/ceph.conf | sed -e 's/mon_host/mon host/' > /etc/ceph/ceph.conf_
 cp /etc/ceph/ceph.conf_ /etc/ceph/ceph.conf
 for host in $allhosts
@@ -68,6 +68,11 @@ do
   ssh -o StrictHostKeyChecking=no $host rm -rf /root/bootstrap.sh
 done
 
+for host in $scvms
+
+do
+  ssh $host "(crontab -l 2>/dev/null; echo \"* * * * * /usr/local/bin/ipcorrector\") | crontab -"
+done
 
 for host in $scvms
 do
