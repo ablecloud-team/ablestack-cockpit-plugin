@@ -45,7 +45,7 @@ def cloudCenter(action, H=False):
 
         except:
              # http 접속되지않는 경우
-            return createReturn(code=500, val="클라우드센터에 정상적으로 연결되지 않습니다. 클라우드센터 서비스 상태를 확인하거나, 잠시 후에 다시 시도해주십시오.")
+            return createReturn(code=500, val="클라우드센터에 정상적으로 연결되지 않습니다. <br>클라우드센터 서비스 상태를 확인하거나, 잠시 후에 다시 시도해주십시오.")
 
     else:
         # 클라우드센터 가상머신
@@ -73,16 +73,15 @@ def storageCenter(action, H=False):
                 value = 'https://'+ip+':8443'
             else: 
                 # ceph 명령어는 정상적으로 전송되지만 ceph mgr module이 활성화되지 않은 경우
-                return createReturn(code=500, val="ceph mgr module is not activated.")
+                return createReturn(code=500, val="ceph mgr module이 활성화되지 않았습니다. <br>mgr 상태를 확인하십시오.")
                 
         except:
              # ceph 설치가 되어있지 않은 경우
-            return createReturn(code=500, val="ceph command err.")
+            return createReturn(code=500, val="ceph 명령어 실행에 실패하였습니다. <br>호스트의 ceph 설정 파일을 확인하십시오.")
 
     else:
-        # 스토리지센터 가상머신
-        num = socket.gethostname()[-1:]
-        ip = socket.gethostbyname('scvm'+num+'-mngt')
+        # 스토리지센터 가상머신        
+        ip = socket.gethostbyname('scvm-mngt')
         value = 'https://'+ip+':9090'
 
     if H: 
