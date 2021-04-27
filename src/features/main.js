@@ -55,7 +55,8 @@ $(document).ready(function(){
     // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
     Promise.all([checkConfigStatus(), checkStorageClusterStatus(),
         checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
-        checkDeployStatus();
+            scanHostKey();
+            checkDeployStatus();
     });
 
 });
@@ -110,11 +111,13 @@ $('#button-link-storage-center-dashboard').on('click', function(){
             // 스토리지센터 연결
             window.open(retVal.val);
         }else{
-            console.log(retVal.val);
+            $("#modal-status-alert-title").html("스토리지센터 연결")
+            $("#modal-status-alert-body").html(retVal.val)
+            $('#div-modal-status-alert').show();
         }
     })
-    .catch(function(data){
-        console.log(":::Error:::");
+    .catch(function(err){
+        console.log(":::create_address.py storageCenter Error:::"+ err);
     });
 });
 
@@ -125,10 +128,14 @@ $('#button-link-cloud-center').on('click', function(){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
                 window.open(retVal.val);
+            }else{
+                $("#modal-status-alert-title").html("클라우드센터 연결")
+                $("#modal-status-alert-body").html(retVal.val)
+                $('#div-modal-status-alert').show();
             }
         })
-        .catch(function(data){
-            //console.log(":::Error:::");
+        .catch(function(err){
+            console.log(":::create_address.py cloudCenter Error:::"+ err);
         });
 });
 
@@ -251,7 +258,9 @@ function scvm_bootstrap_run(){
             // 스토리지센터 연결
             window.open(retVal.val);
         }else{
-            console.log(retVal.val);
+            $("#modal-status-alert-title").html("스토리지센터 연결")
+            $("#modal-status-alert-body").html(retVal.val)
+            $('#div-modal-status-alert').show();
         }
     })
     .catch(function(data){
@@ -298,6 +307,7 @@ function checkConfigStatus(){
                         .catch(err=>{
                             // ssh-key 파일 없음
                             sessionStorage.setItem("ccfg_status", "false");
+                            resetBootstrap();
                             resolve();
                         })
                 }
@@ -305,6 +315,7 @@ function checkConfigStatus(){
             .catch(err=>{
                 // hosts 파일 구성 되지않음
                 sessionStorage.setItem("ccfg_status", "false");
+                resetBootstrap();
                 resolve();
             })
     });
@@ -592,6 +603,13 @@ function checkStorageVmStatus(){
  * History  : 2021.03.30 최초 작성
  */
 function checkDeployStatus(){
+    // 배포 상태 조회 전 버튼 hide 처리
+    $('#button-open-modal-wizard-storage-cluster').hide()
+    $('#button-open-modal-wizard-storage-vm').hide()
+    $('#button-open-modal-wizard-cloud-vm').hide()
+    $('#button-link-storage-center-dashboard').hide()
+    $('#button-link-cloud-center').hide()
+    $('#button-link-monitoring-center').hide()
     /*
        가상머신 배포 및 클러스터 구성 상태를 세션 스토리지에서 조회 
        - 클러스터 구성준비 상태 = false, true
@@ -724,11 +742,60 @@ function saveHostInfo(){
 
 
 
+/**
+ * Meathod Name : scanHostKey
+ * Date Created : 2021.04.14
+ * Writer  : 박다정
+ * Description : 호스트 키 스캔
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.04.14 최초 작성
+ */
+ function scanHostKey(){
+    cockpit.spawn(['python3', pluginpath + '/python/host/ssh-scan.py'])
+    .then(function(data){            
+        console.log("keyscan ok");
+    })
+    .catch(function(err){
+        console.log("keyscan err : " + err);
+    });
+} 
+    
+
+/**
+ * Meathod Name : resetBootstrap
+ * Date Created : 2021.04.14
+ * Writer  : 박다정
+ * Description : 클러스터 구성 전인 경우 bootstrap 관련 프로퍼티 초기화
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.04.14 최초 작성
+ */
+ function resetBootstrap(){
+    //scvm bootstrap 프로퍼티 초기화
+    cockpit.spawn(["python3", pluginpath+"/python/ablestack_json/ablestackJson.py", "update", "--depth1", "bootstrap", "--depth2", "scvm", "--value", "false"])
+    .then(function(data){            
+        console.log("resetBootstrap scvm ok");
+    })
+    .catch(function(err){
+        console.log("resetBootstrap scvm err : " + err);
+    });
+    //ccvm bootstrap 프로퍼티 초기화
+    cockpit.spawn(["python3", pluginpath+"/python/ablestack_json/ablestackJson.py", "update", "--depth1", "bootstrap", "--depth2", "ccvm", "--value", "false"])
+    .then(function(data){            
+        console.log("resetBootstrap ccvm ok");
+    })
+    .catch(function(err){
+        console.log("resetBootstrap ccvm err : " + err);
+    });
+} 
+
 //30초마다 화면 정보 갱신
 setInterval(() => {
     // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
     Promise.all([checkConfigStatus(), checkStorageClusterStatus(),
         checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
-        checkDeployStatus();
+            scanHostKey();
+            checkDeployStatus();
     });
 }, 30000);

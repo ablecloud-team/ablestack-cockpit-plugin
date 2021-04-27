@@ -143,6 +143,10 @@ $('#cloud-cluster-connect').on('click', function(){
         var retVal = JSON.parse(data);        
         if(retVal.code == 200){
             window.open(retVal.val);
+        }else{
+            $("#modal-status-alert-title").html("클라우드센터 연결")
+            $("#modal-status-alert-body").html(retVal.val)
+            $('#div-modal-status-alert').show();
         }
     })
     .catch(function(data){
