@@ -398,7 +398,17 @@ def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_p
                 'permissions': '0777'
             }
         )
-
+    with open(f'{pluginpath}/shell/host/ipcorrector', 'rt') as ipcorrectorfile:
+        ipcorrector = ipcorrectorfile.read()
+        yam2['write_files'].append(
+            {
+                'encoding': 'base64',
+                'content': base64.encodebytes(ipcorrector.encode()),
+                'owner': 'root:root',
+                'path': '/usr/local/bin/ipcorrector',
+                'permissions': '0777'
+            }
+        )
     with open(f'{tmpdir}/user-data', 'wt') as f:
         f.write('#cloud-config\n')
         f.write(yaml.dump(yam2).replace("\n\n", "\n"))
