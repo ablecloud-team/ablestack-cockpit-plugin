@@ -69,7 +69,6 @@ do
 done
 
 for host in $scvms
-
 do
   ssh $host "(crontab -l 2>/dev/null; echo \"* * * * * /usr/local/bin/ipcorrector\") | crontab -"
 done
