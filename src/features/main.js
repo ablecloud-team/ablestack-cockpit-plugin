@@ -403,12 +403,8 @@ function checkStorageClusterStatus(){
                     //json key중 'message'이라는 key의 value값 가져옴
                     const recurse = (obj, arr=[]) => {
                         Object.entries(obj).forEach(([key, val]) => {
-                            if (key === 'message') {
-                                arr.push(val);
-                            }
-                            if (typeof val === 'object') {
-                                recurse(val, arr);
-                            }
+                            if (key === 'message') { arr.push(val); }
+                            if (typeof val === 'object') { recurse(val, arr); }
                         });
                         return arr;
                     };
@@ -417,7 +413,6 @@ function checkStorageClusterStatus(){
                     for(var i in messArr){
                         inMessHtml = inMessHtml + "<br> - "  + messArr[i];
                     }
-                    //console.log(inHtml);
                     $('#scc-status').html(sc_status + inMessHtml);
                 }else{
                     $('#scc-status').html(sc_status);
@@ -425,8 +420,13 @@ function checkStorageClusterStatus(){
                 if(retVal.val.osd !="N/A" && retVal.val.osd_up !="N/A" ){
                     $('#scc-osd').text("전체 " + retVal.val.osd + "개의 디스크 중 " + retVal.val.osd_up + "개 작동 중");
                 }
-                if(retVal.val.mon_gw1 !="N/A" && retVal.val.mon_gw2 !="N/A" ){
-                    $('#scc-gw').text("RBD GW " + retVal.val.mon_gw1 + "개 제공중(quorum : " + retVal.val.mon_gw2 + ")");
+                if(retVal.val.mon_gw1 !="N/A" && retVal.val.mon_gw2 !="N/A" ){     
+                    if(retVal.val.json_raw.health.checks.hasOwnProperty('MON_DOWN')){//health 상태값 중 MON_DOWN 값이 있을때 
+                        activeGwCnt = parseInt(retVal.val.mon_gw1) - parseInt(retVal.val.json_raw.health.checks.MON_DOWN.summary.count);//다운된 mon count 확인해 실행중인(activeGwCnt) mon count 값세팅        
+                    }else{
+                        activeGwCnt = retVal.val.mon_gw1;
+                    }
+                    $('#scc-gw').text("RBD GW " + activeGwCnt + "개 실행 중 / " + retVal.val.mon_gw1 + "개 제공 중(quorum : " + retVal.val.mon_gw2 + ")");
                 }
                 if(retVal.val.mgr !="N/A" && retVal.val.mgr_cnt !="N/A" ){
                     $('#scc-mgr').text(retVal.val.mgr + "(전체 " + retVal.val.mgr_cnt + "개 실행중)");
