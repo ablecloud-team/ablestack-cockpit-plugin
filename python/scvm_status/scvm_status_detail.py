@@ -59,7 +59,7 @@ def statusDeteil():
 
     try:
         '''scvm 상태값 조회 시 리턴값이 0이면 정상, 아니면 비정상'''
-        rc = call(['virsh domstate scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
+        rc = call(['virsh domstate scvm'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, timeout=5)
         if rc == 0:
             '''가상머신 상태 출력값 확인'''
             output = check_output(["virsh domstate scvm"], universal_newlines=True, shell=True, env=env)
@@ -102,7 +102,7 @@ def statusDeteil():
         rc = call(["ping -c 1 scvm"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:                
             '''scvm 에 접속해 df -h 값 세팅''' 
-            rootDiskSize = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm df -h | grep '\-root ' | awk '{print $2}'"], universal_newlines=True, shell=True, env=env)                
+            rootDiskSize = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm df -h | grep '\-root ' | awk '{print $2}'"], universal_newlines=True, shell=True, env=env, timeout=5)                
             if rootDiskSize == "" :
                 rootDiskSize = "N/A"
             output = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm df -h | grep '\-root ' | awk '{print $4}'"], universal_newlines=True, shell=True, env=env)
@@ -230,6 +230,32 @@ def statusDeteil():
             'dataDiskType': dataDiskType
             }
         ret = createReturn(code=200, val=ret_val, retname='Storage Center VM Status Detail')
+
+    except Exception as TimeoutExpired:
+            '''실제 데이터 세팅'''
+            ret_val = {
+                'scvm_status': "No_Response", 
+                'vcpu': vcpu, 
+                'socket': socket, 
+                'core': core,
+                'memory': memory,
+                'rootDiskSize': rootDiskSize,
+                'rootDiskAvail': rootDiskAvail,
+                'rootDiskUsePer': rootDiskUsePer,
+                'manageNicType': manageNicType,
+                'manageNicParent': manageNicParent,
+                'manageNicIp': manageNicIp,
+                'manageNicGw': manageNicGw,
+                'storageServerNicType': storageServerNicType,
+                'storageServerNicParent': storageServerNicParent,
+                'storageServerNicIp': storageServerNicIp,
+                'storageReplicationNicType': storageReplicationNicType,
+                'storageReplicationNicParent': storageReplicationNicParent,
+                'storageReplicationNicIp': storageReplicationNicIp,
+                'dataDiskType': dataDiskType
+                }
+            ret = createReturn(code=500, val=ret_val, retname='Storage Center VM Status Detail')    
+
     except Exception as e:
         '''실제 데이터 세팅'''
         ret_val = {

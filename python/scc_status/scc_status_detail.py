@@ -56,16 +56,16 @@ def statusDetail():
     output_json = 'N/A'
 
     try:
-        ''' 클러스터 유지보수모드인지 체크 리턴값이 0 이면 true, 1이면 false값 세팅 '''
-        rc = call(['ceph -s | grep noout'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)          
-        if rc == 0:
-            maintenance_status = True
-        elif rc == 1:
-            maintenance_status = False
-
         ''' 클러스터 상태 체크 리턴값이 0 이면 정상, 아니면 클러스터 세팅이 안된것으로 확인(HEALTH_ERR) '''
-        rc = call(['ceph -s -f json-pretty'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)        
+        rc = call(['ceph -s'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, timeout=5)        
         if rc == 0:
+
+            ''' 클러스터 유지보수모드인지 체크 리턴값이 0 이면 true, 1이면 false값 세팅 '''
+            rc = call(['ceph -s | grep noout'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)  
+            if rc == 0:
+                maintenance_status = True
+            elif rc == 1:
+                maintenance_status = False
             ''' ceph -s시 출력값을 json으로 리턴 '''
             output = check_output(['ceph -s -f json-pretty'], universal_newlines=True, shell=True, env=env)
             output_json = json.loads(output)
@@ -137,6 +137,24 @@ def statusDetail():
             'maintenance_status': maintenance_status,
             'json_raw' : output_json}
         ret = createReturn(code=200, val=ret_val, retname='Storage Cluster Status Detail')
+
+    except Exception as TimeoutExpired:
+        ret_val = {
+            'cluster_status': 'No_Response', 
+            'osd': osd, 
+            'osd_up': osd_up, 
+            'mon_gw1' : mon_gw1,
+            'mon_gw2' : mon_gw2,
+            'mgr': mgr,            
+            'mgr_cnt': mgr_cnt,
+            'pools': pools,
+            'avail': available,
+            'used': used,
+            'usage_percentage': usage_percentage, 
+            'maintenance_status': maintenance_status,
+            'json_raw' : output_json}
+        ret = createReturn(code=500, val=ret_val, retname='Storage Cluster Status Detail')       
+
     except Exception as e:
         ret_val = {
             'cluster_status': cluster_status, 
@@ -152,7 +170,7 @@ def statusDetail():
             'usage_percentage': usage_percentage, 
             'maintenance_status': maintenance_status,
             'json_raw' : output_json}
-        ret = createReturn(code=500, val=ret_val, retname='Storage Cluster Status Detail')        
+        ret = createReturn(code=500, val=ret_val, retname='Storage Cluster Status Detail')
     return print(json.dumps(json.loads(ret), indent=4))
 
 if __name__ == '__main__':
