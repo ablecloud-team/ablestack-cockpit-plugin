@@ -34,6 +34,9 @@ $(document).ready(function(){
     $('#div-modal-wizard-cloud-vm').load("./src/features/cloud-vm-wizard.html");
     $('#div-modal-wizard-cloud-vm').hide();
 
+    $('#div-modal-wizard-wall-monitoring').load("./src/features/wall-monitoring-wizard.html");
+    $('#div-modal-wizard-wall-monitoring').hide();
+
     $('#dev-modal-migration-cloud-vm').hide();
     $('#dev-modal-stop-cloud-vm').hide();
 
@@ -130,6 +133,24 @@ $('#button-link-cloud-center').on('click', function(){
                 window.open(retVal.val);
             }else{
                 $("#modal-status-alert-title").html("클라우드센터 연결")
+                $("#modal-status-alert-body").html(retVal.val)
+                $('#div-modal-status-alert').show();
+            }
+        })
+        .catch(function(err){
+            console.log(":::create_address.py cloudCenter Error:::"+ err);
+        });
+});
+
+$('#button-link-monitoring-center').on('click', function(){
+    // 클라우드센터 연결
+    cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "wallCenter"])
+        .then(function(data){
+            var retVal = JSON.parse(data);
+            if(retVal.code == 200){
+                window.open(retVal.val);
+            }else{
+                $("#modal-status-alert-title").html("모니터링센터 대시보드 연결")
                 $("#modal-status-alert-body").html(retVal.val)
                 $('#div-modal-status-alert').show();
             }
@@ -627,6 +648,7 @@ function checkDeployStatus(){
     const step5 = sessionStorage.getItem("cc_status");
     const step6 = sessionStorage.getItem("ccvm_status");
     const step7 = sessionStorage.getItem("ccvm_bootstrap_status");
+
     console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6 + ", step7 :: " + step7);  
     // 배포 상태조회 
     if(step1!="true"){
@@ -695,6 +717,11 @@ function checkDeployStatus(){
             }
         }
     }
+    
+    //모니터링센터 구성 완료 여부에 따라 버튼활셩화 
+    if(sessionStorage.getItem("wall_monitoring_status") == "true"){
+        $('#button-link-monitoring-center').show();
+    }
 }
 
 /**
@@ -709,9 +736,9 @@ function checkDeployStatus(){
 function showRibbon(status, description) {
     $('#ribbon').attr('class','pf-c-alert pf-m-'+status)
     if(status =='success'){
-        $('.pf-screen-reader').text('Success alert:');
+        $('#main-ribbon').text('Success alert:');
     }
-    let alert_text = $('.pf-c-alert__description').text(description);
+    let alert_text = $('#main-ribbon-description').text(description);
     alert_text.html(alert_text.html().replace(/\n/g, '<br/>'));
 }
 

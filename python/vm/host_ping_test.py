@@ -28,7 +28,7 @@ def createArgumentParser():
 
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
 
-    parser.add_argument('-hns', '--host-names', metavar=('[hostname1]','[hostname2]','[hostname3]'), type=str, nargs=3, help='input Value to three host names', required=True)
+    parser.add_argument('-hns', '--host-names', type=str, nargs='*', help='input Value to three host names', required=True)
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
