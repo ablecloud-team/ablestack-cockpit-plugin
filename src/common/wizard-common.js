@@ -251,7 +251,7 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
         icon.removeClass('fa-info-circle fa-check-circle fa-play fa-exclamation-circle');
 
         if(status == "proceeding" || status==1){
-            if(span.attr('id') == "span-wall-progress-step1"){
+            if(span.attr('id') == "span-progress-step1"){
                 $('#progress-step-text').text('스토리지센터 가상머신을 배포 중입니다. 전체 4단계 중 1단계 진행 중입니다.');
             } else if(span.attr('id') == "span-progress-step2"){
                 $('#progress-step-text').text('스토리지센터 가상머신을 배포 중입니다. 전체 4단계 중 2단계 진행 중입니다.');
