@@ -28,13 +28,13 @@ do
   echo -n "[v2:$host:3300/0,v1:$host:6789/0], " >> "$conffile"
 done
 echo  >> "$conffile"
-echo -e "\tcontainer_image = docker-archive:/usr/share/ablestack/ablestack.tar:$imagename" >> "$conffile"
+echo -e "\tcontainer_image = $imagename" >> "$conffile"
 echo -e "\tmgr/cephadm/container_image_base = $imagename" >> "$conffile"
 echo >> "$conffile"
 sed -i 's/, $//' "$conffile"
 
 #container image id추출
-image=$(/bin/podman inspect --format {{.ID}},{{.RepoDigests}} docker-archive:/usr/share/ablestack/ablestack.tar:$imagename | cut -d "," -f 2 | sed 's/\[//' | sed 's/]//' )
+image=$(/bin/podman inspect --format {{.ID}},{{.RepoDigests}} $imagename | cut -d "," -f 2 | sed 's/\[//' | sed 's/]//' )
 cephadm --image "$image" bootstrap \
         --initial-dashboard-user ablecloud \
         --initial-dashboard-password password \
