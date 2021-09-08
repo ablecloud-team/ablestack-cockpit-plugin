@@ -376,8 +376,10 @@ function cccc_link_go(){
                     .then(function(data){
                         var retVal = JSON.parse(data);
                         console.log('cloudinit-status : '+retVal.val);
-                        //cloudinit status: done 일때
-                        if(retVal.code == 200 && retVal.val == "status: done"){
+                        
+                        //cloudinit status: done 이면서 진행단계가 step7이 완료 되었을때
+                        step7 = sessionStorage.getItem("ccvm_bootstrap_status");
+                        if(retVal.code == 200 && retVal.val == "status: done" && step7 == "true"){
                             $('#div-modal-wizard-wall-monitoring').show();
                         }else{
                             $('#div-modal-status-alert').show();
