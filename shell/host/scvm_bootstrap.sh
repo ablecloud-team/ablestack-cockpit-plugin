@@ -77,4 +77,20 @@ for host in $scvms
 do
   ceph orch host add $(grep $host /etc/hosts | awk {'print $2'}) $host
 done
+
+for host in $scvms
+do
+  if [ $(ceph orch ps | grep $host) -ne 0 ]
+  then
+    sleep 1
+  fi
+done
+
+for mgr in $(ceph orch ps |grep mgr |awk {'print $1'} | sed 's/mgr\.//')
+do
+  scvm=$(echo $mgr | sed 's/\..*//')
+  ip=$(grep $scvm-mngt /etc/hosts |awk {'print $1'})
+  ceph config set mgr mgr/dashboard/$mgr/server_addr $ip
+done
+
 exit
