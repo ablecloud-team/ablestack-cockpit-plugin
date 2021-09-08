@@ -30,9 +30,9 @@
                         </div>
                         <p class="pf-c-alert__title">
                             <strong>
-                            <span class="pf-screen-reader">Warning alert:</span>ABLESTACK 가상어플라이언스 상태</strong>
+                            <span class="pf-screen-reader" id="main-ribbon">Warning alert:</span>ABLESTACK 가상어플라이언스 상태</strong>
                         </p>
-                        <div class="pf-c-alert__description">
+                        <div class="pf-c-alert__description" id="main-ribbon-description">
                             <p>ABLESTACK 스토리지센터 및 클라우드센터 VM이 배포되지 않았습니다.</p>
                         </div>
                         <div class="pf-c-alert__action-group">
@@ -41,7 +41,7 @@
                             <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-open-modal-wizard-cloud-vm">클라우드센터 VM 배포</button>
                             <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-storage-center-dashboard">스토리지센터 대시보드 연결</button>
                             <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-cloud-center">클라우드센터 연결</button>
-                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-monitoring-center">모니터링센터 연결</button>
+                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-monitoring-center">모니터링센터 대시보드 연결</button>
                         </div>
                     </div>  
                 </section>
@@ -178,6 +178,9 @@
                                                         <li class="pf-c-divider" role="separator"></li>
                                                         <li id="ccvm-after-bootstrap-run"></li>
                                                         <li id="ccvm-before-bootstrap-run"></li>
+                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li id="ccvm-after-monitoring-run"></li>
+                                                        <li id="ccvm-before-monitoring-run"></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -566,6 +569,8 @@
         <!-- 클라우드센터VM 배포 마법사 : ./src/features/cloud-vm-wizard.html을 내용으로 load -->
         <div class="pf-c-backdrop" id="div-modal-wizard-cloud-vm"></div>
 
+        <!-- Wall 모니터링 센터 구성 마법사 : ./src/features/wall-monitoring-wizard.html을 내용으로 load -->
+        <div class="pf-c-backdrop" id="div-modal-wizard-wall-monitoring"></div>
 
         <!-- 클라우드센터VM 시작 : Modal 영역 시작 -->
         <div id="div-modal-start-cloud-vm" class="pf-c-backdrop" style="display:none">

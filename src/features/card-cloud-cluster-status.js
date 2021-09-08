@@ -185,6 +185,27 @@ function CardCloudClusterStatus(){
                 console.log('ClusterStatusInfo spawn error(ablestackJson.py');
 
             });
+            cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ablestack_json/ablestackJson.py', 'status', '--depth1', 'monitoring', '--depth2', 'wall' ])
+                .then(function (monitoring_data){
+                    console.log("ablestackJson.py : "+monitoring_data);
+                    var retVal = JSON.parse(monitoring_data);
+                    var wallStatus = retVal.val;
+                    console.log("wallStatus.wall = " + wallStatus.wall);
+                    if(wallStatus.wall == 'false'){
+                        sessionStorage.setItem("wall_monitoring_status","false");
+                        console.log('wall false in')
+                        $('#ccvm-after-monitoring-run').html('');
+                        $('#ccvm-before-monitoring-run').html('<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-monitoring-run-ccvm" onclick="wall_monitoring_modal_show()">모니터링센터 구성</a>');
+                    }else if (wallStatus.wall == 'true'){
+                        sessionStorage.setItem("wall_monitoring_status","true");
+                        console.log('wall true in')
+                        $('#ccvm-after-monitoring-run').html('<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-linkto-wall" onclick="wall_link_go()">모니터링센터 대시보드 연결</a>');
+                        $('#ccvm-before-monitoring-run').html('');
+                    }
+                }).catch(function(data){
+                console.log('ClusterStatusInfo spawn error(ablestackJson.py');
+
+            });
             var retVal = JSON.parse(data);
             if(retVal.code == '200'){
                 var nodeText = '(';
@@ -263,7 +284,7 @@ function CardCloudClusterStatus(){
  */
 function ccvm_bootstrap_run(){
     $("#modal-status-alert-title").html("클라우드 센터 가상머신 상태 체크")
-    $("#modal-status-alert-body").html("클라우드 센터 가상머신에 cloudinit 실행이 완료되지 않아~~~~~~~~~<br>Bootstrap을 실행할 수 없습니다.<br><br>잠시 후 다시 실행해 주세요.")
+    $("#modal-status-alert-body").html("클라우드 센터 가상머신에 cloudinit 실행이 완료되지 않아<br>Bootstrap을 실행할 수 없습니다.<br><br>잠시 후 다시 실행해 주세요.")
     //scvm ping 체크
     cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "ping", "--target",  "ccvm"])
         .then(function(data){
@@ -302,6 +323,82 @@ function ccvm_bootstrap_run(){
 function cccc_link_go(){
     // 클라우드센터 연결
     cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "cloudCenter"])
+        .then(function(data){
+            var retVal = JSON.parse(data);
+            if(retVal.code == 200){
+                window.open(retVal.val);
+            }
+        })
+        .catch(function(data){
+            //console.log(":::Error:::");
+        });
+}
+
+/**
+ * Meathod Name : wall_monitoring_modal_show
+ * Date Created : 2021.09.1
+ * Writer  : 배태주
+ * Description : wall 모니터링 배포 마법사 실행
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.09.01 최초 작성
+ */
+ function wall_monitoring_modal_show(){
+    $('#div-modal-wizard-wall-monitoring').show();
+    //$('#div-modal-wizard-cloud-vm').show();
+    //$('#div-modal-wizard-storage-vm').show();
+ }
+
+/**
+ * Meathod Name : ccvm_monitoring_run
+ * Date Created : 2021.09.01
+ * Writer  : 배태주
+ * Description : wall 모니터링 배포 마법사 실행
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.09.01 최초 작성
+ */
+ function ccvm_monitoring_run(){
+    $("#modal-status-alert-title").html("클라우드 센터 가상머신 상태 체크")
+    $("#modal-status-alert-body").html("클라우드 센터 가상머신에 cloudinit 실행이 완료되지 않아<br>Bootstrap을 실행할 수 없습니다.<br><br>잠시 후 다시 실행해 주세요.")
+    //scvm ping 체크
+    cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "ping", "--target",  "ccvm"])
+        .then(function(data){
+            var retVal = JSON.parse(data);
+            if(retVal.code == 200){
+                //scvm 의 cloudinit 실행이 완료되었는지 확인하기 위한 명렁
+                cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "status", "--target",  "ccvm"])
+                    .then(function(data){
+                        var retVal = JSON.parse(data);
+                        console.log('cloudinit-status : '+retVal.val);
+                        //cloudinit status: done 일때
+                        if(retVal.code == 200 && retVal.val == "status: done"){
+                            $('#modal-title-scvm-status').text("클라우드 센터 가상머신 Bootstrap 실행");
+                            $('#modal-description-scvm-status').html("<p>클라우드 센터 가상머신의 Bootstrap.sh 파일을 실행 하시겠습니까??</p>");
+                            $('#button-storage-vm-status-update').html("실행");
+                            $('#scvm-status-update-cmd').val("bootstrap_ccvm");
+                            $('#div-modal-storage-vm-status-update').show();
+                        }else{
+                            $('#div-modal-status-alert').show();
+                        }
+                    })
+                    .catch(function(data){
+                        $('#div-modal-status-alert').show();
+                        console.log(":::ccvm_bootstrap_run() Error :::" + data);
+                    });
+            }else{
+                $('#div-modal-status-alert').show();
+            }
+        })
+        .catch(function(data){
+            $('#div-modal-status-alert').show();
+            console.log(":::scvm_bootstrap_run() Error :::" + data);
+        });
+}
+
+function wall_link_go(){
+    // 클라우드센터 연결
+    cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "wallCenter"])
         .then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
