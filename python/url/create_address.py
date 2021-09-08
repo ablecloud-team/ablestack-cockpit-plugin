@@ -23,7 +23,7 @@ def createArgumentParser():
     tmp_parser = argparse.ArgumentParser(description='스토리지 및 클라우드 관련 연결 주소를 생성하는 프로그램',
                                          epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
 
-    tmp_parser.add_argument('action', choices=['cloudCenterVm', 'cloudCenter', 'storageCenterVm', 'storageCenter'], help="Create storage and cloud center related connection addresses")
+    tmp_parser.add_argument('action', choices=['cloudCenterVm', 'cloudCenter', "wallCenter", 'storageCenterVm', 'storageCenter'], help="Create storage and cloud center related connection addresses")
     tmp_parser.add_argument("-v", "--verbose", action='count', default=0, help="increase output verbosity")
     tmp_parser.add_argument("-H", "--Human", action='store_const', dest='H', const=True, help="Human readable")
     tmp_parser.add_argument("-V", "--Version", action='version', version="%(prog)s 1.0")
@@ -56,6 +56,31 @@ def cloudCenter(action, H=False):
 
     return createReturn(code=200, val=value, retname=action)
 
+
+# 함수명 : wallCenter
+# 주요 기능 : Wall 모니터링 센터 연결 주소 생성 
+def wallCenter(action, H=False):
+
+    ip = socket.gethostbyname('ccvm-mngt')
+
+    if action == 'wallCenter':
+        try:
+            # 클라우드센터 
+            value = "http://"+ip+":3000/login"
+            request = requests.get(value)
+
+        except:
+             # http 접속되지않는 경우
+            return createReturn(code=500, val="모니터링센터 대시보드에 정상적으로 연결되지 않습니다. <br>Wall 모니터링센터 서비스 상태를 확인하거나, 잠시 후에 다시 시도해주십시오.")
+
+    else:
+        # 클라우드센터 가상머신
+        value = 'https://'+ip+':3000/login'
+
+    if H: 
+        return json.dumps(json.loads(createReturn(code=200, val=value, retname=action)), indent=4) 
+
+    return createReturn(code=200, val=value, retname=action)
 
 # 함수명 : storageCenter
 # 주요 기능 : 스토리지센터 및 가상머신 연결 주소 생성 
@@ -99,6 +124,9 @@ def createAddressAction(action, H):
 
     elif action == 'cloudCenter':
         return cloudCenter(action, H=H)
+
+    elif action == 'wallCenter':
+        return wallCenter(action, H=H)
 
     elif action == 'storageCenter':
         return storageCenter(action, H=H)
