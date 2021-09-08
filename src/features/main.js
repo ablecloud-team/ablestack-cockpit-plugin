@@ -23,6 +23,7 @@ $(document).ready(function(){
     $('#button-open-modal-wizard-cloud-vm').hide()
     $('#button-link-storage-center-dashboard').hide()
     $('#button-link-cloud-center').hide()
+    $('#button-open-modal-wizard-monitoring-center').hide()
     $('#button-link-monitoring-center').hide()
 
     $('#div-modal-wizard-storage-vm').load("./src/features/storage-vm-wizard.html");
@@ -103,6 +104,10 @@ $('#button-open-modal-wizard-storage-cluster').on('click', function(){
 
 $('#button-open-modal-wizard-cloud-vm').on('click', function(){
     $('#div-modal-wizard-cloud-vm').show();
+});
+
+$('#button-open-modal-wizard-monitoring-center').on('click', function(){
+    $('#div-modal-wizard-wall-monitoring').show();
 });
 
 $('#button-link-storage-center-dashboard').on('click', function(){
@@ -630,6 +635,7 @@ function checkDeployStatus(){
     $('#button-open-modal-wizard-cloud-vm').hide()
     $('#button-link-storage-center-dashboard').hide()
     $('#button-link-cloud-center').hide()
+    $('#button-open-modal-wizard-monitoring-center').hide()
     $('#button-link-monitoring-center').hide()
     /*
        가상머신 배포 및 클러스터 구성 상태를 세션 스토리지에서 조회 
@@ -648,8 +654,9 @@ function checkDeployStatus(){
     const step5 = sessionStorage.getItem("cc_status");
     const step6 = sessionStorage.getItem("ccvm_status");
     const step7 = sessionStorage.getItem("ccvm_bootstrap_status");
+    const step8 = sessionStorage.getItem("wall_monitoring_status");
 
-    console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6 + ", step7 :: " + step7);  
+    console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6 + ", step7 :: " + step7 + ", step8 :: " + step8);  
     // 배포 상태조회 
     if(step1!="true"){
         // 클러스터 구성준비 버튼 show
@@ -690,37 +697,41 @@ function checkDeployStatus(){
                         }else{
                             if(step7!="true"){
                                 //모든 버튼 hide
-                                showRibbon('warning','클라우드 센터에 연결할 수 있도록 클라우드센터 VM Bootstrap 실행 작업을 진행하십시오.')
+                                showRibbon('warning','클라우드센터에 연결할 수 있도록 클라우드센터 VM Bootstrap 실행 작업을 진행하십시오.')
                             }else{
-                                // 스토리지센터 연결 버튼, 클라우드센터 연결 버튼 show
+                                // 스토리지센터 연결 버튼, 클라우드센터 연결 버튼 show, 모니터링센터 구성 버튼 show
                                 $('#button-link-storage-center-dashboard').show()
                                 $('#button-link-cloud-center').show()
-                                showRibbon('success','ABLESTACK 스토리지센터 및 클라우드센터 VM이 배포되었으며, 가상어플라이언스 상태가 정상입니다.')
-                                // 운영 상태조회
-                                let msg ="";
-                                if(step2!="RUNNING"){
-                                    msg += '스토리지센터 가상머신이 '+step2+' 상태 입니다.\n'
-                                    showRibbon('warning', msg);
+                                
+                                if(step8!="true"){
+                                    $('#button-open-modal-wizard-monitoring-center').show()
+                                    showRibbon('warning','모니터링센터에 연결할 수 있도록 모니터링센터 구성 작업을 진행하십시오.')
+                                }else{
+                                    // 모니터링센터 구성 연결 버튼 show
+                                    $('#button-link-monitoring-center').show();
+
+                                    showRibbon('success','ABLESTACK 스토리지센터 및 클라우드센터 VM 배포되었으며 모니터링센터 구성이 완료되었습니다. 가상어플라이언스 상태가 정상입니다.')
+                                    // 운영 상태조회
+                                    let msg ="";
+                                    if(step2!="RUNNING"){
+                                        msg += '스토리지센터 가상머신이 '+step2+' 상태 입니다.\n'
+                                        showRibbon('warning', msg);
+                                    }
+                                    if(step4!="HEALTH_OK"){
+                                        msg += '스토리지센터 클러스터가 '+step4+' 상태 입니다.\n'
+                                        showRibbon('warning', msg);
+                                    }
+                                    if(step6!="RUNNING"){
+                                        msg += '클라우드센터 가상머신이 '+step6+' 상태 입니다.\n'
+                                        showRibbon('warning', msg);
+                                    }
                                 }
-                                if(step4!="HEALTH_OK"){
-                                    msg += '스토리지센터 클러스터가 '+step4+' 상태 입니다.\n'
-                                    showRibbon('warning', msg);
-                                }
-                                if(step6!="RUNNING"){
-                                    msg += '클라우드센터 가상머신이 '+step6+' 상태 입니다.\n'
-                                    showRibbon('warning', msg);
-                                }   
                             }
                         }
                     }
                 }
             }
         }
-    }
-    
-    //모니터링센터 구성 완료 여부에 따라 버튼활셩화 
-    if(sessionStorage.getItem("wall_monitoring_status") == "true"){
-        $('#button-link-monitoring-center').show();
     }
 }
 
