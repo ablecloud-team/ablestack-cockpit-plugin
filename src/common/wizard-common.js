@@ -35,10 +35,15 @@ $(".tab-available").keydown(function (e) {
         var el ='';
         var result = JSON.parse(data);
         var bridge_list = result.val.bridges;
+        var bridge_others_list = result.val.others;
 
         el += '<option value="" selected>선택하십시오</option>';
         for(var i = 0 ; i < bridge_list.length ; i ++ ){
             el += '<option value="'+bridge_list[i].DEVICE+'">'+bridge_list[i].DEVICE+' ('+bridge_list[i].STATE+')</option>';
+        }
+
+        for(var i = 0 ; i < bridge_others_list.length ; i ++ ){
+            el += '<option value="'+bridge_others_list[i].DEVICE+'">'+bridge_others_list[i].DEVICE+' ('+bridge_others_list[i].STATE+')</option>';
         }
 
         $('#'+select_box_id).append(el);
