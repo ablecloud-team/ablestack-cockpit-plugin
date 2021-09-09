@@ -96,4 +96,7 @@ done
 ceph mgr module disable dashboard
 ceph mgr module enable dashboard
 
+systemctl enable --now node-exporter
+systemctl enable --now process-exporter
+
 exit
