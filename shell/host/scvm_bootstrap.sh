@@ -93,4 +93,7 @@ do
   ceph config set mgr mgr/dashboard/$mgr/server_addr $ip
 done
 
+ceph mgr module disable dashboard
+ceph mgr module enable dashboard
+
 exit
