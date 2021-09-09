@@ -394,7 +394,7 @@ function deployWallMonitoringVM() {
         var host_ping_test_result = JSON.parse(data);
         if(host_ping_test_result.code=="200") { //정상
             //=========== 1-2. 모니터링 서비스 전체 종료 ===========
-            var wall_service_stop_cmd = ['python3', pythonPath + 'start_services.py', 'stop', '--service', 'blackbox_exporter', 'node_exporter', 'grafana-server', 'process-exporter', 'prometheus'];
+            var wall_service_stop_cmd = ['python3', pythonPath + 'start_services.py', 'stop', '--service', 'blackbox-exporter', 'node-exporter', 'grafana-server', 'process-exporter', 'prometheus'];
             if (console_log) { console.log(wall_service_stop_cmd); }
             cockpit.spawn(wall_service_stop_cmd, { host: ccvm_ip })
             .then(function (data) {
@@ -420,7 +420,7 @@ function deployWallMonitoringVM() {
                             var prometheus_config_result = JSON.parse(data);
                             if(prometheus_config_result.code=="200") { //정상
                                 //=========== 2-2. Wall Monitoring 구성 서비스 실행 ===========
-                                var wall_service_start_cmd = ['python3', pythonPath + 'start_services.py', 'start', '--service', 'blackbox_exporter', 'node_exporter', 'grafana-server', 'process-exporter', 'prometheus'];
+                                var wall_service_start_cmd = ['python3', pythonPath + 'start_services.py', 'start', '--service', 'blackbox-exporter', 'node-exporter', 'grafana-server', 'process-exporter', 'prometheus'];
                                 if (console_log) { console.log(wall_service_start_cmd); }
                                 cockpit.spawn(wall_service_start_cmd, { host: ccvm_ip })
                                 .then(function (data) {
