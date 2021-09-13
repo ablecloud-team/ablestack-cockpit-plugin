@@ -98,6 +98,23 @@ ceph mgr module enable dashboard
 
 ceph config set mon mon_warn_on_insecure_global_id_reclaim_allowed false
 
+# Add gs - start
+ceph orch device ls --refresh
+
+for host in $scvms
+do
+  for i in $(lsblk -o name,type |grep disk |awk {'print $1'})
+  do
+    ceph orch device zap $host /dev/$i --force
+  done
+done
+
+ceph orch apply osd --all-available-devices
+
+ceph osd pool create rbd --size 2
+
+# Add gs - end
+
 systemctl enable --now node-exporter
 systemctl enable --now process-exporter
 
