@@ -167,7 +167,7 @@ $('#button-link-monitoring-center').on('click', function(){
 });
 
 $('#button-link-skydive').on('click', function(){
-    // 클라우드센터 연결
+    // 스카이다이브 연결
     cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "skydive"])
         .then(function(data){
             var retVal = JSON.parse(data);
