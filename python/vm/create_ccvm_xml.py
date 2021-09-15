@@ -111,56 +111,71 @@ def createSecretKey(host_names):
 def createCcvmXml(args):
     try:
         # 템플릿 파일을 /usr/share/cockpit/ablestack/tools/vmconfig/ccvm 경로로 복사
-        for host_name in args.host_names:
+        slot_hex_num = generateDecToHex()
+        br_num = 0
+        
+        os.system("yes|cp -f "+pluginpath+"/tools/xml-template/ccvm-xml-template.xml "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml")
+        
+        template_file = pluginpath+'/tools/vmconfig/ccvm/ccvm-temp.xml'
 
-            slot_hex_num = generateDecToHex()
-            br_num = 0
-            
-            os.system("yes|cp -f "+pluginpath+"/tools/xml-template/ccvm-xml-template.xml "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml")
-            
-            template_file = pluginpath+'/tools/vmconfig/ccvm/ccvm-temp.xml'
+        with fileinput.FileInput(template_file, inplace=True, backup='.bak' ) as fi:
 
-            with fileinput.FileInput(template_file, inplace=True, backup='.bak' ) as fi:
+            for line in fi:
 
-                for line in fi:
+                if '<!--memory-->' in line:
+                    line = line.replace('<!--memory-->', str(args.memory))
+                elif '<!--cpu-->' in line:
+                    line = line.replace('<!--cpu-->', str(args.cpu))
+                elif '<!--ccvm_cloudinit-->' in line:
+                    cci_txt = "    <disk type='file' device='cdrom'>\n"
+                    cci_txt += "      <driver name='qemu' type='raw'/>\n"
+                    cci_txt += "      <source file='"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso'/>\n"
+                    cci_txt += "      <target dev='hda' bus='ide'/>\n"
+                    cci_txt += "      <readonly/>\n"
+                    cci_txt += "      <shareable/>\n"
+                    cci_txt += "      <address type='drive' controller='0' bus='0' target='0' unit='0'/>\n"
+                    cci_txt += "    </disk>"
+                    
+                    line = line.replace('<!--ccvm_cloudinit-->', cci_txt)
+                elif '<!--management_network_bridge-->' in line:
+                    mnb_txt = "    <interface type='bridge'>\n"
+                    mnb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
+                    mnb_txt += "      <source bridge='" + args.management_network_bridge + "'/>\n"
+                    mnb_txt += "      <target dev='vnet" + str(br_num) + "'/>\n"
+                    mnb_txt += "      <model type='virtio'/>\n"
+                    mnb_txt += "      <alias name='net" + str(br_num) + "'/>\n"
+                    mnb_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
+                    mnb_txt += "    </interface>"
 
-                    if '<!--memory-->' in line:
-                        line = line.replace('<!--memory-->', str(args.memory))
-                    elif '<!--cpu-->' in line:
-                        line = line.replace('<!--cpu-->', str(args.cpu))
-                    elif '<!--management_network_bridge-->' in line:
-                        mnb_txt = "    <interface type='bridge'>\n"
-                        mnb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
-                        mnb_txt += "      <source bridge='" + args.management_network_bridge + "'/>\n"
-                        mnb_txt += "      <target dev='vnet" + str(br_num) + "'/>\n"
-                        mnb_txt += "      <model type='virtio'/>\n"
-                        mnb_txt += "      <alias name='net" + str(br_num) + "'/>\n"
-                        mnb_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
-                        mnb_txt += "    </interface>"
+                    br_num += 1
+                    line = line.replace('<!--management_network_bridge-->', mnb_txt)
+                elif '<!--service_network_bridge-->' in line:
+                    if args.service_network_bridge is not None:
+                        snb_txt = "    <interface type='bridge'>\n"
+                        snb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
+                        snb_txt += "      <source bridge='" + args.service_network_bridge + "'/>\n"
+                        snb_txt += "      <target dev='vnet" + str(br_num) + "'/>\n"
+                        snb_txt += "      <model type='virtio'/>\n"
+                        snb_txt += "      <alias name='net" + str(br_num) + "'/>\n"
+                        snb_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
+                        snb_txt += "    </interface>"
 
                         br_num += 1
-                        line = line.replace('<!--management_network_bridge-->', mnb_txt)
-                    elif '<!--service_network_bridge-->' in line:
-                        if args.service_network_bridge is not None:
-                            snb_txt = "    <interface type='bridge'>\n"
-                            snb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
-                            snb_txt += "      <source bridge='" + args.service_network_bridge + "'/>\n"
-                            snb_txt += "      <target dev='vnet" + str(br_num) + "'/>\n"
-                            snb_txt += "      <model type='virtio'/>\n"
-                            snb_txt += "      <alias name='net" + str(br_num) + "'/>\n"
-                            snb_txt += "      <address type='pci' domain='0x0000' bus='0x00' slot='" + slot_hex_num.pop(0) + "' function='0x0'/>\n"
-                            snb_txt += "    </interface>"
+                        line = line.replace('<!--service_network_bridge-->', snb_txt)
+                    else:
+                        # <!--service_network_bridge--> 주석제거
+                        line = ''
+                
+                # 라인 수정
+                sys.stdout.write(line)
 
-                            br_num += 1
-                            line = line.replace('<!--service_network_bridge-->', snb_txt)
-                        else:
-                            # <!--service_network_bridge--> 주석제거
-                            line = ''
-                    
-                    # 라인 수정
-                    sys.stdout.write(line)
+        # 클러스터 구성한 호스트에 파일 복사
+        for host_name in args.host_names:
 
             os.system("scp "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
+
+            # pcs 클러스터 할 호스트 전체의 폴더 권한 수정
+            os.system("ssh root@"+host_name+" 'chmod 755 -R "+pluginpath+"/tools/vmconfig/ccvm'")
 
         #작업파일 지우기
         os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml "+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml.bak "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml.bak")

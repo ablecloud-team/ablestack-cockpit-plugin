@@ -156,3 +156,33 @@ function checkSpace(str) {
   	return true;
   }
 }
+
+/**
+ * Meathod Name : checkEmail
+ * Date Created : 2021.09.02
+ * Writer  : 배태주
+ * Description : 이메일 유형인지 확인
+ * Parameter : str (문자열)
+ * Return  : boolean
+ * History  : 2021.09.02
+ */
+function checkEmail(email) {
+  var regex=/([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+  return (email != '' && email != 'undefined' && regex.test(email));
+}
+
+/**
+ * Meathod Name : checkNumber
+ * Date Created : 2021.09.07
+ * Writer  : 배태주
+ * Description : 숫자만 입력 받도록 하는 함수
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.09.07 최초 작성
+ */
+ function checkNumber(event) {
+  if(event.key >= 0 && event.key <= 9) {
+    return true;
+  }
+  return false;
+}

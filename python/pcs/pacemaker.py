@@ -235,6 +235,15 @@ class Pacemaker:
             node['host'] = soup_node['name']
             node['online'] = soup_node['online']
             node['resources_running'] = soup_node['resources_running']
+            node['standby'] = soup_node['standby']
+            node['standby_onfail'] = soup_node['standby_onfail']
+            node['maintenance'] = soup_node['maintenance']
+            node['pending'] = soup_node['pending']
+            node['unclean'] = soup_node['unclean']
+            node['shutdown'] = soup_node['shutdown']
+            node['expected_up'] = soup_node['expected_up']
+            node['is_dc'] = soup_node['is_dc']
+            node['type'] = soup_node['type']
             nodes.append(node)
 
         for i in range(0, len(nodes)):
@@ -248,7 +257,7 @@ class Pacemaker:
         res['resource'] = soup_resource['id']
         resource.append(res)
 
-        ret_val = {'clustered_host':node_list, 'started':current_host, 'role':res_role, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
+        ret_val = {'clustered_host':node_list, 'nodes':nodes, 'started':current_host, 'role':res_role, 'active': res_active, 'blocked': res_blocked, 'failed': res_failed}
         ret = createReturn(code=200, val=ret_val)
         print(json.dumps(json.loads(ret), indent=4))
 

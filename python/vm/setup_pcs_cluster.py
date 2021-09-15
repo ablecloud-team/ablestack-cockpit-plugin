@@ -45,7 +45,7 @@ def createArgumentParser():
 
     return parser
 
-def resetCloud(args):
+def setupPcsCluster(args):
     
     success_bool = True
 
@@ -71,7 +71,7 @@ def resetCloud(args):
         time.sleep(1)
         cnt_num += 1
         domid_check = os.system("virsh domid ccvm > /dev/null")
-        if domid_check == 0 or cnt_num > 60:
+        if domid_check == 0 or cnt_num > 300:
             break
 
     if domid_check != 0:
@@ -96,5 +96,5 @@ if __name__ == '__main__':
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
     # 실제 로직 부분 호출 및 결과 출력
-    ret = resetCloud(args)
+    ret = setupPcsCluster(args)
     print(ret)

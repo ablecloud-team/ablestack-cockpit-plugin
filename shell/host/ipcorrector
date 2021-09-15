@@ -1,0 +1,21 @@
+#!/bin/bash
+
+LANG=en_US.utf-8
+LANGUAGE=en
+PROMETHEUS_HOST=$(ceph orch ps |grep prome  |awk {'print $2'})
+GRAFANA_HOST=$(ceph orch ps |grep grafana  |awk {'print $2'})
+ALERTMANAGER_HOST=$(ceph orch ps |grep alertmanager  |awk {'print $2'})
+
+PROMETHEUS_IP=$(cat /etc/hosts | grep $PROMETHEUS_HOST-mngt |awk {'print $1'})
+GRAFANA_IP=$(cat /etc/hosts | grep $GRAFANA_HOST-mngt |awk {'print $1'})
+ALERTMANAGER_IP=$(cat /etc/hosts | grep $ALERTMANAGER_HOST-mngt |awk {'print $1'})
+
+
+date                    | tee -a /var/log/ceph/ip.log
+echo "$GRAFANA_HOST     | $GRAFANA_IP"          | tee -a /var/log/ceph/ip.log
+echo "$ALERTMANAGER_HOST        | $ALERTMANAGER_IP"     | tee -a /var/log/ceph/ip.log
+echo "$PROMETHEUS_HOST  | $PROMETHEUS_IP"       | tee -a /var/log/ceph/ip.log
+
+ceph config set mgr mgr/dashboard/ALERTMANAGER_API_HOST http://$ALERTMANAGER_IP:9093
+ceph config set mgr mgr/dashboard/GRAFANA_API_URL https://$GRAFANA_IP:3000
+ceph config set mgr mgr/dashboard/PROMETHEUS_API_HOST http://$PROMETHEUS_IP:9095

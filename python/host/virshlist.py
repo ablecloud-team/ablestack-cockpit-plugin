@@ -64,7 +64,10 @@ for vm in vms:
             for line in ret[:-1]:
                 if 'ipv4' in line and 'ens20' in line:
                     items = line.split(maxsplit=4)
-                    vm['ip'] = items[3]
+                    ipPrefix = items[3]
+                    ipSplit = ipPrefix.split('/')
+                    vm['ip'] = ipSplit[0]
+                    vm['prefix'] = ipSplit[1]
                     vm['mac'] = items[1]
             ret = virsh_cmd('domiflist', domain=vm['Name']).stdout.decode().splitlines()
             for line in ret[:-1]:
