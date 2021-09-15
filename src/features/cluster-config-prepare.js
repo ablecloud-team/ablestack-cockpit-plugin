@@ -1086,33 +1086,6 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
     cockpit.script(["sed -i '/^server /d' /" + chrony_file_root + ""])
     cockpit.script(["sed -i '/^pool /d' /" + chrony_file_root + ""])
 
-    let allow_ip;
-
-    // chrony.conf 파일에서 서버 추가하는 부분
-    // hosts 정보에서 scvm에 해당하는 IP 주소를 추출
-    let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
-    let array_of_lines = hosts_file_text.split('\n');
-    let array_result = [];
-    let ip_addr1;
-    let ip_addr2;
-    // textarea 값을 배열로 변환
-    for (let i = 0; i < array_of_lines.length; i++) {
-        array_result.push(array_of_lines[i].split('\t'));
-    }
-    // 각 배열 검색하여 문자열이 들어있는 배열의 위치를 추출
-    for (var i = 0; i < array_result.length; i++) {
-        ip_addr1 = array_result[i].findIndex(findNumberOne);
-        if (ip_addr1 != -1) {
-            ip_addr2 = (array_result[i][0]);
-        }
-    }
-    // scvm이 포함된 배열을 찾지 못하면 강제로 주소 할당
-    if(ip_addr2 == undefined || null){
-        ip_addr2 = "100.100.10.11"
-    }
-    ip_addr2 = ip_addr2.split('.');
-    allow_ip = ip_addr2[0] +'.'+ ip_addr2[1] +'.0.0/16'
-
     // 외부 시간 서버
     if (file_type == "external") {
         // chrony.conf 파일 서버 리스트 부분 초기화
@@ -1126,6 +1099,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
         for (let i in timeserver_confirm_ip_text) {
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[i] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
         }
+        let allow_ip = "0.0.0.0/0";
         cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
     }
     // 로컬 시간 서버
@@ -1147,27 +1121,14 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
         }
         // 공통 수정 부분
+        let allow_ip = "0.0.0.0/0";
         cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
         cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\local stratum 10\" /" + chrony_file_root + ""])
-        // chronyd 서비스 다시 시작
+        // chronyd restart
         cockpit.script(["systemctl restart chronyd"])
     }
 }
 
-
-/**
- * Meathod Name : findNumberOne
- * Date Created : 2021.04.13
- * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사 타임서버 단계에서 hosts file의 scvm ip 값을 추출하기 위한 함수
- * Parameter : element
- * Return  : boolean
- * History  : 2021.04.13 최초 작성
- */
-
-function findNumberOne(element)  {
-  	if(element === "scvm") return true;
-}
 
 
 /**
@@ -1227,6 +1188,4 @@ function validateClusterConfigPrepare(timeserver_type) {
     }
     return validate_check;
 }
-
-
 
