@@ -332,6 +332,25 @@ def ccvmGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str ):
                                          'type': 'physical'})
     with open(f'{tmpdir}/network-config', 'wt') as f:
         f.write(yaml.dump(yam))
+
+    with open(f'{tmpdir}/user-data', 'rt') as f:
+        yam2 = yaml.load(f)
+        with open(f'{pluginpath}/shell/host/ccvm_bootstrap.sh', 'rt') as bootstrapfile:
+            bootstrap = bootstrapfile.read()
+        yam2['write_files'].append(
+            {
+                'encoding': 'base64',
+                'content': base64.encodebytes(bootstrap.encode()),
+                'owner': 'root:root',
+                'path': '/root/bootstrap.sh',
+                'permissions': '0777'
+            }
+        )
+
+    with open(f'{tmpdir}/user-data', 'wt') as f:
+        f.write('#cloud-config\n')
+        f.write(yaml.dump(yam2).replace("\n\n", "\n"))
+
     return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=yam)))
 
 
@@ -368,18 +387,28 @@ def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_p
     #         [f'/usr/bin/script', '-c', '/root/bootstrap.sh', 'bootstrap.log']
     #     )
 
-    with open(f'{pluginpath}/shell/host/bootstrap.sh', 'rt') as bootstrapfile:
+    with open(f'{pluginpath}/shell/host/scvm_bootstrap.sh', 'rt') as bootstrapfile:
         bootstrap = bootstrapfile.read()
-
-    yam2['write_files'].append(
-        {
-            'encoding': 'base64',
-            'content': base64.encodebytes(bootstrap.encode()),
-            'owner': 'root:root',
-            'path': '/root/bootstrap.sh',
-            'permissions': '0777'
-        }
-    )
+        yam2['write_files'].append(
+            {
+                'encoding': 'base64',
+                'content': base64.encodebytes(bootstrap.encode()),
+                'owner': 'root:root',
+                'path': '/root/bootstrap.sh',
+                'permissions': '0777'
+            }
+        )
+    with open(f'{pluginpath}/shell/host/ipcorrector', 'rt') as ipcorrectorfile:
+        ipcorrector = ipcorrectorfile.read()
+        yam2['write_files'].append(
+            {
+                'encoding': 'base64',
+                'content': base64.encodebytes(ipcorrector.encode()),
+                'owner': 'root:root',
+                'path': '/usr/local/bin/ipcorrector',
+                'permissions': '0777'
+            }
+        )
     with open(f'{tmpdir}/user-data', 'wt') as f:
         f.write('#cloud-config\n')
         f.write(yaml.dump(yam2).replace("\n\n", "\n"))

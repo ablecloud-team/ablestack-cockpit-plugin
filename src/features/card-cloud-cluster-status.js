@@ -143,6 +143,10 @@ $('#cloud-cluster-connect').on('click', function(){
         var retVal = JSON.parse(data);        
         if(retVal.code == 200){
             window.open(retVal.val);
+        }else{
+            $("#modal-status-alert-title").html("클라우드센터 연결")
+            $("#modal-status-alert-body").html(retVal.val)
+            $('#div-modal-status-alert').show();
         }
     })
     .catch(function(data){
@@ -153,8 +157,55 @@ $('#cloud-cluster-connect').on('click', function(){
 // 클라우드 센터 클러스터 상태 조회 및 조회 결과값으로 화면 변경하는 함수
 function CardCloudClusterStatus(){
     return new Promise((resolve) => {
+        //초기 상태 체크 중 표시
+        $('#cccs-status').html("상태 체크 중 &bull;&bull;&bull;&nbsp;&nbsp;&nbsp;<svg class='pf-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
+        $("#cccs-back-color").attr('class','pf-c-label pf-m-orange');
+        $("#cccs-cluster-icon").attr('class','fas fa-fw fa-exclamation-triangle');
+
         cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsDetail' ])
         .then(function(data){
+            cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ablestack_json/ablestackJson.py', 'status', '--depth1', 'bootstrap', '--depth2', 'ccvm' ])
+                .then(function (bootstrap_data){
+                    console.log("ablestackJson.py : "+bootstrap_data);
+                    var retVal = JSON.parse(bootstrap_data);
+                    var ccvmStatus = retVal.val;
+                    console.log("ccvmStatus.ccvm = " + ccvmStatus.ccvm);
+                    if(ccvmStatus.ccvm == 'false'){
+                        sessionStorage.setItem("ccvm_bootstrap_status","false");
+                        console.log('ccvm false in')
+                        $('#ccvm-after-bootstrap-run').html('');
+                        $('#ccvm-before-bootstrap-run').html('<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-bootstrap-run-ccvm" onclick="ccvm_bootstrap_run()">Bootstrap 실행</a>');
+                    }else if (ccvmStatus.ccvm == 'true'){
+                        sessionStorage.setItem("ccvm_bootstrap_status","true");
+                        console.log('ccvm true in')
+                        $('#ccvm-after-bootstrap-run').html('<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-linkto-storage-center-ccvm" onclick="cccc_link_go()">클라우드센터 연결</a>');
+                        $('#ccvm-before-bootstrap-run').html('');
+                    }
+                }).catch(function(data){
+                console.log('ClusterStatusInfo spawn error(ablestackJson.py');
+
+            });
+            cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ablestack_json/ablestackJson.py', 'status', '--depth1', 'monitoring', '--depth2', 'wall' ])
+                .then(function (monitoring_data){
+                    console.log("ablestackJson.py : "+monitoring_data);
+                    var retVal = JSON.parse(monitoring_data);
+                    var wallStatus = retVal.val;
+                    console.log("wallStatus.wall = " + wallStatus.wall);
+                    if(wallStatus.wall == 'false'){
+                        sessionStorage.setItem("wall_monitoring_status","false");
+                        console.log('wall false in')
+                        $('#ccvm-after-monitoring-run').html('');
+                        $('#ccvm-before-monitoring-run').html('<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-monitoring-run-ccvm" onclick="wall_monitoring_run()">모니터링센터 구성</a>');
+                    }else if (wallStatus.wall == 'true'){
+                        sessionStorage.setItem("wall_monitoring_status","true");
+                        console.log('wall true in')
+                        $('#ccvm-after-monitoring-run').html('<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-linkto-wall" onclick="wall_link_go()">모니터링센터 대시보드 연결</a>');
+                        $('#ccvm-before-monitoring-run').html('');
+                    }
+                }).catch(function(data){
+                console.log('ClusterStatusInfo spawn error(ablestackJson.py');
+
+            });
             var retVal = JSON.parse(data);
             if(retVal.code == '200'){
                 var nodeText = '(';
@@ -173,14 +224,14 @@ function CardCloudClusterStatus(){
                         nodeText = nodeText + ',';
                     }
                 }
-                $('#cccs_back_color').attr('class','pf-c-label pf-m-green');
-                $('#cccs_cluster_icon').attr('class','fas fa-fw fa-check-circle');
-                $('#cccs_status').text('HEALTH OK');
-                $('#cccs_node_info').text('총 ' + Object.keys(retVal.val.clustered_host).length + '노드로 구성됨 : ' + nodeText);
+                $('#cccs-back-color').attr('class','pf-c-label pf-m-green');
+                $('#cccs-cluster-icon').attr('class','fas fa-fw fa-check-circle');
+                $('#cccs-status').text('Health Ok');
+                $('#cccs-node-info').text('총 ' + Object.keys(retVal.val.clustered_host).length + '노드로 구성됨 : ' + nodeText);
                 sessionStorage.setItem("cc_status", "HEALTH_OK"); 
                 if(retVal.val.active == 'true'){
-                    $('#cccs_resource_status').text('실행중');
-                    $('#cccs_execution_node').text(retVal.val.started);
+                    $('#cccs-resource-status').text('실행중');
+                    $('#cccs-execution-node').text(retVal.val.started);
                     $('#button-cloud-cluster-start').prop('disabled', true);
                     $('#button-cloud-cluster-stop').prop('disabled', false);
                     $('#button-cloud-cluster-cleanup').prop('disabled', false);
@@ -188,8 +239,8 @@ function CardCloudClusterStatus(){
                     $('#button-cloud-cluster-connect').prop('disabled', false);
                     $('#form-select-cloud-vm-migration-node').append(selectHtml);
                 }else if(retVal.val.active == 'false'){
-                    $('#cccs_resource_status').text('정지됨');
-                    $('#cccs_execution_node').text('N/A');
+                    $('#cccs-resource-status').text('정지됨');
+                    $('#cccs-execution-node').text('N/A');
                     $('#button-cloud-cluster-start').prop('disabled', false);
                     $('#button-cloud-cluster-stop').prop('disabled', true);
                     $('#button-cloud-cluster-cleanup').prop('disabled', false);
@@ -199,24 +250,165 @@ function CardCloudClusterStatus(){
                 $('#cccs-low-info').text('클라우드센터 클러스터가 구성되었습니다.');
                 $('#cccs-low-info').attr('style','color: var(--pf-global--success-color--100)')
             }else if(retVal.code == '400' && retVal.val == 'cluster is not configured.'){
-                $('#cccs_status').text('Health Err.');
-                $('#cccs_back_color').attr('class','pf-c-label pf-m-red');
-                $('#cccs_cluster_icon').attr('class','fas fa-fw fa-exclamation-triangle');
+                $('#cccs-status').text('Health Err');
+                $('#cccs-back-color').attr('class','pf-c-label pf-m-red');
+                $('#cccs-cluster-icon').attr('class','fas fa-fw fa-exclamation-triangle');
                 $('#cccs-low-info').text('클라우드센터 클러스터가 구성되지 않았습니다.');
                 sessionStorage.setItem("cc_status", "HEALTH_ERR1"); 
             }else if(retVal.code == '400' && retVal.val == 'resource not found.'){
-                $('#cccs_status').text('Health Err.');
-                $('#cccs_back_color').attr('class','pf-c-label pf-m-red');
-                $('#cccs_cluster_icon').attr('class','fas fa-fw fa-exclamation-triangle');
+                $('#cccs-status').text('Health Err');
+                $('#cccs-back-color').attr('class','pf-c-label pf-m-red');
+                $('#cccs-cluster-icon').attr('class','fas fa-fw fa-exclamation-triangle');
                 $('#cccs-low-info').text('클라우드센터 클러스터는 구성되었으나 리소스 구성이 되지 않았습니다.');
                 sessionStorage.setItem("cc_status", "HEALTH_ERR2"); 
             }else{
                 console.log('ClusterStatusInfo spawn error');
             }
+
             resolve();
         }).catch(function(data){
             console.log('ClusterStatusInfo spawn error');
             resolve();
         });
     });
+}
+
+/**
+ * Meathod Name : scvm_bootstrap_run
+ * Date Created : 2021.04.13
+ * Writer  : 이석민
+ * Description : ccvm /root/bootstrap.sh  파일 실행
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.04.13 최초 작성
+ */
+function ccvm_bootstrap_run(){
+    $("#modal-status-alert-title").html("클라우드 센터 가상머신 상태 체크")
+    $("#modal-status-alert-body").html("클라우드 센터 가상머신에 cloudinit 실행이 완료되지 않아<br>Bootstrap을 실행할 수 없습니다.<br><br>잠시 후 다시 실행해 주세요.")
+    //scvm ping 체크
+    cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "ping", "--target",  "ccvm"])
+        .then(function(data){
+            var retVal = JSON.parse(data);
+            if(retVal.code == 200){
+                //scvm 의 cloudinit 실행이 완료되었는지 확인하기 위한 명렁
+                cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "status", "--target",  "ccvm"])
+                    .then(function(data){
+                        var retVal = JSON.parse(data);
+                        console.log('cloudinit-status : '+retVal.val);
+                        //cloudinit status: done 일때
+                        if(retVal.code == 200 && retVal.val == "status: done"){
+                            $('#modal-title-scvm-status').text("클라우드 센터 가상머신 Bootstrap 실행");
+                            $('#modal-description-scvm-status').html("<p>클라우드 센터 가상머신의 Bootstrap.sh 파일을 실행 하시겠습니까??</p>");
+                            $('#button-storage-vm-status-update').html("실행");
+                            $('#scvm-status-update-cmd').val("bootstrap_ccvm");
+                            $('#div-modal-storage-vm-status-update').show();
+                        }else{
+                            $('#div-modal-status-alert').show();
+                        }
+                    })
+                    .catch(function(data){
+                        $('#div-modal-status-alert').show();
+                        console.log(":::ccvm_bootstrap_run() Error :::" + data);
+                    });
+            }else{
+                $('#div-modal-status-alert').show();
+            }
+        })
+        .catch(function(data){
+            $('#div-modal-status-alert').show();
+            console.log(":::scvm_bootstrap_run() Error :::" + data);
+        });
+}
+
+function cccc_link_go(){
+    // 클라우드센터 연결
+    cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "cloudCenter"])
+        .then(function(data){
+            var retVal = JSON.parse(data);
+            if(retVal.code == 200){
+                window.open(retVal.val);
+            }
+        })
+        .catch(function(data){
+            //console.log(":::Error:::");
+        });
+}
+
+/**
+ * Meathod Name : wall_monitoring_modal_show
+ * Date Created : 2021.09.1
+ * Writer  : 배태주
+ * Description : wall 모니터링 배포 마법사 실행
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.09.01 최초 작성
+ */
+ function wall_monitoring_modal_show(){
+    
+    const step7 = sessionStorage.getItem("ccvm_bootstrap_status");
+
+    if(step7=="true"){
+        $('#div-modal-wizard-wall-monitoring').show();
+    }else{
+        $('#div-modal-status-alert').show();
+    }
+ }
+
+/**
+ * Meathod Name : wall_monitoring_run
+ * Date Created : 2021.09.01
+ * Writer  : 배태주
+ * Description : wall 모니터링 배포 마법사 실행
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.09.01 최초 작성
+ */
+ function wall_monitoring_run(){
+    $("#modal-status-alert-title").html("클라우드 센터 가상머신 상태 체크")
+    $("#modal-status-alert-body").html("클라우드 센터 가상머신에 cloudinit 실행이 완료되지 않아<br>모니터링센터 구성을 실행할 수 없습니다.<br><br>잠시 후 다시 실행해 주세요.")
+    //scvm ping 체크
+    cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "ping", "--target",  "ccvm"])
+        .then(function(data){
+            var retVal = JSON.parse(data);
+            if(retVal.code == 200){
+                //scvm 의 cloudinit 실행이 완료되었는지 확인하기 위한 명렁
+                cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "status", "--target",  "ccvm"])
+                    .then(function(data){
+                        var retVal = JSON.parse(data);
+                        console.log('cloudinit-status : '+retVal.val);
+                        
+                        //cloudinit status: done 이면서 진행단계가 step7이 완료 되었을때
+                        step7 = sessionStorage.getItem("ccvm_bootstrap_status");
+                        if(retVal.code == 200 && retVal.val == "status: done" && step7 == "true"){
+                            $('#div-modal-wizard-wall-monitoring').show();
+                        }else{
+                            $('#div-modal-status-alert').show();
+                        }
+                    })
+                    .catch(function(data){
+                        $('#div-modal-status-alert').show();
+                        console.log(":::ccvm_bootstrap_run() Error :::" + data);
+                    });
+            }else{
+                $('#div-modal-status-alert').show();
+            }
+        })
+        .catch(function(data){
+            $('#div-modal-status-alert').show();
+            console.log(":::scvm_bootstrap_run() Error :::" + data);
+        });
+}
+
+function wall_link_go(){
+    // 클라우드센터 연결
+    cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "wallCenter"])
+        .then(function(data){
+            var retVal = JSON.parse(data);
+            if(retVal.code == 200){
+                window.open(retVal.val);
+            }
+        })
+        .catch(function(data){
+            //console.log(":::Error:::");
+        });
 }

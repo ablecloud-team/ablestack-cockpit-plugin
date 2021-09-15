@@ -213,8 +213,8 @@
                                             <div class="pf-c-form__group-control pf-m-inline">
                                                 <select class="pf-c-form-control" id="form-select-cloud-vm-compute-cpu-core" name="form-select-cloud-vm-compute-cpu-core" style="width:40%;">
                                                     <option value="" selected>선택하십시오</option>
-                                                    <option value="4">4 vCore</option>
                                                     <option value="8">8 vCore</option>
+                                                    <option value="16">16 vCore</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -228,9 +228,9 @@
                                             <div class="pf-c-form__group-control">
                                                 <select class="pf-c-form-control" id="form-select-cloud-vm-compute-memory" name="form-select-cloud-vm-compute-memory" style="width:40%;">
                                                     <option value="" selected>선택하십시오</option>
-                                                    <option value="8">8 GiB</option>
                                                     <option value="16">16 GiB</option>
                                                     <option value="32">32 GiB</option>
+                                                    <option value="64">64 GiB</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -260,8 +260,8 @@
                                     <div class="pf-c-alert__description">
                                         <p>클라우드센터 VM의 Compute 자원은 클라우드센터가 관리해야 할 호스트의 수에 따라 탄력적으로 선택합니다. </p>
                                         <p>
-                                            가상머신이 컨트롤 할 호스트의 수가 10개 미만이면 4 vCore를, 그 이상이면 8 vCore를 선택하십시오. 
-                                            메모리는 컨트롤할 호스트의 수가 10개 미만이면 8GiB를, 10 ~ 20개 이면 16GiB를, 21개 이상이면 32GiB를 선택해야 합니다. 
+                                            가상머신이 컨트롤 할 호스트의 수가 10개 미만이면 8 vCore를, 그 이상이면 16 vCore를 선택하십시오. 
+                                            메모리는 컨트롤할 호스트의 수가 10개 미만이면 16GiB를, 10 ~ 20개 이면 32GiB를, 21개 이상이면 64GiB를 선택해야 합니다. 
                                         </p>
                                         <p>ROOT Disk의 크기는 70GiB를 디스크가 Thin Provisioning 방식으로 제공됩니다. </p>
                                     </div>
