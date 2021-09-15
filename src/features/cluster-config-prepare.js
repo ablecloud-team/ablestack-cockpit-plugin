@@ -1188,4 +1188,3 @@ function validateClusterConfigPrepare(timeserver_type) {
     }
     return validate_check;
 }
-
