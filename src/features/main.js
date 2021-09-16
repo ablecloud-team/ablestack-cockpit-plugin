@@ -25,6 +25,7 @@ $(document).ready(function(){
     $('#button-link-cloud-center').hide()
     $('#button-open-modal-wizard-monitoring-center').hide()
     $('#button-link-monitoring-center').hide()
+    $('#button-link-skydive').hide()
 
     $('#div-modal-wizard-storage-vm').load("./src/features/storage-vm-wizard.html");
     $('#div-modal-wizard-storage-vm').hide();
@@ -156,6 +157,24 @@ $('#button-link-monitoring-center').on('click', function(){
                 window.open(retVal.val);
             }else{
                 $("#modal-status-alert-title").html("모니터링센터 대시보드 연결")
+                $("#modal-status-alert-body").html(retVal.val)
+                $('#div-modal-status-alert').show();
+            }
+        })
+        .catch(function(err){
+            console.log(":::create_address.py cloudCenter Error:::"+ err);
+        });
+});
+
+$('#button-link-skydive').on('click', function(){
+    // 스카이다이브 연결
+    cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "skydive"])
+        .then(function(data){
+            var retVal = JSON.parse(data);
+            if(retVal.code == 200){
+                window.open(retVal.val);
+            }else{
+                $("#modal-status-alert-title").html("스카이다이브 연결")
                 $("#modal-status-alert-body").html(retVal.val)
                 $('#div-modal-status-alert').show();
             }
@@ -637,6 +656,7 @@ function checkDeployStatus(){
     $('#button-link-cloud-center').hide()
     $('#button-open-modal-wizard-monitoring-center').hide()
     $('#button-link-monitoring-center').hide()
+    $('#button-link-skydive').hide()
     /*
        가상머신 배포 및 클러스터 구성 상태를 세션 스토리지에서 조회 
        - 클러스터 구성준비 상태 = false, true
@@ -709,6 +729,7 @@ function checkDeployStatus(){
                                 }else{
                                     // 모니터링센터 구성 연결 버튼 show
                                     $('#button-link-monitoring-center').show();
+                                    $('#button-link-skydive').show();
 
                                     showRibbon('success','ABLESTACK 스토리지센터 및 클라우드센터 VM 배포되었으며 모니터링센터 구성이 완료되었습니다. 가상어플라이언스 상태가 정상입니다.')
                                     // 운영 상태조회
