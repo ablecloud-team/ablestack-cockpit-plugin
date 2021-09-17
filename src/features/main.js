@@ -149,7 +149,7 @@ $('#button-link-cloud-center').on('click', function(){
 });
 
 $('#button-link-monitoring-center').on('click', function(){
-    // 클라우드센터 연결
+    // 모니터링센터 대시보드 연결
     cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "wallCenter"])
         .then(function(data){
             var retVal = JSON.parse(data);
@@ -162,7 +162,7 @@ $('#button-link-monitoring-center').on('click', function(){
             }
         })
         .catch(function(err){
-            console.log(":::create_address.py cloudCenter Error:::"+ err);
+            console.log(":::create_address.py wallCenter Error:::"+ err);
         });
 });
 
@@ -180,7 +180,7 @@ $('#button-link-skydive').on('click', function(){
             }
         })
         .catch(function(err){
-            console.log(":::create_address.py cloudCenter Error:::"+ err);
+            console.log(":::create_address.py skydive Error:::"+ err);
         });
 });
 
