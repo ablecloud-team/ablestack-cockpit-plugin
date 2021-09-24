@@ -690,33 +690,31 @@ function checkDeployStatus(){
             showRibbon('warning','스토리지센터 및 클라우드센터 VM이 배포되지 않았습니다. 스토리지센터 VM 배포를 진행하십시오.')
         }else{
             if(step3!="true"){
-                //모든 버튼 hide
                 showRibbon('warning','스토리지센터 대시보드에 연결할 수 있도록 스토리지센터 VM Bootstrap 실행 작업을 진행하십시오.')
             }else{
-                if(step4=="HEALTH_ERR"||step4==null){
+                if(step8!="true" && step4=="HEALTH_ERR"||step4==null){
                     // 스토리지센터 연결 버튼 show
                     $('#button-open-modal-wizard-cloud-vm').show()
                     $('#button-link-storage-center-dashboard').show()
                     showRibbon('warning','클라우드센터 VM이 배포되지 않았습니다. 스토리지센터에 연결하여 스토리지 클러스터 구성한 후 클라우드센터 VM 배포를 진행하십시오.')
                 }else{
-                    if(step5=="HEALTH_ERR1"||step5=="HEALTH_ERR2"||step5==null){
+                    if(step8!="true" && step5=="HEALTH_ERR1"||step5=="HEALTH_ERR2"||step5==null){
                         //클라우드센터 VM 배포 버튼, 스토리지센터 연결 버튼 show
                         $('#button-open-modal-wizard-cloud-vm').show()
                         $('#button-link-storage-center-dashboard').show()
-                        if(step5=="HEALTH_ERR1"||step5==null){
+                        if(step8!="true" && step5=="HEALTH_ERR1"||step5==null){
                             showRibbon('warning','클라우드센터 클러스터가 구성되지 않았습니다. 클라우드센터 클러스터 구성을 진행하십시오.')
                         }else{
                             showRibbon('warning','클라우드센터 클러스터는 구성되었으나 리소스 구성이 되지 않았습니다. 리소스 구성을 진행하십시오.')
                         }
                     }else{
-                        if(step6=="HEALTH_ERR"||step6==null){
+                        if(step8!="true" && step6=="HEALTH_ERR"||step6==null){
                             //클라우드센터 VM 배포 버튼, 스토리지센터 연결 버튼 show
                             $('#button-open-modal-wizard-cloud-vm').show()
                             $('#button-link-storage-center-dashboard').show()
                             showRibbon('warning','클라우드센터 VM이 배포되지 않았습니다. 클라우드센터 VM 배포를 진행하십시오.')
                         }else{
-                            if(step7!="true"){
-                                //모든 버튼 hide
+                            if(step8!="true" && step7!="true"){
                                 showRibbon('warning','클라우드센터에 연결할 수 있도록 클라우드센터 VM Bootstrap 실행 작업을 진행하십시오.')
                             }else{
                                 // 스토리지센터 연결 버튼, 클라우드센터 연결 버튼 show, 모니터링센터 구성 버튼 show
