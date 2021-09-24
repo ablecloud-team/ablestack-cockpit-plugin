@@ -648,7 +648,7 @@ function resetSmtpValues() {
         $('#form-input-wall-smtp-server-port').val("");
         $('#form-input-wall-smtp-email-addr').val("");
         $('#form-input-wall-smtp-email-pw').val("");
-        $('#form-input-wall-receive-smtp-email-addr').val("");
+        $('#form-input-wall-smtp-receive-email-addr').val("");
 
         // 입력값 비활성화
         $('#form-input-wall-smtp-server-ip').attr('disabled', true);
