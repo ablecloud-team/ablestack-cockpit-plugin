@@ -199,7 +199,9 @@ function CardCloudClusterStatus(){
                     }else if (wallStatus.wall == 'true'){
                         sessionStorage.setItem("wall_monitoring_status","true");
                         console.log('wall true in')
-                        $('#ccvm-after-monitoring-run').html('<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-linkto-wall" onclick="wall_link_go()">모니터링센터 대시보드 연결</a>');
+                        el = '<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-linkto-wall" onclick="wall_link_go()">모니터링센터 대시보드 연결</a>';
+                        el += '<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-linkto-wall" onclick="skydive_link_go()">스카이다이브 연결</a>';
+                        $('#ccvm-after-monitoring-run').html(el);
                         $('#ccvm-before-monitoring-run').html('');
                     }
                 }).catch(function(data){
@@ -211,7 +213,7 @@ function CardCloudClusterStatus(){
                 var nodeText = '(';
                 var selectHtml = '<option selected="" value="null">노드를 선택해주세요.</option>';
                 $('#form-select-cloud-vm-migration-node option').remove();
-            
+
                 for(var i=0; i<Object.keys(retVal.val.clustered_host).length; i++){
                     nodeText = nodeText +retVal.val.clustered_host[i];
                     if(retVal.val.clustered_host[i] != retVal.val.started){
@@ -228,7 +230,7 @@ function CardCloudClusterStatus(){
                 $('#cccs-cluster-icon').attr('class','fas fa-fw fa-check-circle');
                 $('#cccs-status').text('Health Ok');
                 $('#cccs-node-info').text('총 ' + Object.keys(retVal.val.clustered_host).length + '노드로 구성됨 : ' + nodeText);
-                sessionStorage.setItem("cc_status", "HEALTH_OK"); 
+                sessionStorage.setItem("cc_status", "HEALTH_OK");
                 if(retVal.val.active == 'true'){
                     $('#cccs-resource-status').text('실행중');
                     $('#cccs-execution-node').text(retVal.val.started);
@@ -254,13 +256,13 @@ function CardCloudClusterStatus(){
                 $('#cccs-back-color').attr('class','pf-c-label pf-m-red');
                 $('#cccs-cluster-icon').attr('class','fas fa-fw fa-exclamation-triangle');
                 $('#cccs-low-info').text('클라우드센터 클러스터가 구성되지 않았습니다.');
-                sessionStorage.setItem("cc_status", "HEALTH_ERR1"); 
+                sessionStorage.setItem("cc_status", "HEALTH_ERR1");
             }else if(retVal.code == '400' && retVal.val == 'resource not found.'){
                 $('#cccs-status').text('Health Err');
                 $('#cccs-back-color').attr('class','pf-c-label pf-m-red');
                 $('#cccs-cluster-icon').attr('class','fas fa-fw fa-exclamation-triangle');
                 $('#cccs-low-info').text('클라우드센터 클러스터는 구성되었으나 리소스 구성이 되지 않았습니다.');
-                sessionStorage.setItem("cc_status", "HEALTH_ERR2"); 
+                sessionStorage.setItem("cc_status", "HEALTH_ERR2");
             }else{
                 console.log('ClusterStatusInfo spawn error');
             }
@@ -344,7 +346,7 @@ function cccc_link_go(){
  * History  : 2021.09.01 최초 작성
  */
  function wall_monitoring_modal_show(){
-    
+
     const step7 = sessionStorage.getItem("ccvm_bootstrap_status");
 
     if(step7=="true"){
@@ -376,7 +378,7 @@ function cccc_link_go(){
                     .then(function(data){
                         var retVal = JSON.parse(data);
                         console.log('cloudinit-status : '+retVal.val);
-                        
+
                         //cloudinit status: done 이면서 진행단계가 step7이 완료 되었을때
                         step7 = sessionStorage.getItem("ccvm_bootstrap_status");
                         if(retVal.code == 200 && retVal.val == "status: done" && step7 == "true"){
@@ -400,8 +402,22 @@ function cccc_link_go(){
 }
 
 function wall_link_go(){
-    // 클라우드센터 연결
+    // 모니터링센터 대시보드 연결
     cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "wallCenter"])
+        .then(function(data){
+            var retVal = JSON.parse(data);
+            if(retVal.code == 200){
+                window.open(retVal.val);
+            }
+        })
+        .catch(function(data){
+            //console.log(":::Error:::");
+        });
+}
+
+function skydive_link_go(){
+    // 스카이다이브 연결
+    cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "skydive"])
         .then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
