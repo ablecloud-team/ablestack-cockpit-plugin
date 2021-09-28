@@ -53,6 +53,8 @@ def setupPcsCluster(args):
     #=========== pcs cluster 구성 ===========
     # ceph 이미지 등록
     os.system("qemu-img convert -f qcow2 -O rbd /var/lib/libvirt/images/ablestack-template-back.qcow2 rbd:rbd/ccvm")
+    # ccvm image resize
+    os.system("rbd resize -s 500G ccvm")
 
     # 클러스터 구성
     result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'config', '--cluster', 'cloudcenter_cluster', '--hosts', args.host_names[0], args.host_names[1], args.host_names[2] ).stdout.decode())
@@ -71,7 +73,7 @@ def setupPcsCluster(args):
         time.sleep(1)
         cnt_num += 1
         domid_check = os.system("virsh domid ccvm > /dev/null")
-        if domid_check == 0 or cnt_num > 60:
+        if domid_check == 0 or cnt_num > 300:
             break
 
     if domid_check != 0:
@@ -98,3 +100,4 @@ if __name__ == '__main__':
     # 실제 로직 부분 호출 및 결과 출력
     ret = setupPcsCluster(args)
     print(ret)
+
