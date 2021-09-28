@@ -98,6 +98,8 @@ ceph mgr module enable dashboard
 
 ceph config set mon mon_warn_on_insecure_global_id_reclaim_allowed false
 
+/usr/bin/mv -f /usr/share/ablestack/ablestack-wall/process-exporter/scvm_process.yml /usr/share/ablestack/ablestack-wall/process-exporter/process.yml
+
 systemctl enable --now node-exporter
 systemctl enable --now process-exporter
 
