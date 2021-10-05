@@ -42,21 +42,6 @@ firewall-cmd --reload
 firewall-cmd --list-all 2>&1 | tee -a $LOGFILE
 
 
-# resize partition
-parted --script /dev/vda resizepart 2 100%
-pvresize /dev/vda2
-lvcreate cl_ablestack-bronto -n nfs --extents 100%FREE
-mkfs.xfs /dev/cl_ablestack-bronto/nfs
-mkdir /nfs
-echo  '/dev/mapper/cl_ablestack--bronto-nfs /nfs                    xfs    defaults        0 0' >> /etc/fstab
-echo '/nfs *(rw,no_root_squash,async)' >> /etc/exports
-systemctl enable --now nfs-server.service
-
-mkdir /nfs/primary
-mkdir /nfs/secondary
-
-
-
 ################# Setting Database
 mysqladmin -uroot password $DATABASE_PASSWD
 setenforce 0
@@ -81,14 +66,4 @@ cloudstack-setup-management  2>&1 | tee -a $LOGFILE
 
 systemctl enable --now cloudstack-management
 
-#systemvm template 등록
-/usr/share/cloudstack-common/scripts/storage/secondary/cloud-install-sys-tmplt \
--m /nfs/secondary \
--f /usr/share/ablestack/systemvmtemplate-4.16.0-kvm.qcow2.bz2 \
--h kvm -F
-
-# Delete container image file
-rm -rf /usr/share/ablestack/*.tar
-# Delete bootstrap script file
 rm -rf /root/bootstrap.sh
-
