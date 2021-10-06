@@ -197,6 +197,28 @@ $('#modal-status-alert-button-close1, #modal-status-alert-button-close2').on('cl
     $('#div-modal-status-alert').hide();
 });
 
+// 상태 보기 드롭다운 메뉴를 활성화한 상태에서 다른 영역을 클릭 했을 경우 메뉴 닫기 (현재 활성화된 iframe 클릭할 때 작동)
+$('html').on('click', function(e){
+    if(!$(e.target).hasClass('pf-c-dropdown__toggle')){
+        $('.pf-c-dropdown__menu, .pf-m-align-right').hide();
+    }
+});
+
+// 상태 보기 드롭다운 메뉴를 활성화한 상태에서 다른 영역을 클릭 했을 경우 메뉴 닫기 (pareant html 클릭할 때 작동)
+$(top.document, 'html').on('click', function(e){ 
+    if(!$(e.target).hasClass('pf-c-dropdown__toggle')){
+        $('.pf-c-dropdown__menu, .pf-m-align-right').hide();
+    }
+});
+
+// 상태 보기 드롭다운 메뉴를 활성화한 상태에서 다른 드롭다운 메뉴를 클릭 했을 경우 메뉴 닫기
+$('.pf-c-dropdown').on('click', function(e){
+    $('.pf-c-dropdown__menu, .pf-m-align-right').hide();
+    var card_id_sting = $(this).find('ul').attr('id');
+    $('#'+ card_id_sting).show();
+})
+
+
 /**
  * Meathod Name : scvm_bootstrap_run
  * Date Created : 2021.04.10

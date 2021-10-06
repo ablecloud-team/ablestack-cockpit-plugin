@@ -97,5 +97,6 @@ ceph mgr module disable dashboard
 ceph mgr module enable dashboard
 
 ceph config set mon mon_warn_on_insecure_global_id_reclaim_allowed false
+ceph config set mgr mgr/pg_autoscaler/autoscale_profile scale-up
 
 exit

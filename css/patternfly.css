@@ -14034,7 +14034,8 @@ label.pf-c-check, .pf-c-check__label,
 
 .pf-c-page__main-breadcrumb {
   padding: var(--pf-c-page__main-breadcrumb--PaddingTop) var(--pf-c-page__main-breadcrumb--PaddingRight) var(--pf-c-page__main-breadcrumb--PaddingBottom) var(--pf-c-page__main-breadcrumb--PaddingLeft);
-  background-color: var(--pf-c-page__main-breadcrumb--BackgroundColor); }
+  background-color: var(--pf-c-page__main-breadcrumb--BackgroundColor);
+  overflow: auto; }
   .pf-c-page__main-breadcrumb + .pf-c-page__main-section {
     --pf-c-page__main-section--PaddingTop: var(--pf-c-page__main-breadcrumb--main-section--PaddingTop); }
   .pf-c-page__main-breadcrumb.pf-m-sticky-top,
