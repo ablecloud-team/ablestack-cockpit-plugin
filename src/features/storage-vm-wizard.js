@@ -537,6 +537,8 @@ function deployStorageCenterVM() {
     $('#nav-button-ssh-key').addClass('pf-m-disabled');
     $('#nav-button-review').addClass('pf-m-disabled');
 
+    createLoggerInfo("deployStorageCenterVM start");
+
     //=========== 1. 스토리지센터 가상머신 초기화 작업 ===========
     // 설정 초기화 ( 필요시 python까지 종료 )
     seScvmProgressStep("span-progress-step1",1);
@@ -601,45 +603,54 @@ function deployStorageCenterVM() {
                                                 var result = JSON.parse(data);
                                                 if(result.code=="200"){
                                                     seScvmProgressStep("span-progress-step4",2);
+                                                    createLoggerInfo("deployStorageCenterVM success");
 
                                                     //최종 화면 호출
                                                     showDivisionVMConfigFinish();
                                                 } else {
                                                     setScvmProgressFail(4);
+                                                    createLoggerInfo(result.val);
                                                     alert(result.val);            
                                                 }
                                             })
                                             .catch(function(data){
                                                 setScvmProgressFail(4);
-                                                alert("클러스터 구성 및 클라우드센터 가상머신 배포 실패 : "+data);
+                                                createLoggerInfo("Storage Center Virtual Machine Deployment Failed");
+                                                alert("스토리지센터 가상머신 배포 실패 : "+data);
                                             });                                                        
                                     } else {
                                         setScvmProgressFail(3);
+                                        createLoggerInfo(create_scvm_xml_result.val);
                                         alert(create_scvm_xml_result.val);
                                     }
                                 })
                                 .catch(function(data){
                                     setScvmProgressFail(3);
-                                    alert("클라우드센터 가상머신 XML 생성 실패 : "+data);
+                                    createLoggerInfo("Storage center virtual machine configuration failed");
+                                    alert("스토리지센터 가상머신 구성 실패 : "+data);
                                 });                            
                         } else {
                             setScvmProgressFail(2);
+                            createLoggerInfo(create_scvm_cloudinit_result.val);
                             alert(create_scvm_cloudinit_result.val);
                         }
                     })
                     .catch(function(data){
                         setScvmProgressFail(2);
+                        createLoggerInfo("Failed to create cloudinit iso file");
                         alert("cloudinit iso 파일 생성 실패 : "+data);
                     });
 
             } else {
                 setScvmProgressFail(1);
+                createLoggerInfo(reset_storage_center_result.val);
                 alert(reset_storage_center_result.val);
             }
         })
         .catch(function(data){
             setScvmProgressFail(1);
-            alert("클러스터 구성 설정 초기화 작업 실패 : "+data);
+            createLoggerInfo("Storage center virtual machine initialization operation failed");
+            alert("스토리지센터 가상머신 초기화 작업 실패 : "+data);
         });
 }
 
@@ -679,6 +690,8 @@ function setDiskInfo(){
 
     // rp = raid passthrough, lp = lun passthrough
     disk_setup_type = $('input[name="form-radio-storage-vm-disk-type"]:checked').val()
+
+    createLoggerInfo("setDiskInfo() start");
     
     cockpit.spawn(cmd).then(function(data){
         
@@ -730,6 +743,7 @@ function setDiskInfo(){
         $('#disk-pci-list').append(el);
 
     }).catch(function(){
+        createLoggerInfo("setDiskInfo error");
         alert("setDiskInfo error");
     });
 }
@@ -783,7 +797,7 @@ $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
  */
  function setNicPassthrough(select_box_id){
     var cmd = ["python3",pluginpath + "/python/nic/network_action.py","list"];
-
+    createLoggerInfo("setNicPassthrough() start");
     cockpit.spawn(cmd).then(function(data){
         
         // 초기화
@@ -801,6 +815,7 @@ $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
         $('#'+select_box_id).append(el);
 
     }).catch(function(){
+        createLoggerInfo("setNicPassthrough error");
         alert("setNicPassthrough error");
     });
 }

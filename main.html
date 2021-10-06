@@ -39,11 +39,9 @@
                             <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-open-modal-wizard-storage-cluster">클러스터 구성 준비</button>
                             <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-open-modal-wizard-storage-vm">스토리지센터 VM 배포</button>
                             <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-open-modal-wizard-cloud-vm">클라우드센터 VM 배포</button>
-                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-storage-center-dashboard">스토리지센터 대시보드 연결</button>
+                            <!-- <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-storage-center-dashboard">스토리지센터 대시보드 연결</button> -->
                             <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-cloud-center">클라우드센터 연결</button>
-                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-open-modal-wizard-monitoring-center">모니터링센터 구성</button>
-                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-monitoring-center">모니터링센터 대시보드 연결</button>
-                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-skydive">스카이다이브 연결</button>
+                            <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-link-monitoring-center">모니터링센터 연결</button>
                         </div>
                     </div>  
                 </section>
@@ -73,7 +71,7 @@
                                                         <li>
                                                             <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-unset-maintenance-mode" >유지보수 모드 해제</button>
                                                         </li>
-                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li class="pf-c-divider" role="separator" id="scvm-after-bootstrap-separator"></li>
                                                         <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 있을때 표시-->
                                                         <li id="scvm-after-bootstrap-run"></li>
                                                         <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 없을때 표시-->
@@ -165,24 +163,21 @@
                                                     </button>
                                                     <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-cloud-cluster-status" id="dropdown-menu-cloud-cluster-status">
                                                         <li>
-                                                            <button id="button-cloud-cluster-start" class="pf-c-dropdown__menu-item" type="button">클러스터 시작</button>
+                                                            <button id="button-cloud-cluster-start" class="pf-c-dropdown__menu-item" type="button">클라우드센터VM 시작</button>
                                                         </li>
                                                         <li>
-                                                            <button id="button-cloud-cluster-stop" class="pf-c-dropdown__menu-item" type="button">클러스터 중지</button>
+                                                            <button id="button-cloud-cluster-stop" class="pf-c-dropdown__menu-item" type="button">클라우드센터VM 정지</button>
                                                         </li>
                                                         <li>
-                                                            <button id="button-cloud-cluster-cleanup" class="pf-c-dropdown__menu-item" type="button">클러스터 클린업</button>
+                                                            <button id="button-cloud-cluster-cleanup" class="pf-c-dropdown__menu-item" type="button">클라우드센터 클러스터 클린업</button>
                                                         </li>
                                                         <li class="pf-c-divider" role="separator"></li>
                                                         <li>
                                                             <button id="button-cloud-cluster-migration" class="pf-c-dropdown__menu-item" type="button">클라우드센터VM 마이그레이션</button>
                                                         </li>
-                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li class="pf-c-divider" role="separator" id="bootstrap-run-divider"></li>
                                                         <li id="ccvm-after-bootstrap-run"></li>
                                                         <li id="ccvm-before-bootstrap-run"></li>
-                                                        <li class="pf-c-divider" role="separator"></li>
-                                                        <li id="ccvm-after-monitoring-run"></li>
-                                                        <li id="ccvm-before-monitoring-run"></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -281,10 +276,6 @@
                                                         </li>
                                                         <li>
                                                             <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-storage-center-vm-resource-update" >스토리지센터VM 자원변경</button>
-                                                        </li>
-                                                        <li class="pf-c-divider" role="separator"></li>
-                                                        <li>
-                                                            <a class="pf-c-dropdown__menu-item pf-m-disabled" href="#" aria-disabled="true" tabindex="-1" id="menu-item-linkto-storage-center-vm">스토리지센터VM 연결</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -571,8 +562,6 @@
         <!-- 클라우드센터VM 배포 마법사 : ./src/features/cloud-vm-wizard.html을 내용으로 load -->
         <div class="pf-c-backdrop" id="div-modal-wizard-cloud-vm"></div>
 
-        <!-- Wall 모니터링 센터 구성 마법사 : ./src/features/wall-monitoring-wizard.html을 내용으로 load -->
-        <div class="pf-c-backdrop" id="div-modal-wizard-wall-monitoring"></div>
 
         <!-- 클라우드센터VM 시작 : Modal 영역 시작 -->
         <div id="div-modal-start-cloud-vm" class="pf-c-backdrop" style="display:none">
@@ -618,7 +607,7 @@
         <div id="div-modal-cleanup-cloud-vm" class="pf-c-backdrop" style="display:none">
             <div class="pf-l-bullseye">
                 <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Cloud VM stop">
-                    <button id="button-close-modal-cloud-vm-stop" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                    <button id="button-close-modal-cloud-vm-cleanup" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
                         <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                     <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">클라우드센터 클러스터 클린업</span></h1></header>
@@ -747,6 +736,7 @@
         <script src="./src/features/cloud-center-virtual-machine.js"></script>
         <script src="./src/features/main.js"></script>
         <script src="./src/features/card-cloud-cluster-status.js"></script>
+        <script src="./src/common/logger.js"></script>
         <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
         
     </body>

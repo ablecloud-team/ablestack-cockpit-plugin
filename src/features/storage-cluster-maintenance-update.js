@@ -16,6 +16,8 @@ $('#button-maintenance-mode-update').on('click', function(){
     $('#div-modal-spinner-header-txt').text('스토리지 클러스터 유지보수모드 변경중입니다.');
     $('#div-modal-spinner').show();
 
+    createLoggerInfo("button-maintenance-mode-update click");
+
     var cmd = $('#scc-maintenance-update-cmd').val();    
     if(cmd == "unset"){//유지보수 모드 해제 시 이벤트 요청        
         cockpit.spawn(["python3", pluginpath+"/python/scc_status/scc_status_update.py", "unset_noout" ])
@@ -25,10 +27,12 @@ $('#button-maintenance-mode-update').on('click', function(){
                 sessionStorage.setItem("storage_cluster_maintenance_status", "false"); //유지보수모드 해제 요청 후 세션스토리지에 상태값 재세팅
                 location.reload();                
             }else{
+                createLoggerInfo(":::scc maintenance update unset Error:::");
                 console.log(":::scc maintenance update unset Error::: " +data);
             }
         })
         .catch(function(data){
+            createLoggerInfo(":::scc maintenance update unset Error:::");
             console.log(":::scc maintenance update unset Error::: " +data);
         });    
     }else if(cmd == "set"){//유지보수 모드 설정 시 이벤트 요청        
@@ -39,10 +43,12 @@ $('#button-maintenance-mode-update').on('click', function(){
                 sessionStorage.setItem("storage_cluster_maintenance_status", "true"); //유지보수모드 해제 요청 후 세션스토리지에 상태값 재세팅
                 location.reload();                
             }else{
+                createLoggerInfo(":::scc maintenance update set Error:::");
                 console.log(":::scc maintenance update set Error::: " +data);
             }
         })
         .catch(function(data){
+            createLoggerInfo(":::scc maintenance update set Error:::");
             console.log(":::scc maintenance update set Error::: " +data);
         });        
     }    

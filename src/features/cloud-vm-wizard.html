@@ -213,8 +213,8 @@
                                             <div class="pf-c-form__group-control pf-m-inline">
                                                 <select class="pf-c-form-control" id="form-select-cloud-vm-compute-cpu-core" name="form-select-cloud-vm-compute-cpu-core" style="width:40%;">
                                                     <option value="" selected>선택하십시오</option>
+                                                    <option value="4">4 vCore</option>
                                                     <option value="8">8 vCore</option>
-                                                    <option value="16">16 vCore</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -228,9 +228,9 @@
                                             <div class="pf-c-form__group-control">
                                                 <select class="pf-c-form-control" id="form-select-cloud-vm-compute-memory" name="form-select-cloud-vm-compute-memory" style="width:40%;">
                                                     <option value="" selected>선택하십시오</option>
+                                                    <option value="8">8 GiB</option>
                                                     <option value="16">16 GiB</option>
                                                     <option value="32">32 GiB</option>
-                                                    <option value="64">64 GiB</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -260,8 +260,8 @@
                                     <div class="pf-c-alert__description">
                                         <p>클라우드센터 VM의 Compute 자원은 클라우드센터가 관리해야 할 호스트의 수에 따라 탄력적으로 선택합니다. </p>
                                         <p>
-                                            가상머신이 컨트롤 할 호스트의 수가 10개 미만이면 8 vCore를, 그 이상이면 16 vCore를 선택하십시오. 
-                                            메모리는 컨트롤할 호스트의 수가 10개 미만이면 16GiB를, 10 ~ 20개 이면 32GiB를, 21개 이상이면 64GiB를 선택해야 합니다. 
+                                            가상머신이 컨트롤 할 호스트의 수가 10개 미만이면 4 vCore를, 그 이상이면 8 vCore를 선택하십시오. 
+                                            메모리는 컨트롤할 호스트의 수가 10개 미만이면 8GiB를, 10 ~ 20개 이면 16GiB를, 21개 이상이면 32GiB를 선택해야 합니다. 
                                         </p>
                                         <p>ROOT Disk의 크기는 70GiB를 디스크가 Thin Provisioning 방식으로 제공됩니다. </p>
                                     </div>
@@ -288,7 +288,7 @@
                                                     <input class="pf-c-check__input" type="checkbox" id="form-checkbox-mngt-network" name="form-checkbox-mngt-network" checked disabled/>
                                                     <label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-mngt-network">관리네트워크</label>
                                                 </div>
-                                                <div class="pf-c-check">
+                                                <div class="pf-c-check" hidden>
                                                     <input class="pf-c-check__input" type="checkbox" id="form-checkbox-svc-network" name="form-checkbox-svc-network" />
                                                     <label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-svc-network">서비스네트워크</label>
                                                 </div>    
@@ -315,7 +315,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                <div class="pf-c-form__group" style="padding:0px;" hidden>
                                                     <div class="pf-c-form__group-label">
                                                         <label class="pf-c-form__label" for="form-select-cloud-vm-svc-parent">
                                                             <span class="pf-c-form__label-text">서비스네트워크</span>
@@ -339,12 +339,9 @@
                                         <strong><span class="pf-screen-reader">Info alert:</span>네트워크 구성 시 참고사항</strong>
                                     </p>
                                     <div class="pf-c-alert__description">
-                                        <p>클라우드센터에 접근하고자 하는 네트워크 위치에 따라 가상머신에 할당할 네트워크와 네트워크의 상위 브릿지를 선택합니다. </p>
                                         <p>
-                                            관리네트워크는 호스트를 관리하기 위해 필수적인 네트워크이며, 기본 선택되어 있고, 선택 여부를 변경할 수 없습니다. 
-                                            서비스네트워크는 사용자가 접근하고자 하는 네트워크 위치이며, 관리네트워크와 서비스네트워크가 다른 경우 선택합니다. 
+                                            관리네트워크는 호스트를 관리하기 위해 필수적인 네트워크이며, 기본 선택되어 있고, 선택 여부를 변경할 수 없습니다.
                                         </p>
-                                        <p>가상머신에 네트워크를 할당하기 전에 반드시 상위 브릿지를 먼저 생성해야 합니다. </p>
                                     </div>
                                 </div>
                             </div>
@@ -405,7 +402,7 @@
                                                 <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cloud-vm-mngt-gw" name="form-input-cloud-vm-mngt-gw" placeholder="xxx.xxx.xxx.xxx 형식으로 입력"/>
                                             </div>
                                         </div>
-                                        <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group" hidden>
                                             <div class="pf-c-form__group-label">
                                                 <label class="pf-c-form__label" for="form-input-cloud-vm-svc-nic-ip">
                                                     <span class="pf-c-form__label-text">서비스 NIC IP</span>
@@ -417,7 +414,7 @@
                                                 <input class="pf-c-form-control" style="width:10%" type="text" id="form-input-cloud-vm-svc-vlan" name="form-input-cloud-vm-svc-vlan" disabled/>
                                             </div>
                                         </div>
-                                        <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group" hidden>
                                             <div class="pf-c-form__group-label">
                                                 <label class="pf-c-form__label" for="form-input-cloud-vm-svc-gw">
                                                     <span class="pf-c-form__label-text">서비스 NIC Gateway</span>
@@ -612,7 +609,7 @@
                                                     </div>
                                                 </dd>
                                             </div>
-                                            <div class="pf-c-description-list__group">
+                                            <div class="pf-c-description-list__group" hidden>
                                                 <dt class="pf-c-description-list__term">
                                                     <span class="pf-c-description-list__text">서비스용 Bridge</span>
                                                 </dt>
@@ -682,7 +679,7 @@
                                                     </div>
                                                 </dd>
                                             </div>
-                                            <div class="pf-c-description-list__group">
+                                            <div class="pf-c-description-list__group" hidden>
                                                 <dt class="pf-c-description-list__term">
                                                     <span class="pf-c-description-list__text">서비스 NIC 정보</span>
                                                 </dt>
@@ -849,7 +846,7 @@
                             <div>클라우드센터 가상머신 배포를 취소하시겠습니까? 입력된 데이터는 초기화 됩니다.</div>
                         </div>
                         <footer class="pf-c-modal-box__footer">
-                            <button id="button-execution-modal-cloud-wizard-cancel" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                            <button id="button-execution-modal-cloud-wizard-cancel" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">예</button>
                             <button id="button-cancel-modal-cloud-wizard-cancel" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">아니요</button>
                         </footer>
                     </div>
