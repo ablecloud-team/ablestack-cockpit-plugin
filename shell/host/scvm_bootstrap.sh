@@ -97,5 +97,12 @@ ceph mgr module disable dashboard
 ceph mgr module enable dashboard
 
 ceph config set mon mon_warn_on_insecure_global_id_reclaim_allowed false
+ceph config set mgr mgr/pg_autoscaler/autoscale_profile scale-up
+
+# Add gs - start
+ceph orch apply osd --all-available-devices
+ceph osd pool create rbd --size 2
+ceph osd pool application enable rbd rbd --yes-i-really-mean-it
+# Add gs - end
 
 exit
