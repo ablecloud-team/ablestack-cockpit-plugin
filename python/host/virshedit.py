@@ -65,7 +65,7 @@ Parameter: memory: int memory용량(GiB)
 Parameter: xml: str xml파일의 경로
 :return: json
 '''
-def editVMOffering(cpu, memory, xml='/root/text.xml', H=False):
+def editVMOffering(cpu, memory, xml='/usr/share/cockpit/ablestack/tools/vmconfig/ccvm/ccvm.xml', H=False):
     soup = ""
     with open(xml, 'rt') as fp:
         soup = bs4.BeautifulSoup(fp, features='xml')
