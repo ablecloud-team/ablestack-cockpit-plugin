@@ -24,7 +24,7 @@ class CloudCenterVirtualMachine {
             ccvm_instance.runningHost = ''
             ccvm_instance.clusterdHost = []
             ccvm_instance.Name = 'ccvm'
-            ccvm_instance.xml = '/root/test.xml'
+            ccvm_instance.xml = '/usr/share/cockpit/ablestack/tools/vmconfig/ccvm/ccvm.xml'
             ccvm_instance.resource = 'cloudcenter_res'
         }
     }
@@ -270,7 +270,7 @@ class CloudCenterVirtualMachine {
     */
     changeOffering(cpu, memory) {
         ccvm_instance.clusterdHost.forEach(function (host){
-        cockpit.spawn(['/usr/bin/ssh', '-o', 'StrictHostKeyChecking=no', ccvm_instance.runningHost,
+        cockpit.spawn(['/usr/bin/ssh', '-o', 'StrictHostKeyChecking=no', host,
             '/usr/bin/python3', pluginpath + '/python/host/virshedit.py', 'edit', '--cpu', cpu, '--memory', memory, '--xml', ccvm_instance.xml])
             .then(ccvm_instance.createAlertModal)
             .catch(ccvm_instance.createAlertModal)
@@ -309,6 +309,8 @@ class CloudCenterVirtualMachine {
 
     */
     createAlertModal(data, message){
+        console.log(data);
+        console.log(message);
 
         const obj = JSON.parse(data)
         let msg = ''
