@@ -52,7 +52,11 @@ cephadm --image "$image" bootstrap \
         ceph config set client rbd_cache_size 1073741824 && \
         ceph config set client rbd_cache_max_dirty 805306368 && \
         ceph config set client rbd_cache_target_dirty 536870912 && \
-        ceph config set client rbd_cache_max_dirty_age 5.0
+        ceph config set client rbd_cache_max_dirty_age 5.0 && \
+        ceph config set mgr mgr/cephadm/container_image_alertmanager localhost:5000/prom/alertmanager:ablestack && \
+        ceph config set mgr mgr/cephadm/container_image_grafana localhost:5000/ceph/ceph-grafana:ablestack && \
+        ceph config set mgr mgr/cephadm/container_image_node_exporter localhost:5000/prom/node-exporter:ablestack && \
+        ceph config set mgr mgr/cephadm/container_image_prometheus localhost:5000/prom/prometheus:ablestack
 
 #crontab<<EOF
 #* * * * * /usr/local/bin/ipcorrector
@@ -100,13 +104,6 @@ ceph mgr module enable dashboard
 
 ceph config set mon mon_warn_on_insecure_global_id_reclaim_allowed false
 ceph config set mgr mgr/pg_autoscaler/autoscale_profile scale-up
-
-ceph config set mgr mgr/cephadm/container_image_alertmanager docker.io/prom/alertmanager:ablestack
-ceph config set mgr mgr/cephadm/container_image_grafana docker.io/ceph/ceph-grafana:ablestack
-ceph config set mgr mgr/cephadm/container_image_node_exporter docker.io/prom/node-exporter:ablestack
-ceph config set mgr mgr/cephadm/container_image_prometheus docker.io/prom/prometheus:ablestack
-
-
 
 /usr/bin/mv -f /usr/share/ablestack/ablestack-wall/process-exporter/scvm_process.yml /usr/share/ablestack/ablestack-wall/process-exporter/process.yml
 
