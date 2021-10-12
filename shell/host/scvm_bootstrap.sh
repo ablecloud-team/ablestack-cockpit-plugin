@@ -57,7 +57,9 @@ cephadm --image "$image" bootstrap \
 #crontab<<EOF
 #* * * * * /usr/local/bin/ipcorrector
 #EOF
-sed -e '/mon host/d' /etc/ceph/ceph.conf | sed -e 's/mon_host/mon host/' > /etc/ceph/ceph.conf_
+#sed -e '/mon host/d' /etc/ceph/ceph.conf | sed -e 's/mon_host/mon host/' > /etc/ceph/ceph.conf_
+grep fsid /etc/ceph/ceph.conf >> /root/ceph.conf
+sed -e '/mon_host/d' /root/ceph.conf > /etc/ceph/ceph.conf_
 cp /etc/ceph/ceph.conf_ /etc/ceph/ceph.conf
 for host in $allhosts
 do
@@ -98,6 +100,13 @@ ceph mgr module enable dashboard
 
 ceph config set mon mon_warn_on_insecure_global_id_reclaim_allowed false
 ceph config set mgr mgr/pg_autoscaler/autoscale_profile scale-up
+
+ceph config set mgr mgr/cephadm/container_image_alertmanager docker.io/prom/alertmanager:ablestack
+ceph config set mgr mgr/cephadm/container_image_grafana docker.io/ceph/ceph-grafana:ablestack
+ceph config set mgr mgr/cephadm/container_image_node_exporter docker.io/prom/node-exporter:ablestack
+ceph config set mgr mgr/cephadm/container_image_prometheus docker.io/prom/prometheus:ablestack
+
+
 
 /usr/bin/mv -f /usr/share/ablestack/ablestack-wall/process-exporter/scvm_process.yml /usr/share/ablestack/ablestack-wall/process-exporter/process.yml
 
