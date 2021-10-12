@@ -33,6 +33,9 @@ echo -e "\tmgr/cephadm/container_image_base = $imagename" >> "$conffile"
 echo >> "$conffile"
 sed -i 's/, $//' "$conffile"
 
+podman run --privileged -d --name registry -p 5000:5000 -v /var/lib/registry:/var/lib/registry --restart=always registry:2
+
+
 #container image id추출
 image=$(/bin/podman inspect --format {{.ID}},{{.RepoDigests}} $imagename | cut -d "," -f 2 | sed 's/\[//' | sed 's/]//' )
 cephadm --image "$image" bootstrap \
