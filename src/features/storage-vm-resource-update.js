@@ -15,6 +15,7 @@ $('#scvm-resource-update').click(function(){
     $('#div-modal-storage-vm-resource-update').hide();
     $('#div-modal-spinner-header-txt').text('스토리지센터 가상머신 자원 변경중입니다.');
     $('#div-modal-spinner').show();
+    createLoggerInfo("scvm-resource-update click");
 
     var cpu = $('#form-select-storage-vm-cpu-update option:selected').val();
     var memory = $('#form-select-storage-vm-memory-update option:selected').val();    
@@ -27,10 +28,12 @@ $('#scvm-resource-update').click(function(){
             if(retVal.code == "200"){
                 location.reload();
             }else{                
+                createLoggerInfo(":::scvm resource update Error:::");
                 console.log(":::scvm resource update Error::: "+ data);
             }
         })
         .catch(function(data){
+            createLoggerInfo(":::scvm resource update Error:::");
             console.log(":::scvm resource update Error::: "+ data);     
         });
     }

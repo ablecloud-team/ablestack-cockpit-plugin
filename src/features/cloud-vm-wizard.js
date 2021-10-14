@@ -586,7 +586,7 @@ function deployCloudCenterVM() {
     //=========== 1. 클러스터 구성 host 네트워크 연결 테스트 ===========
     setProgressStep("span-ccvm-progress-step1",1);
     var console_log = true;
-
+    createLoggerInfo("deployCloudCenterVM start");
     var host_ping_test_cmd = ['python3', pluginpath + '/python/vm/host_ping_test.py', '-hns', host1_name, host2_name, host3_name];
     if(console_log){console.log(host_ping_test_cmd);}
     cockpit.spawn(host_ping_test_cmd)
@@ -661,54 +661,65 @@ function deployCloudCenterVM() {
                                                             //결과 값 json으로 return
                                                             var result = JSON.parse(data);
                                                             if(result.code=="200"){
+                                                                createLoggerInfo("deployCloudCenterVM success");
                                                                 setProgressStep("span-ccvm-progress-step5",2);
                                                                 //최종 화면 호출
                                                                 showDivisionCloudVMConfigFinish();
                                                             } else {
                                                                 setProgressFail(5);
+                                                                createLoggerInfo(result.val);
                                                                 alert(result.val);            
                                                             }
                                                         })
                                                         .catch(function(data){
                                                             setProgressFail(5);
+                                                            createLoggerInfo("Cluster configuration and cloud center virtual machine deployment failed");
                                                             alert("클러스터 구성 및 클라우드센터 가상머신 배포 실패 : "+data);
                                                         });                                                        
                                                 } else {
                                                     setProgressFail(4);
+                                                    createLoggerInfo(create_ccvm_xml_result.val);
                                                     alert(create_ccvm_xml_result.val);
                                                 }
                                             })
                                             .catch(function(data){
                                                 setProgressFail(4);
+                                                createLoggerInfo("Cloud Center Virtual Machine XML Creation Failed");
                                                 alert("클라우드센터 가상머신 XML 생성 실패 : "+data);
                                             });                                        
                                     } else {
                                         setProgressFail(3);
+                                        createLoggerInfo(create_ccvm_cloudinit_result.val);
                                         alert(create_ccvm_cloudinit_result.val);
                                     }
                                 })
                                 .catch(function(data){
                                     setProgressFail(3);
+                                    createLoggerInfo("Failed to create cloudinit iso file");
                                     alert("cloudinit iso 파일 생성 실패 : "+data);
                                 });
 
                         } else {
                             setProgressFail(2);
+                            createLoggerInfo(reset_cloud_center_result.val);
                             alert(reset_cloud_center_result.val);
                         }
                     })
                     .catch(function(data){
                         setProgressFail(2);
+                        createLoggerInfo("Failed to initialize cluster configuration settings");
                         alert("클러스터 구성 설정 초기화 작업 실패 : "+data);
                     });
 
             } else {
                 setProgressFail(1);
+                createLoggerInfo(ping_test_result.val);
                 alert(ping_test_result.val);
             }
         })
         .catch(function(data){
             setProgressFail(1);
+            createLoggerInfo("Failed to check connection status of host to configure cluster");
             alert("클러스터 구성할 host 연결 상태 확인 실패 : "+data);
         });
 }
