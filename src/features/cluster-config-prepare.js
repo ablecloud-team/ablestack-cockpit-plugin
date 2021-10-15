@@ -337,15 +337,36 @@ $('#form-radio-hosts-new').on('click', function () {
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
     $('#div-form-hosts-input-number').show();
-    // "기존 파일 사용"에서 "신규 생성"을 클릭하면 초기화 된다.
-    $('#form-textarea-cluster-config-new-host-profile').val("");
-    let hosts_text = "10.10.10.10\tccvm-mngt\n" +
-        "10.10.10.1\tablecube1\n" +
-        "10.10.10.11\tscvm1-mngt\n" +
-        "100.100.10.11\tscvm1\n" +
-        "100.200.10.11\tscvm1-cn\n";
-    $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
     $('#form-input-cluster-config-host-number').val(1);
+    // 테이블 형식으로 변경
+    // "기존 파일 사용"에서 "신규 생성"을 클릭하면 초기화 된다.
+    $("#form-table-tbody-cluster-config-new-host-profile").empty();
+    let insert_tr = "";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>10.10.10.10</td>";
+    insert_tr += "<td contenteditable='true'>ccvm-mngt</td>";
+    insert_tr += "</tr>";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>10.10.10.1</td>";
+    insert_tr += "<td contenteditable='true'>ablecube1</td>";
+    insert_tr += "</tr>";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>10.10.10.11</td>";
+    insert_tr += "<td contenteditable='true'>scvm1-mngt</td>";
+    insert_tr += "</tr>";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>100.100.10.1</td>";
+    insert_tr += "<td contenteditable='true'>ablecube-pn</td>";
+    insert_tr += "</tr>";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>100.100.10.11</td>";
+    insert_tr += "<td contenteditable='true'>scvm1</td>";
+    insert_tr += "</tr>";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>100.200.10.11</td>";
+    insert_tr += "<td contenteditable='true'>scvm1-cn</td>";
+    insert_tr += "</tr>";
+    $("#form-table-cluster-config-new-host-profile").append(insert_tr);
 });
 
 // Host 파일 준비 방법 중 기존 파일 사용을 클릭하는 경우 Host 프로파일 디비전을 숨기고 Hosts 파일 디비전은 보여준다.
@@ -370,39 +391,63 @@ $('#form-input-cluster-config-host-number-minus').on('click', function () {
     }
 });
 $('#form-input-cluster-config-host-number').on('propertychange change keyup paste input', function () {
-    if (this.value <= 0 || this.value > 90) {
-        alert("1~90까지의 숫자만 입력할 수 있습니다.")
+    if (this.value <= 0 || this.value > 9) {
+        alert("1~9까지의 숫자만 입력할 수 있습니다.")
         this.value = 1;
     }
 });
 // Host 파일 준비 중 신규생성을 선택한 경우 Host 수에 따라 텍스트 값 변경
 $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-number-plus, #form-input-cluster-config-host-number-minus').on('change click', function () {
     let current_val = $('#form-input-cluster-config-host-number').val();
-    let target_textarea = $('#form-textarea-cluster-config-new-host-profile');
-    let host_ip_info;
-    if (current_val <= 90) {
-        target_textarea.val("");
-        host_ip_info = "10.10.10.10\tccvm-mngt\n";
+    if (current_val <= 9) {
+        let target_table = $("#form-table-tbody-cluster-config-new-host-profile");
+        target_table.empty();
+        let insert_tr;
+        insert_tr += "<tr>";
+        insert_tr += "<td contenteditable='true'>10.10.10.10</td>";
+        insert_tr += "<td contenteditable='true'>ccvm-mngt</td>";
+        insert_tr += "</tr>";
+
         for (let i = 1; i <= current_val; i++) {
             let sum = 0 + i;
-            host_ip_info = host_ip_info + "10.10.10." + sum + "\tablecube" + i + "\n";
+            insert_tr += "<tr>";
+            insert_tr += "<td contenteditable='true'>10.10.10."+ sum +"</td>";
+            insert_tr += "<td contenteditable='true'>ablecube"+ i +"</td>";
+            insert_tr += "</tr>";
         }
         for (let i = 1; i <= current_val; i++) {
             let sum = 10 + i;
-            host_ip_info = host_ip_info + "10.10.10." + sum + "\tscvm" + i + "-mngt\n";
+            insert_tr += "<tr>";
+            insert_tr += "<td contenteditable='true'>10.10.10."+ sum +"</td>";
+            insert_tr += "<td contenteditable='true'>scvm"+ i +"-mngt</td>";
+            insert_tr += "</tr>";
+        }
+        for (let i = 1; i <= current_val; i++) {
+            let sum = 0 + i;
+            insert_tr += "<tr>";
+            insert_tr += "<td contenteditable='true'>100.100.10."+ sum +"</td>";
+            insert_tr += "<td contenteditable='true'>ablecube"+ i +"-pn" +"</td>";
+            insert_tr += "</tr>";
         }
         for (let i = 1; i <= current_val; i++) {
             let sum = 10 + i;
-            host_ip_info = host_ip_info + "100.100.10." + sum + "\tscvm" + i + "\n";
+            insert_tr += "<tr>";
+            insert_tr += "<td contenteditable='true'>100.100.10."+ sum +"</td>";
+            insert_tr += "<td contenteditable='true'>scvm"+ i +"</td>";
+            insert_tr += "</tr>";
         }
         for (let i = 1; i <= current_val; i++) {
             let sum = 10 + i;
-            host_ip_info = host_ip_info + "100.200.10." + sum + "\tscvm" + i + "-cn\n";
+            insert_tr += "<tr>";
+            insert_tr += "<td contenteditable='true'>100.200.10."+ sum +"</td>";
+            insert_tr += "<td contenteditable='true'>scvm"+ i +"-cn</td>";
+            insert_tr += "</tr>";
         }
-        target_textarea.val(host_ip_info);
+        $("#form-table-cluster-config-new-host-profile").append(insert_tr);
+
     } else {
-        $('#form-input-cluster-config-host-number').val(90);
-        alert("1~90까지의 숫자만 입력할 수 있습니다.");
+        $('#form-input-cluster-config-host-number').val(9);
+        alert("1~9까지의 숫자만 입력할 수 있습니다.");
     }
 });
 
@@ -576,8 +621,22 @@ $('#span-modal-wizard-cluster-config-finish-pub-sshkey-download').on('click', fu
 $('#span-modal-wizard-cluster-config-finish-hosts-file-download').on('click', function () {
     let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
     putHostsValueIntoTextarea(hosts_file_type);
-
+    
     let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
+    // OS 타입에 따라 hosts 파일 값을 다르게 설정
+    let os_type = ($('#os-type').val()).trim();
+    let host_name = $('#host-name').val();
+    os_type = "ubuntu"
+    if(os_type.match("centos")) {
+        let hosts_centos_default_text = "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4\n" +
+        "::1         localhost localhost.localdomain localhost6 localhost6.localdomain6\n\n";
+        hosts_file_text = hosts_centos_default_text + hosts_file_text
+    }else if(os_type.match("ubuntu")) {
+        host_name = host_name.trim();
+        let hosts_ubuntu_default_text = "127.0.0.1\tlocalhost\n" +
+            "127.0.1.1\t" + host_name + "\t" + host_name + "\n\n";
+        hosts_file_text = hosts_ubuntu_default_text + hosts_file_text    
+    }
     let hosts_file_download_link_id = 'span-modal-wizard-cluster-config-finish-hosts-file-download';
     // 다운로드 링크 생성 전 유효성 검정
     if (hosts_file_text.trim() != "") {
@@ -679,12 +738,34 @@ async function resetClusterConfigWizardWithData() {
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
     $('#div-form-hosts-input-number').show();
-    let hosts_text = "10.10.10.10\tccvm-mngt\n" +
-        "10.10.10.1\tablecube1\n" +
-        "10.10.10.11\tscvm1-mngt\n" +
-        "100.100.10.11\tscvm1\n" +
-        "100.200.10.11\tscvm1-cn\n";
-    $('#form-textarea-cluster-config-new-host-profile').val(hosts_text);
+    // hosts 입력 테이블 초기화
+    $("#form-table-tbody-cluster-config-new-host-profile").empty();
+    let insert_tr = "";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>10.10.10.10</td>";
+    insert_tr += "<td contenteditable='true'>ccvm-mngt</td>";
+    insert_tr += "</tr>";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>10.10.10.1</td>";
+    insert_tr += "<td contenteditable='true'>ablecube1</td>";
+    insert_tr += "</tr>";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>10.10.10.11</td>";
+    insert_tr += "<td contenteditable='true'>scvm1-mngt</td>";
+    insert_tr += "</tr>";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>100.100.10.1</td>";
+    insert_tr += "<td contenteditable='true'>ablecube-pn</td>";
+    insert_tr += "</tr>";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>100.100.10.11</td>";
+    insert_tr += "<td contenteditable='true'>scvm1</td>";
+    insert_tr += "</tr>";
+    insert_tr += "<tr>";
+    insert_tr += "<td contenteditable='true'>100.200.10.11</td>";
+    insert_tr += "<td contenteditable='true'>scvm1-cn</td>";
+    insert_tr += "</tr>";
+    $("#form-table-cluster-config-new-host-profile").append(insert_tr);
     $('#form-input-cluster-config-host-number').val(1);
     // 시간 서버
     $('#form-radio-timeserver-ext').prop('checked', true);
@@ -903,7 +984,28 @@ function putHostsValueIntoTextarea(radio_value) {
     if (radio_value == "new") {
         // hosts file 준비 방법 표시 및 값 설정
         $('#div-accordion-hosts-file-type').text("신규 생성");
-        $('#div-textarea-cluster-config-confirm-hosts-file').val($('#form-textarea-cluster-config-new-host-profile').val());
+        // 신규로 생성할 경우 테이블의 내용을 textarea에 넣는 코드
+        let current_val = $('#form-input-cluster-config-host-number').val();
+        let colcnt = $('#form-table-cluster-config-new-host-profile colgroup col').length;
+        let rowcnt = $('#form-table-cluster-config-new-host-profile tbody tr').length;
+        console.log(current_val)
+        console.log(colcnt)
+        console.log(rowcnt)
+        let arr = new Array();
+        $('#form-table-cluster-config-new-host-profile tr').each(function(){
+            for(let i = 0; i < 2; i++){
+                arr += $(this).find('td').eq(i).text();
+                if(i%2 == 0) {
+                    arr += "\t"
+                }
+                else{
+                    arr += "\n"
+                }
+            }
+        });
+        console.log(arr);
+
+        $('#div-textarea-cluster-config-confirm-hosts-file').val(arr);
     } else if (radio_value == "existing") {
         // hosts file 준비 방법 표시 및 값 설정
         $('#div-accordion-hosts-file-type').text("기존 파일 사용");
@@ -1159,9 +1261,6 @@ function validateClusterConfigPrepare(timeserver_type) {
         validate_check = false;
     } else if ($('#div-textarea-cluster-config-confirm-hosts-file').val().trim() == "") {
         alert("Hosts 파일 정보를 확인해 주세요.");
-        validate_check = false;
-    } else if (checkSpace($('#form-textarea-cluster-config-new-host-profile').val()) == false) {
-        alert("Hosts 파일 작성 시 'Tab 키'만 사용 가능합니다.");
         validate_check = false;
     } else if (timeserver_type == "external") {
         if (timeserver_ip_check_external_1 == false) {

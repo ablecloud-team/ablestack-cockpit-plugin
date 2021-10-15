@@ -166,14 +166,64 @@
                                     </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-profile">
                                         <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-textarea-cluster-config-new-host-profile">
+                                            <label class="pf-c-form__label" for="form-table-cluster-config-new-host-profile">
                                                 <span class="pf-c-form__label-text">Hosts 프로파일</span>
                                             </label>
                                         </div>
-                                        <div class="pf-c-form__group-control">
-                                            <textarea class="pf-c-form-control tab-available" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-new-host-profile">10.10.10.10&#9;ccvm-mngt&#10;10.10.10.1&#9;ablecube1&#10;10.10.10.11&#9;scvm1-mngt&#10;100.100.10.11&#9;scvm1&#10;100.200.10.11&#9;scvm1-cn&#10;</textarea>
+                                        <div class="pf-c-form__group-control" style="width: 558px;height: 200px;overflow: auto;">
+                                            <table id="form-table-cluster-config-new-host-profile" style="width:100%;">
+                                                <colgroup>
+                                                <col width="50%">
+                                                <col width="50%">
+                                                </colgroup>
+                                                <thead class="--pf-global--BorderColor--300" style="border-bottom: solid 1px #8a8d90;position: sticky;top: 0;background-color: white;">
+                                                    <tr>
+                                                      <th>IP 주소</th>
+                                                      <th>Alias</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="form-table-tbody-cluster-config-new-host-profile">
+                                                  <tr>
+                                                    <td class='host-td'contenteditable="true">10.10.10.10</td>
+                                                    <td contenteditable="true">ccvm-mngt</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td contenteditable="true">10.10.10.1</td>
+                                                    <td contenteditable="true">ablecube1</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td contenteditable="true">10.10.10.11</td>
+                                                    <td contenteditable="true">scvm1-mngt</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td contenteditable="true">100.100.10.1</td>
+                                                    <td contenteditable="true">ablecube1-pn</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td contenteditable="true">100.100.10.11</td>
+                                                    <td contenteditable="true">scvm1</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td contenteditable="true">100.200.10.11</td>
+                                                    <td contenteditable="true">scvm1-cn</td>
+                                                  </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
+                                        
                                     </div>
+
+                                        
+
+
+
+
+
+
+
+
+
+
                                     <div class="pf-c-form__group" id="div-form-hosts-file">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-config-hosts-file">
@@ -189,14 +239,6 @@
                                     </div>
                                 </section>
                             </form>
-                            <div class="pf-c-alert pf-m-info pf-m-inline" aria-label="Cluster Prepare Hosts" style="margin-left:15px;margin-top:32px">
-                                <div class="pf-c-alert__icon">
-                                    <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
-                                </div>
-                                <p class="pf-c-alert__title pf-m-truncate">
-                                    <strong><span class="pf-screen-reader">Info alert:</span>호스트 프로파일 작성 시 IP 및 Host Name, Alias 구분은 탭(Tab)을 사용해야합니다.</strong>
-                                </p>
-                            </div>
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cluster-config-time-server">
                             <p>
@@ -281,7 +323,6 @@
                                         </div>
                                     </div>
                                 </section>
-중
                             </form>
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cluster-config-review">
@@ -356,7 +397,7 @@
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-hosts-file" style="width:90%;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>Host 프로파일 내용</textarea>
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-hosts-file" style="width:670px;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>Host 프로파일 내용</textarea>
                                                     </div>
                                                 </dd>
                                             </div>
