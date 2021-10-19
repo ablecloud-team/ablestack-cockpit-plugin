@@ -337,34 +337,42 @@ $('#form-radio-hosts-new').on('click', function () {
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
     $('#div-form-hosts-input-number').show();
+    $('#div-form-hosts-input-current-number').show();
     $('#form-input-cluster-config-host-number').val(1);
+    $('#form-input-cluster-config-current-host-number').val(1);
     // 테이블 형식으로 변경
     // "기존 파일 사용"에서 "신규 생성"을 클릭하면 초기화 된다.
     $("#form-table-tbody-cluster-config-new-host-profile").empty();
     let insert_tr = "";
     insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>10.10.10.10</td>";
-    insert_tr += "<td contenteditable='true'>ccvm-mngt</td>";
+    insert_tr += "<td contenteditable='true'>192.168.0.10</td>";
+    insert_tr += "<td contenteditable='flase'>ccvm-mngt</td>";
+    insert_tr += "<td contenteditable='flase'>ccvm</td>";
     insert_tr += "</tr>";
     insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>10.10.10.1</td>";
+    insert_tr += "<td contenteditable='true'>192.168.1.1</td>";
     insert_tr += "<td contenteditable='true'>ablecube1</td>";
+    insert_tr += "<td contenteditable='true'>ablecube</td>";
     insert_tr += "</tr>";
     insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>10.10.10.11</td>";
-    insert_tr += "<td contenteditable='true'>scvm1-mngt</td>";
+    insert_tr += "<td contenteditable='true'>192.168.2.1</td>";
+    insert_tr += "<td contenteditable='flase'>scvm1-mngt</td>";
+    insert_tr += "<td contenteditable='flase'>scvm-mngt</td>";
     insert_tr += "</tr>";
     insert_tr += "<tr>";
     insert_tr += "<td contenteditable='true'>100.100.10.1</td>";
+    insert_tr += "<td contenteditable='true'>ablecube1-pn</td>";
     insert_tr += "<td contenteditable='true'>ablecube-pn</td>";
     insert_tr += "</tr>";
     insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>100.100.10.11</td>";
-    insert_tr += "<td contenteditable='true'>scvm1</td>";
+    insert_tr += "<td contenteditable='true'>100.100.10.101</td>";
+    insert_tr += "<td contenteditable='flase'>scvm1</td>";
+    insert_tr += "<td contenteditable='flase'>scvm</td>";
     insert_tr += "</tr>";
     insert_tr += "<tr>";
     insert_tr += "<td contenteditable='true'>100.200.10.11</td>";
-    insert_tr += "<td contenteditable='true'>scvm1-cn</td>";
+    insert_tr += "<td contenteditable='flase'>scvm1-cn</td>";
+    insert_tr += "<td contenteditable='flase'>scvm-cn</td>";
     insert_tr += "</tr>";
     $("#form-table-cluster-config-new-host-profile").append(insert_tr);
 });
@@ -376,79 +384,145 @@ $('#form-radio-hosts-file').on('click', function () {
     $('#div-form-hosts-input-number').hide();
 });
 
-// Host 파일 준비 중 Host 수를 편집하고 제한하는 기능
+// Host 파일 준비 중 "현재 호스트 번호"를 변경하는 '+', '-' 기능 
+$('#form-input-cluster-config-current-host-number-plus').on('click', function () {
+    let total_host_num_val = $('#form-input-cluster-config-host-number').val();
+    let n = $('.bt_up').index(this);
+    let num = $("#form-input-cluster-config-current-host-number:eq(" + n + ")").val();
+    if (num < total_host_num_val) {
+        num = $("#form-input-cluster-config-current-host-number:eq(" + n + ")").val(num * 1 + 1);
+    }
+});
+$('#form-input-cluster-config-current-host-number-minus').on('click', function () {
+    let n = $('.bt_down').index(this);
+    let num = $("#form-input-cluster-config-current-host-number:eq(" + n + ")").val();
+    if (num > 1) {
+        num = $("#form-input-cluster-config-current-host-number:eq(" + n + ")").val(num * 1 - 1);
+        return;
+    }
+});
+$('#form-input-cluster-config-current-host-number').on('propertychange change keyup paste input', function () {
+    let total_host_num_val = $('#form-input-cluster-config-host-number').val();
+    if (this.value <= 0 || this.value > 90) {
+        alert("1~90까지의 숫자만 입력할 수 있습니다.")
+        this.value = total_host_num_val;
+    }else if(this.value > total_host_num_val) {
+        this.value = total_host_num_val;
+        return;
+    }
+});
+
+// Host 파일 준비 중 "구성할 호스트"를 변경하는 '+', '-' 기능 
 $('#form-input-cluster-config-host-number-plus').on('click', function () {
     let n = $('.bt_up').index(this);
     let num = $("#form-input-cluster-config-host-number:eq(" + n + ")").val();
     num = $("#form-input-cluster-config-host-number:eq(" + n + ")").val(num * 1 + 1);
 });
 $('#form-input-cluster-config-host-number-minus').on('click', function () {
+    let current_host_num_val = $('#form-input-cluster-config-current-host-number').val();
     let n = $('.bt_down').index(this);
     let num = $("#form-input-cluster-config-host-number:eq(" + n + ")").val();
+    if (current_host_num_val >= num && num != 1) {
+        $('#form-input-cluster-config-current-host-number').val(num * 1 - 1)
+    }
     if (num > 1) {
         num = $("#form-input-cluster-config-host-number:eq(" + n + ")").val(num * 1 - 1);
         return;
     }
 });
 $('#form-input-cluster-config-host-number').on('propertychange change keyup paste input', function () {
-    if (this.value <= 0 || this.value > 9) {
-        alert("1~9까지의 숫자만 입력할 수 있습니다.")
+    let current_host_num_val = $('#form-input-cluster-config-current-host-number').val();
+    if (this.value <= 0 || this.value > 90) {
+        alert("1~90까지의 숫자만 입력할 수 있습니다.")
         this.value = 1;
+    }else if(this.value < current_host_num_val) {
+        $('#form-input-cluster-config-current-host-number').val(this.value)
     }
 });
 // Host 파일 준비 중 신규생성을 선택한 경우 Host 수에 따라 텍스트 값 변경
-$('#form-input-cluster-config-host-number, #form-input-cluster-config-host-number-plus, #form-input-cluster-config-host-number-minus').on('change click', function () {
-    let current_val = $('#form-input-cluster-config-host-number').val();
-    if (current_val <= 9) {
+$('#form-input-cluster-config-host-number, #form-input-cluster-config-host-number-plus, #form-input-cluster-config-host-number-minus' +
+', #form-input-cluster-config-current-host-number, #form-input-cluster-config-current-host-number-plus, #form-input-cluster-config-current-host-number-minus').on('change click', function () {
+
+    let current_host_num_val = $('#form-input-cluster-config-current-host-number').val();
+    let total_host_num_val = $('#form-input-cluster-config-host-number').val();
+    if (total_host_num_val <= 90 && current_host_num_val <= 90) {
         let target_table = $("#form-table-tbody-cluster-config-new-host-profile");
         target_table.empty();
         let insert_tr;
         insert_tr += "<tr>";
-        insert_tr += "<td contenteditable='true'>10.10.10.10</td>";
-        insert_tr += "<td contenteditable='true'>ccvm-mngt</td>";
+        insert_tr += "<td contenteditable='true'>192.168.0.10</td>";
+        insert_tr += "<td contenteditable='flase'>ccvm-mngt</td>";
+        insert_tr += "<td contenteditable='flase'>ccvm</td>";
         insert_tr += "</tr>";
 
-        for (let i = 1; i <= current_val; i++) {
+        for (let i = 1; i <= total_host_num_val; i++) {
             let sum = 0 + i;
             insert_tr += "<tr>";
-            insert_tr += "<td contenteditable='true'>10.10.10."+ sum +"</td>";
+            insert_tr += "<td contenteditable='true'>192.168.1."+ sum +"</td>";
             insert_tr += "<td contenteditable='true'>ablecube"+ i +"</td>";
+            if(current_host_num_val == sum) {
+                insert_tr += "<td contenteditable='true'>ablecube</td>";
+            }else {
+                insert_tr += "<td contenteditable='flase'></td>";
+            }
             insert_tr += "</tr>";
         }
-        for (let i = 1; i <= current_val; i++) {
+        for (let i = 1; i <= total_host_num_val; i++) {
             let sum = 10 + i;
             insert_tr += "<tr>";
-            insert_tr += "<td contenteditable='true'>10.10.10."+ sum +"</td>";
-            insert_tr += "<td contenteditable='true'>scvm"+ i +"-mngt</td>";
+            insert_tr += "<td contenteditable='true'>192.168.2."+ sum +"</td>";
+            insert_tr += "<td contenteditable='flase'>scvm"+ i +"-mngt</td>";
+            if(current_host_num_val == sum-10) {
+                insert_tr += "<td contenteditable='flase'>scvm-mngt</td>";
+            }else {
+                insert_tr += "<td contenteditable='flase'></td>";
+            }
             insert_tr += "</tr>";
         }
-        for (let i = 1; i <= current_val; i++) {
+        for (let i = 1; i <= total_host_num_val; i++) {
             let sum = 0 + i;
             insert_tr += "<tr>";
             insert_tr += "<td contenteditable='true'>100.100.10."+ sum +"</td>";
             insert_tr += "<td contenteditable='true'>ablecube"+ i +"-pn" +"</td>";
+            if(current_host_num_val == sum) {
+                insert_tr += "<td contenteditable='true'>ablecube-pn</td>";
+            }else {
+                insert_tr += "<td contenteditable='flase'></td>";
+            }
             insert_tr += "</tr>";
         }
-        for (let i = 1; i <= current_val; i++) {
-            let sum = 10 + i;
+        for (let i = 1; i <= total_host_num_val; i++) {
+            let sum = 100 + i;
             insert_tr += "<tr>";
             insert_tr += "<td contenteditable='true'>100.100.10."+ sum +"</td>";
-            insert_tr += "<td contenteditable='true'>scvm"+ i +"</td>";
+            insert_tr += "<td contenteditable='flase'>scvm"+ i +"</td>";
+            if(current_host_num_val == sum-100) {
+                insert_tr += "<td contenteditable='flase'>scvm</td>";
+            }else {
+                insert_tr += "<td contenteditable='flase'></td>";
+            }
             insert_tr += "</tr>";
         }
-        for (let i = 1; i <= current_val; i++) {
+        for (let i = 1; i <= total_host_num_val; i++) {
             let sum = 10 + i;
             insert_tr += "<tr>";
             insert_tr += "<td contenteditable='true'>100.200.10."+ sum +"</td>";
-            insert_tr += "<td contenteditable='true'>scvm"+ i +"-cn</td>";
+            insert_tr += "<td contenteditable='flase'>scvm"+ i +"-cn</td>";
+            if(current_host_num_val == sum-10) {
+                insert_tr += "<td contenteditable='flase'>scvm-cn</td>";
+            }else {
+                insert_tr += "<td contenteditable='flase'></td>";
+            }
             insert_tr += "</tr>";
         }
         $("#form-table-cluster-config-new-host-profile").append(insert_tr);
 
     } else {
-        $('#form-input-cluster-config-host-number').val(9);
-        alert("1~9까지의 숫자만 입력할 수 있습니다.");
+        $('#form-input-cluster-config-host-number').val(90);
+        $('#form-input-cluster-config-current-host-number').val(90);
+        alert("1~90까지의 숫자만 입력할 수 있습니다.");
     }
+    
 });
 
 // 로컬 시간서버를 외부 시간서버로 선택하면 시간서버 2, 3은 선택 입력으로 전환한다.
@@ -738,35 +812,43 @@ async function resetClusterConfigWizardWithData() {
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
     $('#div-form-hosts-input-number').show();
+    $('#div-form-hosts-input-current-number').show();
     // hosts 입력 테이블 초기화
     $("#form-table-tbody-cluster-config-new-host-profile").empty();
     let insert_tr = "";
     insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>10.10.10.10</td>";
-    insert_tr += "<td contenteditable='true'>ccvm-mngt</td>";
+    insert_tr += "<td contenteditable='true'>192.168.0.10</td>";
+    insert_tr += "<td contenteditable='flase'>ccvm-mngt</td>";
+    insert_tr += "<td contenteditable='flase'>ccvm</td>";
     insert_tr += "</tr>";
     insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>10.10.10.1</td>";
+    insert_tr += "<td contenteditable='true'>192.168.1.1</td>";
     insert_tr += "<td contenteditable='true'>ablecube1</td>";
+    insert_tr += "<td contenteditable='true'>ablecube</td>";
     insert_tr += "</tr>";
     insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>10.10.10.11</td>";
-    insert_tr += "<td contenteditable='true'>scvm1-mngt</td>";
+    insert_tr += "<td contenteditable='true'>192.168.2.1</td>";
+    insert_tr += "<td contenteditable='flase'>scvm1-mngt</td>";
+    insert_tr += "<td contenteditable='flase'>scvm-mngt</td>";
     insert_tr += "</tr>";
     insert_tr += "<tr>";
     insert_tr += "<td contenteditable='true'>100.100.10.1</td>";
+    insert_tr += "<td contenteditable='true'>ablecube1-pn</td>";
     insert_tr += "<td contenteditable='true'>ablecube-pn</td>";
     insert_tr += "</tr>";
     insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>100.100.10.11</td>";
-    insert_tr += "<td contenteditable='true'>scvm1</td>";
+    insert_tr += "<td contenteditable='true'>100.100.10.101</td>";
+    insert_tr += "<td contenteditable='flase'>scvm1</td>";
+    insert_tr += "<td contenteditable='flase'>scvm</td>";
     insert_tr += "</tr>";
     insert_tr += "<tr>";
     insert_tr += "<td contenteditable='true'>100.200.10.11</td>";
-    insert_tr += "<td contenteditable='true'>scvm1-cn</td>";
+    insert_tr += "<td contenteditable='flase'>scvm1-cn</td>";
+    insert_tr += "<td contenteditable='flase'>scvm-cn</td>";
     insert_tr += "</tr>";
     $("#form-table-cluster-config-new-host-profile").append(insert_tr);
     $('#form-input-cluster-config-host-number').val(1);
+    $('#form-input-cluster-config-currnt-host-number').val(1);
     // 시간 서버
     $('#form-radio-timeserver-ext').prop('checked', true);
     $('#form-radio-timeserver-int').prop('checked', false);
@@ -985,17 +1067,15 @@ function putHostsValueIntoTextarea(radio_value) {
         // hosts file 준비 방법 표시 및 값 설정
         $('#div-accordion-hosts-file-type').text("신규 생성");
         // 신규로 생성할 경우 테이블의 내용을 textarea에 넣는 코드
-        let current_val = $('#form-input-cluster-config-host-number').val();
+        let total_host_num_val = $('#form-input-cluster-config-host-number').val();
         let colcnt = $('#form-table-cluster-config-new-host-profile colgroup col').length;
         let rowcnt = $('#form-table-cluster-config-new-host-profile tbody tr').length;
-        console.log(current_val)
-        console.log(colcnt)
-        console.log(rowcnt)
         let arr = new Array();
         $('#form-table-cluster-config-new-host-profile tr').each(function(){
-            for(let i = 0; i < 2; i++){
-                arr += $(this).find('td').eq(i).text();
-                if(i%2 == 0) {
+            for(let i = 1; i <= colcnt; i++){
+                arr += $(this).find('td').eq(i-1).text();
+                console.log(arr);
+                if(i%3 == 0) {
                     arr += "\t"
                 }
                 else{
