@@ -24,7 +24,7 @@ class CloudCenterVirtualMachine {
             ccvm_instance.runningHost = ''
             ccvm_instance.clusterdHost = []
             ccvm_instance.Name = 'ccvm'
-            ccvm_instance.xml = '/root/test.xml'
+            ccvm_instance.xml = '/usr/share/cockpit/ablestack/tools/vmconfig/ccvm/ccvm.xml'
             ccvm_instance.resource = 'cloudcenter_res'
         }
     }
@@ -151,7 +151,7 @@ class CloudCenterVirtualMachine {
                     ccvm_instance.disk_cap=vm['DISK_CAP']
                     ccvm_instance.disk_phy=vm['DISK_PHY']
                     ccvm_instance.ip=vm['ip'].split('/')[0]
-                    $('#card-action-cloud-vm-change').attr('disabled', false);
+                    $('#card-action-cloud-vm-change').attr('disabled', true);
                     $('#card-action-cloud-vm-connect').removeClass('pf-m-disabled')
                     resolve();
                 }else{
@@ -271,7 +271,7 @@ class CloudCenterVirtualMachine {
     */
     changeOffering(cpu, memory) {
         ccvm_instance.clusterdHost.forEach(function (host){
-        cockpit.spawn(['/usr/bin/ssh', '-o', 'StrictHostKeyChecking=no', ccvm_instance.runningHost,
+        cockpit.spawn(['/usr/bin/ssh', '-o', 'StrictHostKeyChecking=no', host,
             '/usr/bin/python3', pluginpath + '/python/host/virshedit.py', 'edit', '--cpu', cpu, '--memory', memory, '--xml', ccvm_instance.xml])
             .then(ccvm_instance.createAlertModal)
             .catch(ccvm_instance.createAlertModal)

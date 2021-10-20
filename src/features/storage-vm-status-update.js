@@ -15,6 +15,7 @@ $('#button-storage-vm-status-update').on('click', function(){
     $('#div-modal-storage-vm-status-update').hide();
     $('#div-modal-spinner-header-txt').text('스토리지센터 가상머신 상태 변경중입니다.');
     $('#div-modal-spinner').show();
+    createLoggerInfo("button-storage-vm-status-update click");
 
     var cmd = $('#scvm-status-update-cmd').val();    
     if(cmd == "stop"){//스토리지센터VM 정지 버튼 클릭시
@@ -26,10 +27,12 @@ $('#button-storage-vm-status-update').on('click', function(){
                 console.log(data);
                 location.reload();
             }else{
+                createLoggerInfo(":::scvm stop Error:::");
                 console.log(":::scvm stop Error::: "+ data);
             }            
         })
         .catch(function(data){
+            createLoggerInfo(":::scvm stop Error:::");
             console.log(":::scvm stop Error::: " + data);            
         });    
     }else if(cmd == "start"){//스토리지센터VM 시작 버튼 클릭시
@@ -41,10 +44,12 @@ $('#button-storage-vm-status-update').on('click', function(){
                 console.log(data);
                 location.reload();
             }else{
+                createLoggerInfo(":::scvm start Error:::");
                 console.log(":::scvm start Error::: "+ data);
             }
         })
         .catch(function(data){
+            createLoggerInfo(":::scvm delete Error:::");
             console.log(":::scvm delete Error::: "+data);
         });        
     }else if(cmd == "delete"){//스토리지센터VM 삭제 버튼 클릭시
@@ -56,10 +61,12 @@ $('#button-storage-vm-status-update').on('click', function(){
                 console.log(data);
                 location.reload();    
             }else{
+                createLoggerInfo(":::scvm delete Error:::");
                 console.log(":::scvm delete Error::: "+ data);
             }
         })
         .catch(function(data){
+            createLoggerInfo(":::scvm delete Error:::");
             console.log(":::scvm delete Error:::"+data);
         });        
     }else if(cmd == "bootstrap"){//SCC bootstrap실행 버튼 클릭시        
@@ -70,6 +77,7 @@ $('#button-storage-vm-status-update').on('click', function(){
             location.reload();
         })
         .catch(function(data){
+            createLoggerInfo("bootstrap_run_check() Error");
             console.log("bootstrap_run_check() Error : " + data);        
         });
     }else if(cmd == "bootstrap_ccvm"){//CCC bootstrap실행 버튼 클릭시
@@ -81,6 +89,7 @@ $('#button-storage-vm-status-update').on('click', function(){
                 location.reload();
             })
             .catch(function(data){
+                createLoggerInfo("bootstrap_run_check() Error");
                 console.log("bootstrap_run_check() Error : " + data);
             });
     }

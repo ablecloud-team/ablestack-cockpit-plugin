@@ -91,7 +91,7 @@
                                                             <span class="pf-c-description-list__text">클러스터 상태</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">
+                                                            <div class="pf-c-description-list__text "style="overflow: auto;">
                                                                 <span class="pf-c-label pf-m-red" id="scc-css">
                                                                     <span class="pf-c-label__content">
                                                                         <span class="pf-c-label__icon">
@@ -165,13 +165,13 @@
                                                     </button>
                                                     <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-cloud-cluster-status" id="dropdown-menu-cloud-cluster-status">
                                                         <li>
-                                                            <button id="button-cloud-cluster-start" class="pf-c-dropdown__menu-item" type="button">클러스터 시작</button>
+                                                            <button id="button-cloud-cluster-start" class="pf-c-dropdown__menu-item" type="button">클라우드센터VM 시작</button>
                                                         </li>
                                                         <li>
-                                                            <button id="button-cloud-cluster-stop" class="pf-c-dropdown__menu-item" type="button">클러스터 중지</button>
+                                                            <button id="button-cloud-cluster-stop" class="pf-c-dropdown__menu-item" type="button">클라우드센터VM 정지</button>
                                                         </li>
                                                         <li>
-                                                            <button id="button-cloud-cluster-cleanup" class="pf-c-dropdown__menu-item" type="button">클러스터 클린업</button>
+                                                            <button id="button-cloud-cluster-cleanup" class="pf-c-dropdown__menu-item" type="button">클라우드센터 클러스터 클린업</button>
                                                         </li>
                                                         <li class="pf-c-divider" role="separator"></li>
                                                         <li>
@@ -196,7 +196,7 @@
                                                             <span class="pf-c-description-list__text">클러스터 상태</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">
+                                                            <div class="pf-c-description-list__text" style="overflow: auto;">
                                                                 <span id="cccs-back-color" class="pf-c-label pf-m-red">
                                                                     <span class="pf-c-label__content">
                                                                         <span class="pf-c-label__icon">
@@ -299,7 +299,7 @@
                                                             <span class="pf-c-description-list__text">가상머신상태</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">
+                                                            <div class="pf-c-description-list__text" style="overflow: auto;">
                                                                 <span class="pf-c-label pf-m-red" id="scvm-css">
                                                                     <span class="pf-c-label__content">
                                                                         <span class="pf-c-label__icon" >
@@ -444,7 +444,7 @@
                                                         <dt class="pf-c-description-list__term">
                                                             <span class="pf-c-description-list__text">가상머신상태</span>
                                                         </dt>
-                                                        <dd class="pf-c-description-list__description" id="description-cloud-vm-status">
+                                                        <dd class="pf-c-description-list__description" id="description-cloud-vm-status" style="overflow: auto;">
                                                             <div class="pf-c-description-list__text">
                                                                 <span class="pf-c-label pf-m-red" id="span-cloud-vm-status">
                                                                     <span class="pf-c-label__content" id="span-cloud-vm-status-content">
@@ -618,7 +618,7 @@
         <div id="div-modal-cleanup-cloud-vm" class="pf-c-backdrop" style="display:none">
             <div class="pf-l-bullseye">
                 <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Cloud VM stop">
-                    <button id="button-close-modal-cloud-vm-stop" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                    <button id="button-close-modal-cloud-vm-cleanup" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
                         <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                     <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">클라우드센터 클러스터 클린업</span></h1></header>
@@ -747,6 +747,7 @@
         <script src="./src/features/cloud-center-virtual-machine.js"></script>
         <script src="./src/features/main.js"></script>
         <script src="./src/features/card-cloud-cluster-status.js"></script>
+        <script src="./src/common/logger.js"></script>
         <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
         
     </body>
