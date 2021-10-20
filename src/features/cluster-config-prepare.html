@@ -254,8 +254,30 @@
                                         <div class="pf-c-form__group-control">
                                             <input class="pf-c-form-control" style="width:60%" type="file" id="form-input-cluster-config-hosts-file" name="form-input-cluster-config-hosts-file"/>
                                         </div>
-                                        <div class="pf-c-form__group-control">
-                                            <textarea class="pf-c-form-control tab-available" style="width:90%;height:150px;margin-top:10px" type="text" id="form-textarea-cluster-config-existing-host-profile"></textarea>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-form-hosts-table">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-table-cluster-config-existing-host-profile">
+                                                <span class="pf-c-form__label-text">Hosts 프로파일</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control" style="width: 558px;height: 200px;overflow: auto;">
+                                            <table id="form-table-cluster-config-existing-host-profile" style="width:100%;">
+                                                <colgroup>
+                                                <col width="33%">
+                                                <col width="33%">
+                                                <col width="33%">
+                                                </colgroup>
+                                                <thead class="--pf-global--BorderColor--300" style="border-bottom: solid 1px #8a8d90;position: sticky;top: 0;background-color: white;">
+                                                    <tr>
+                                                      <th>IP 주소</th>
+                                                      <th>Alias1</th>
+                                                      <th>Alias2</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="form-tbody-cluster-config-existing-host-profile">
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </section>

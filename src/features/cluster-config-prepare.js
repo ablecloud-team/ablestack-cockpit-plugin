@@ -17,6 +17,7 @@ $(document).ready(function () {
     $('#div-modal-wizard-cluster-config-review').hide();
     $('#div-modal-wizard-cluster-config-finish').hide();
     $('#div-form-hosts-file').hide();
+    $('#div-form-hosts-table').hide();
     $('#span-timeserver2-required').hide();
     $('#span-timeserver3-required').hide();
     $('#div-accordion-ssh-key').hide();
@@ -336,6 +337,7 @@ $('#form-radio-ssh-key-file').on('click', function () {
 $('#form-radio-hosts-new').on('click', function () {
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
+    $('#div-form-hosts-table').hide();
     $('#div-form-hosts-input-number').show();
     $('#div-form-hosts-input-current-number').show();
     $('#form-input-cluster-config-host-number').val(1);
@@ -381,6 +383,7 @@ $('#form-radio-hosts-new').on('click', function () {
 $('#form-radio-hosts-file').on('click', function () {
     $('#div-form-hosts-profile').hide();
     $('#div-form-hosts-file').show();
+    $('#div-form-hosts-table').show();
     $('#div-form-hosts-input-number').hide();
 });
 
@@ -389,9 +392,14 @@ $('#form-input-cluster-config-current-host-number-plus').on('click', function ()
     let total_host_num_val = $('#form-input-cluster-config-host-number').val();
     let n = $('.bt_up').index(this);
     let num = $("#form-input-cluster-config-current-host-number:eq(" + n + ")").val();
-    if (num < total_host_num_val) {
+    let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
+    // 신규 생성일 때만 조건문 활성
+    if (num < total_host_num_val && hosts_file_type == "new") {
+        num = $("#form-input-cluster-config-current-host-number:eq(" + n + ")").val(num * 1 + 1);
+    }else if(hosts_file_type != "new") {
         num = $("#form-input-cluster-config-current-host-number:eq(" + n + ")").val(num * 1 + 1);
     }
+    
 });
 $('#form-input-cluster-config-current-host-number-minus').on('click', function () {
     let n = $('.bt_down').index(this);
@@ -636,12 +644,12 @@ $('#form-input-cluster-config-hosts-file').on('click', function () {
     let hosts_input = document.querySelector('#form-input-cluster-config-hosts-file');
     let hosts_textarea_existing = "form-textarea-cluster-config-existing-host-profile";
     let file_type = "hosts";
-    fileReaderFunc(hosts_input, hosts_textarea_existing, file_type);
+    fileReaderIntoTableFunc(hosts_input, hosts_textarea_existing, file_type);
 });
 // Hosts 기존 파일 선택 시 파일 선택 취소 시 hidden textarea 초기화
 $('#form-input-cluster-config-hosts-file').on('change', function () {
     if ($(this).val() == "") {
-        $('#form-textarea-cluster-config-existing-host-profile').val("");
+        $('#form-textarea-cluster-config-existing-host-profile').empty();
     }
 });
 
@@ -698,19 +706,19 @@ $('#span-modal-wizard-cluster-config-finish-hosts-file-download').on('click', fu
     
     let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
     // OS 타입에 따라 hosts 파일 값을 다르게 설정
-    let os_type = ($('#os-type').val()).trim();
-    let host_name = $('#host-name').val();
-    os_type = "ubuntu"
-    if(os_type.match("centos")) {
-        let hosts_centos_default_text = "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4\n" +
-        "::1         localhost localhost.localdomain localhost6 localhost6.localdomain6\n\n";
-        hosts_file_text = hosts_centos_default_text + hosts_file_text
-    }else if(os_type.match("ubuntu")) {
-        host_name = host_name.trim();
-        let hosts_ubuntu_default_text = "127.0.0.1\tlocalhost\n" +
-            "127.0.1.1\t" + host_name + "\t" + host_name + "\n\n";
-        hosts_file_text = hosts_ubuntu_default_text + hosts_file_text    
-    }
+    // let os_type = ($('#os-type').val()).trim();
+    // let host_name = $('#host-name').val();
+    // os_type = "ubuntu"
+    // if(os_type.match("centos")) {
+    //     let hosts_centos_default_text = "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4\n" +
+    //     "::1         localhost localhost.localdomain localhost6 localhost6.localdomain6\n\n";
+    //     hosts_file_text = hosts_centos_default_text + hosts_file_text
+    // }else if(os_type.match("ubuntu")) {
+    //     host_name = host_name.trim();
+    //     let hosts_ubuntu_default_text = "127.0.0.1\tlocalhost\n" +
+    //         "127.0.1.1\t" + host_name + "\t" + host_name + "\n\n";
+    //     hosts_file_text = hosts_ubuntu_default_text + hosts_file_text    
+    // }
     let hosts_file_download_link_id = 'span-modal-wizard-cluster-config-finish-hosts-file-download';
     // 다운로드 링크 생성 전 유효성 검정
     if (hosts_file_text.trim() != "") {
@@ -811,6 +819,7 @@ async function resetClusterConfigWizardWithData() {
     $('#form-textarea-cluster-config-existing-host-profile').val("");
     $('#div-form-hosts-profile').show();
     $('#div-form-hosts-file').hide();
+    $('#div-form-hosts-table').hide();
     $('#div-form-hosts-input-number').show();
     $('#div-form-hosts-input-current-number').show();
     // hosts 입력 테이블 초기화
@@ -976,6 +985,59 @@ function fileReaderFunc(input, textarea_type, file_type) {
     });
 }
 
+/**
+ * Meathod Name : fileReaderIntoTableFunc
+ * Date Created : 2021.10.19
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 input box에서 파일을 선택하면 문자열로 읽어와 table에 담 함수
+ * Parameter : input (input box id 값), textarea_type(textarea id 값), file_type(ssh-key, hosts 파일 타입에 따라 분류)
+ * Return  : 없음
+ * History  : 2021.10.19 최초 작성
+ **/
+
+ function fileReaderIntoTableFunc(input, textarea_type, file_type) {
+    input.addEventListener('change', function (event) {
+        let file_list = input.files || event.target.files;
+        let file = file_list[0];
+        let id = input.getAttribute('id');
+        if ($(input).val() != "") {
+            let file_name = file_list[0].name;
+            // 파일 이름 및 용량 체크
+            if (checkClusterConfigPrepareFileName(file_name, file_type) != false && checkFileSize(file) != false) {
+                // FileList
+                let reader = new FileReader();
+                try {
+                    reader.onload = function (progressEvent) {
+                        let result = progressEvent.target.result;
+                        // text를 배열로 분리
+                        result_arr = result.split(/[\t]|[\n]/);
+                        console.log(result_arr);
+                        // 배열 데이터를 테이블 형식으로 생성
+                        let insert_tr = "";
+                        for (let i=0; i<result_arr.length;) {
+                            insert_tr += "<tr>";
+                            for(let j=1; j<=3; j++) {
+                                if(i < result_arr.length) {
+                                    insert_tr += "<td contenteditable='true'>"+result_arr[i]+"</td>";
+                                    i++
+                                }
+                            }
+                            insert_tr += "</tr>";
+                        }
+                        $(insert_tr).appendTo('#form-tbody-cluster-config-existing-host-profile')
+                    };
+                    reader.readAsText(file);
+                } catch (err) {
+                }
+            } else {
+                // validation 실패 시 초기화
+                $('#' + id).val("");
+                $('#' + textarea_type).val("");
+            }
+        }
+    });
+}
+
 
 /**
  * Meathod Name : fileExtensionChecker
@@ -1071,19 +1133,21 @@ function putHostsValueIntoTextarea(radio_value) {
         let colcnt = $('#form-table-cluster-config-new-host-profile colgroup col').length;
         let rowcnt = $('#form-table-cluster-config-new-host-profile tbody tr').length;
         let arr = new Array();
-        $('#form-table-cluster-config-new-host-profile tr').each(function(){
-            for(let i = 1; i <= colcnt; i++){
-                arr += $(this).find('td').eq(i-1).text();
-                console.log(arr);
-                if(i%3 == 0) {
-                    arr += "\t"
-                }
-                else{
+        console.log(colcnt);
+        console.log(rowcnt);
+        $('#form-table-tbody-cluster-config-new-host-profile tr').each(function(){
+            let j;
+            for(let i = 0; i < colcnt; i++){
+                j = i+1;
+                arr += $(this).find('td').eq(i).text();
+                if(j%3 == 0) {
                     arr += "\n"
+                }
+                else if(j%3 != 0){
+                    arr += "\t"
                 }
             }
         });
-        console.log(arr);
 
         $('#div-textarea-cluster-config-confirm-hosts-file').val(arr);
     } else if (radio_value == "existing") {
