@@ -108,9 +108,11 @@ ceph mgr module enable dashboard
 ceph config set mon mon_warn_on_insecure_global_id_reclaim_allowed false
 ceph config set mgr mgr/pg_autoscaler/autoscale_profile scale-up
 
-/usr/bin/mv -f /usr/share/ablestack/ablestack-wall/process-exporter/scvm_process.yml /usr/share/ablestack/ablestack-wall/process-exporter/process.yml
-
-systemctl enable --now node-exporter
-systemctl enable --now process-exporter
+for host in $hosts
+do
+  ssh -o StrictHostKeyChecking=no $host /usr/bin/mv -f /usr/share/ablestack/ablestack-wall/process-exporter/scvm_process.yml /usr/share/ablestack/ablestack-wall/process-exporter/process.yml
+  ssh -o StrictHostKeyChecking=no $host systemctl enable --now node-exporter
+  ssh -o StrictHostKeyChecking=no $host systemctl enable --now process-exporter
+done
 
 exit
