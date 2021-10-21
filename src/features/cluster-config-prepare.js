@@ -385,6 +385,7 @@ $('#form-radio-hosts-file').on('click', function () {
     $('#div-form-hosts-file').show();
     $('#div-form-hosts-table').show();
     $('#div-form-hosts-input-number').hide();
+    $('#div-form-hosts-input-current-number').hide();
 });
 
 // Host 파일 준비 중 "현재 호스트 번호"를 변경하는 '+', '-' 기능 
@@ -530,7 +531,6 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
         $('#form-input-cluster-config-current-host-number').val(90);
         alert("1~90까지의 숫자만 입력할 수 있습니다.");
     }
-    
 });
 
 // 로컬 시간서버를 외부 시간서버로 선택하면 시간서버 2, 3은 선택 입력으로 전환한다.
@@ -646,10 +646,10 @@ $('#form-input-cluster-config-hosts-file').on('click', function () {
     let file_type = "hosts";
     fileReaderIntoTableFunc(hosts_input, hosts_textarea_existing, file_type);
 });
-// Hosts 기존 파일 선택 시 파일 선택 취소 시 hidden textarea 초기화
+// Hosts 기존 파일 선택 시, 파일 선택 취소 시 hidden textarea 초기화
 $('#form-input-cluster-config-hosts-file').on('change', function () {
     if ($(this).val() == "") {
-        $('#form-textarea-cluster-config-existing-host-profile').empty();
+        $('#form-tbody-cluster-config-existing-host-profile').empty();
     }
 });
 
@@ -989,13 +989,13 @@ function fileReaderFunc(input, textarea_type, file_type) {
  * Meathod Name : fileReaderIntoTableFunc
  * Date Created : 2021.10.19
  * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 input box에서 파일을 선택하면 문자열로 읽어와 table에 담 함수
- * Parameter : input (input box id 값), textarea_type(textarea id 값), file_type(ssh-key, hosts 파일 타입에 따라 분류)
+ * Description : 클러스터 준비 마법사에서 input box에서 파일을 선택하면 문자열로 읽어와 table에 담는 함수
+ * Parameter : input (input box id 값), hosts_textarea_existing(textarea id 값), file_type(ssh-key, hosts 파일 타입에 따라 분류)
  * Return  : 없음
  * History  : 2021.10.19 최초 작성
  **/
 
- function fileReaderIntoTableFunc(input, textarea_type, file_type) {
+ function fileReaderIntoTableFunc(input, hosts_textarea_existing, file_type) {
     input.addEventListener('change', function (event) {
         let file_list = input.files || event.target.files;
         let file = file_list[0];
@@ -1011,7 +1011,6 @@ function fileReaderFunc(input, textarea_type, file_type) {
                         let result = progressEvent.target.result;
                         // text를 배열로 분리
                         result_arr = result.split(/[\t]|[\n]/);
-                        console.log(result_arr);
                         // 배열 데이터를 테이블 형식으로 생성
                         let insert_tr = "";
                         for (let i=0; i<result_arr.length;) {
@@ -1024,7 +1023,7 @@ function fileReaderFunc(input, textarea_type, file_type) {
                             }
                             insert_tr += "</tr>";
                         }
-                        $(insert_tr).appendTo('#form-tbody-cluster-config-existing-host-profile')
+                        $(insert_tr).appendTo('#form-table-tbody-cluster-config-existing-host-profile')
                     };
                     reader.readAsText(file);
                 } catch (err) {
@@ -1032,7 +1031,7 @@ function fileReaderFunc(input, textarea_type, file_type) {
             } else {
                 // validation 실패 시 초기화
                 $('#' + id).val("");
-                $('#' + textarea_type).val("");
+                $('#' + hosts_tbody_existing).empty();
             }
         }
     });
@@ -1121,7 +1120,7 @@ function putSshKeyValueIntoTextarea(radio_value) {
  * Description : 클러스터 준비 마법사에서 설정에 따라 설정확인에 위치한 textarea에 hosts 값을 넣는 함수
  * Parameter : radio_value
  * Return  : 없음
- * History  : 2021.03.22 최초 작성
+ * History  : 2021.10.21 수정
  **/
 
 function putHostsValueIntoTextarea(radio_value) {
@@ -1129,12 +1128,8 @@ function putHostsValueIntoTextarea(radio_value) {
         // hosts file 준비 방법 표시 및 값 설정
         $('#div-accordion-hosts-file-type').text("신규 생성");
         // 신규로 생성할 경우 테이블의 내용을 textarea에 넣는 코드
-        let total_host_num_val = $('#form-input-cluster-config-host-number').val();
         let colcnt = $('#form-table-cluster-config-new-host-profile colgroup col').length;
-        let rowcnt = $('#form-table-cluster-config-new-host-profile tbody tr').length;
         let arr = new Array();
-        console.log(colcnt);
-        console.log(rowcnt);
         $('#form-table-tbody-cluster-config-new-host-profile tr').each(function(){
             let j;
             for(let i = 0; i < colcnt; i++){
@@ -1148,12 +1143,28 @@ function putHostsValueIntoTextarea(radio_value) {
                 }
             }
         });
-
         $('#div-textarea-cluster-config-confirm-hosts-file').val(arr);
     } else if (radio_value == "existing") {
         // hosts file 준비 방법 표시 및 값 설정
         $('#div-accordion-hosts-file-type').text("기존 파일 사용");
-        $('#div-textarea-cluster-config-confirm-hosts-file').val($('#form-textarea-cluster-config-existing-host-profile').val());
+        // 기존 파일로 생성할 경우 테이블의 내용을 textarea에 넣는 코드
+        let colcnt = $('#form-table-cluster-config-existing-host-profile colgroup col').length;
+        let arr = new Array();
+        $('#form-table-tbody-cluster-config-existing-host-profile tr').each(function(){
+            let j;
+            for(let i = 0; i < colcnt; i++){
+                j = i+1;
+                arr += $(this).find('td').eq(i).text();
+                if(j%3 == 0) {
+                    arr += "\n"
+                }
+                else if(j%3 != 0){
+                    arr += "\t"
+                }
+            }
+        });
+        console.log(arr);
+        $('#div-textarea-cluster-config-confirm-hosts-file').val(arr);
     }
 }
 
