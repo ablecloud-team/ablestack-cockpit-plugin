@@ -48,7 +48,10 @@ $(".tab-available").keydown(function (e) {
 
         $('#'+select_box_id).append(el);
 
+        createLoggerInfo("setNicBridge success");
+
     }).catch(function(){
+        createLoggerInfo("setNicBridge error");
         alert("setNicBridge error");
     });
 }
@@ -68,22 +71,26 @@ function setHostsFileReader(input, file_name, callBackFunction) {
         let file_list = input.files || event.target.files;
         // File
         let file = file_list[0];
-        if(file.name == file_name){
-            if(input.val() != ""){
-                try {
-                    let reader = new FileReader();
-                    reader.onload = function (e) {
-                        var text = e.target.result
-                        var host_array = readHostsFileCallBack(text);
-                        callBackFunction(host_array, text);
-                    };
-                    reader.readAsText(file);
-                } catch (err) {
-                    console.error(err);
+        if(file.name == file_name ){
+            if(checkFileSize(file) != false){
+                if(input.val() != ""){
+                    try {
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            var text = e.target.result
+                            var host_array = readHostsFileCallBack(text);
+                            callBackFunction(host_array, text);
+                        };
+                        reader.readAsText(file);
+                    } catch (err) {
+                        console.error(err);
+                    }
+                } else {
+                    callBackFunction("");
                 }
             } else {
-                callBackFunction("");
-            }
+                input.val("");
+            }            
         } else {
             alert(file_name+" 파일만 업로드할 수 있습니다.");
             input.val("");
@@ -162,20 +169,24 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
         // File
         let file = file_list[0];
         if(file.name == file_name){
-            if(input.val() != ""){
-                try {
-
-                    let reader = new FileReader();
-                    reader.onload = function (e) {
-                        var text = e.target.result
-                        callBackFunction(text);
-                    };
-                    reader.readAsText(file);
-                } catch (err) {
-                    console.error(err);
+            if(checkFileSize(file) != false){
+                if(input.val() != ""){
+                    try {
+    
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            var text = e.target.result
+                            callBackFunction(text);
+                        };
+                        reader.readAsText(file);
+                    } catch (err) {
+                        console.error(err);
+                    }
+                } else {
+                    callBackFunction("");
                 }
             } else {
-                callBackFunction("");
+                input.val("");
             }
         } else {
             alert(file_name+" 파일만 업로드할 수 있습니다.");
