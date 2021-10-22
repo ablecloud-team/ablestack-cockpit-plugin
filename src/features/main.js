@@ -90,6 +90,19 @@ $('#card-action-cloud-vm-change').on('click', function(){
     ccvm_instance.createChangeModal();
 });
 
+/** cloud vm dbbackup modal 관련 action start */
+$('#card-action-cloud-vm-db-dump').on('click', function(){
+    $('#div-modal-db-backup-cloud-vm').show();
+});
+$('#button-close-modal-cloud-vm-db-dump').on('click', function(){
+    $('#dbdump-prepare-status').html("")
+    $('#div-modal-db-backup-cloud-vm').hide();
+});
+$('#button-cancel-modal-cloud-vm-db-dump').on('click', function(){
+    $('#dbdump-prepare-status').html("")
+    $('#div-modal-db-backup-cloud-vm').hide();
+});
+
 $('#card-action-cloud-vm-connect').on('click', function(){
     // 클라우드센터VM 연결
     window.open('http://' + ccvm_instance.ip + ":9090");
@@ -263,6 +276,22 @@ $('.pf-c-dropdown').on('click', function(e){
     $('#'+ card_id_sting).show();
 })
 
+// 클라우드센터 VM DB 백업 드롭다운 메뉴 클릭 시
+$('#card-action-cloud-vm-db-dump').on('click', function(){
+
+});
+// 클라우드센터 VM DB 백업 실행 클릭 시
+$('#button-execution-modal-cloud-vm-db-dump').on('click', function () {
+    $('#dbdump-prepare-status').html("<svg class='pf-c-spinner pf-m-xl' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100'><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>" +
+    "<h1 data-ouia-component-type='PF4/Title' data-ouia-safe='true' data-ouia-component-id='OUIA-Generated-Title-1' class='pf-c-title pf-m-lg'>백업파일 준비 중...</h1><div class='pf-c-empty-state__body'></div>")
+    let dump_sql_file_path = "/root/ccvm_cloud.sql"
+    readFile(dump_sql_file_path);
+})
+
+// 클라우드센터 VM DB 백업파일 다운로드 링크 클릭 시
+$('#span-modal-wizard-cluster-config-finish-db-dump-file-download').on('click', function () {
+    
+})
 
 /**
  * Meathod Name : scvm_bootstrap_run
@@ -911,3 +940,33 @@ setInterval(() => {
             checkDeployStatus();
     });
 }, 30000);
+
+
+
+/**
+ * Meathod Name : readFile
+ * Date Created : 2021.03.25
+ * Writer  : 류홍욱
+ * Description : DB Dump 파일을 로컬 저장소에 저장하는 함수
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.10.21 수정
+ */
+ async function readFile(file_path) {
+    cockpit.file(file_path).read()
+    .done(function (tag) {
+        $('#span-modal-wizard-cluster-config-finish-db-dump-file-download').attr({
+            target: '_blank',
+            href: 'data:Application/octet-stream;application/x-xz;attachment;/,' + encodeURIComponent(tag),
+            download: "dump_ccvm_cloud.sql"
+        });
+        $('#dbdump-prepare-status').html("")
+        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').attr('style', 'visibility:block');
+        alert("sdfsdf");
+    })
+    .close()
+    .fail(function (error) {
+        createLoggerInfo("Failed to Downloading ccvm_dump_file");
+    });
+}
+
