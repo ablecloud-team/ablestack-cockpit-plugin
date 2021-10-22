@@ -8,24 +8,31 @@ Copyright (c) 2021 ABLECLOUD Co. Ltd
 # -*- coding: utf-8 -*-
 
 import os
+import sh
 
 user_id = "cloud"
 passwd = "Ablecloud1!"
 database = "cloud"
-# enc = "utf8"
+enc = "utf8"
 
+# 함수명 : dumpdb
+# 주요 기능 : ccvm의 "cloud" database를 dump하는 함수
 def dumpdb():
-    
+
+    os.system("mkdir -p /root/db_dump")
+    os.system("ssh root@ccvm mkdir -p /root/db_dump")
+
     command = []
     command.append("mysqldump")
     command.append("-u%s" % user_id)
     command.append("-p%s" % passwd)
     # command.append("--default-character-set=%s" % enc)
     # command.append("--extended-insert=FALSE")
-    command.append("%s > /root/dump_%s.sql" % (database, database))
+    command.append("%s > /root/db_dump/ccvm_dump_%s.sql" % (database, database))
     command = " ".join(command)
-    
-    os.system(command)
 
+    os.system("ssh root@ccvm " + command)
+    sh.scp("root@ccvm:/root/db_dump/ccvm_dump_cloud.sql", "/root/db_dump/ccvm_dump_cloud.sql")
+    
 if __name__=="__main__":
     dumpdb()

@@ -90,17 +90,19 @@ $('#card-action-cloud-vm-change').on('click', function(){
     ccvm_instance.createChangeModal();
 });
 
-/** cloud vm dbbackup modal 관련 action start */
+/** cloud vm DB backup modal 관련 action start */
 $('#card-action-cloud-vm-db-dump').on('click', function(){
     $('#div-modal-db-backup-cloud-vm').show();
 });
 $('#button-close-modal-cloud-vm-db-dump').on('click', function(){
     $('#dbdump-prepare-status').html("")
     $('#div-modal-db-backup-cloud-vm').hide();
+    $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide();
 });
 $('#button-cancel-modal-cloud-vm-db-dump').on('click', function(){
     $('#dbdump-prepare-status').html("")
     $('#div-modal-db-backup-cloud-vm').hide();
+    $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide();
 });
 
 $('#card-action-cloud-vm-connect').on('click', function(){
@@ -961,8 +963,7 @@ setInterval(() => {
             download: "dump_ccvm_cloud.sql"
         });
         $('#dbdump-prepare-status').html("")
-        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').attr('style', 'visibility:block');
-        alert("sdfsdf");
+        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').show()
     })
     .close()
     .fail(function (error) {
