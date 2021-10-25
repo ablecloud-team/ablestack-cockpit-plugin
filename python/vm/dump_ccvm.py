@@ -8,7 +8,9 @@ Copyright (c) 2021 ABLECLOUD Co. Ltd
 # -*- coding: utf-8 -*-
 
 import os
-import sh
+import json
+
+from ablestack import *
 
 user_id = "cloud"
 passwd = "Ablecloud1!"
@@ -19,20 +21,29 @@ enc = "utf8"
 # 주요 기능 : ccvm의 "cloud" database를 dump하는 함수
 def dumpdb():
 
-    os.system("mkdir -p /root/db_dump")
-    os.system("ssh root@ccvm mkdir -p /root/db_dump")
+    os.system("mkdir -p /root/db_dump/")
+    # os.system("ssh root@ccvm mkdir -p /root/db_dump")
 
     command = []
     command.append("mysqldump")
     command.append("-u%s" % user_id)
     command.append("-p%s" % passwd)
-    # command.append("--default-character-set=%s" % enc)
-    # command.append("--extended-insert=FALSE")
     command.append("%s > /root/db_dump/ccvm_dump_%s.sql" % (database, database))
     command = " ".join(command)
-
     os.system("ssh root@ccvm " + command)
-    sh.scp("root@ccvm:/root/db_dump/ccvm_dump_cloud.sql", "/root/db_dump/ccvm_dump_cloud.sql")
+
+    # sh.scp("root@ccvm:/root/db_dump/ccvm_dump_cloud.sql", "/root/db_dump/ccvm_dump_cloud.sql")
     
-if __name__=="__main__":
-    dumpdb()
+def main():
+    try:
+        dumpdb()
+        ret = createReturn(code=200, val="Creation of mysqldump of ccvm is completed")
+        print(json.dumps(json.loads(ret), indent=4))
+
+    except Exception as e:
+        ret = createReturn(code=500, val="Creation of mysqldump of ccvm is failed")
+        print(json.dumps(json.loads(ret), indent=4))
+    return ret
+
+if __name__ == "__main__":
+    main()
