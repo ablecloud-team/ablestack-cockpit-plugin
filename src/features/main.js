@@ -948,6 +948,18 @@ setInterval(() => {
  * History  : 2021.10.26 수정
  */
  async function readFile(file_path) {
+    // 파일명에 날짜 출력을 위한 코드
+    let today = new Date();
+    let year = today.getFullYear();
+    let month = ('0' + (today.getMonth() + 1)).slice(-2);
+    let day = ('0' + today.getDate()).slice(-2);
+    let date_string = year+month+day;
+    let hours = ('0' + today.getHours()).slice(-2); 
+    let minutes = ('0' + today.getMinutes()).slice(-2);
+    let seconds = ('0' + today.getSeconds()).slice(-2); 
+    let time_string = hours+ minutes+seconds;
+
+    // ccvm에서 mysqldump 파일을 생성하는 파이썬 파일 실행
     let result="";
     await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py'])
     .then(function(data){
@@ -980,13 +992,15 @@ setInterval(() => {
         console.log("Creation of mysqldump of ccvm is failed");
         result="500";
     });
+
+    // 파이썬 파일 실행 결과에 따라 다운로드 링크 생성
     if (result == "200") {
         await cockpit.file(file_path).read()
         .done(function (tag) {
             $('#span-modal-wizard-cluster-config-finish-db-dump-file-download').attr({
                 target: '_blank',
                 href: 'data:Application/octet-stream;application/x-xz;attachment;/,' + encodeURIComponent(tag),
-                download: "dump_ccvm_cloud.sql"
+                download: "dump_ccvm_cloud_" +date_string+time_string+ ".sql"
             });
             $('#div-db-backup').show();
             $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 완료되었습니다.");
