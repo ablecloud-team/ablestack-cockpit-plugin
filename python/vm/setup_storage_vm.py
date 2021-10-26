@@ -59,6 +59,10 @@ def setupStorageVm(args):
     if check_err != 0 :
         success_bool = False
 
+    check_err = os.system("virsh autostart scvm > /dev/null")
+    if check_err != 0 :
+        success_bool = False
+
     # 결과값 리턴
     if success_bool:
         return createReturn(code=200, val="storage center setup success")

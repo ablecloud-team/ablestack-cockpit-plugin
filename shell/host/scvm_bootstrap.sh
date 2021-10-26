@@ -14,7 +14,6 @@ imagename="localhost/ceph/daemon:ablestack"
 hosts=$(grep scvm /etc/hosts| grep -v mngt | grep -v cn | awk {'print $1'})
 scvms=$(grep scvm /etc/hosts| grep -v mngt | grep -v cn | grep scvm | awk {'print $1'})
 allhosts=$(grep -v mngt /etc/hosts | grep -v cn | grep -v localhost | awk {'print $1'})
-cubes=$(grep -v mngt /etc/hosts |grep -v scvm | grep -v cn | grep -v localhost | awk {'print $1'})
 
 echo "[global]" > "$conffile"
 echo -n -e "\tmon_host = " >> "$conffile"
@@ -114,11 +113,6 @@ do
   ssh -o StrictHostKeyChecking=no $host /usr/bin/mv -f /usr/share/ablestack/ablestack-wall/process-exporter/scvm_process.yml /usr/share/ablestack/ablestack-wall/process-exporter/process.yml
   ssh -o StrictHostKeyChecking=no $host systemctl enable --now node-exporter
   ssh -o StrictHostKeyChecking=no $host systemctl enable --now process-exporter
-done
-
-for cube in $cubes
-do
-  ssh -o StrictHostKeyChecking=no $cube virsh autostart scvm
 done
 
 exit
