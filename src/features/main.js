@@ -940,30 +940,70 @@ setInterval(() => {
 
 /**
  * Meathod Name : readFile
- * Date Created : 2021.03.25
+ * Date Created : 2021.10.21
  * Writer  : 류홍욱
- * Description : DB Dump 파일을 로컬 저장소에 저장하는 함수
- * Parameter : 없음
+ * Description : DB Dump 파일을 로컬 저장소에 저장하고 다운로드 링크를 생성하는 함수
+ * Parameter : file_path
  * Return  : 없음
- * History  : 2021.10.21 수정
+ * History  : 2021.10.26 수정
  */
  async function readFile(file_path) {
     await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py'])
     .then(function(data){
         var retVal = JSON.parse(data);
         if (retVal.code == 200) {
+            cockpit.file(file_path).read()
+            .done(function (tag) {
+                $('#span-modal-wizard-cluster-config-finish-db-dump-file-download').attr({
+                    target: '_blank',
+                    href: 'data:Application/octet-stream;application/x-xz;attachment;/,' + encodeURIComponent(tag),
+                    download: "dump_ccvm_cloud.sql"
+                });
+                $('#div-db-backup').show();
+                $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 완료되었습니다.");
+                $('#dbdump-prepare-status').html("")
+                $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').show()
+                $('#button-execution-modal-cloud-vm-db-dump').show();
+                $('#button-cancel-modal-cloud-vm-db-dump').show();
+                $('#button-close-modal-cloud-vm-db-dump').show();
+                createLoggerInfo("Creation of download link of ccvm_mysqldump is completed");
+                console.log("Creation of download link of ccvm_mysqldump is completed");
+            }).catch(function(tag){
+                $('#div-db-backup').show();
+                $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
+                $('#dbdump-prepare-status').html("")
+                $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
+                $('#button-execution-modal-cloud-vm-db-dump').show();
+                $('#button-cancel-modal-cloud-vm-db-dump').show();
+                $('#button-close-modal-cloud-vm-db-dump').show();
+                createLoggerInfo("Creation download link of ccvm_mysqldump is failed");
+                console.log("Creation download link of ccvm_mysqldump is failed");
+            });
+            cockpit.file().close()
             createLoggerInfo("Creation of mysqldump of ccvm is completed");
             console.log("Creation of mysqldump of ccvm is completed");
         }else {
+            $('#div-db-backup').show();
+            $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
+            $('#dbdump-prepare-status').html("")
+            $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
+            $('#button-execution-modal-cloud-vm-db-dump').show();
+            $('#button-cancel-modal-cloud-vm-db-dump').show();
+            $('#button-close-modal-cloud-vm-db-dump').show();
             createLoggerInfo("Creation of mysqldump of ccvm is failed");
             console.log("Creation of mysqldump of ccvm is failed");
+            resolve();
         }
     }).catch(function(data){
-        var retVal = JSON.parse(data);
-        if (retVal.code == 500) {
-            createLoggerInfo("Creation of mysqldump of ccvm is failed");
-            console.log("Creation of mysqldump of ccvm is failed");
-        }
+        $('#div-db-backup').show();
+        $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
+        $('#dbdump-prepare-status').html("")
+        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
+        $('#button-execution-modal-cloud-vm-db-dump').show();
+        $('#button-cancel-modal-cloud-vm-db-dump').show();
+        $('#button-close-modal-cloud-vm-db-dump').show();
+        createLoggerInfo("Creation of mysqldump of ccvm is failed");
+        console.log("Creation of mysqldump of ccvm is failed");
     });
     
     await cockpit.file(file_path).read()
@@ -986,7 +1026,7 @@ setInterval(() => {
         $('#div-db-backup').show();
         $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
         $('#dbdump-prepare-status').html("")
-        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').show()
+        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
         $('#button-execution-modal-cloud-vm-db-dump').show();
         $('#button-cancel-modal-cloud-vm-db-dump').show();
         $('#button-close-modal-cloud-vm-db-dump').show();
