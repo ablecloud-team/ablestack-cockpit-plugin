@@ -941,6 +941,7 @@ async function readSshKeyFile() {
             $('#div-textarea-cluster-config-temp-new-ssh-key-pri-file').val(tag);
         })
         .fail(function (error) {
+            createLoggerInfo("cluster configuration preparation failed to read the private key");
         });
     // 공개키 읽어오기
     cockpit.file("/root/.ssh/temp_id_rsa.pub").read()
@@ -950,6 +951,7 @@ async function readSshKeyFile() {
             $('#div-textarea-cluster-config-temp-new-ssh-key-pub-file').val(tag);
         })
         .fail(function (error) {
+            createLoggerInfo("cluster configuration preparation failed to read the public key");
         });
 }
 
@@ -1252,6 +1254,7 @@ async function writeSshKeyFile(text1, text2) {
         .done(function (tag) {
         })
         .fail(function (error) {
+            createLoggerInfo("cluster configuration preparation failed to write the public key");
         });
     // 개인 키 파일 권한 변경
     cockpit.script(["chmod 600 /root/.ssh/id_rsa"])
@@ -1260,6 +1263,7 @@ async function writeSshKeyFile(text1, text2) {
         .done(function (tag) {
         })
         .fail(function (error) {
+            createLoggerInfo("cluster configuration preparation failed to write the public key");
         });
     // 공개 키 파일 권한 변경
     cockpit.script(["chmod 644 /root/.ssh/id_rsa.pub"])
@@ -1295,6 +1299,7 @@ async function writeHostsFile(text1, os_type, host_name) {
             .done(function (tag) {
             })
             .fail(function (error) {
+                createLoggerInfo("cluster configuration preparation failed to write the hosts");
             });
     } else if (os_type.match("ubuntu")) {
         host_name = host_name.trim();
@@ -1305,6 +1310,7 @@ async function writeHostsFile(text1, os_type, host_name) {
             .done(function (tag) {
             })
             .fail(function (error) {
+                createLoggerInfo("cluster configuration preparation failed to write the hosts");
             });
     }
 }
