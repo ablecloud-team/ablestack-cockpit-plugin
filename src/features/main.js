@@ -948,40 +948,14 @@ setInterval(() => {
  * History  : 2021.10.26 수정
  */
  async function readFile(file_path) {
+    let result="";
     await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py'])
     .then(function(data){
-        var retVal = JSON.parse(data);
+        let retVal = JSON.parse(data);
         if (retVal.code == 200) {
-            cockpit.file(file_path).read()
-            .done(function (tag) {
-                $('#span-modal-wizard-cluster-config-finish-db-dump-file-download').attr({
-                    target: '_blank',
-                    href: 'data:Application/octet-stream;application/x-xz;attachment;/,' + encodeURIComponent(tag),
-                    download: "dump_ccvm_cloud.sql"
-                });
-                $('#div-db-backup').show();
-                $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 완료되었습니다.");
-                $('#dbdump-prepare-status').html("")
-                $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').show()
-                $('#button-execution-modal-cloud-vm-db-dump').show();
-                $('#button-cancel-modal-cloud-vm-db-dump').show();
-                $('#button-close-modal-cloud-vm-db-dump').show();
-                createLoggerInfo("Creation of download link of ccvm_mysqldump is completed");
-                console.log("Creation of download link of ccvm_mysqldump is completed");
-            }).catch(function(tag){
-                $('#div-db-backup').show();
-                $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
-                $('#dbdump-prepare-status').html("")
-                $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
-                $('#button-execution-modal-cloud-vm-db-dump').show();
-                $('#button-cancel-modal-cloud-vm-db-dump').show();
-                $('#button-close-modal-cloud-vm-db-dump').show();
-                createLoggerInfo("Creation download link of ccvm_mysqldump is failed");
-                console.log("Creation download link of ccvm_mysqldump is failed");
-            });
-            cockpit.file().close()
             createLoggerInfo("Creation of mysqldump of ccvm is completed");
             console.log("Creation of mysqldump of ccvm is completed");
+            result="200";
         }else {
             $('#div-db-backup').show();
             $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
@@ -992,7 +966,7 @@ setInterval(() => {
             $('#button-close-modal-cloud-vm-db-dump').show();
             createLoggerInfo("Creation of mysqldump of ccvm is failed");
             console.log("Creation of mysqldump of ccvm is failed");
-            resolve();
+            result="500";
         }
     }).catch(function(data){
         $('#div-db-backup').show();
@@ -1004,6 +978,37 @@ setInterval(() => {
         $('#button-close-modal-cloud-vm-db-dump').show();
         createLoggerInfo("Creation of mysqldump of ccvm is failed");
         console.log("Creation of mysqldump of ccvm is failed");
+        result="500";
     });
+    if (result == "200") {
+        await cockpit.file(file_path).read()
+        .done(function (tag) {
+            $('#span-modal-wizard-cluster-config-finish-db-dump-file-download').attr({
+                target: '_blank',
+                href: 'data:Application/octet-stream;application/x-xz;attachment;/,' + encodeURIComponent(tag),
+                download: "dump_ccvm_cloud.sql"
+            });
+            $('#div-db-backup').show();
+            $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 완료되었습니다.");
+            $('#dbdump-prepare-status').html("")
+            $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').show()
+            $('#button-execution-modal-cloud-vm-db-dump').show();
+            $('#button-cancel-modal-cloud-vm-db-dump').show();
+            $('#button-close-modal-cloud-vm-db-dump').show();
+            createLoggerInfo("Creation of download link of ccvm_mysqldump is completed");
+            console.log("Creation of download link of ccvm_mysqldump is completed");
+        }).catch(function(tag){
+            $('#div-db-backup').show();
+            $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
+            $('#dbdump-prepare-status').html("")
+            $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
+            $('#button-execution-modal-cloud-vm-db-dump').show();
+            $('#button-cancel-modal-cloud-vm-db-dump').show();
+            $('#button-close-modal-cloud-vm-db-dump').show();
+            createLoggerInfo("Creation download link of ccvm_mysqldump is failed");
+            console.log("Creation download link of ccvm_mysqldump is failed");
+        });
+        cockpit.file().close()
+    }
 }
 
