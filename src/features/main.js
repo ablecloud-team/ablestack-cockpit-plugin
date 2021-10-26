@@ -966,7 +966,7 @@ setInterval(() => {
  * History  : 2021.10.21 수정
  */
  async function readFile(file_path) {
-    cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py'])
+    await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py'])
     .then(function(data){
         var retVal = JSON.parse(data);
         if (retVal.code == 200) {
@@ -984,7 +984,7 @@ setInterval(() => {
         }
     });
     
-    cockpit.file(file_path).read()
+    await cockpit.file(file_path).read()
     .done(function (tag) {
         $('#span-modal-wizard-cluster-config-finish-db-dump-file-download').attr({
             target: '_blank',
