@@ -80,13 +80,17 @@ $('#nav-button-cluster-config-ip-info').on('click', function () {
 
 $('#nav-button-cluster-config-time-server').on('click', function () {
     resetClusterConfigWizard();
-
+    
     $('#div-modal-wizard-cluster-config-time-server').show();
     $('#nav-button-cluster-config-time-server').addClass('pf-m-current');
-
+    
     $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
     $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
+    // 로컬 시간서버 설정 시 PN 아이피 주소 자동 입력
+    if ($('input[name=radio-timeserver]:checked').val() == "internal") {
+        inputPnIntoTimeServer();
+    }
     cur_step_wizard_cluster_config_prepare = "4";
 });
 
@@ -179,6 +183,10 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
         // time server 내용을 설정 확인에 반영
         let timeserver_type = $('input[name=radio-timeserver]:checked').val();
         putTimeServerValueIntoTextarea(timeserver_type);
+        // 로컬 시간서버 설정 시 PN 아이피 주소 자동 입력
+        if ($('input[name=radio-timeserver]:checked').val() == "internal") {
+            inputPnIntoTimeServer();
+        }
 
     } else if (cur_step_wizard_cluster_config_prepare == "4") {
         $('#div-modal-wizard-cluster-config-review').show();
@@ -562,6 +570,8 @@ $('#form-radio-timeserver-int').on('click', function () {
     // 현재 host radio 버튼 보임
     $('#div-timeserver-host-num').show();
     $('input[name=form-input-cluster-config-timeserver]').val("");
+    // PN 아이피 주소 자동 입력
+    inputPnIntoTimeServer();
 });
 
 // 아코디언 개체의 버튼 클릭 이벤트 처리
@@ -831,39 +841,8 @@ async function resetClusterConfigWizardWithData() {
     $('#div-form-hosts-input-number').show();
     $('#div-form-hosts-input-current-number').show();
     // hosts 입력 테이블 초기화
-    $("#form-table-tbody-cluster-config-new-host-profile").empty();
-    let insert_tr = "";
-    insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>192.168.0.10</td>";
-    insert_tr += "<td contenteditable='flase'>ccvm-mngt</td>";
-    insert_tr += "<td contenteditable='flase'>ccvm</td>";
-    insert_tr += "</tr>";
-    insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>192.168.1.1</td>";
-    insert_tr += "<td contenteditable='true'>ablecube1</td>";
-    insert_tr += "<td contenteditable='true'>ablecube</td>";
-    insert_tr += "</tr>";
-    insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>192.168.2.1</td>";
-    insert_tr += "<td contenteditable='flase'>scvm1-mngt</td>";
-    insert_tr += "<td contenteditable='flase'>scvm-mngt</td>";
-    insert_tr += "</tr>";
-    insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>100.100.10.1</td>";
-    insert_tr += "<td contenteditable='true'>ablecube1-pn</td>";
-    insert_tr += "<td contenteditable='true'>ablecube-pn</td>";
-    insert_tr += "</tr>";
-    insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>100.100.10.101</td>";
-    insert_tr += "<td contenteditable='flase'>scvm1</td>";
-    insert_tr += "<td contenteditable='flase'>scvm</td>";
-    insert_tr += "</tr>";
-    insert_tr += "<tr>";
-    insert_tr += "<td contenteditable='true'>100.200.10.11</td>";
-    insert_tr += "<td contenteditable='flase'>scvm1-cn</td>";
-    insert_tr += "<td contenteditable='flase'>scvm-cn</td>";
-    insert_tr += "</tr>";
-    $("#form-table-cluster-config-new-host-profile").append(insert_tr);
+    $('#form-table-tbody-cluster-config-new-host-profile tr').remove();
+    $('#form-table-tbody-cluster-config-existing-host-profile tr').remove();
     $('#form-input-cluster-config-host-number').val(1);
     $('#form-input-cluster-config-currnt-host-number').val(1);
     // 시간 서버
@@ -982,7 +961,7 @@ function fileReaderFunc(input, textarea_type, file_type) {
                     };
                     reader.readAsText(file);
                 } catch (err) {
-                    // console.error(err);
+                    console.error(err);
                 }
             } else {
                 // validation 실패 시 초기화
@@ -1013,38 +992,70 @@ $('#form-input-cluster-config-current-host-number-plus').on('click', function ()
         current_hosts_input_number = current_hosts_input_number*1
         let tbody_td_number = $('#form-table-tbody-cluster-config-existing-host-profile > tr > td').length;
         tbody_td_number = tbody_td_number-1;
-        let ablecube = ((current_hosts_input_number+1)*1*3)-1;
+        // 현재호트스 숫자 *1(Alias2 순서) + 1(ccvm 포함하여 2번째 줄부터) *3(1줄 3칸) -1(테이블 시작점 0)
+        let ablecube = ((hosts_input_number*1)+1)*3-1;
+        let scvm_mngt = ((hosts_input_number*2)+1)*3-1;
+        let ablecube_pn = ((hosts_input_number*3)+1)*3-1;
+        let scvm = ((hosts_input_number*4)+1)*3-1;
+        let scvm_cn = ((hosts_input_number*5)+1)*3-1;
+        let pre_td = 3;
+        let gap_num = hosts_input_number-current_hosts_input_number;
 
-        for(let i=0; i<tbody_td_number; i++) {
-                $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+ablecube+")").text("");
-                // $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+ablecube+1+")").text("ablecube");
+        // Alias2 (ccvm제외) 모두 삭제
+        for(let i=3; i < tbody_td_number; i++) {
+            let j;
+            j = i+1;
+            if(j%3 == 0) {
+                $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(i)+")").text("");
+            }
         }
-
-
-        // $("#form-table-tbody-cluster-config-existing-host-profile tr:eq(0) td:eq(0)").text("000");
-        // console.log("hosts_input_number");
-        // console.log(hosts_input_number);
-        // console.log("tbody_td_number");
-        // console.log(tbody_td_number);
-
-
+        for(let i=0; i < tbody_td_number; i++) {
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube+(pre_td*gap_num)*-1)+")").text("ablecube");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_mngt+(pre_td*gap_num)*-1)+")").text("scvm-mngt");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube_pn+(pre_td*gap_num)*-1)+")").text("ablecube-pn");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm+(pre_td*gap_num)*-1)+")").text("scvm");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_cn+(pre_td*gap_num)*-1)+")").text("scvm-cn");
+        }
     }else if ($('input[name="radio-hosts-file"]:checked').val() == "existing"){
-        console.log($('#form-table-tbody-cluster-config-existing-host-profile > tr').length);
-        console.log("없다");
+        console.log("There are no data");
     }
 });
 
 // 현재 호스트 - 클릭 시 
 $('#form-input-cluster-config-current-host-number-minus').on('click', function () {
-    let hosts_input_number = $('#form-input-cluster-config-host-number').val();
     if($('#form-table-tbody-cluster-config-existing-host-profile > tr').length && $('input[name="radio-hosts-file"]:checked').val() == "existing") {
         console.log("있다");
-        
+        let hosts_input_number = $('#form-input-cluster-config-host-number').val();
+        let current_hosts_input_number = $('#form-input-cluster-config-current-host-number').val();
+        current_hosts_input_number = current_hosts_input_number*1
+        let tbody_td_number = $('#form-table-tbody-cluster-config-existing-host-profile > tr > td').length;
+        tbody_td_number = tbody_td_number-1;
+        // 현재호트스 숫자 *1(Alias2 순서) + 1(ccvm 포함하여 2번째 줄부터) *3(1줄 3칸) -1(테이블 시작점 0)
+        let ablecube = ((hosts_input_number*1)+1)*3-1;
+        let scvm_mngt = ((hosts_input_number*2)+1)*3-1;
+        let ablecube_pn = ((hosts_input_number*3)+1)*3-1;
+        let scvm = ((hosts_input_number*4)+1)*3-1;
+        let scvm_cn = ((hosts_input_number*5)+1)*3-1;
+        let pre_td = 3;
+        let gap_num = hosts_input_number-current_hosts_input_number;
 
-        
+        // Alias2 (ccvm제외) 모두 삭제
+        for(let i=3; i < tbody_td_number; i++) {
+            let j;
+            j = i+1;
+            if(j%3 == 0) {
+                $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(i)+")").text("");
+            }
+        }
+        for(let i=0; i < tbody_td_number; i++) {
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube-(pre_td*gap_num))+")").text("ablecube");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_mngt-(pre_td*gap_num))+")").text("scvm-mngt");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube_pn-(pre_td*gap_num))+")").text("ablecube-pn");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm-(pre_td*gap_num))+")").text("scvm");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_cn-(pre_td*gap_num))+")").text("scvm-cn");
+        }
     }else if ($('input[name="radio-hosts-file"]:checked').val() == "existing"){
-        console.log($('#form-table-tbody-cluster-config-existing-host-profile > tr').length);
-        console.log("없다");
+        console.log("There are no data");
     }
 });
 
@@ -1087,7 +1098,7 @@ async function fileReaderIntoTableFunc(input, file_type) {
                                             total_scvm_num++
                                         }
                                     }
-                                    // ccvm 문자열 검색하여 구성된 총 호스트의 수를 파악
+                                    // ccvm 문자열 검색하여 현재 호스트의 번호를 파악
                                     str = result_arr[i];
                                     if(str.length == 4) {
                                         if(str == find_string) {
@@ -1408,6 +1419,48 @@ function checkHostName() {
         });
 }
 
+
+/**
+ * Meathod Name : inputPnIntoTimeServer
+ * Date Created : 2021.11.01
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 호스트 파일 메뉴에서 작성했던 PN IP 정보대로 로컬 시간서버에 자동 입력하는 함수
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.11.01 수정
+ **/
+
+function inputPnIntoTimeServer() {
+    let pn1 = "1-pn";
+    let pn2 = "2-pn";
+    let pn3 = "3-pn";
+    let colcnt;
+    let tbody_tr;
+    radio_value = $('input[name=radio-hosts-file]:checked').val();
+    if (radio_value == "new") {
+        colcnt = $('#form-table-cluster-config-new-host-profile colgroup col').length;
+        tbody_tr = 'form-table-tbody-cluster-config-new-host-profile tr';
+    }else if(radio_value == "existing") {
+        colcnt = $('#form-table-cluster-config-existing-host-profile colgroup col').length;
+        tbody_tr = 'form-table-tbody-cluster-config-existing-host-profile tr';
+    }
+    $('#'+ tbody_tr).each(function(){
+        for(let i = 0; i < colcnt; i++){
+            str = $(this).find('td').eq(i).text();
+            if(str.slice(-4) === pn1) {
+                pn1 = $(this).find('td').eq(i-1).text();
+            }else if(str.slice(-4) === pn2) {
+                pn2 = $(this).find('td').eq(i-1).text();
+            }else if(str.slice(-4) === pn3) {
+                pn3 = $(this).find('td').eq(i-1).text();
+            }
+        }
+    });
+    $('#form-input-cluster-config-time-server-ip-1').val(pn1);
+    $('#form-input-cluster-config-time-server-ip-2').val(pn2);
+    $('#form-input-cluster-config-time-server-ip-3').val(pn3);
+
+}
 
 /**
  * Meathod Name : modifyTimeServer
