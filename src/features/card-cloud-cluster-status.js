@@ -221,7 +221,7 @@ $('#button-execution-modal-cloud-vm-snap-rollback-confirm').on('click', function
     cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/pcs/main.py', 'status', '--resource', 'cloudcenter_res'])
     .then(function(data){
         var retVal = JSON.parse(data);
-        if(retVal.code == 200 || retVal.role == "Started"){
+        if(retVal.code == 200 && retVal.role == "Stopped"){
             
             // 스냅샷 복구
             var valSelect = $('#form-select-cloud-vm-snap option:selected').val();
@@ -241,13 +241,13 @@ $('#button-execution-modal-cloud-vm-snap-rollback-confirm').on('click', function
                 }
             }).catch(function(data){
                 $('#div-modal-status-alert').show();
-                createLoggerInfo("rollback cloud vm snapshot spawn error");
+                createLoggerInfo("rollback cloud vm snapshot spawn error : " + data);
             });
         }
     }).catch(function(data){
         $('#div-modal-spinner').hide();
         $('#div-modal-status-alert').show();
-        createLoggerInfo("rollback cloud vm snapshot status error");
+        createLoggerInfo("rollback cloud vm snapshot status error : " + data);
     });
 });
 /** cloud vm snap rollback modal 관련 action end */
