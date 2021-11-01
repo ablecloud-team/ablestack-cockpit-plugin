@@ -428,8 +428,8 @@ $('#form-input-cluster-config-current-host-number-minus').on('click', function (
 });
 $('#form-input-cluster-config-current-host-number').on('propertychange change keyup paste input', function () {
     let total_host_num_val = $('#form-input-cluster-config-host-number').val();
-    if (this.value <= 0 || this.value > 90) {
-        alert("1~90까지의 숫자만 입력할 수 있습니다.")
+    if (this.value <= 0 || this.value > 99) {
+        alert("1~99까지의 숫자만 입력할 수 있습니다.")
         this.value = total_host_num_val;
     }else if(this.value > total_host_num_val) {
         this.value = total_host_num_val;
@@ -457,11 +457,12 @@ $('#form-input-cluster-config-host-number-minus').on('click', function () {
 });
 $('#form-input-cluster-config-host-number').on('propertychange change keyup paste input', function () {
     let current_host_num_val = $('#form-input-cluster-config-current-host-number').val();
-    if (this.value <= 0 || this.value > 90) {
-        alert("1~90까지의 숫자만 입력할 수 있습니다.")
+    if (this.value <= 0 || this.value > 99) {
+        alert("1~99까지의 숫자만 입력할 수 있습니다.")
         this.value = 1;
     }else if(this.value < current_host_num_val) {
         $('#form-input-cluster-config-current-host-number').val(this.value)
+        changeAlias2()
     }
 });
 // Host 파일 준비 중 신규생성을 선택한 경우 Host 수에 따라 텍스트 값 변경
@@ -470,7 +471,7 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
 
     let current_host_num_val = $('#form-input-cluster-config-current-host-number').val();
     let total_host_num_val = $('#form-input-cluster-config-host-number').val();
-    if (total_host_num_val <= 90 && current_host_num_val <= 90) {
+    if (total_host_num_val <= 99 && current_host_num_val <= 99) {
         let target_table = $("#form-table-tbody-cluster-config-new-host-profile");
         target_table.empty();
         let insert_tr;
@@ -543,10 +544,12 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
         $("#form-table-cluster-config-new-host-profile").append(insert_tr);
 
     } else {
-        $('#form-input-cluster-config-host-number').val(90);
-        $('#form-input-cluster-config-current-host-number').val(90);
-        alert("1~90까지의 숫자만 입력할 수 있습니다.");
+        $('#form-input-cluster-config-host-number').val(99);
+        $('#form-input-cluster-config-current-host-number').val(99);
+        alert("1~99까지의 숫자만 입력할 수 있습니다.");
     }
+    // 기존 파일 사용 시, 현재 호스트 + 또는 - 클릭 시 Alias2 변경 
+    changeAlias2();
 });
 
 // 로컬 시간서버를 외부 시간서버로 선택하면 시간서버 2, 3은 선택 입력으로 전환한다.
@@ -982,83 +985,6 @@ function fileReaderFunc(input, textarea_type, file_type) {
  * History  : 2021.10.19 최초 작성
  **/
 
-
-// 현재 호스트 + 클릭 시 
-$('#form-input-cluster-config-current-host-number-plus').on('click', function () {
-    if($('#form-table-tbody-cluster-config-existing-host-profile > tr').length && $('input[name="radio-hosts-file"]:checked').val() == "existing") {
-        console.log("있다");
-        let hosts_input_number = $('#form-input-cluster-config-host-number').val();
-        let current_hosts_input_number = $('#form-input-cluster-config-current-host-number').val();
-        current_hosts_input_number = current_hosts_input_number*1
-        let tbody_td_number = $('#form-table-tbody-cluster-config-existing-host-profile > tr > td').length;
-        tbody_td_number = tbody_td_number-1;
-        // 현재호트스 숫자 *1(Alias2 순서) + 1(ccvm 포함하여 2번째 줄부터) *3(1줄 3칸) -1(테이블 시작점 0)
-        let ablecube = ((hosts_input_number*1)+1)*3-1;
-        let scvm_mngt = ((hosts_input_number*2)+1)*3-1;
-        let ablecube_pn = ((hosts_input_number*3)+1)*3-1;
-        let scvm = ((hosts_input_number*4)+1)*3-1;
-        let scvm_cn = ((hosts_input_number*5)+1)*3-1;
-        let pre_td = 3;
-        let gap_num = hosts_input_number-current_hosts_input_number;
-
-        // Alias2 (ccvm제외) 모두 삭제
-        for(let i=3; i < tbody_td_number; i++) {
-            let j;
-            j = i+1;
-            if(j%3 == 0) {
-                $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(i)+")").text("");
-            }
-        }
-        for(let i=0; i < tbody_td_number; i++) {
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube+(pre_td*gap_num)*-1)+")").text("ablecube");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_mngt+(pre_td*gap_num)*-1)+")").text("scvm-mngt");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube_pn+(pre_td*gap_num)*-1)+")").text("ablecube-pn");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm+(pre_td*gap_num)*-1)+")").text("scvm");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_cn+(pre_td*gap_num)*-1)+")").text("scvm-cn");
-        }
-    }else if ($('input[name="radio-hosts-file"]:checked').val() == "existing"){
-        console.log("There are no data");
-    }
-});
-
-// 현재 호스트 - 클릭 시 
-$('#form-input-cluster-config-current-host-number-minus').on('click', function () {
-    if($('#form-table-tbody-cluster-config-existing-host-profile > tr').length && $('input[name="radio-hosts-file"]:checked').val() == "existing") {
-        console.log("있다");
-        let hosts_input_number = $('#form-input-cluster-config-host-number').val();
-        let current_hosts_input_number = $('#form-input-cluster-config-current-host-number').val();
-        current_hosts_input_number = current_hosts_input_number*1
-        let tbody_td_number = $('#form-table-tbody-cluster-config-existing-host-profile > tr > td').length;
-        tbody_td_number = tbody_td_number-1;
-        // 현재호트스 숫자 *1(Alias2 순서) + 1(ccvm 포함하여 2번째 줄부터) *3(1줄 3칸) -1(테이블 시작점 0)
-        let ablecube = ((hosts_input_number*1)+1)*3-1;
-        let scvm_mngt = ((hosts_input_number*2)+1)*3-1;
-        let ablecube_pn = ((hosts_input_number*3)+1)*3-1;
-        let scvm = ((hosts_input_number*4)+1)*3-1;
-        let scvm_cn = ((hosts_input_number*5)+1)*3-1;
-        let pre_td = 3;
-        let gap_num = hosts_input_number-current_hosts_input_number;
-
-        // Alias2 (ccvm제외) 모두 삭제
-        for(let i=3; i < tbody_td_number; i++) {
-            let j;
-            j = i+1;
-            if(j%3 == 0) {
-                $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(i)+")").text("");
-            }
-        }
-        for(let i=0; i < tbody_td_number; i++) {
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube-(pre_td*gap_num))+")").text("ablecube");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_mngt-(pre_td*gap_num))+")").text("scvm-mngt");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube_pn-(pre_td*gap_num))+")").text("ablecube-pn");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm-(pre_td*gap_num))+")").text("scvm");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_cn-(pre_td*gap_num))+")").text("scvm-cn");
-        }
-    }else if ($('input[name="radio-hosts-file"]:checked').val() == "existing"){
-        console.log("There are no data");
-    }
-});
-
 async function fileReaderIntoTableFunc(input, file_type) {
     input.addEventListener('change', function (event) {
         let file_list = input.files || event.target.files;
@@ -1093,7 +1019,7 @@ async function fileReaderIntoTableFunc(input, file_type) {
                                     insert_tr += "<td contenteditable='true'>"+result_arr[i]+"</td>";
                                     // ccvm 문자열 검색하여 구성된 총 호스트의 수를 파악
                                     str = result_arr[i];
-                                    if(str.length == 5) {
+                                    if(str.length == 5 || str.length == 6) {
                                         if(str.substring(0,4) == find_string) {
                                             total_scvm_num++
                                         }
@@ -1104,7 +1030,11 @@ async function fileReaderIntoTableFunc(input, file_type) {
                                         if(str == find_string) {
                                             let current_scvm = "";
                                             current_scvm = result_arr[i-1]
-                                            current_scvm_num = current_scvm.substring(4,5)
+                                            if(current_scvm.length == 5) {
+                                                current_scvm_num = current_scvm.substring(4,5)
+                                            }else if(current_scvm.length == 6) {
+                                                current_scvm_num = current_scvm.substring(4,6)
+                                            }
                                         }
                                     }
                                     i++
@@ -1419,6 +1349,50 @@ function checkHostName() {
         });
 }
 
+/**
+ * Meathod Name : inputPnIntoTimeServer
+ * Date Created : 2021.11.01
+ * Writer  : 류홍욱
+ * Description : 클러스터 준비 마법사에서 기존 호스트 파일의 Alias2를 현재 호스트 숫자에 따라 변경하는 함수
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.11.01 수정
+ **/
+function changeAlias2() {
+    if($('#form-table-tbody-cluster-config-existing-host-profile > tr').length && $('input[name="radio-hosts-file"]:checked').val() == "existing") {
+        let hosts_input_number = $('#form-input-cluster-config-host-number').val();
+        let current_hosts_input_number = $('#form-input-cluster-config-current-host-number').val();
+        current_hosts_input_number = current_hosts_input_number*1
+        let tbody_td_number = $('#form-table-tbody-cluster-config-existing-host-profile > tr > td').length;
+        tbody_td_number = tbody_td_number-1;
+        // 현재호트스 숫자 *1(Alias2 순서) + 1(ccvm 포함하여 2번째 줄부터) *3(1줄 3칸) -1(테이블 시작점 0)
+        let ablecube = ((hosts_input_number*1)+1)*3-1;
+        let scvm_mngt = ((hosts_input_number*2)+1)*3-1;
+        let ablecube_pn = ((hosts_input_number*3)+1)*3-1;
+        let scvm = ((hosts_input_number*4)+1)*3-1;
+        let scvm_cn = ((hosts_input_number*5)+1)*3-1;
+        let pre_td = 3;
+        let gap_num = hosts_input_number-current_hosts_input_number;
+
+        // Alias2 (ccvm제외) 모두 삭제
+        for(let i=3; i < tbody_td_number; i++) {
+            let j;
+            j = i+1;
+            if(j%3 == 0) {
+                $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(i)+")").text("");
+            }
+        }
+        for(let i=0; i < tbody_td_number; i++) {
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube+(pre_td*gap_num)*-1)+")").text("ablecube");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_mngt+(pre_td*gap_num)*-1)+")").text("scvm-mngt");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube_pn+(pre_td*gap_num)*-1)+")").text("ablecube-pn");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm+(pre_td*gap_num)*-1)+")").text("scvm");
+            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_cn+(pre_td*gap_num)*-1)+")").text("scvm-cn");
+        }
+    }else if ($('input[name="radio-hosts-file"]:checked').val() == "existing"){
+        console.log("There are no data");
+    }
+}
 
 /**
  * Meathod Name : inputPnIntoTimeServer
@@ -1456,6 +1430,17 @@ function inputPnIntoTimeServer() {
             }
         }
     });
+    // 구성할 호스트의 숫자가 1이하일 때 값 처리
+    if(pn1 === "1-pn") {
+        pn1 = ""
+    }
+    if(pn2 === "2-pn") {
+        pn2 = ""
+    }
+    if(pn3 === "3-pn") {
+        pn3 = ""
+    }
+
     $('#form-input-cluster-config-time-server-ip-1').val(pn1);
     $('#form-input-cluster-config-time-server-ip-2').val(pn2);
     $('#form-input-cluster-config-time-server-ip-3').val(pn3);
