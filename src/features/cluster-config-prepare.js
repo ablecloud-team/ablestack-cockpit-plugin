@@ -412,11 +412,9 @@ $('#form-input-cluster-config-current-host-number-plus').on('click', function ()
     let total_host_num_val = $('#form-input-cluster-config-host-number').val();
     let n = $('.bt_up').index(this);
     let num = $("#form-input-cluster-config-current-host-number:eq(" + n + ")").val();
-    let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
-    if (num < total_host_num_val) {
+    if (num*1 < total_host_num_val*1) {
         num = $("#form-input-cluster-config-current-host-number:eq(" + n + ")").val(num * 1 + 1);
     }
-    
 });
 $('#form-input-cluster-config-current-host-number-minus').on('click', function () {
     let n = $('.bt_down').index(this);
@@ -429,9 +427,8 @@ $('#form-input-cluster-config-current-host-number-minus').on('click', function (
 $('#form-input-cluster-config-current-host-number').on('propertychange change keyup paste input', function () {
     let total_host_num_val = $('#form-input-cluster-config-host-number').val();
     if (this.value <= 0 || this.value > 99) {
-        alert("1~99까지의 숫자만 입력할 수 있습니다.")
         this.value = total_host_num_val;
-    }else if(this.value > total_host_num_val) {
+    }else if(this.value*1 > total_host_num_val*1) {
         this.value = total_host_num_val;
         return;
     }
@@ -458,8 +455,8 @@ $('#form-input-cluster-config-host-number-minus').on('click', function () {
 $('#form-input-cluster-config-host-number').on('propertychange change keyup paste input', function () {
     let current_host_num_val = $('#form-input-cluster-config-current-host-number').val();
     if (this.value <= 0 || this.value > 99) {
-        alert("1~99까지의 숫자만 입력할 수 있습니다.")
         this.value = 1;
+        alert("1~99까지의 숫자만 입력할 수 있습니다.")
     }else if(this.value < current_host_num_val) {
         $('#form-input-cluster-config-current-host-number').val(this.value)
         changeAlias2()
