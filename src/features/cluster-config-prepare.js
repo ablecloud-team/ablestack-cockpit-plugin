@@ -88,8 +88,14 @@ $('#nav-button-cluster-config-time-server').on('click', function () {
     $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
     // 로컬 시간서버 설정 시 PN 아이피 주소 자동 입력
-    if ($('input[name=radio-timeserver]:checked').val() == "internal") {
+    if($('input[name=radio-timeserver]:checked').val() == "internal") {
         inputPnIntoTimeServer();
+    }
+    // 구성할 호스트 수가 3대 미만이면 로컬 시간 서버 비활성화
+    if($('#form-input-cluster-config-host-number').val() < 3) {
+        $('#form-radio-timeserver-int').attr('disabled', true);
+    }else {
+        $('#form-radio-timeserver-int').attr('disabled', false);
     }
     cur_step_wizard_cluster_config_prepare = "4";
 });
@@ -186,6 +192,12 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
         // 로컬 시간서버 설정 시 PN 아이피 주소 자동 입력
         if ($('input[name=radio-timeserver]:checked').val() == "internal") {
             inputPnIntoTimeServer();
+        }
+        // 구성할 호스트 수가 3대 미만이면 로컬 시간 서버 비활성화
+        if($('#form-input-cluster-config-host-number').val() < 3) {
+            $('#form-radio-timeserver-int').attr('disabled', true);
+        }else {
+            $('#form-radio-timeserver-int').attr('disabled', false);
         }
 
     } else if (cur_step_wizard_cluster_config_prepare == "4") {
