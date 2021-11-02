@@ -9,6 +9,9 @@
 #########################################
 set -x
 LOGFILE="/var/log/cloud_install.log"
+
+hosts=$(grep -v mngt /etc/hosts | grep -v scvm | grep -v pn | grep -v localhost | awk {'print $1'})
+
 systemctl enable --now mysqld
 DATABASE_PASSWD="Ablecloud1!"
 ################# firewall setting
@@ -86,6 +89,12 @@ systemctl enable --now cloudstack-management
 -m /nfs/secondary \
 -f /usr/share/ablestack/systemvmtemplate-4.16.0-kvm.qcow2.bz2 \
 -h kvm -F
+
+for host in $hosts
+do
+  ssh -o StrictHostKeyChecking=no $host /usr/bin/systemctl enable --now pacemaker
+  ssh -o StrictHostKeyChecking=no $host /usr/bin/systemctl enable --now corosync
+done
 
 # Delete container image file
 rm -rf /usr/share/ablestack/*.tar
