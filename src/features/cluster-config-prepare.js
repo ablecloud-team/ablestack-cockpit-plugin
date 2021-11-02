@@ -1359,7 +1359,7 @@ function checkHostName() {
 }
 
 /**
- * Meathod Name : inputPnIntoTimeServer
+ * Meathod Name : changeAlias2
  * Date Created : 2021.11.01
  * Writer  : 류홍욱
  * Description : 클러스터 준비 마법사에서 기존 호스트 파일의 Alias2를 현재 호스트 숫자에 따라 변경하는 함수
