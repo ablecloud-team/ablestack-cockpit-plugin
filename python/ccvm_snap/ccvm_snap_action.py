@@ -40,7 +40,7 @@ def createArgumentParser():
 
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
 
-    parser.add_argument('action', choices=['list', 'rollback'], help='choose one of the actions')
+    parser.add_argument('action', choices=['list', 'rollback', 'backup'], help='choose one of the actions')
     parser.add_argument('--snap-name', metavar='snapshot name', type=str, help='The name of the CCVM Snapshot')
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
@@ -70,13 +70,44 @@ def listCcvmSnap(args):
 
 def rollbackCcvmSnap(args):
     try:        
-        # ccvm 스냅 백업
+        # ccvm 스냅 롤백
         result = os.system("rbd snap rollback "+pool_name+"/"+ccvm_image_name+"@"+args.snap_name)
         
         if result == 0:
             return createReturn(code=200, val="CCVM Snapshot Rollback Success")
         else:
             return createReturn(code=500, val="CCVM Snapshot Rollback Fail. Check if ccvm is Stopped")
+
+    except Exception as e:
+        # 결과값 리턴
+        return createReturn(code=500, val=e)
+
+def backupCcvmSnap(args):
+    # 현재 데이터의 안정성을 위해 클라우드센터 가상머신이 정지된 상태에서 백업 가능하도록 개발 되어있음
+    # 실행중인 상태의 클라우드센터 가상머신 스냅샷 생성하려면 추가 작업 필요
+    # 실행중인 ccvm 백업할 경우 추가작업 : ccvm이 실행중인 호스트를 확인하여 virsh 명령으로 suspend 후 스냅샷 생성하고 완료후 다시 resume 하는 로직 필요
+    try:
+        now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+
+        # ccvm 스냅 생성
+        result = os.system("rbd snap create "+pool_name+"/"+ccvm_image_name+"@"+now)
+
+        # ccvm 스냅이 10개 이상이면 마지막 스냅 삭제
+        output = check_output(["rbd snap list "+ccvm_image_name+" --format json"], universal_newlines=True, shell=True, env=env)
+        output_json = json.loads(output)
+
+        ccvm_snap_cnt = len(output_json)
+        ccvm_snap_limit = 10
+
+        for ccvm_snap_info in output_json:
+            if ccvm_snap_cnt > ccvm_snap_limit:
+                ccvm_snap_cnt = ccvm_snap_cnt - 1
+                os.system("rbd snap rm "+pool_name+"/"+ccvm_image_name+"@"+ccvm_snap_info["name"])
+
+        if result == 0:
+            return createReturn(code=200, val="CCVM Snapshot Backup Create Success")
+        else:
+            return createReturn(code=500, val="CCVM Snapshot Backup Create Fail. Check if ccvm is Stopped")
 
     except Exception as e:
         # 결과값 리턴
@@ -99,4 +130,6 @@ if __name__ == '__main__':
         print(listCcvmSnap(args))
     elif (args.action) == 'rollback':
         print(rollbackCcvmSnap(args))
+    elif (args.action) == 'backup':
+        print(backupCcvmSnap(args))
     

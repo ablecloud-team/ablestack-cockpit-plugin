@@ -432,6 +432,9 @@
                                                             <button class="pf-c-dropdown__menu-item" id="card-action-cloud-vm-change" type="button" disabled>클라우드센터VM 자원변경</button>
                                                         </li>
                                                         <li>
+                                                            <button class="pf-c-dropdown__menu-item" id="button-cloud-vm-snap-backup" type="button">클라우드센터VM 스냅샷 백업</button>
+                                                        </li>
+                                                        <li>
                                                             <button class="pf-c-dropdown__menu-item" id="button-cloud-vm-snap-rollback" type="button">클라우드센터VM 스냅샷 복구</button>
                                                         </li>
                                                         <li>
@@ -817,6 +820,26 @@
             </div>
         </div>
         <!-- 클라우드센터VM 스냅샷 복구 : Modal 영역 끝 -->
+
+        <!-- 클라우드센터VM 스냅샷 백업 : Modal 영역 시작 -->
+        <div id="div-modal-cloud-vm-snap-backup" class="pf-c-backdrop" style="display:none">
+            <div class="pf-l-bullseye">
+                <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Cloud VM snap backup">
+                    <button id="button-close-modal-cloud-vm-snap-backup" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                    <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">클라우드센터VM 스냅샷 백업</span></h1></header>
+                    <div class="pf-c-modal-box__body">
+                        <div>클라우드센터VM 백업용 스냅샷을 생성하시겠습니까?</div>
+                    </div>
+                    <footer class="pf-c-modal-box__footer">
+                        <button id="button-execution-modal-cloud-vm-snap-backup" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                        <button id="button-cancel-modal-cloud-vm-snap-backup" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+        <!-- 클라우드센터VM 스냅샷 백업 : Modal 영역 끝 -->
 
         <!-- 모달 영역 끝  -->
 
