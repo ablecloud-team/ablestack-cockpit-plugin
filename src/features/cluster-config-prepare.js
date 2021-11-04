@@ -129,7 +129,22 @@ $('#nav-button-cluster-config-review').on('click', function () {
     let option = "";
     putHostsValueIntoTextarea(host_file_type, option);
     // time server 내용을 설정 확인에 반영
-    let timeserver_type = $('input[name=radio-hosts-file]:checked').val();
+    // 구성할 호스트 수가 3대 미만이면 로컬 시간 서버 비활성화
+    if($('#form-input-cluster-config-host-number').val() < 3) {
+        $("input[name='radio-timeserver'][value='external']").prop("checked", true);
+        $('#form-radio-timeserver-int').attr('disabled', true);
+        $('#span-timeserver2-required').hide();
+        $('#span-timeserver3-required').hide();
+        $('#form-input-cluster-config-time-server-ip-2').removeAttr('required');
+        $('#form-input-cluster-config-time-server-ip-3').removeAttr('required');
+        // 현재 host radio 버튼 숨김
+        $('#div-timeserver-host-num').hide();
+        // radio 버튼 클릭 시 ip 정보 초기화
+        $('input[name=form-input-cluster-config-timeserver]').val("");
+    }else {
+        $('#form-radio-timeserver-int').attr('disabled', false);
+    }
+    let timeserver_type = $('input[name=radio-timeserver]:checked').val();
     putTimeServerValueIntoTextarea(timeserver_type);
 });
 
