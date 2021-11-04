@@ -52,7 +52,7 @@ $(".tab-available").keydown(function (e) {
 
     }).catch(function(){
         createLoggerInfo("setNicBridge error");
-        // alert("setNicBridge error");
+        alert("setNicBridge error");
     });
 }
 
