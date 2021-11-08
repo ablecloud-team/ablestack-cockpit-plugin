@@ -88,8 +88,23 @@ $('#nav-button-cluster-config-time-server').on('click', function () {
     $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
     // 로컬 시간서버 설정 시 PN 아이피 주소 자동 입력
-    if ($('input[name=radio-timeserver]:checked').val() == "internal") {
+    if($('input[name=radio-timeserver]:checked').val() == "internal") {
         inputPnIntoTimeServer();
+    }
+    // 구성할 호스트 수가 3대 미만이면 로컬 시간 서버 비활성화
+    if($('#form-input-cluster-config-host-number').val() < 3) {
+        $("input[name='radio-timeserver'][value='external']").prop("checked", true);
+        $('#form-radio-timeserver-int').attr('disabled', true);
+        $('#span-timeserver2-required').hide();
+        $('#span-timeserver3-required').hide();
+        $('#form-input-cluster-config-time-server-ip-2').removeAttr('required');
+        $('#form-input-cluster-config-time-server-ip-3').removeAttr('required');
+        // 현재 host radio 버튼 숨김
+        $('#div-timeserver-host-num').hide();
+        // radio 버튼 클릭 시 ip 정보 초기화
+        $('input[name=form-input-cluster-config-timeserver]').val("");
+    }else {
+        $('#form-radio-timeserver-int').attr('disabled', false);
     }
     cur_step_wizard_cluster_config_prepare = "4";
 });
@@ -111,9 +126,25 @@ $('#nav-button-cluster-config-review').on('click', function () {
     putSshKeyValueIntoTextarea(ssh_key_type);
     // 변경된 hosts file 내용을 설정 확인에 반영
     let host_file_type = $('input[name=radio-hosts-file]:checked').val();
-    putHostsValueIntoTextarea(host_file_type);
+    let option = "";
+    putHostsValueIntoTextarea(host_file_type, option);
     // time server 내용을 설정 확인에 반영
-    let timeserver_type = $('input[name=radio-hosts-file]:checked').val();
+    // 구성할 호스트 수가 3대 미만이면 로컬 시간 서버 비활성화
+    if($('#form-input-cluster-config-host-number').val() < 3) {
+        $("input[name='radio-timeserver'][value='external']").prop("checked", true);
+        $('#form-radio-timeserver-int').attr('disabled', true);
+        $('#span-timeserver2-required').hide();
+        $('#span-timeserver3-required').hide();
+        $('#form-input-cluster-config-time-server-ip-2').removeAttr('required');
+        $('#form-input-cluster-config-time-server-ip-3').removeAttr('required');
+        // 현재 host radio 버튼 숨김
+        $('#div-timeserver-host-num').hide();
+        // radio 버튼 클릭 시 ip 정보 초기화
+        $('input[name=form-input-cluster-config-timeserver]').val("");
+    }else {
+        $('#form-radio-timeserver-int').attr('disabled', false);
+    }
+    let timeserver_type = $('input[name=radio-timeserver]:checked').val();
     putTimeServerValueIntoTextarea(timeserver_type);
 });
 
@@ -135,7 +166,8 @@ $('#nav-button-cluster-config-finish').on('click', function () {
     putSshKeyValueIntoTextarea(ssh_key_type);
     // 변경된 hosts file 내용을 설정 확인에 반영
     let host_file_type = $('input[name=radio-hosts-file]:checked').val();
-    putHostsValueIntoTextarea(host_file_type);
+    let option = "";
+    putHostsValueIntoTextarea(host_file_type, option);
     // time server 내용을 설정 확인에 반영
     let ntp_timeserver_type = $('input[name=radio-timeserver]:checked').val();
     putTimeServerValueIntoTextarea(ntp_timeserver_type);
@@ -179,13 +211,29 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
         putSshKeyValueIntoTextarea(ssh_key_type);
         // 변경된 hosts file 내용을 설정 확인에 반영
         let host_file_type = $('input[name=radio-hosts-file]:checked').val();
-        putHostsValueIntoTextarea(host_file_type);
+        let option = "";
+        putHostsValueIntoTextarea(host_file_type, option);
         // time server 내용을 설정 확인에 반영
         let timeserver_type = $('input[name=radio-timeserver]:checked').val();
         putTimeServerValueIntoTextarea(timeserver_type);
         // 로컬 시간서버 설정 시 PN 아이피 주소 자동 입력
         if ($('input[name=radio-timeserver]:checked').val() == "internal") {
             inputPnIntoTimeServer();
+        }
+        // 구성할 호스트 수가 3대 미만이면 로컬 시간 서버 비활성화
+        if($('#form-input-cluster-config-host-number').val() < 3) {
+            $("input[name='radio-timeserver'][value='external']").prop("checked", true);
+            $('#form-radio-timeserver-int').attr('disabled', true);
+            $('#span-timeserver2-required').hide();
+            $('#span-timeserver3-required').hide();
+            $('#form-input-cluster-config-time-server-ip-2').removeAttr('required');
+            $('#form-input-cluster-config-time-server-ip-3').removeAttr('required');
+            // 현재 host radio 버튼 숨김
+            $('#div-timeserver-host-num').hide();
+            // radio 버튼 클릭 시 ip 정보 초기화
+            $('input[name=form-input-cluster-config-timeserver]').val("");
+        }else {
+            $('#form-radio-timeserver-int').attr('disabled', false);
         }
 
     } else if (cur_step_wizard_cluster_config_prepare == "4") {
@@ -203,7 +251,8 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
         putSshKeyValueIntoTextarea(ssh_key_type);
         // 변경된 hosts file 내용을 설정 확인에 반영
         let host_file_type = $('input[name=radio-hosts-file]:checked').val();
-        putHostsValueIntoTextarea(host_file_type);
+        let option = "";
+        putHostsValueIntoTextarea(host_file_type, option);
         // time server 내용을 설정 확인에 반영
         let timeserver_type = $('input[name=radio-timeserver]:checked').val();
         putTimeServerValueIntoTextarea(timeserver_type);
@@ -224,7 +273,8 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
 
             // hosts 파일
             radio_value = $('input[name=radio-hosts-file]:checked').val();
-            putHostsValueIntoTextarea(radio_value);
+            let option = "";
+            putHostsValueIntoTextarea(radio_value, option);
             let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
             let os_type = ($('#os-type').val()).trim();
             let host_name = $('#host-name').val();
@@ -454,18 +504,21 @@ $('#form-input-cluster-config-host-number-minus').on('click', function () {
 });
 $('#form-input-cluster-config-host-number').on('propertychange change keyup paste input', function () {
     let current_host_num_val = $('#form-input-cluster-config-current-host-number').val();
+    current_host_num_val = current_host_num_val*1;
     if (this.value <= 0 || this.value > 99) {
         this.value = 1;
         alert("1~99까지의 숫자만 입력할 수 있습니다.")
+        return;
     }else if(this.value < current_host_num_val) {
         $('#form-input-cluster-config-current-host-number').val(this.value)
-        changeAlias2()
+        let option = "";
+        changeAlias2(option)
+        return;
     }
 });
 // Host 파일 준비 중 신규생성을 선택한 경우 Host 수에 따라 텍스트 값 변경
 $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-number-plus, #form-input-cluster-config-host-number-minus' +
 ', #form-input-cluster-config-current-host-number, #form-input-cluster-config-current-host-number-plus, #form-input-cluster-config-current-host-number-minus').on('change click', function () {
-
     let current_host_num_val = $('#form-input-cluster-config-current-host-number').val();
     let total_host_num_val = $('#form-input-cluster-config-host-number').val();
     if (total_host_num_val <= 99 && current_host_num_val <= 99) {
@@ -546,7 +599,8 @@ $('#form-input-cluster-config-host-number, #form-input-cluster-config-host-numbe
         alert("1~99까지의 숫자만 입력할 수 있습니다.");
     }
     // 기존 파일 사용 시, 현재 호스트 + 또는 - 클릭 시 Alias2 변경 
-    changeAlias2();
+    let option = "";
+    changeAlias2(option);
 });
 
 // 로컬 시간서버를 외부 시간서버로 선택하면 시간서버 2, 3은 선택 입력으로 전환한다.
@@ -661,7 +715,8 @@ $('input[name=radio-ssh-key]').on('click', function () {
 $('#form-input-cluster-config-hosts-file').on('click', function () {
     let hosts_input = document.querySelector('#form-input-cluster-config-hosts-file');
     let file_type = "hosts";
-    fileReaderIntoTableFunc(hosts_input, file_type);
+    let option = "";
+    fileReaderIntoTableFunc(hosts_input, file_type, option);
     $('#form-input-cluster-config-hosts-file').val("")
 });
 // Hosts 기존 파일 선택 시, 파일 선택 취소 시 table 초기화
@@ -681,7 +736,8 @@ $('#button-accordion-ssh-key').on('click change', function () {
 // hosts 파일 준비 방식에 따라 내용 보여주기
 $('#button-accordion-hosts-file').on('click change', function () {
     let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
-    putHostsValueIntoTextarea(hosts_file_type);
+    let option = "";
+    putHostsValueIntoTextarea(hosts_file_type, option);
 });
 // time server 종류에 따라 내용 보여주기
 $('#button-accordion-timeserver').on('click change', function () {
@@ -720,7 +776,9 @@ $('#span-modal-wizard-cluster-config-finish-pub-sshkey-download').on('click', fu
 // Host File 다운로드 링크 생성
 $('#span-modal-wizard-cluster-config-finish-hosts-file-download').on('click', function () {
     let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
-    putHostsValueIntoTextarea(hosts_file_type);
+    let option = "";
+    putHostsValueIntoTextarea(hosts_file_type, option);
+
     
     let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
     // OS 타입에 따라 hosts 파일 값을 다르게 설정
@@ -972,92 +1030,6 @@ function fileReaderFunc(input, textarea_type, file_type) {
     });
 }
 
-/**
- * Meathod Name : fileReaderIntoTableFunc
- * Date Created : 2021.10.19
- * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 input box에서 파일을 선택하면 문자열로 읽어와 table에 담는 함수
- * Parameter : input (input box id 값), file_type(ssh-key, hosts 파일 타입에 따라 분류)
- * Return  : 없음
- * History  : 2021.10.19 최초 작성
- **/
-
-async function fileReaderIntoTableFunc(input, file_type) {
-    input.addEventListener('change', function (event) {
-        let file_list = input.files || event.target.files;
-        let file = file_list[0];
-        let id = input.getAttribute('id');
-        // 배열 안 데이터 검색을 위한 변수
-        let str = "";
-        let find_string = "scvm";
-        let total_scvm_num = 0;
-        let current_scvm_num = 0;
-        let current_scvm_td_num = 0;
-        // 현재 호스트 +, - 클릭 시 Alias2 변경을 위한 변수
-
-        if ($(input).val() != "") {
-            let file_name = file_list[0].name;
-            // 파일 이름 및 용량 체크
-            if (checkClusterConfigPrepareFileName(file_name, file_type) != false && checkFileSize(file) != false) {
-                
-                // FileList
-                let reader = new FileReader();
-                try {
-                    reader.onload = function (progressEvent) {
-                        let result = progressEvent.target.result;
-                        // text를 배열로 분리
-                        let result_arr = result.split(/[\t]|[\n]/);
-                        // 배열 데이터를 테이블 형식으로 생성
-                        let insert_tr = "";
-                        for (let i=0; i<result_arr.length;) {
-                            insert_tr += "<tr>";
-                            for(let j=1; j<=3; j++) {
-                                if(i < result_arr.length) {
-                                    insert_tr += "<td contenteditable='true'>"+result_arr[i]+"</td>";
-                                    // ccvm 문자열 검색하여 구성된 총 호스트의 수를 파악
-                                    str = result_arr[i];
-                                    if(str.length == 5 || str.length == 6) {
-                                        if(str.substring(0,4) == find_string) {
-                                            total_scvm_num++
-                                        }
-                                    }
-                                    // ccvm 문자열 검색하여 현재 호스트의 번호를 파악
-                                    str = result_arr[i];
-                                    if(str.length == 4) {
-                                        if(str == find_string) {
-                                            let current_scvm = "";
-                                            current_scvm = result_arr[i-1]
-                                            if(current_scvm.length == 5) {
-                                                current_scvm_num = current_scvm.substring(4,5)
-                                            }else if(current_scvm.length == 6) {
-                                                current_scvm_num = current_scvm.substring(4,6)
-                                            }
-                                        }
-                                    }
-                                    i++
-                                }
-                            }
-                            insert_tr += "</tr>";
-                        }
-                        // 기존 호스트파일을 읽어와 구성할 호스트, 현재 호스트를 input 박스에 넣기
-                        $('#form-input-cluster-config-host-number').val(total_scvm_num);
-                        $('#form-input-cluster-config-current-host-number').val(current_scvm_num);
-
-                        $('#form-table-tbody-cluster-config-existing-host-profile tr').remove();
-                        $(insert_tr).appendTo('#form-table-tbody-cluster-config-existing-host-profile');
-                    };
-                    reader.readAsText(file);
-
-                } catch (err) {
-                }
-            } else {
-                // validation 실패 시 초기화
-                $('#' + id).val("");
-                $('#form-table-tbody-cluster-config-existing-host-profile tr').remove();
-            }
-        }
-    });
-}
 
 /**
  * Meathod Name : fileExtensionChecker
@@ -1130,61 +1102,6 @@ function putSshKeyValueIntoTextarea(radio_value) {
         $('#div-accordion-ssh-key-type').text("기존 파일 사용");
         $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val($('#div-textarea-cluster-config-temp-existing-ssh-key-pri-file').val());
         $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val($('#div-textarea-cluster-config-temp-existing-ssh-key-pub-file').val());
-    }
-}
-
-
-/**
- * Meathod Name : putHostsValueIntoTextarea
- * Date Created : 2021.03.22
- * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 설정에 따라 설정확인에 위치한 textarea에 hosts 값을 넣는 함수
- * Parameter : radio_value
- * Return  : 없음
- * History  : 2021.10.21 수정
- **/
-
-function putHostsValueIntoTextarea(radio_value) {
-    if (radio_value == "new") {
-        // hosts file 준비 방법 표시 및 값 설정
-        $('#div-accordion-hosts-file-type').text("신규 생성");
-        // 신규로 생성할 경우 테이블의 내용을 table에 넣는 코드
-        let colcnt = $('#form-table-cluster-config-new-host-profile colgroup col').length;
-        let arr = new Array();
-        $('#form-table-tbody-cluster-config-new-host-profile tr').each(function(){
-            let j;
-            for(let i = 0; i < colcnt; i++){
-                j = i+1;
-                arr += $(this).find('td').eq(i).text();
-                if(j%3 == 0) {
-                    arr += "\n"
-                }
-                else if(j%3 != 0){
-                    arr += "\t"
-                }
-            }
-        });
-        $('#div-textarea-cluster-config-confirm-hosts-file').val(arr);
-    } else if (radio_value == "existing") {
-        // hosts file 준비 방법 표시 및 값 설정
-        $('#div-accordion-hosts-file-type').text("기존 파일 사용");
-        // 기존 파일로 생성할 경우 테이블의 내용을 textarea에 넣는 코드
-        let colcnt = $('#form-table-cluster-config-existing-host-profile colgroup col').length;
-        let arr = new Array();
-        $('#form-table-tbody-cluster-config-existing-host-profile tr').each(function(){
-            let j;
-            for(let i = 0; i < colcnt; i++){
-                j = i+1;
-                arr += $(this).find('td').eq(i).text();
-                if(j%3 == 0) {
-                    arr += "\n"
-                }
-                else if(j%3 != 0){
-                    arr += "\t"
-                }
-            }
-        });
-        $('#div-textarea-cluster-config-confirm-hosts-file').val(arr);
     }
 }
 
@@ -1344,51 +1261,6 @@ function checkHostName() {
         })
         .catch(function (error) {
         });
-}
-
-/**
- * Meathod Name : inputPnIntoTimeServer
- * Date Created : 2021.11.01
- * Writer  : 류홍욱
- * Description : 클러스터 준비 마법사에서 기존 호스트 파일의 Alias2를 현재 호스트 숫자에 따라 변경하는 함수
- * Parameter : 없음
- * Return  : 없음
- * History  : 2021.11.01 수정
- **/
-function changeAlias2() {
-    if($('#form-table-tbody-cluster-config-existing-host-profile > tr').length && $('input[name="radio-hosts-file"]:checked').val() == "existing") {
-        let hosts_input_number = $('#form-input-cluster-config-host-number').val();
-        let current_hosts_input_number = $('#form-input-cluster-config-current-host-number').val();
-        current_hosts_input_number = current_hosts_input_number*1
-        let tbody_td_number = $('#form-table-tbody-cluster-config-existing-host-profile > tr > td').length;
-        tbody_td_number = tbody_td_number-1;
-        // 현재호트스 숫자 *1(Alias2 순서) + 1(ccvm 포함하여 2번째 줄부터) *3(1줄 3칸) -1(테이블 시작점 0)
-        let ablecube = ((hosts_input_number*1)+1)*3-1;
-        let scvm_mngt = ((hosts_input_number*2)+1)*3-1;
-        let ablecube_pn = ((hosts_input_number*3)+1)*3-1;
-        let scvm = ((hosts_input_number*4)+1)*3-1;
-        let scvm_cn = ((hosts_input_number*5)+1)*3-1;
-        let pre_td = 3;
-        let gap_num = hosts_input_number-current_hosts_input_number;
-
-        // Alias2 (ccvm제외) 모두 삭제
-        for(let i=3; i < tbody_td_number; i++) {
-            let j;
-            j = i+1;
-            if(j%3 == 0) {
-                $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(i)+")").text("");
-            }
-        }
-        for(let i=0; i < tbody_td_number; i++) {
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube+(pre_td*gap_num)*-1)+")").text("ablecube");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_mngt+(pre_td*gap_num)*-1)+")").text("scvm-mngt");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(ablecube_pn+(pre_td*gap_num)*-1)+")").text("ablecube-pn");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm+(pre_td*gap_num)*-1)+")").text("scvm");
-            $('#form-table-tbody-cluster-config-existing-host-profile').find("td:eq("+(scvm_cn+(pre_td*gap_num)*-1)+")").text("scvm-cn");
-        }
-    }else if ($('input[name="radio-hosts-file"]:checked').val() == "existing"){
-        console.log("There are no data");
-    }
 }
 
 /**

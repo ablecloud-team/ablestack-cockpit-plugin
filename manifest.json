@@ -8,6 +8,12 @@
     "menu": {
         "ablestack": {
             "label": "ABLESTACK",
+            "docs": [
+                {
+                    "label": "ABLESTACK 관리",
+                    "url": "https://docs.ablecloud.io/1.0%20Allo/administration/cube/ablestack-guide/"
+                }
+            ],
             "path": "main.html",
             "order": "200"
         }

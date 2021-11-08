@@ -296,15 +296,161 @@
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label">
-                                                <span class="pf-c-form__label-text">정보 입력 소스</span>
+                                                <span class="pf-c-form__label-text">Hosts 파일 준비 방법</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-new-scvm" name="radio-hosts-file-scvm" value="new" checked/>
+                                                <label class="pf-c-radio__label" for="form-radio-hosts-new-scvm">신규 생성</label>
+                                            </div>
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-file-scvm" name="radio-hosts-file-scvm" value="existing" />
+                                                <label class="pf-c-radio__label" for="form-radio-hosts-file-scvm">기존 파일 사용</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-form-hosts-input-number-scvm">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-host-number-scvm">
+                                                <span class="pf-c-form__label-text">구성할 호스트 수</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control pf-m-inline">
-                                            <input class="pf-c-check__input" style="margin-top:12px;margin-right:5px" type="checkbox" id="form-input-storage-vm-additional-file" name="form-input-storage-vm-additional-file" checked/>
-                                            <label class="pf-c-check__label" style="margin-top:8px;margin-left:0px" for="form-input-storage-vm-additional-file">Hosts 파일 사용</label>
-                                            <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-storage-vm-hosts-file" name="form-input-storage-vm-hosts-file"/>
-                                            <textarea class="pf-c-form-control tab-available" style="width:90%;height:110px;margin-top:10px" type="text" id="form-textarea-storage-vm-hosts-file"></textarea>
+                                            <div class="pf-c-number-input">
+                                              <div class="pf-c-input-group">
+                                                <button class="pf-c-button pf-m-control" id="form-input-cluster-config-host-number-minus-scvm" type="button" aria-label="Minus">
+                                                  <span class="pf-c-number-input__icon">
+                                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                                  </span>
+                                                </button>
+                                                <input class="pf-c-form-control" type="number" value="1" id="form-input-cluster-config-host-number-scvm" name="form-input-cluster-config-host-number-scvm" style="padding-right:10px;" aria-label="Number input" />
+                                                <button class="pf-c-button pf-m-control" id="form-input-cluster-config-host-number-plus-scvm" type="button" aria-label="Plus">
+                                                  <span class="pf-c-number-input__icon">
+                                                    <i class="fas fa-plus" aria-hidden="true"></i>
+                                                  </span>
+                                                </button>
+                                              </div>
+                                            </div>
+                                            <span style="margin-top:10px">대</span>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-form-hosts-input-current-number-scvm">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-config-current-host-number-scvm">
+                                                <span class="pf-c-form__label-text">현재 호스트 번호</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline">
+                                            <div class="pf-c-number-input">
+                                              <div class="pf-c-input-group">
+                                                <button class="pf-c-button pf-m-control" id="form-input-cluster-config-current-host-number-minus-scvm" type="button" aria-label="Minus">
+                                                  <span class="pf-c-number-input__icon">
+                                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                                  </span>
+                                                </button>
+                                                <input class="pf-c-form-control" type="number" value="1" id="form-input-cluster-config-current-host-number-scvm" name="form-input-cluster-config-host-number-scvm" style="padding-right:10px;" aria-label="Number input" />
+                                                <button class="pf-c-button pf-m-control" id="form-input-cluster-config-current-host-number-plus-scvm" type="button" aria-label="Plus">
+                                                  <span class="pf-c-number-input__icon">
+                                                    <i class="fas fa-plus" aria-hidden="true"></i>
+                                                  </span>
+                                                </button>
+                                              </div>
+                                            </div>
+                                            <span style="margin-top:10px">번</span>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-form-hosts-profile-scvm">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-table-cluster-config-new-host-profile-scvm">
+                                                <span class="pf-c-form__label-text">Hosts 프로파일</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control" style="width: 558px;height: 200px;overflow: auto;">
+                                            <table id="form-table-cluster-config-new-host-profile-scvm" style="width:100%;">
+                                                <colgroup>
+                                                <col width="33%">
+                                                <col width="33%">
+                                                <col width="33%">
+                                                </colgroup>
+                                                <thead class="--pf-global--BorderColor--300" style="border-bottom: solid 1px #8a8d90;position: sticky;top: 0;background-color: white;">
+                                                    <tr>
+                                                      <th>IP 주소</th>
+                                                      <th>Alias1</th>
+                                                      <th>Alias2</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="form-table-tbody-cluster-config-new-host-profile-scvm">
+                                                  <tr>
+                                                    <td class='host-td'contenteditable="true">192.168.0.10</td>
+                                                    <td contenteditable="flase">ccvm-mngt</td>
+                                                    <td contenteditable="flase">ccvm</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td contenteditable="true">192.168.1.1</td>
+                                                    <td contenteditable="true">ablecube1</td>
+                                                    <td contenteditable="true">ablecube</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td contenteditable="true">192.168.2.1</td>
+                                                    <td contenteditable="false">scvm1-mngt</td>
+                                                    <td contenteditable="false">scvm-mngt</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td contenteditable="true">100.100.10.1</td>
+                                                    <td contenteditable="true">ablecube1-pn</td>
+                                                    <td contenteditable="true">ablecube-pn</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td contenteditable="true">100.100.10.101</td>
+                                                    <td contenteditable="false">scvm1</td>
+                                                    <td contenteditable="false">scvm</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td contenteditable="true">100.200.10.11</td>
+                                                    <td contenteditable="false">scvm1-cn</td>
+                                                    <td contenteditable="false">scvm-cn</td>
+                                                  </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-form-hosts-file-scvm">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-storage-vm-hosts-file">
+                                                <span class="pf-c-form__label-text">Hosts 파일</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <input class="pf-c-form-control" style="width:60%" type="file" id="form-input-storage-vm-hosts-file" name="form-input-storage-vm-hosts-file"/>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-form-hosts-table-scvm">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-table-cluster-config-existing-host-profile-scvm">
+                                                <span class="pf-c-form__label-text">Hosts 프로파일</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control" style="width: 558px;height: 200px;overflow: auto;">
+                                            <table id="form-table-cluster-config-existing-host-profile-scvm" style="width:100%;">
+                                                <colgroup>
+                                                <col width="33%">
+                                                <col width="33%">
+                                                <col width="33%">
+                                                </colgroup>
+                                                <thead class="--pf-global--BorderColor--300" style="border-bottom: solid 1px #8a8d90;position: sticky;top: 0;background-color: white;">
+                                                    <tr>
+                                                      <th>IP 주소</th>
+                                                      <th>Alias1</th>
+                                                      <th>Alias2</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="form-table-tbody-cluster-config-existing-host-profile-scvm">
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
@@ -514,21 +660,16 @@
                                         <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text">정보 입력 소스</span>
-                                                </dt>
-                                                <dd class="pf-c-description-list__description">
-                                                    <div class="pf-c-description-list__text">
-                                                        <span id="span-storage-vm-hosts-source"></span><br/>
-                                                    </div>
-                                                </dd>
-                                            </div>
-                                            <div class="pf-c-description-list__group">
-                                                <dt class="pf-c-description-list__term">
                                                     <span class="pf-c-description-list__text">Hosts 파일</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        <span id="span-storage-vm-hosts-file"></span><br/>
+                                                        <span id="span-hosts-file-scvm"></span><br/>
+                                                    </div>
+                                                </dd>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-hosts-file-scvm" style="width:670px;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>Host 프로파일 내용</textarea>
                                                     </div>
                                                 </dd>
                                             </div>
