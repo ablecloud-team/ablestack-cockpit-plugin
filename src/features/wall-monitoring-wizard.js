@@ -393,21 +393,21 @@ function resetWallMonitoringWizard() {
     .then(function (data) {
         var host_ping_test_result = JSON.parse(data);
         if(host_ping_test_result.code=="200") { //정상
-            //=========== 1-2. skydive 구성 ===========
-            var skydive_config_cmd = ['python3', pythonPath + 'config_skydive.py', 'config', '--ccvm', ccvm_ip];
-            skydive_config_cmd.push('--cube');
+            //=========== 1-2. netdive 구성 ===========
+            var netdive_config_cmd = ['python3', pythonPath + 'config_netdive.py', 'config', '--ccvm', ccvm_ip];
+            netdive_config_cmd.push('--cube');
             for(var i = 1 ; i <= host_count ; i ++ ){
                 var cubehost_ip = $('#form-input-wall-monitoring-cubehost'+i+'-ip').val();
-                skydive_config_cmd.push(cubehost_ip);
+                netdive_config_cmd.push(cubehost_ip);
             }
 
-            if (console_log) { console.log(skydive_config_cmd); }
-            cockpit.spawn(skydive_config_cmd, { host: ccvm_ip })
+            if (console_log) { console.log(netdive_config_cmd); }
+            cockpit.spawn(netdive_config_cmd, { host: ccvm_ip })
             .then(function (data) {
-                var skydive_config_result = JSON.parse(data);
-                if(skydive_config_result.code=="200") { //정상
+                var netdive_config_result = JSON.parse(data);
+                if(netdive_config_result.code=="200") { //정상
                     //=========== 1-3. 모니터링 서비스 전체 종료 ===========
-                    var wall_service_stop_cmd = ['python3', pythonPath + 'start_services.py', 'stop', '--service', 'blackbox-exporter', 'node-exporter', 'grafana-server', 'process-exporter', 'prometheus', 'skydive-analyzer'];
+                    var wall_service_stop_cmd = ['python3', pythonPath + 'start_services.py', 'stop', '--service', 'blackbox-exporter', 'node-exporter', 'grafana-server', 'process-exporter', 'prometheus', 'netdive-analyzer'];
                     if (console_log) { console.log(wall_service_stop_cmd); }
                     cockpit.spawn(wall_service_stop_cmd, { host: ccvm_ip })
                     .then(function (data) {
@@ -434,7 +434,7 @@ function resetWallMonitoringWizard() {
                                 var prometheus_config_result = JSON.parse(data);
                                 if(prometheus_config_result.code=="200") { //정상
                                     //=========== 2-2. Wall Monitoring 구성 서비스 실행 ===========
-                                    var wall_service_start_cmd = ['python3', pythonPath + 'start_services.py', 'start', '--service', 'blackbox-exporter', 'node-exporter', 'grafana-server', 'process-exporter', 'prometheus', 'skydive-analyzer'];
+                                    var wall_service_start_cmd = ['python3', pythonPath + 'start_services.py', 'start', '--service', 'blackbox-exporter', 'node-exporter', 'grafana-server', 'process-exporter', 'prometheus', 'netdive-analyzer'];
                                     if (console_log) { console.log(wall_service_start_cmd); }
                                     cockpit.spawn(wall_service_start_cmd, { host: ccvm_ip })
                                     .then(function (data) {
@@ -577,12 +577,12 @@ function resetWallMonitoringWizard() {
                     });
                 } else {
                     setWallProgressFail(1);
-                    alert(skydive_config_result.val);
+                    alert(netdive_config_result.val);
                 }
             })
             .catch(function (data) {
                 setWallProgressFail(1);
-                alert("skydive 구성 실패 : "+data);
+                alert("netdive 구성 실패 : "+data);
             });
         } else {
             setWallProgressFail(1);

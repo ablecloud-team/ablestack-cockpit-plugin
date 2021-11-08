@@ -600,17 +600,3 @@ function wall_link_go(){
             //console.log(":::Error:::");
         });
 }
-
-function skydive_link_go(){
-    // 스카이다이브 연결
-    cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "skydive"])
-        .then(function(data){
-            var retVal = JSON.parse(data);
-            if(retVal.code == 200){
-                window.open(retVal.val);
-            }
-        })
-        .catch(function(data){
-            //console.log(":::Error:::");
-        });
-}

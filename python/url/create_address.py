@@ -23,7 +23,7 @@ def createArgumentParser():
     tmp_parser = argparse.ArgumentParser(description='스토리지 및 클라우드 관련 연결 주소를 생성하는 프로그램',
                                          epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
 
-    tmp_parser.add_argument('action', choices=['cloudCenterVm', 'cloudCenter', "wallCenter", "skydive", 'storageCenterVm', 'storageCenter'], help="Create storage and cloud center related connection addresses")
+    tmp_parser.add_argument('action', choices=['cloudCenterVm', 'cloudCenter', "wallCenter", 'storageCenterVm', 'storageCenter'], help="Create storage and cloud center related connection addresses")
     tmp_parser.add_argument("-v", "--verbose", action='count', default=0, help="increase output verbosity")
     tmp_parser.add_argument("-H", "--Human", action='store_const', dest='H', const=True, help="Human readable")
     tmp_parser.add_argument("-V", "--Version", action='version', version="%(prog)s 1.0")
@@ -83,30 +83,6 @@ def wallCenter(action, H=False):
     return createReturn(code=200, val=value, retname=action)
 
 
-# 함수명 : skydive
-# 주요 기능 : skydive 연결 주소 생성
-def skydive(action, H=False):
-
-    ip = socket.gethostbyname('ccvm-mngt')
-
-    if action == 'skydive':
-        try:
-            value = "http://"+ip+":8082"
-            request = requests.get(value)
-
-        except:
-             # http 접속되지않는 경우
-            return createReturn(code=500, val="Skydive에 정상적으로 연결되지 않습니다. <br>Skydive 서비스 상태를 확인하거나, 잠시 후에 다시 시도해주십시오.")
-
-    else:
-        value = 'https://'+ip+':8082'
-
-    if H:
-        return json.dumps(json.loads(createReturn(code=200, val=value, retname=action)), indent=4)
-
-    return createReturn(code=200, val=value, retname=action)
-
-
 # 함수명 : storageCenter
 # 주요 기능 : 스토리지센터 및 가상머신 연결 주소 생성 
 def storageCenter(action, H=False):
@@ -152,9 +128,6 @@ def createAddressAction(action, H):
 
     elif action == 'wallCenter':
         return wallCenter(action, H=H)
-
-    elif action == 'skydive':
-        return skydive(action, H=H)
 
     elif action == 'storageCenter':
         return storageCenter(action, H=H)
