@@ -153,6 +153,7 @@ class CloudCenterVirtualMachine {
                     ccvm_instance.ip=vm['ip'].split('/')[0]
                     $('#card-action-cloud-vm-change').attr('disabled', true);
                     $('#button-cloud-vm-snap-rollback').attr('disabled', true);
+                    $('#button-cloud-vm-snap-backup').attr('disabled', true);
                     $('#card-action-cloud-vm-connect').removeClass('pf-m-disabled')
                     resolve();
                 }else{
