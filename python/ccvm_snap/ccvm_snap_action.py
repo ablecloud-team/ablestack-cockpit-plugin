@@ -42,7 +42,7 @@ def createArgumentParser():
 
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
 
-    parser.add_argument('action', choices=['list', 'rollback', 'backup', 'test'], help='choose one of the actions')
+    parser.add_argument('action', choices=['list', 'rollback', 'backup'], help='choose one of the actions')
     parser.add_argument('--snap-name', metavar='snapshot name', type=str, help='The name of the CCVM Snapshot')
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
