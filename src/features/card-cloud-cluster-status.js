@@ -31,7 +31,6 @@ $('#button-execution-modal-cloud-vm-start').on('click', function(){
             CardCloudClusterStatus();
             $('#card-action-cloud-vm-change').attr('disabled', true);
             $('#button-cloud-vm-snap-rollback').attr('disabled', true);
-            $('#button-cloud-vm-snap-backup').attr('disabled', true);
             createLoggerInfo("cloud vm start success");
         }
         $('#div-modal-spinner').hide();
@@ -69,7 +68,6 @@ $('#button-execution-modal-cloud-vm-stop').on('click', function(){
             CardCloudClusterStatus();
             $('#card-action-cloud-vm-change').attr('disabled', false);
             $('#button-cloud-vm-snap-rollback').attr('disabled', false);
-            $('#button-cloud-vm-snap-backup').attr('disabled', false);
             createLoggerInfo("cloud vm stop success");
         }
         $('#div-modal-spinner').hide();
@@ -275,35 +273,26 @@ $('#button-execution-modal-cloud-vm-snap-backup').on('click', function(){
 
     $("#modal-status-alert-title").html("클라우드센터VM 복구용 스냅샷 생성 실패");
     $("#modal-status-alert-body").html("복구용 스냅샷 생성을 실패하였습니다. 클라우드센터VM 상태를 점검해주세요.");
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/pcs/main.py', 'status', '--resource', 'cloudcenter_res'])
-    .then(function(data){
-        var retVal = JSON.parse(data);
-        if(retVal.code == 200 && retVal.role == "Stopped"){
-            
-            // 복구용 스냅샷 생성
-            cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ccvm_snap/ccvm_snap_action.py', 'backup'])
-            .then(function(data){
-                $('#div-modal-spinner').hide();
 
-                var retVal = JSON.parse(data);
-                if(retVal.code == 200){
-                    $("#modal-status-alert-title").html("클라우드센터VM 복구용 스냅샷 생성 완료");
-                    $("#modal-status-alert-body").html("스냅샷 복구용 스냅샷 생성을 완료하였습니다. 클라우드센터VM을 시작해주세요.");
-                    $('#div-modal-status-alert').show();
-                    createLoggerInfo("backup cloud vm snapshot spawn success");
-                } else {
-                    $('#div-modal-status-alert').show();
-                    createLoggerInfo(retVal.val);
-                }
-            }).catch(function(data){
-                $('#div-modal-status-alert').show();
-                createLoggerInfo("backup cloud vm snapshot spawn error : " + data);
-            });
+    // 복구용 스냅샷 생성
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ccvm_snap/ccvm_snap_action.py', 'backup'])
+    .then(function(data){
+        $('#div-modal-spinner').hide();
+
+        var retVal = JSON.parse(data);
+        if(retVal.code == 200){
+            $("#modal-status-alert-title").html("클라우드센터VM 복구용 스냅샷 생성 완료");
+            $("#modal-status-alert-body").html("스냅샷 복구용 스냅샷 생성을 완료하였습니다. 클라우드센터VM을 시작해주세요.");
+            $('#div-modal-status-alert').show();
+            createLoggerInfo("backup cloud vm snapshot spawn success");
+        } else {
+            $('#div-modal-status-alert').show();
+            createLoggerInfo(retVal.val);
         }
     }).catch(function(data){
         $('#div-modal-spinner').hide();
         $('#div-modal-status-alert').show();
-        createLoggerInfo("backup cloud vm snapshot status error : " + data);
+        createLoggerInfo("backup cloud vm snapshot spawn error : " + data);
     });
 });
 /** cloud vm snap backup modal 관련 action end */
@@ -416,7 +405,6 @@ function CardCloudClusterStatus(){
                     $('#form-select-cloud-vm-migration-node').append(selectHtml);
                     $('#card-action-cloud-vm-change').attr('disabled', true);
                     $('#button-cloud-vm-snap-rollback').attr('disabled', true);
-                    $('#button-cloud-vm-snap-backup').attr('disabled', true);
                 }else if(retVal.val.active == 'false'){
                     $('#cccs-resource-status').text('정지됨');
                     $('#cccs-execution-node').text('N/A');
@@ -427,7 +415,6 @@ function CardCloudClusterStatus(){
                     $('#button-cloud-cluster-connect').prop('disabled', true);
                     $('#card-action-cloud-vm-change').attr('disabled', false);
                     $('#button-cloud-vm-snap-rollback').attr('disabled', false);
-                    $('#button-cloud-vm-snap-backup').attr('disabled', false);
                 }
                 $('#cccs-low-info').text('클라우드센터 클러스터가 구성되었습니다.');
                 $('#cccs-low-info').attr('style','color: var(--pf-global--success-color--100)')

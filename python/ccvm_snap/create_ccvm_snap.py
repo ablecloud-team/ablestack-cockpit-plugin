@@ -67,6 +67,9 @@ def createCcvmSnap(args):
             # ccvm 스냅 생성
             os.system("rbd snap create "+pool_name+"/"+ccvm_image_name+"@"+now)
 
+            # ccvm 재시작
+            os.system("virsh resume "+ccvm_name+" > /dev/null")
+
             # ccvm 스냅이 10개 이상이면 마지막 스냅 삭제
             output = check_output(["rbd snap list "+ccvm_image_name+" --format json"], universal_newlines=True, shell=True, env=env)
             output_json = json.loads(output)
@@ -78,9 +81,6 @@ def createCcvmSnap(args):
                 if ccvm_snap_cnt > ccvm_snap_limit:
                     ccvm_snap_cnt = ccvm_snap_cnt - 1
                     os.system("rbd snap rm "+pool_name+"/"+ccvm_image_name+"@"+ccvm_snap_info["name"])
-
-            # ccvm 재시작
-            os.system("virsh resume "+ccvm_name+" > /dev/null")
 
     except Exception as e:
         # 결과값 리턴
