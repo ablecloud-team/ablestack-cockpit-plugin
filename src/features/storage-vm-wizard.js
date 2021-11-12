@@ -1443,9 +1443,6 @@ function validateStorageVm(){
     }else if(!checkCidrFormat($("#form-input-storage-vm-cluster-ip").val())){
         alert("스토리지 복제 NIC IP 형식을 확인해주세요.");
         valicate_check = false;
-    }else if(!checkSpace($("#form-textarea-storage-vm-hosts-file").val())){
-        alert("Hosts 파일 작성 시 'Tab 키'만 사용 가능합니다.");
-        valicate_check = false;
     }
 
     return valicate_check;
