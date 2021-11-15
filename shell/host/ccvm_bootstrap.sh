@@ -63,6 +63,7 @@ mkdir /nfs/secondary
 ################# Setting Database
 mysqladmin -uroot password $DATABASE_PASSWD
 setenforce 0
+systemctl enable --now cloudstack-usage
 sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 cloudstack-setup-databases cloud:$DATABASE_PASSWD --deploy-as=root:$DATABASE_PASSWD  2>&1 | tee -a $LOGFILE
 
@@ -82,7 +83,6 @@ done
 
 cloudstack-setup-management  2>&1 | tee -a $LOGFILE
 
-systemctl enable --now cloudstack-usage
 systemctl enable --now cloudstack-management
 
 #systemvm template 등록
