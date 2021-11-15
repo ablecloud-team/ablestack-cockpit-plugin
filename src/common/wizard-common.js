@@ -501,7 +501,7 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
                 }
             }
         });
-        $('#div-textarea-cluster-config-confirm-hosts-file'+option+'').val($.trim(arr));
+        $('#div-textarea-cluster-config-confirm-hosts-file'+option+'').val(arr);
     } else if (radio_value == "existing") {
         // hosts file 준비 방법 표시 및 값 설정
         $('#span-hosts-file'+option+'').text("기존 파일 사용");
@@ -521,6 +521,6 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
                 }
             }
         });
-        $('#div-textarea-cluster-config-confirm-hosts-file'+option+'').val($.trim(arr));
+        $('#div-textarea-cluster-config-confirm-hosts-file'+option+'').val(arr);
     }
 }

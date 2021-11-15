@@ -1195,8 +1195,8 @@ function setCcvmReviewInfo(){
     
     //-----클라우드센트 VM 설정-----
     //cpu
-    var cpu = $('select#form-select-cloud-vm-compute-cpu-core option:checked').val();
-    var cpu_text = $('select#form-select-cloud-vm-compute-cpu-core option:checked').text();
+    var cpu = $('select#form-modal-select-cloud-vm-compute-cpu-core option:checked').val();
+    var cpu_text = $('select#form-modal-select-cloud-vm-compute-cpu-core option:checked').text();
     
     if(cpu == '') {
         $('#span-cloud-vm-cpu-core').text("미입력");
@@ -1206,8 +1206,8 @@ function setCcvmReviewInfo(){
     }
 
     //memory
-    var memory = $('select#form-select-cloud-vm-compute-memory option:checked').val();
-    var memory_txt = $('select#form-select-cloud-vm-compute-memory option:checked').text();
+    var memory = $('select#form-modal-select-cloud-vm-compute-memory option:checked').val();
+    var memory_txt = $('select#form-modal-select-cloud-vm-compute-memory option:checked').text();
 
     if(memory == '') {
         $('#span-cloud-vm-memory').text("미입력");
@@ -1367,7 +1367,7 @@ function validateCloudCenterVm(){
     } else if ($('#form-input-cloud-vm-failover-cluster-host3-name').val() == "") { //host3 name
         alert("클러스터 호스트3의 이름을 입력해주세요.");
         valicate_check = false;
-    } else if ($('select#form-select-cloud-vm-compute-cpu-core option:checked').val() == "") { //cpu
+    } else if ($('select#form-modal-select-cloud-vm-compute-cpu-core option:checked').val() == "") { //cpu
         alert("CPU core를 입력해주세요.");
         valicate_check = false;
     } else if ($('select#form-select-cloud-vm-compute-memory option:checked').val() == "") { //memory
@@ -1417,9 +1417,6 @@ function validateCloudCenterVm(){
         valicate_check = false;
     } else if(svc_bool && !checkIp($("#form-input-cloud-vm-svc-gw").val())){
         alert("서비스 NIC Gateway 형식을 확인해주세요.");
-        valicate_check = false;
-    } else if(!checkSpace($("#form-textarea-cloud-vm-hosts-file").val())){
-        alert("Hosts 파일 작성 시 'Tab 키'만 사용 가능합니다.");
         valicate_check = false;
     }
 
