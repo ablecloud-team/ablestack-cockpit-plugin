@@ -82,6 +82,7 @@ done
 
 cloudstack-setup-management  2>&1 | tee -a $LOGFILE
 
+systemctl enable --now cloudstack-usage
 systemctl enable --now cloudstack-management
 
 #systemvm template 등록
