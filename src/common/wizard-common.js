@@ -360,20 +360,29 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
         let find_string = "scvm";
         let total_scvm_num = 0;
         let current_scvm_num = 0;
-        // 현재 호스트 +, - 클릭 시 Alias2 변경을 위한 변수
+        // hosts 파일에 구분자 (탭)이 없을 경우 추가하는데 필요한 정규식
+        let ip_format = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
         if ($(input).val() != "") {
             let file_name = file_list[0].name;
             // 파일 이름 및 용량 체크
             if (checkClusterConfigPrepareFileName(file_name, file_type) != false && checkFileSize(file) != false) {
-                
                 // FileList
                 let reader = new FileReader();
                 try {
                     reader.onload = function (progressEvent) {
                         let result = progressEvent.target.result;
+                        result = $.trim(result);
                         // text를 배열로 분리
                         let result_arr = result.split(/[\t]|[\n]/);
+                        // hosts 파일 내용 중, Alias2 부분이 탭으로 구분되어 있지 않은 경우
+                        for (let i=1; i<result_arr.length;) {
+                            if (ip_format.test(result_arr[i+1])) {
+                                result_arr.splice(i+1, 0, '\t');
+                            }
+                            i = i+3;
+                        }
+                        result_arr.push('\n');
                         // 배열 데이터를 테이블 형식으로 생성
                         let insert_tr = "";
                         for (let i=0; i<result_arr.length;) {
@@ -409,12 +418,10 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
                         // 기존 호스트파일을 읽어와 구성할 호스트, 현재 호스트를 input 박스에 넣기
                         $('#form-input-cluster-config-host-number'+option+'').val(total_scvm_num);
                         $('#form-input-cluster-config-current-host-number'+option+'').val(current_scvm_num);
-
                         $('#form-table-tbody-cluster-config-existing-host-profile'+option+' tr').remove();
                         $(insert_tr).appendTo('#form-table-tbody-cluster-config-existing-host-profile'+option+'');
                     };
                     reader.readAsText(file);
-
                 } catch (err) {
                 }
             } else {
@@ -441,7 +448,6 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
         let current_hosts_input_number = $('#form-input-cluster-config-current-host-number'+option+'').val();
         current_hosts_input_number = current_hosts_input_number*1
         let tbody_td_number = $('#form-table-tbody-cluster-config-existing-host-profile'+option+' > tr > td').length;
-        tbody_td_number = tbody_td_number-1;
         // 현재호트스 숫자 *1(Alias2 순서) + 1(ccvm 포함하여 2번째 줄부터) *3(1줄 3칸) -1(테이블 시작점 0)
         let ablecube = ((hosts_input_number*1)+1)*3-1;
         let scvm_mngt = ((hosts_input_number*2)+1)*3-1;
