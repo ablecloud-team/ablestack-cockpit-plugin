@@ -15,7 +15,7 @@ License: None
 URL: https://github.com/ablecloud-team/ablestack-cockpit-plugin.git
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: /bin/bash, /bin/mkdir, /bin/cp
-Requires: /bin/bash, /bin/mkdir, /bin/cp, cockpit-packagekit, cockpit-machines, cockpit-bridge, cockpit-storaged, cockpit, cockpit-system, cockpit-ws, cockpit-doc
+Requires: /bin/bash, /bin/mkdir, /bin/cp
 
 %description
  ablestack-cockpit-plugin package
