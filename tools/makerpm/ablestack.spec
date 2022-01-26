@@ -5,8 +5,8 @@
 %define _topdir %(echo $PWD)/rpmbuild
 
 Name: ablestack
-Version: %{?version}%{!?version:1.0}
-Release: %{?release}%{!?release:1.wip.el8.noarch}
+Version: %{?version}%{!?version:2.0}
+Release: %{?release}%{!?release:0.wip.el8.noarch}
 Source0: %{name}-%{version}.tar.gz
 Summary: ablestack package
 

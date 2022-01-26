@@ -6,7 +6,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 export PATH
 
-VER="1.0"
+VER="2.0"
 
 BUILD_PATH="/root/ablestack-cockpit-plugin/tools/makerpm"
 mkdir -p $BUILD_PATH/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
