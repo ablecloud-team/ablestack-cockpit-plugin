@@ -85,6 +85,14 @@ cloudstack-setup-management  2>&1 | tee -a $LOGFILE
 
 systemctl enable --now cloudstack-management
 
+#UEFI 설정 파일 생성
+echo -e "guest.nvram.template.secure=/usr/share/edk2/ovmf/OVMF_VARS.secboot.fd
+guest.nvram.template.legacy=/usr/share/edk2/ovmf/OVMF_VARS.fd
+guest.loader.secure=/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd
+guest.loader.legacy=/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd
+guest.nvram.path=/var/lib/libvirt/qemu/nvram/" > /etc/cloudstack/agent/uefi.properties
+
+
 #systemvm template 등록
 /usr/share/cloudstack-common/scripts/storage/secondary/cloud-install-sys-tmplt \
 -m /nfs/secondary \
