@@ -8,7 +8,14 @@ export PATH
 
 VER="2.0"
 
-BUILD_PATH="/root/ablestack-cockpit-plugin/tools/makerpm"
+if [ -z "$1" ];
+then 
+  BUILD_PATH="`pwd`"
+else
+  BUILD_PATH="$1"
+fi
+
+echo $BUILD_PATH
 mkdir -p $BUILD_PATH/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 cd $BUILD_PATH/rpmbuild/SOURCES
 mkdir -p ablestack-$VER
@@ -17,7 +24,7 @@ tar -cvf ablestack-$VER.tar.gz ablestack-$VER
 fi
 rm -rf ablestack-$VER
 
-cp -f $BUILD_PATH/ablestack.spec $BUILD_PATH/rpmbuild/SPECS/
+cp -f $BUILD_PATH/tools/makerpm/ablestack.spec $BUILD_PATH/rpmbuild/SPECS/
 
 cd $BUILD_PATH
-rpmbuild -ba $BUILD_PATH/rpmbuild/SPECS/ablestack.spec
+rpmbuild -ba $BUILD_PATH/rpmbuild/SPECS/ablestack.spec --define "_topdir $BUILD_PATH/rpmbuild" --nocheck
