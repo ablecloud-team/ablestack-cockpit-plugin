@@ -33,7 +33,7 @@ Requires: /bin/bash, /bin/mkdir, /bin/cp
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/share/cockpit/ablestack
-cp -r $RPM_BUILD_ROOT/../{README.md,css,images,main.html,manifest.json,sample,shell,src,tools,python} $RPM_BUILD_ROOT/usr/share/cockpit/ablestack
+cp -r $RPM_BUILD_ROOT/../../../{README.md,css,images,main.html,manifest.json,sample,shell,src,tools,python} $RPM_BUILD_ROOT/usr/share/cockpit/ablestack
 
 %post
 #echo 'AbleStack script'
