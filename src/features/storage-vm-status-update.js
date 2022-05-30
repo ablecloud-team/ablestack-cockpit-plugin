@@ -57,7 +57,17 @@ $('#button-storage-vm-status-update').on('click', function(){
         .then(function(data){  
             //console.log(data);
             var retVal = JSON.parse(data);
-            if(retVal.code == "200"){  
+            if(retVal.code == "200"){
+                //scvm bootstrap 프로퍼티 초기화
+                cockpit.spawn(["python3", pluginpath+"/python/ablestack_json/ablestackJson.py", "update", "--depth1", "bootstrap", "--depth2", "scvm", "--value", "false"])
+                .then(function(data){
+                    createLoggerInfo("Success in initializing ablestackJson's scvm setting to false");
+                    console.log("Success in initializing ablestackJson's scvm setting to false");
+                })
+                .catch(function(err){
+                    createLoggerInfo("Error in initializing ablestackJson's scvm setting to false");
+                    console.log("Error in initializing ablestackJson's scvm setting to false : " + err);
+                });
                 console.log(data);
                 location.reload();    
             }else{
