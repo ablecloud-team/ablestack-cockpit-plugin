@@ -130,7 +130,7 @@ def createCcvmXml(args):
                     cci_txt = "    <disk type='file' device='cdrom'>\n"
                     cci_txt += "      <driver name='qemu' type='raw'/>\n"
                     cci_txt += "      <source file='"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso'/>\n"
-                    cci_txt += "      <target dev='hda' bus='ide'/>\n"
+                    cci_txt += "      <target dev='sdz' bus='sata'/>\n"
                     cci_txt += "      <readonly/>\n"
                     cci_txt += "      <shareable/>\n"
                     cci_txt += "      <address type='drive' controller='0' bus='0' target='0' unit='0'/>\n"

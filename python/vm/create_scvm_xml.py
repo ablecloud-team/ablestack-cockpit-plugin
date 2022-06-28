@@ -122,7 +122,7 @@ def createScvmXml(args):
                     sci_txt = "    <disk type='file' device='cdrom'>\n"
                     sci_txt += "      <driver name='qemu' type='raw'/>\n"
                     sci_txt += "      <source file='"+pluginpath+"/tools/vmconfig/scvm/scvm-cloudinit.iso'/>\n"
-                    sci_txt += "      <target dev='hda' bus='ide'/>\n"
+                    sci_txt += "      <target dev='sdz' bus='sata'/>\n"
                     sci_txt += "      <readonly/>\n"
                     sci_txt += "      <shareable/>\n"
                     sci_txt += "      <address type='drive' controller='0' bus='0' target='0' unit='0'/>\n"
