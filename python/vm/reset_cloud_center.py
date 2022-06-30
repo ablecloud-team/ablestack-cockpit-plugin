@@ -66,7 +66,7 @@ def resetCloudCenter(args):
 
     # virsh 초기화
     os.system("virsh destroy ccvm > /dev/null")
-    os.system("virsh undefine ccvm > /dev/null")
+    os.system("virsh undefine ccvm --keep-nvram> /dev/null")
 
     # 작업폴더 생성
     os.system("mkdir -p "+pluginpath+"/tools/vmconfig/ccvm")
