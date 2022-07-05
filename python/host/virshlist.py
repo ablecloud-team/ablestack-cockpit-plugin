@@ -59,10 +59,10 @@ for vm in vms:
                 vm['DISK_PHY'] = items[3]
                 vm['DISK_USAGE_RATE'] = items[4]
         if vm['State'] == "running":
-            ret = virsh_cmd('domifaddr', domain=vm['Name'], source='agent', interface='ens20',
+            ret = virsh_cmd('domifaddr', domain=vm['Name'], source='agent', interface='enp0s20',
                             full=True).stdout.decode().splitlines()
             for line in ret[:-1]:
-                if 'ipv4' in line and 'ens20' in line:
+                if 'ipv4' in line and 'enp0s20' in line:
                     items = line.split(maxsplit=4)
                     ipPrefix = items[3]
                     ipSplit = ipPrefix.split('/')

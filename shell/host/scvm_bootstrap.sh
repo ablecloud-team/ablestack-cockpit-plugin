@@ -10,7 +10,7 @@
 set -x
 #scvm의 PN-ip를 갖는 host목록 생성
 conffile=/root/ceph.conf
-imagename="localhost/ceph/daemon:Glue-v2.0.0"
+imagename="localhost/ceph/daemon:latest"
 hosts=$(grep scvm /etc/hosts| grep -v mngt | grep -v cn | awk {'print $1'})
 scvms=$(grep scvm /etc/hosts| grep -v mngt | grep -v cn | grep scvm | awk {'print $1'})
 allhosts=$(grep -v mngt /etc/hosts | grep -v cn | grep -v localhost | awk {'print $1'})
