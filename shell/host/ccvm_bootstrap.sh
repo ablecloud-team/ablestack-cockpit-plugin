@@ -102,7 +102,7 @@ rm -rf /root/uefi.properties
 #systemvm template 등록
 /usr/share/cloudstack-common/scripts/storage/secondary/cloud-install-sys-tmplt \
 -m /nfs/secondary \
--f /usr/share/ablestack/systemvmtemplate-4.16.0-kvm.qcow2.bz2 \
+-f /usr/share/ablestack/systemvmtemplate-* \
 -h kvm -F
 
 for host in $hosts
