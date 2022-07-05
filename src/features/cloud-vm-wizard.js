@@ -867,7 +867,7 @@ function deployCloudCenterVM() {
                                                     ,"-f3",pluginpath+"/tools/vmconfig/ccvm/id_rsa.pub","-t3", $("#form-textarea-cloud-vm-ssh-public-key-file").val() // ssh 공개 key 파일
                                                     ,'--hostname',host_name
                                                     ,'-hns', host1_name, host2_name, host3_name
-                                                    ,'--mgmt-nic','ens20'
+                                                    ,'--mgmt-nic','enp0s20'
                                                     ,'--mgmt-ip',mgmt_ip
                                                     ,'--mgmt-prefix',mgmt_prefix
                                                     ,'--mgmt-gw',mngt_gw
@@ -878,7 +878,7 @@ function deployCloudCenterVM() {
                                 var sn_ip = $('#form-input-cloud-vm-svc-nic-ip').val().split("/")[0];
                                 var sn_prefix = $('#form-input-cloud-vm-svc-nic-ip').val().split("/")[1];
                                 var sn_gw = $('#form-input-cloud-vm-svc-gw').val();
-                                create_ccvm_cloudinit_cmd.push('--sn-nic','ens21','--sn-ip',sn_ip,'--sn-prefix',sn_prefix,'--sn-gw',sn_gw)
+                                create_ccvm_cloudinit_cmd.push('--sn-nic','enp0s21','--sn-ip',sn_ip,'--sn-prefix',sn_prefix,'--sn-gw',sn_gw)
                             }
                             if(console_log){console.log(create_ccvm_cloudinit_cmd);}
                             cockpit.spawn(create_ccvm_cloudinit_cmd)
