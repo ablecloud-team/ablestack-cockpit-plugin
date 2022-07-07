@@ -46,12 +46,13 @@ firewall-cmd --list-all 2>&1 | tee -a $LOGFILE
 
 
 # resize partition
-parted --script /dev/vda resizepart 2 100%
-pvresize /dev/vda2
-lvcreate cl_ablestack-bronto -n nfs --extents 100%FREE
-mkfs.xfs /dev/cl_ablestack-bronto/nfs
+sgdisk -e /dev/vda
+parted --script /dev/vda resizepart 3 100%
+pvresize /dev/vda3
+lvcreate cs_ablestack-cerato -n nfs --extents 100%FREE
+mkfs.xfs /dev/cs_ablestack-cerato/nfs
 mkdir /nfs
-echo  '/dev/mapper/cl_ablestack--bronto-nfs /nfs                    xfs    defaults        0 0' >> /etc/fstab
+echo  '/dev/mapper/cs_ablestack--cerato-nfs /nfs                    xfs    defaults        0 0' >> /etc/fstab
 echo '/nfs *(rw,no_root_squash,async)' >> /etc/exports
 systemctl enable --now nfs-server.service
 
