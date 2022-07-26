@@ -295,7 +295,7 @@
                                                 <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
                                                     <div class="pf-c-description-list__group">
                                                         <dt class="pf-c-description-list__term">
-                                                            <span class="pf-c-description-list__text">가상머신상태</span>
+                                                            <span class="pf-c-description-list__text">가상머신 상태</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
                                                             <div class="pf-c-description-list__text" style="overflow: auto;">
@@ -432,6 +432,12 @@
                                                             <button class="pf-c-dropdown__menu-item" id="card-action-cloud-vm-change" type="button" disabled>클라우드센터VM 자원변경</button>
                                                         </li>
                                                         <li>
+                                                            <button class="pf-c-dropdown__menu-item" id="button-mold-service-control" type="button">Mold 서비스 제어</button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" id="button-mold-db-control" type="button">Mold DB 제어</button>
+                                                        </li>
+                                                        <li>
                                                             <button class="pf-c-dropdown__menu-item" id="button-cloud-vm-snap-backup" type="button">클라우드센터VM 스냅샷 백업</button>
                                                         </li>
                                                         <li>
@@ -450,7 +456,7 @@
                                                 <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
                                                     <div class="pf-c-description-list__group">
                                                         <dt class="pf-c-description-list__term">
-                                                            <span class="pf-c-description-list__text">가상머신상태</span>
+                                                            <span class="pf-c-description-list__text">가상머신 상태</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description" id="description-cloud-vm-status" style="overflow: auto;">
                                                             <div class="pf-c-description-list__text">
@@ -522,18 +528,18 @@
                                                     </div>
                                                     <div class="pf-c-description-list__group">
                                                         <dt class="pf-c-description-list__term">
-                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                            <span class="pf-c-description-list__text">Mold 서비스 상태</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">&nbsp;</div>
+                                                            <div id="div-mold-service-status" class="pf-c-description-list__text">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
                                                         <dt class="pf-c-description-list__term">
-                                                            <span class="pf-c-description-list__text">&nbsp;</span>
+                                                            <span class="pf-c-description-list__text">Mold DB 상태</span>
                                                         </dt>
                                                         <dd class="pf-c-description-list__description">
-                                                            <div class="pf-c-description-list__text">&nbsp;</div>
+                                                            <div id="div-mold-db-status" class="pf-c-description-list__text">N/A</div>
                                                         </dd>
                                                     </div>
                                                     <div class="pf-c-description-list__group">
@@ -841,6 +847,69 @@
         </div>
         <!-- 클라우드센터VM 스냅샷 백업 : Modal 영역 끝 -->
 
+        <!-- mold 서비스 제어 : Modal 영역 시작 -->
+        <div id="div-modal-mold-service-control" class="pf-c-backdrop" style="display:none">
+            <div class="pf-l-bullseye">
+                <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Mold Service Control">
+                    <button id="button-close-mold-service-control" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                    <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">Mold 서비스 제어</span></h1></header>
+                    <div class="pf-c-modal-box__body">
+                        <div>Mold 서비스 제어 명령을 선택해주세요</div>
+                        <div id="div-modal-mold-service-control" style="color: var(--pf-global--danger-color--100);"></div>
+                        <div>
+                            <div class="pf-c-dropdown">
+                                <select class="pf-c-form-control" id="form-select-mold-service-control" name="form-select-mold-service-control" style="width:100%">
+                                    <option value="" selected>선택하십시오</option>
+                                    <option value="start">시작</option>
+                                    <option value="restart">재시작</option>
+                                    <option value="stop">정지</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <footer class="pf-c-modal-box__footer">
+                        <button id="button-execution-modal-mold-service-control" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                        <button id="button-cancel-modal-mold-service-control" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+        <!-- mold 서비스 제어 : Modal 영역 끝 -->
+
+        <!-- mold db 제어 : Modal 영역 시작 -->
+        <div id="div-modal-mold-db-control" class="pf-c-backdrop" style="display:none">
+            <div class="pf-l-bullseye">
+                <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Mold Service Control">
+                    <button id="button-close-mold-db-control" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                    <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">Mold DB 제어</span></h1></header>
+                    <div class="pf-c-modal-box__body">
+                        <div>Mold DB 제어 명령을 선택해주세요</div>
+                        <div id="div-modal-mold-db-control" style="color: var(--pf-global--danger-color--100);"></div>
+                        <div>
+                            <div class="pf-c-dropdown">
+                                <select class="pf-c-form-control" id="form-select-mold-db-control" name="form-select-mold-db-control" style="width:100%">
+                                    <option value="" selected>선택하십시오</option>
+                                    <option value="start">시작</option>
+                                    <option value="restart">재시작</option>
+                                    <option value="stop">정지</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <footer class="pf-c-modal-box__footer">
+                        <button id="button-execution-modal-mold-db-control" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                        <button id="button-cancel-modal-mold-db-control" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+        <!-- mold db 제어 : Modal 영역 끝 -->
+        
+        
         <!-- 모달 영역 끝  -->
 
         <!-- 클라우드센터VM 용량 변경에 관한 modal : ./src/features/cloud-vm-change.html을 내용으로 load -->
