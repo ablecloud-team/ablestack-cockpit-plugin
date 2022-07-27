@@ -134,6 +134,16 @@ class CloudCenterVirtualMachine {
                     $("#div-cloud-vm-nic-prefix-text").text(
                         "PREFIX : " + vm['prefix']
                     );
+                    if(vm['MOLD_SERVICE_STATUE'] == "active"){
+                        $("#div-mold-service-status").text("실행중");
+                    }else{
+                        $("#div-mold-service-status").text("정지됨");
+                    }
+                    if(vm['MOLD_DB_STATUE'] == "active"){
+                        $("#div-mold-db-status").text("실행중");
+                    }else{
+                        $("#div-mold-db-status").text("정지됨");
+                    }
                     if (vm.State == "running") {                        
                         let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'green', 'Running');
                         status_span[0].children[0].replaceWith(a)                        

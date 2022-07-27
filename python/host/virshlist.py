@@ -13,6 +13,10 @@ import os
 import sh
 import pprint
 import json
+import socket
+import subprocess
+from subprocess import check_output
+from subprocess import call
 
 from ablestack import *
 from sh import ssh
@@ -79,5 +83,14 @@ for vm in vms:
         for line in ret[:]:
             items = line.split()
             vm['GW'] = items[1]
+
+        try :
+            vm['MOLD_SERVICE_STATUE'] = ssh('-o', 'StrictHostKeyChecking=no', 'ccvm-mngt', 'systemctl is-active cloudstack-management.service').stdout.decode().splitlines()
+        except Exception as e:
+            vm['MOLD_SERVICE_STATUE'] = 'inactive'.splitlines()
+        try :
+            vm['MOLD_DB_STATUE'] = ssh('-o', 'StrictHostKeyChecking=no', 'ccvm-mngt', 'systemctl is-active mysqld').stdout.decode().splitlines()
+        except Exception as e:
+            vm['MOLD_DB_STATUE'] = 'inactive'.splitlines()
 
 print(json.dumps(vms, indent=2))
