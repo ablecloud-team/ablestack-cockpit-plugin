@@ -457,6 +457,15 @@ $('#form-radio-hosts-file').on('click', function () {
     $('#form-input-cluster-config-host-number').attr('disabled', 'true');
 });
 
+$('#form-radio-cluster-host-new').on('click', function () {
+    $('#form-radio-hosts-new').attr('disabled', false);
+});
+
+$('#form-radio-cluster-host-add').on('click', function () {
+    $('#form-radio-hosts-new').attr('disabled', true);
+    $('#form-radio-hosts-file').click();
+});
+
 // Host 파일 준비 중 "현재 호스트 번호"를 변경하는 '+', '-' 기능 
 $('#form-input-cluster-config-current-host-number-plus').on('click', function () {
     let total_host_num_val = $('#form-input-cluster-config-host-number').val();

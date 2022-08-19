@@ -123,6 +123,24 @@
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label">
+                                                <span class="pf-c-form__label-text">클러스터 호스트 구분</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-cluster-host-new" name="radio-cluster-host" value="new" checked/>
+                                                <label class="pf-c-radio__label" for="form-radio-cluster-host-new">신규 클러스터 호스트</label>
+                                            </div>
+                                            <div class="pf-c-radio">
+                                                <input class="pf-c-radio__input" type="radio" id="form-radio-cluster-host-add" name="radio-cluster-host" value="add" />
+                                                <label class="pf-c-radio__label" for="form-radio-cluster-host-add">추가 호스트</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label">
                                                 <span class="pf-c-form__label-text">Hosts 파일 준비 방법</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
@@ -209,48 +227,56 @@
                                         <div class="pf-c-form__group-control" style="width: 558px;height: 200px;overflow: auto;">
                                             <table id="form-table-cluster-config-new-host-profile" style="width:100%;">
                                                 <colgroup>
-                                                <col width="33%">
-                                                <col width="33%">
-                                                <col width="33%">
+                                                    <col width="25%">
+                                                    <col width="25%">
+                                                    <col width="25%">
+                                                    <col width="25%">
                                                 </colgroup>
                                                 <thead class="--pf-global--BorderColor--300" style="border-bottom: solid 1px #8a8d90;position: sticky;top: 0;background-color: white;">
                                                     <tr>
                                                       <th>IP 주소</th>
                                                       <th>Alias1</th>
                                                       <th>Alias2</th>
+                                                      <th>Alias3</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="form-table-tbody-cluster-config-new-host-profile">
-                                                  <tr>
-                                                    <td class='host-td'contenteditable="true">192.168.0.10</td>
-                                                    <td contenteditable="flase">ccvm-mngt</td>
-                                                    <td contenteditable="flase">ccvm</td>
-                                                  </tr>
-                                                  <tr>
-                                                    <td contenteditable="true">192.168.1.1</td>
-                                                    <td contenteditable="true">ablecube1</td>
-                                                    <td contenteditable="true">ablecube</td>
-                                                  </tr>
-                                                  <tr>
-                                                    <td contenteditable="true">192.168.2.1</td>
-                                                    <td contenteditable="false">scvm1-mngt</td>
-                                                    <td contenteditable="false">scvm-mngt</td>
-                                                  </tr>
-                                                  <tr>
-                                                    <td contenteditable="true">100.100.10.1</td>
-                                                    <td contenteditable="true">ablecube1-pn</td>
-                                                    <td contenteditable="true">ablecube-pn</td>
-                                                  </tr>
-                                                  <tr>
-                                                    <td contenteditable="true">100.100.10.101</td>
-                                                    <td contenteditable="false">scvm1</td>
-                                                    <td contenteditable="false">scvm</td>
-                                                  </tr>
-                                                  <tr>
-                                                    <td contenteditable="true">100.200.10.11</td>
-                                                    <td contenteditable="false">scvm1-cn</td>
-                                                    <td contenteditable="false">scvm-cn</td>
-                                                  </tr>
+                                                    <tr>
+                                                        <td class='host-td'contenteditable="true">192.168.0.10</td>
+                                                        <td contenteditable="flase">ccvm-mngt</td>
+                                                        <td contenteditable="flase">ccvm</td>
+                                                        <td contenteditable="false"></td>
+                                                      </tr>
+                                                      <tr>
+                                                        <td contenteditable="true">192.168.1.1</td>
+                                                        <td contenteditable="flase">ablecube1</td>
+                                                        <td contenteditable="false">ablecube</td>
+                                                        <td contenteditable="true"></td>
+                                                      </tr>
+                                                      <tr>
+                                                        <td contenteditable="true">192.168.2.1</td>
+                                                        <td contenteditable="false">scvm1-mngt</td>
+                                                        <td contenteditable="false">scvm-mngt</td>
+                                                        <td contenteditable="true"></td>
+                                                      </tr>
+                                                      <tr>
+                                                        <td contenteditable="true">100.100.10.1</td>
+                                                        <td contenteditable="true">ablecube1-pn</td>
+                                                        <td contenteditable="true">ablecube-pn</td>
+                                                        <td contenteditable="true"></td>
+                                                      </tr>
+                                                      <tr>
+                                                        <td contenteditable="true">100.100.10.101</td>
+                                                        <td contenteditable="false">scvm1</td>
+                                                        <td contenteditable="false">scvm</td>
+                                                        <td contenteditable="true"></td>
+                                                      </tr>
+                                                      <tr>
+                                                        <td contenteditable="true">100.200.10.11</td>
+                                                        <td contenteditable="false">scvm1-cn</td>
+                                                        <td contenteditable="false">scvm-cn</td>
+                                                        <td contenteditable="true"></td>
+                                                      </tr>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -264,15 +290,17 @@
                                         <div class="pf-c-form__group-control" style="width: 558px;height: 200px;overflow: auto;">
                                             <table id="form-table-cluster-config-existing-host-profile" style="width:100%;">
                                                 <colgroup>
-                                                <col width="33%">
-                                                <col width="33%">
-                                                <col width="33%">
+                                                    <col width="25%">
+                                                    <col width="25%">
+                                                    <col width="25%">
+                                                    <col width="25%">
                                                 </colgroup>
                                                 <thead class="--pf-global--BorderColor--300" style="border-bottom: solid 1px #8a8d90;position: sticky;top: 0;background-color: white;">
                                                     <tr>
                                                       <th>IP 주소</th>
                                                       <th>Alias1</th>
                                                       <th>Alias2</th>
+                                                      <th>Alias3</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="form-table-tbody-cluster-config-existing-host-profile">

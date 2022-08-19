@@ -23,7 +23,7 @@ $('#button-execution-modal-cloud-vm-start').on('click', function(){
     $('#div-modal-start-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터VM을 시작하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStart'])
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStart'], { host: ccvm_instance.cmdExeHost})
     .then(function(data){
         var retVal = JSON.parse(data);
 
@@ -60,7 +60,7 @@ $('#button-execution-modal-cloud-vm-stop').on('click', function(){
     $('#div-modal-stop-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터VM을 정지하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStop'])
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStop'], { host: ccvm_instance.cmdExeHost})
     .then(function(data){
         var retVal = JSON.parse(data);
 
@@ -92,7 +92,7 @@ $('#button-execution-modal-cloud-vm-cleanup').on('click', function(){
     $('#div-modal-cleanup-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터 클러스터를 클린업하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsCleanup'])
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsCleanup'], { host: ccvm_instance.cmdExeHost})
     .then(function(data){
         var retVal = JSON.parse(data);
         createLoggerInfo("cloud cluster cleanup spawn success");
@@ -126,7 +126,7 @@ $('#button-execution-modal-cloud-vm-migration').on('click', function(){
         $('#div-modal-migration-cloud-vm').hide();
         $('#div-modal-spinner-header-txt').text('클라우드센터VM을 마이그레이션하고 있습니다.');
         $('#div-modal-spinner').show();
-        cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsMigration', '--target', valSelect])
+        cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsMigration', '--target', valSelect], { host: ccvm_instance.cmdExeHost})
         .then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
@@ -419,7 +419,7 @@ function CardCloudClusterStatus(){
         $("#cccs-back-color").attr('class','pf-c-label pf-m-orange');
         $("#cccs-cluster-icon").attr('class','fas fa-fw fa-exclamation-triangle');
 
-        cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsDetail' ])
+        cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsDetail' ], { host: "10.10.3.1"})
         .then(function(data){
             cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ablestack_json/ablestackJson.py', 'status', '--depth1', 'bootstrap', '--depth2', 'ccvm' ])
                 .then(function (bootstrap_data){
