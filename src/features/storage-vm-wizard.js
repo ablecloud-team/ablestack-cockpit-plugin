@@ -816,12 +816,14 @@ function deployStorageCenterVM() {
                                         ,"--hostname",host_name
                                         ,"--mgmt-ip",mgmt_ip
                                         ,"--mgmt-prefix",mgmt_prefix
-                                        ,"--mgmt-gw",mgmt_gw
                                         ,"--pn-ip",pn_ip
                                         ,"--pn-prefix",pn_prefix
                                         ,"--cn-ip",cn_ip
                                         ,"--cn-prefix",cn_prefix
                                     ];
+                if(mgmt_gw != ""){
+                    create_scvm_cloudinit_cmd.push('--mgmt-gw',mgmt_gw);
+                }
                 if(console_log){console.log(create_scvm_cloudinit_cmd);}
                 cockpit.spawn(create_scvm_cloudinit_cmd)
                     .then(function(data){
@@ -1413,9 +1415,6 @@ function validateStorageVm(){
     }else if($("#form-input-storage-vm-mgmt-ip").val()  == ""){
         alert("관리 NIC IP를 입력해주세요.");
         valicate_check = false;
-    }else if($("#form-input-storage-vm-mgmt-gw").val() == ""){
-        alert("관리 NIC Gateway를 입력해주세요.");
-        valicate_check = false;
     }else if($("#form-input-storage-vm-public-ip").val() == ""){
         alert("스토리지 서버 NIC IP를 입력해주세요.");
         valicate_check = false;
@@ -1434,7 +1433,7 @@ function validateStorageVm(){
     }else if(!checkCidrFormat($("#form-input-storage-vm-mgmt-ip").val())){
         alert("관리 NIC IP 형식을 확인해주세요.");
         valicate_check = false;
-    }else if(!checkIp($("#form-input-storage-vm-mgmt-gw").val())){
+    }else if($("#form-input-storage-vm-mgmt-gw").val() != "" && !checkIp($("#form-input-storage-vm-mgmt-gw").val())){
         alert("관리 NIC Gateway 형식을 확인해주세요.");
         valicate_check = false;
     }else if(!checkCidrFormat($("#form-input-storage-vm-public-ip").val())){

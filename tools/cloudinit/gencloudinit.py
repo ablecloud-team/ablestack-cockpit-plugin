@@ -160,8 +160,13 @@ network-config파일의 관리 네트워크 부분을 생성하는 함수
 """
 def genManagement(mgmt_nic: str, mgmt_ip: str, mgmt_prefix: int, mgmt_gw: str, dns: str):
     yam = {'network': {'version': 1, 'config': []}}
-
-    yam['network']['config'] = [{'name': mgmt_nic,
+    if mgmt_gw == None:
+        yam['network']['config'] = [{'name': mgmt_nic,
+                                 'subnets': [{'address': f'{mgmt_ip}/{mgmt_prefix}',
+                                              'type': 'static'}],
+                                 'type': 'physical'}]
+    else:
+        yam['network']['config'] = [{'name': mgmt_nic,
                                  'subnets': [{'address': f'{mgmt_ip}/{mgmt_prefix}',
                                               'dns_nameservers': [dns],
                                               'gateway': mgmt_gw,

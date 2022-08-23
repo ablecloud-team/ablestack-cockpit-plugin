@@ -870,9 +870,10 @@ function deployCloudCenterVM() {
                                                     ,'--mgmt-nic','enp0s20'
                                                     ,'--mgmt-ip',mgmt_ip
                                                     ,'--mgmt-prefix',mgmt_prefix
-                                                    ,'--mgmt-gw',mngt_gw
                                                 ];
-                            
+                            if(mngt_gw != ""){
+                                create_ccvm_cloudinit_cmd.push('--mgmt-gw',mngt_gw)
+                            }
                             var svc_bool = $('input[type=checkbox][id="form-checkbox-svc-network"]').is(":checked");
                             if(svc_bool){
                                 var sn_ip = $('#form-input-cloud-vm-svc-nic-ip').val().split("/")[0];
@@ -1388,9 +1389,6 @@ function validateCloudCenterVm(){
     } else if ($('#form-input-cloud-vm-mngt-nic-ip').val() == "") { //관리 NIC IP
         alert("관리 NIC IP를 입력해주세요.");
         valicate_check = false;
-    } else if ($('#form-input-cloud-vm-mngt-gw').val() == "") { //관리 NIC Gateway
-        alert("관리 NIC Gateway를 입력해주세요.");
-        valicate_check = false;
     } else if (svc_bool && $('#form-input-cloud-vm-svc-nic-ip').val() == "") { //서비스 NIC IP
         alert("서비스 NIC IP를 입력해주세요.");
         valicate_check = false;
@@ -1409,7 +1407,7 @@ function validateCloudCenterVm(){
     } else if(!checkCidrFormat($("#form-input-cloud-vm-mngt-nic-ip").val())){
         alert("관리 NIC IP 형식을 확인해주세요.");
         valicate_check = false;
-    } else if(!checkIp($("#form-input-cloud-vm-mngt-gw").val())){
+    } else if(!checkIp($("#form-input-cloud-vm-mngt-gw").val()) && $('#form-input-cloud-vm-mngt-gw').val() != ""){
         alert("관리 NIC Gateway 형식을 확인해주세요.");
         valicate_check = false;
     } else if(svc_bool && !checkCidrFormat($("#form-input-cloud-vm-svc-nic-ip").val())){
