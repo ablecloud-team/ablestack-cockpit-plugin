@@ -337,7 +337,7 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
         }
     }else{
         alert("진행 상태를 잘못 입력했습니다.");
-    }    
+    }
 }
 
 /**
@@ -356,12 +356,12 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
         let file = file_list[0];
         let id = input.getAttribute('id');
         // 배열 안 데이터 검색을 위한 변수
-        let str = "";
-        let find_string = "scvm";
-        let total_scvm_num = 0;
-        let current_scvm_num = 0;
+        //let str = "";
+        //let find_string = "scvm";
+        //let total_scvm_num = 0;
+        //let current_scvm_num = 0;
         // hosts 파일에 구분자 (탭)이 없을 경우 추가하는데 필요한 정규식
-        let ip_format = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        //let ip_format = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
         if ($(input).val() != "") {
             let file_name = file_list[0].name;
@@ -372,110 +372,160 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
                 try {
                     reader.onload = function (progressEvent) {
                         let result = progressEvent.target.result;
-                        // 공백제거
-                        result = $.trim(result);
-                        // finalList는 host정보를 최종 결과값을 list를 2중화 하여 저장할 변수
-                        // ex : ["10.10.1.10", "ccvm-mngt", "ccvm"],["10.10.1.1", "hostname1", "ablecube1","ablecube"],["10.10.1.2", "hostname2", "ablecube2"]...
-                        finalList = [];  
-                        // hosts 정보를 한줄씩 변환
-                        let result_line_arr = result.split(/[\r]|[\n]/);
-                        for (let i=0; i<result_line_arr.length; i++) {
-                            // 호스트 한줄 정보를 tab 문자로 구분하여 객체화 시킴 ex : ["10.10.1.10", "ccvm-mngt", "ccvm"]
-                            if(result_line_arr[i] != "" || !result_line_arr[i].includes("localhost")){
-                                let result_arr = result_line_arr[i].split(/[\t]|[\n]/);
-                                let arr = [];
-                                for (let j=0; j<result_arr.length; j++) {
-                                    if(ip_format.test(result_arr[0]) && result_arr[j] != ""){
-                                        arr.push(result_arr[j]);
-                                    }
-                                }
-                                if(arr.length > 0){
-                                    finalList.push(arr);
-                                }
-                            }
+                        var confJson = JSON.parse(result);
+                        let hostsJson = confJson.clusterConfig.hosts;
+                        let hostCnt = confJson.clusterConfig.hosts.length; // 설정파일에서 읽어온 node 수
+                        
+                        let insert_tr = "";
+                        for (let i = 0 ; i < hostCnt ; i++){
+                            insert_tr += "<tr style='border-bottom: solid 1px #dcdcdc'>";
+                            insert_tr += "  <td contenteditable='false'>"+hostsJson[i].hostname+"</td>";
+                            insert_tr += "  <td contenteditable='false'>"+hostsJson[i].ablecube+"</td>";
+                            insert_tr += "  <td contenteditable='false'>"+hostsJson[i].scvmMngt+"</td>";
+                            insert_tr += "  <td contenteditable='false'>"+hostsJson[i].ablecubePn+"</td>";
+                            insert_tr += "  <td contenteditable='false'>"+hostsJson[i].scvm+"</td>";
+                            insert_tr += "  <td contenteditable='false'>"+hostsJson[i].scvmCn+"</td>";
+                            insert_tr += "</tr>";
                         }
 
-                        let insert_tr = "";
-                        
                         // clusterHostYN는 신규 클러스터 호스트 = new, 추가 호스트 = add
                         clusterHostYN = $('input[name=radio-cluster-host]:checked').val()
-                        if (clusterHostYN=="new"){
-                            // 배열 데이터를 테이블 형식으로 생성 최대 td 개수는 4개 (ip, Alias1, Alias2, Alias3)
-                            for (let i=0; i<finalList.length; i++) {
-                                insert_tr += "<tr>";
+                        if(clusterHostYN=="add") {
+                            insert_tr += "<tr style='border-bottom: solid 1px #dcdcdc'>";
+                            insert_tr += "  <td contenteditable='true'></td>";
+                            insert_tr += "  <td contenteditable='true'></td>";
+                            insert_tr += "  <td contenteditable='true'></td>";
+                            insert_tr += "  <td contenteditable='true'></td>";
+                            insert_tr += "  <td contenteditable='true'></td>";
+                            insert_tr += "  <td contenteditable='true'></td>";
+                            insert_tr += "</tr>";
 
-                                for(let j=0; j<finalList[i].length; j++) {
-                                    insert_tr += "<td contenteditable='true'>"+finalList[i][j]+"</td>";
-                                }
-                                if(finalList[i].length == 2){
-                                    insert_tr += "<td contenteditable='true'></td>";
-                                    insert_tr += "<td contenteditable='true'></td>";
-                                } else if (finalList[i].length == 3) {
-                                    insert_tr += "<td contenteditable='true'></td>";
-                                }
-                                insert_tr += "</tr>";
-                            }
-                        } else if(clusterHostYN=="add") {
-                            //해당 alias의 최대 번호값을 구해오는 함수 호출 
-
-
-                            // 배열 데이터를 테이블 형식으로 생성 최대 td 개수는 4개 (ip, Alias1, Alias2, Alias3)
-                            for (let i=0; i<finalList.length; i++) {
-                                insert_tr += "<tr>";
-
-                                for(let j=0; j<finalList[i].length; j++) {
-                                    insert_tr += "<td contenteditable='true'>"+finalList[i][j]+"</td>";
-                                }
-                                if(finalList[i].length == 2){
-                                    insert_tr += "<td contenteditable='true'></td>";
-                                    insert_tr += "<td contenteditable='true'></td>";
-                                } else if (finalList[i].length == 3) {
-                                    insert_tr += "<td contenteditable='true'></td>";
-                                }
-                                insert_tr += "</tr>";
-                            }
+                            hostCnt = hostCnt+1;
                         }
 
-                        hostsAliasMaxNum(finalList,"ablecube");
-
-
-
-
-                        // for (let i=0; i<result_arr.length;) {
-                        //     insert_tr += "<tr>";
-                        //     for(let j=1; j<=3; j++) {
-                        //         if(i < result_arr.length) {
-                        //             insert_tr += "<td contenteditable='true'>"+result_arr[i]+"</td>";
-                        //             // ccvm 문자열 검색하여 구성된 총 호스트의 수를 파악
-                        //             str = result_arr[i];
-                        //             if(str.length == 5 || str.length == 6) {
-                        //                 if(str.substring(0,4) == find_string) {
-                        //                     total_scvm_num++
-                        //                 }
-                        //             }
-                        //             // ccvm 문자열 검색하여 현재 호스트의 번호를 파악
-                        //             str = result_arr[i];
-                        //             if(str.length == 4) {
-                        //                 if(str == find_string) {
-                        //                     let current_scvm = "";
-                        //                     current_scvm = result_arr[i-1]
-                        //                     if(current_scvm.length == 5) {
-                        //                         current_scvm_num = current_scvm.substring(4,5)
-                        //                     }else if(current_scvm.length == 6) {
-                        //                         current_scvm_num = current_scvm.substring(4,6)
-                        //                     }
-                        //                 }
-                        //             }
-                        //             i++
-                        //         }
-                        //     }
-                        //     insert_tr += "</tr>";
-                        // }
-                        // 기존 호스트파일을 읽어와 구성할 호스트, 현재 호스트를 input 박스에 넣기
-                        $('#form-input-cluster-config-host-number'+option+'').val(total_scvm_num);
-                        $('#form-input-cluster-config-current-host-number'+option+'').val(current_scvm_num);
+                        $('#form-input-cluster-config-host-number'+option+'').val(hostCnt);
                         $('#form-table-tbody-cluster-config-existing-host-profile'+option+' tr').remove();
                         $(insert_tr).appendTo('#form-table-tbody-cluster-config-existing-host-profile'+option+'');
+                        
+                        // // 공백제거
+                        // result = $.trim(result);
+                        // // finalList는 host정보를 최종 결과값을 list를 2중화 하여 저장할 변수
+                        // // ex : ["10.10.1.10", "ccvm-mngt", "ccvm"],["10.10.1.1", "hostname1", "ablecube1","ablecube"],["10.10.1.2", "hostname2", "ablecube2"]...
+                        // finalList = [];  
+                        // // hosts 정보를 한줄씩 변환
+                        // let result_line_arr = result.split(/[\r]|[\n]/);
+                        // for (let i=0; i<result_line_arr.length; i++) {
+                        //     // 호스트 한줄 정보를 tab 문자로 구분하여 객체화 시킴 ex : ["10.10.1.10", "ccvm-mngt", "ccvm"]
+                        //     if(result_line_arr[i] != "" || !result_line_arr[i].includes("localhost")){
+                        //         let result_arr = result_line_arr[i].split(/[\t]|[\n]/);
+                        //         let arr = [];
+                        //         for (let j=0; j<result_arr.length; j++) {
+                        //             if(ip_format.test(result_arr[0]) && result_arr[j] != ""){
+                        //                 arr.push(result_arr[j]);
+                        //             }
+                        //         }
+                        //         if(arr.length > 0){
+                        //             finalList.push(arr);
+                        //         }
+                        //     }
+                        // }
+
+                        // let insert_tr = "";
+                        
+                        // // clusterHostYN는 신규 클러스터 호스트 = new, 추가 호스트 = add
+                        // clusterHostYN = $('input[name=radio-cluster-host]:checked').val()
+                        // if (clusterHostYN=="new"){
+                        //     // 배열 데이터를 테이블 형식으로 생성 최대 td 개수는 4개 (ip, Alias1, Alias2, Alias3)
+                        //     for (let i=0; i<finalList.length; i++) {
+                        //         insert_tr += "<tr>";
+
+                        //         for(let j=0; j<finalList[i].length; j++) {
+                        //             insert_tr += "<td contenteditable='true'>"+finalList[i][j]+"</td>";
+                        //         }
+                        //         if(finalList[i].length == 2){
+                        //             insert_tr += "<td contenteditable='true'></td>";
+                        //             insert_tr += "<td contenteditable='true'></td>";
+                        //         } else if (finalList[i].length == 3) {
+                        //             insert_tr += "<td contenteditable='true'></td>";
+                        //         }
+                        //         insert_tr += "</tr>";
+                        //     }
+                        // } else if(clusterHostYN=="add") {
+                        //     //해당 alias의 최대 번호값을 구해오는 함수 호출
+                        //     let maxNum = hostsAliasMaxNum(finalList,"ablecube");
+                        //     let nextNum = parseInt(maxNum)+parseInt(1);
+
+                        //     //ablecube 일때
+
+                        //     // 배열 데이터를 테이블 형식으로 생성 최대 td 개수는 4개 (ip, Alias1, Alias2, Alias3)
+                        //     for (let i=0; i<finalList.length; i++) {
+                        //         insert_tr += "<tr>";
+
+                        //         for(let j=0; j<finalList[i].length; j++) {
+                        //             insert_tr += "<td contenteditable='true'>"+finalList[i][j]+"</td>";
+                        //         }
+                        //         if(finalList[i].length == 2){
+                        //             insert_tr += "<td contenteditable='true'></td>";
+                        //             insert_tr += "<td contenteditable='true'></td>";
+                        //             insert_tr += "</tr>";
+                        //         } else if (finalList[i].length == 3) {
+                        //             insert_tr += "<td contenteditable='true'></td>";
+                        //             insert_tr += "</tr>";
+                        //         } else {
+                        //             insert_tr += "</tr>";
+                        //             insert_tr += "<tr>";
+                        //             insert_tr += "<td contenteditable='true'></td>";
+                        //             insert_tr += "<td contenteditable='true'></td>";
+                        //             insert_tr += "<td contenteditable='true'>ablecube"+ nextNum +"</td>";
+                        //             insert_tr += "<td contenteditable='true'>ablecube</td>";
+                        //             insert_tr += "</tr>";
+                        //         }
+                        //     }
+                        // }
+
+
+                        // // alert(hostsAliasMaxNum(finalList,"ablecube"));
+                        // // alert(hostsAliasMaxNum(finalList,"ablecube-pn"));
+                        // // alert(hostsAliasMaxNum(finalList,"scvm"));
+                        // // alert(hostsAliasMaxNum(finalList,"scvm-mngt"));
+                        // // alert(hostsAliasMaxNum(finalList,"scvm-cn"));
+
+
+                        // // for (let i=0; i<result_arr.length;) {
+                        // //     insert_tr += "<tr>";
+                        // //     for(let j=1; j<=3; j++) {
+                        // //         if(i < result_arr.length) {
+                        // //             insert_tr += "<td contenteditable='true'>"+result_arr[i]+"</td>";
+                        // //             // ccvm 문자열 검색하여 구성된 총 호스트의 수를 파악
+                        // //             str = result_arr[i];
+                        // //             if(str.length == 5 || str.length == 6) {
+                        // //                 if(str.substring(0,4) == find_string) {
+                        // //                     total_scvm_num++
+                        // //                 }
+                        // //             }
+                        // //             // ccvm 문자열 검색하여 현재 호스트의 번호를 파악
+                        // //             str = result_arr[i];
+                        // //             if(str.length == 4) {
+                        // //                 if(str == find_string) {
+                        // //                     let current_scvm = "";
+                        // //                     current_scvm = result_arr[i-1]
+                        // //                     if(current_scvm.length == 5) {
+                        // //                         current_scvm_num = current_scvm.substring(4,5)
+                        // //                     }else if(current_scvm.length == 6) {
+                        // //                         current_scvm_num = current_scvm.substring(4,6)
+                        // //                     }
+                        // //                 }
+                        // //             }
+                        // //             i++
+                        // //         }
+                        // //     }
+                        // //     insert_tr += "</tr>";
+                        // // }
+                        // // 기존 호스트파일을 읽어와 구성할 호스트, 현재 호스트를 input 박스에 넣기
+                        // $('#form-input-cluster-config-host-number'+option+'').val(total_scvm_num);
+                        // $('#form-input-cluster-config-current-host-number'+option+'').val(current_scvm_num);
+                        // $('#form-table-tbody-cluster-config-existing-host-profile'+option+' tr').remove();
+                        // $(insert_tr).appendTo('#form-table-tbody-cluster-config-existing-host-profile'+option+'');
                     };
                     reader.readAsText(file);
                 } catch (err) {
@@ -587,41 +637,36 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
     }
 }
 
-
 /**
- * Meathod Name : putHostsValueIntoTextarea
- * Date Created : 2021.03.22
- * Writer  : 류홍욱
- * Description : 준비 마법사에서 설정에 따라 설정확인에 위치한 textarea에 hosts 값을 넣는 함수
- * Parameter : radio_value
+ * Meathod Name : clusterConfigTableChange()
+ * Date Created : 2022.08.23
+ * Writer  : 배태주 
+ * Description : 클러스터 구성할 호스트 대수에 따라 클러스터 구성 프로파일 입력항목을 추가하거나 제거하는 함수
+ * Parameter : number_input, table_tbody
  * Return  : 없음
- * History  : 2021.10.21 수정
+ * History  : 2022.08.23 최초 작성
  **/
+ function clusterConfigTableChange(number_input, table_tbody) {
+    
+    let input_num = $("#"+number_input).val();
+    let tr_cnt = $("#"+table_tbody+ " > tr").length;
 
- function hostsAliasMaxNum(finalList,name) {
-    // name의 종류 (ablecube, scvm-mngt, ablecube-pn, )
-    // ablecube1 넘버링된 항목은 alias2 값에서 검색 조건
-    // ablecube1-pn 넘버링된 항목은 alias1 값에서 검색
-    // scvm1 넘버링된 항목은 alias1 값에서 검색
-    // scvm1-mngt 넘버링된 항목은 alias1 값에서 검색
-    // scvm1-cn 넘버링된 항목은 alias1 값에서 검색
-    // ccvm-mngt 넘버링된 항목은 alias1 값에서 검색
-
-    result_arr = 0;
-
-    for (let i=0; i<finalList.length; i++) {
-        for(let j=0; j<finalList[i].length; j++) {
-            if(name == "ablecube"){
-                if(j == 2 && finalList[i][j].includes("ablecube") && !finalList[i][j].includes("-pn")){
-                    finalList[i][j]
-                    result_arr.push(finalList[i][j]);
-                }
-            }
+    if(input_num > tr_cnt){ // <tr> 증가 경우 6 > 5
+        let insert_tr = "";
+        insert_tr += "<tr style='border-bottom: solid 1px #dcdcdc'>";
+        insert_tr += "  <td contenteditable='true'></td>";
+        insert_tr += "  <td contenteditable='true'></td>";
+        insert_tr += "  <td contenteditable='true'></td>";
+        insert_tr += "  <td contenteditable='true'></td>";
+        insert_tr += "  <td contenteditable='true'></td>";
+        insert_tr += "  <td contenteditable='true'></td>";
+        insert_tr += "</tr>";
+        for(let i = 0 ; i < input_num-tr_cnt ; i++){
+            $("#" + table_tbody + ":last").append(insert_tr);
+        }
+    } else if (input_num < tr_cnt){ // <tr> 감소 경우
+        for(let i = 0 ; i > input_num-tr_cnt ; i--){
+            $("#" + table_tbody + " > tr:last").remove();
         }
     }
-
-    
-
-    
-
 }

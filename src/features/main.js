@@ -20,7 +20,7 @@ $(document).ready(function(){
 
     $('#button-open-modal-wizard-storage-cluster').hide();
     $('#button-open-modal-wizard-storage-vm').hide();
-    $('#button-open-modal-wizard-cloud-vm').hide();
+    $('#button-open-modal-wizard-cloud-vm').show();
     $('#button-link-storage-center-dashboard').hide();
     $('#button-link-cloud-center').hide();
     $('#button-open-modal-wizard-monitoring-center').hide();
@@ -722,7 +722,7 @@ function checkDeployStatus(){
     // 배포 상태 조회 전 버튼 hide 처리
     $('#button-open-modal-wizard-storage-cluster').hide();
     $('#button-open-modal-wizard-storage-vm').hide();
-    $('#button-open-modal-wizard-cloud-vm').hide();
+    $('#button-open-modal-wizard-cloud-vm').show();
     $('#button-link-storage-center-dashboard').hide();
     $('#button-link-cloud-center').hide();
     $('#button-open-modal-wizard-monitoring-center').hide();

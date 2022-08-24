@@ -1,8 +1,8 @@
 <!-- 
-* File Name : cluster-config-prepare.html  
-* Date Created : 2020.03.02
-* Writer  : 박동혁
-* Description : ABLESTACK 스토리지센터 VM을 배포하기 위한 절차를 진행하는 마법사 Modal 대화상자
+* File Name cluster-config-prepare.html  
+* Date Created 2020.03.02
+* Writer  박동혁
+* Description ABLESTACK 스토리지센터 VM을 배포하기 위한 절차를 진행하는 마법사 Modal 대화상자
 -->
 
 <div class="pf-l-bullseye" >
@@ -26,7 +26,7 @@
                                 <button class="pf-c-wizard__nav-link" id="nav-button-cluster-config-ssh-key">SSH Key 파일</button>
                             </li>
                             <li class="pf-c-wizard__nav-item">
-                                <button class="pf-c-wizard__nav-link" id="nav-button-cluster-config-ip-info">Hosts 파일</button>
+                                <button class="pf-c-wizard__nav-link" id="nav-button-cluster-config-ip-info">클러스터 구성 파일</button>
                             </li>
                             <li class="pf-c-wizard__nav-item">
                                 <button class="pf-c-wizard__nav-link" id="nav-button-cluster-config-time-server">시간서버</button>
@@ -141,7 +141,7 @@
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label">
-                                                <span class="pf-c-form__label-text">Hosts 파일 준비 방법</span>
+                                                <span class="pf-c-form__label-text">클러스터 구성 파일 준비 방법</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
@@ -159,11 +159,22 @@
                                     <div class="pf-c-form__group" id="div-form-hosts-file">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-config-hosts-file">
-                                                <span class="pf-c-form__label-text">Hosts 파일</span>
+                                                <span class="pf-c-form__label-text">클러스터 구성 파일</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
                                             <input class="pf-c-form-control" style="width:60%" type="file" id="form-input-cluster-config-hosts-file" name="form-input-cluster-config-hosts-file"/>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-current-host-name">
+                                                <span class="pf-c-form__label-text">현재 호스트명</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-current-host-name" name="form-input-current-host-name" required="required" disabled/> 
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-input-number">
@@ -181,7 +192,7 @@
                                                     <i class="fas fa-minus" aria-hidden="true"></i>
                                                   </span>
                                                 </button>
-                                                <input class="pf-c-form-control" type="number" value="1" id="form-input-cluster-config-host-number" name="form-input-cluster-config-host-number" style="padding-right:10px;" aria-label="Number input" />
+                                                <input class="pf-c-form-control" type="number" maxlength="2" value="3" id="form-input-cluster-config-host-number" name="form-input-cluster-config-host-number" style="padding-right:10px;" aria-label="Number input" />
                                                 <button class="pf-c-button pf-m-control" id="form-input-cluster-config-host-number-plus" type="button" aria-label="Plus">
                                                   <span class="pf-c-number-input__icon">
                                                     <i class="fas fa-plus" aria-hidden="true"></i>
@@ -192,115 +203,85 @@
                                             <span style="margin-top:10px">대</span>
                                         </div>
                                     </div>
-                                    <div class="pf-c-form__group" id="div-form-hosts-input-current-number">
-                                        <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label" for="form-input-cluster-config-current-host-number">
-                                                <span class="pf-c-form__label-text">현재 호스트 번호</span>
-                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
-                                            </label>
-                                        </div>
-                                        <div class="pf-c-form__group-control pf-m-inline">
-                                            <div class="pf-c-number-input">
-                                              <div class="pf-c-input-group">
-                                                <button class="pf-c-button pf-m-control" id="form-input-cluster-config-current-host-number-minus" type="button" aria-label="Minus">
-                                                  <span class="pf-c-number-input__icon">
-                                                    <i class="fas fa-minus" aria-hidden="true"></i>
-                                                  </span>
-                                                </button>
-                                                <input class="pf-c-form-control" type="number" value="1" id="form-input-cluster-config-current-host-number" name="form-input-cluster-config-host-number" style="padding-right:10px;" aria-label="Number input" />
-                                                <button class="pf-c-button pf-m-control" id="form-input-cluster-config-current-host-number-plus" type="button" aria-label="Plus">
-                                                  <span class="pf-c-number-input__icon">
-                                                    <i class="fas fa-plus" aria-hidden="true"></i>
-                                                  </span>
-                                                </button>
-                                              </div>
-                                            </div>
-                                            <span style="margin-top:10px">번</span>
-                                        </div>
-                                    </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-profile">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-table-cluster-config-new-host-profile">
-                                                <span class="pf-c-form__label-text">Hosts 프로파일</span>
+                                                <span class="pf-c-form__label-text">클러스터 구성 프로파일</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control" style="width: 558px;height: 200px;overflow: auto;">
-                                            <table id="form-table-cluster-config-new-host-profile" style="width:100%;">
+                                            <table id="form-table-cluster-config-new-host-profile" style="width:100%;font-size: 0.75rem;">
                                                 <colgroup>
-                                                    <col width="25%">
-                                                    <col width="25%">
-                                                    <col width="25%">
-                                                    <col width="25%">
+                                                    <col width="15%">
+                                                    <col width="17%">
+                                                    <col width="17">
+                                                    <col width="17%">
+                                                    <col width="17">
+                                                    <col width="17">
                                                 </colgroup>
                                                 <thead class="--pf-global--BorderColor--300" style="border-bottom: solid 1px #8a8d90;position: sticky;top: 0;background-color: white;">
                                                     <tr>
-                                                      <th>IP 주소</th>
-                                                      <th>Alias1</th>
-                                                      <th>Alias2</th>
-                                                      <th>Alias3</th>
+                                                      <th>호스트 명</th>
+                                                      <th>호스트 IP</th>
+                                                      <th>SCVM<br/>MNGT IP</th>
+                                                      <th>호스트 PN IP</th>
+                                                      <th>SCVM PN IP</th>
+                                                      <th>SCVM CN IP</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="form-table-tbody-cluster-config-new-host-profile">
-                                                    <tr>
-                                                        <td class='host-td'contenteditable="true">192.168.0.10</td>
-                                                        <td contenteditable="flase">ccvm-mngt</td>
-                                                        <td contenteditable="flase">ccvm</td>
-                                                        <td contenteditable="false"></td>
-                                                      </tr>
-                                                      <tr>
-                                                        <td contenteditable="true">192.168.1.1</td>
-                                                        <td contenteditable="flase">ablecube1</td>
-                                                        <td contenteditable="false">ablecube</td>
-                                                        <td contenteditable="true"></td>
-                                                      </tr>
-                                                      <tr>
-                                                        <td contenteditable="true">192.168.2.1</td>
-                                                        <td contenteditable="false">scvm1-mngt</td>
-                                                        <td contenteditable="false">scvm-mngt</td>
-                                                        <td contenteditable="true"></td>
-                                                      </tr>
-                                                      <tr>
-                                                        <td contenteditable="true">100.100.10.1</td>
-                                                        <td contenteditable="true">ablecube1-pn</td>
-                                                        <td contenteditable="true">ablecube-pn</td>
-                                                        <td contenteditable="true"></td>
-                                                      </tr>
-                                                      <tr>
-                                                        <td contenteditable="true">100.100.10.101</td>
-                                                        <td contenteditable="false">scvm1</td>
-                                                        <td contenteditable="false">scvm</td>
-                                                        <td contenteditable="true"></td>
-                                                      </tr>
-                                                      <tr>
-                                                        <td contenteditable="true">100.200.10.11</td>
-                                                        <td contenteditable="false">scvm1-cn</td>
-                                                        <td contenteditable="false">scvm-cn</td>
-                                                        <td contenteditable="true"></td>
-                                                      </tr>
+                                                    <tr style='border-bottom: solid 1px #dcdcdc'>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                    </tr>
+                                                    <tr style='border-bottom: solid 1px #dcdcdc'>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                    </tr>
+                                                    <tr style='border-bottom: solid 1px #dcdcdc'>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                        <td contenteditable='true'></td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
                                         </div>
-                                    </div>                                    
+                                    </div>
                                     <div class="pf-c-form__group" id="div-form-hosts-table">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-table-cluster-config-existing-host-profile">
-                                                <span class="pf-c-form__label-text">Hosts 프로파일</span>
+                                                <span class="pf-c-form__label-text">클러스터 구성 프로파일</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control" style="width: 558px;height: 200px;overflow: auto;">
-                                            <table id="form-table-cluster-config-existing-host-profile" style="width:100%;">
+                                            <table id="form-table-cluster-config-existing-host-profile" style="width:100%;font-size: 0.75rem;">
                                                 <colgroup>
-                                                    <col width="25%">
-                                                    <col width="25%">
-                                                    <col width="25%">
-                                                    <col width="25%">
+                                                    <col width="15%">
+                                                    <col width="17%">
+                                                    <col width="17">
+                                                    <col width="17%">
+                                                    <col width="17">
+                                                    <col width="17">
                                                 </colgroup>
                                                 <thead class="--pf-global--BorderColor--300" style="border-bottom: solid 1px #8a8d90;position: sticky;top: 0;background-color: white;">
                                                     <tr>
-                                                      <th>IP 주소</th>
-                                                      <th>Alias1</th>
-                                                      <th>Alias2</th>
-                                                      <th>Alias3</th>
+                                                      <th>호스트 명</th>
+                                                      <th>호스트 IP</th>
+                                                      <th>SCVM<br/>MNGT IP</th>
+                                                      <th>호스트 PN IP</th>
+                                                      <th>SCVM PN IP</th>
+                                                      <th>SCVM CN IP</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="form-table-tbody-cluster-config-existing-host-profile">
@@ -544,17 +525,17 @@
                             </p>
                             <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
                                 <span>
-                                    -Private SSH Key 다운로드 :
+                                    -Private SSH Key 다운로드
                                     <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pri-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                                 <br/>
                                 <span>
-                                    -Public SSH Key 다운로드 :
+                                    -Public SSH Key 다운로드
                                     <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-pub-sshkey-download" name="span-modal-wizard-cluster-config-finish-sshkey-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                                 <br/>
                                 <span>
-                                    - Hosts 프로파일 다운로드 :
+                                    - Hosts 프로파일 다운로드
                                     <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-hosts-file-download" href="#">파일을 재사용 하려면 클릭하십시오</a>
                                 </span>
                             </div>
