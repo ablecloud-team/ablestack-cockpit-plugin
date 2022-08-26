@@ -638,7 +638,7 @@ $('#form-input-cluster-config-host-number-scvm, #form-input-cluster-config-host-
 // Hosts 기존 파일 선택 시 hidden textarea 내용을 선택한 파일의 내용으로 변경
 $('#form-input-storage-vm-hosts-file').on('click', function () {
     let hosts_input = document.querySelector('#form-input-storage-vm-hosts-file');
-    let file_type = "ablestack.json";
+    let file_type = "cluster.json";
     let option = "-scvm";
     fileReaderIntoTableFunc(hosts_input, file_type, option);
     $('#form-input-storage-vm-hosts-file').val("")

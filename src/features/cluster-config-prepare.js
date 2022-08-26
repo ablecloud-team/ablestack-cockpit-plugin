@@ -262,7 +262,7 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
         // 유효성 검증 후 완료 버튼을 누르면 선택한 내용대로 파일이 호스트에 저장
         let timeserver_type = $('input[name=radio-timeserver]:checked').val();
         let cluster_config_prepare_vaildation = validateClusterConfigPrepare(timeserver_type);
-        if (cluster_config_prepare_vaildation != false) {
+        if (cluster_config_prepare_vaildation == true) {
             // SSH Key 파일
             let radio_value = $('input[name=radio-ssh-key]:checked').val();
             putSshKeyValueIntoTextarea(radio_value);
@@ -271,14 +271,19 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
             let file_type = "ssh_key";
             writeSshKeyFile(pri_ssh_key_text, pub_ssh_key_text, file_type);
 
-            // hosts 파일
-            radio_value = $('input[name=radio-hosts-file]:checked').val();
+            // hosts 파일 > config 파일 쓰는 부분
+            
+            // 변경된 hosts file 내용을 설정 확인에 반영
+            let host_file_type = $('input[name=radio-hosts-file]:checked').val();
             let option = "";
-            putHostsValueIntoTextarea(radio_value, option);
-            let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
-            let os_type = ($('#os-type').val()).trim();
-            let host_name = $('#host-name').val();
-            writeHostsFile(hosts_file_text, os_type, host_name);
+            let ret_json_string = tableToClusterConfigJsonString(host_file_type, option);
+            // 파이선 호출
+            writeConfigFile(ret_json_string);
+
+
+            //writeHostsFile(hosts_file_text, os_type, host_name);
+
+            
 
             // time server 파일
             timeserver_type = $('input[name=radio-timeserver]:checked').val();
@@ -429,6 +434,7 @@ $('#form-radio-hosts-file').on('click', function () {
 
 $('#form-radio-cluster-host-new').on('click', function () {
     $('#form-radio-hosts-new').attr('disabled', false);
+    $('#form-radio-hosts-new').click();
 });
 
 $('#form-radio-cluster-host-add').on('click', function () {
@@ -688,7 +694,7 @@ $('input[name=radio-ssh-key]').on('click', function () {
 // Hosts 기존 파일 선택 시 hidden textarea 내용을 선택한 파일의 내용으로 변경
 $('#form-input-cluster-config-hosts-file').on('click', function () {
     let hosts_input = document.querySelector('#form-input-cluster-config-hosts-file');
-    let file_type = "ablestack.json";
+    let file_type = "cluster.json";
     let option = "";
     fileReaderIntoTableFunc(hosts_input, file_type, option);
     $('#form-input-cluster-config-hosts-file').val("")
@@ -746,37 +752,30 @@ $('#span-modal-wizard-cluster-config-finish-pub-sshkey-download').on('click', fu
         alert("SSH 공개 키 파일 정보를 입력해 주세요.");
     }
 });
-// Host File 다운로드 링크 생성
-$('#span-modal-wizard-cluster-config-finish-hosts-file-download').on('click', function () {
-    let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
-    let option = "";
-    putHostsValueIntoTextarea(hosts_file_type, option);
 
-    
-    let hosts_file_text = $('#div-textarea-cluster-config-confirm-hosts-file').val();
-    // OS 타입에 따라 hosts 파일 값을 다르게 설정
-    // let os_type = ($('#os-type').val()).trim();
-    // let host_name = $('#host-name').val();
-    // os_type = "ubuntu"
-    // if(os_type.match("centos")) {
-    //     let hosts_centos_default_text = "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4\n" +
-    //     "::1         localhost localhost.localdomain localhost6 localhost6.localdomain6\n\n";
-    //     hosts_file_text = hosts_centos_default_text + hosts_file_text
-    // }else if(os_type.match("ubuntu")) {
-    //     host_name = host_name.trim();
-    //     let hosts_ubuntu_default_text = "127.0.0.1\tlocalhost\n" +
-    //         "127.0.1.1\t" + host_name + "\t" + host_name + "\n\n";
-    //     hosts_file_text = hosts_ubuntu_default_text + hosts_file_text    
-    // }
-    let hosts_file_download_link_id = 'span-modal-wizard-cluster-config-finish-hosts-file-download';
+
+// cluster.json 다운로드 링크 생성
+$('#span-modal-wizard-cluster-config-finish-hosts-file-download').on('click', function () {
+    let configtext = $('#div-textarea-cluster-config-confirm-json-conf').val();
+
+    let hosts_download = 'span-modal-wizard-cluster-config-finish-hosts-file-download';
     // 다운로드 링크 생성 전 유효성 검정
-    if (hosts_file_text.trim() != "") {
-        saveAsFile(hosts_file_download_link_id, hosts_file_text, "hosts");
+    if (configtext != "" && configtext != null) {
+        saveAsFile(hosts_download, configtext, "cluster.json");
     } else {
-        alert("Hosts 파일 정보를 입력해 주세요.");
-    }
+        alert("cluster.json 파일이 존재하지 않습니다.");
+    }       
 });
 
+function createClusterJsonLink(){
+    let conf_file_path = pluginpath+ "/tools/properties/cluster.json";
+
+    cockpit.file(conf_file_path).read()
+    .done(function (content) {
+        $('#div-textarea-cluster-config-confirm-json-conf').val(content);
+    }).fail(function (error) {
+    });
+}
 
 /* HTML Object에서 발생하는 이벤트 처리 끝 */
 
@@ -1053,9 +1052,9 @@ function checkClusterConfigPrepareFileName(file_name, file_type) {
             alert("'id_rsa.pub'으로 된 공개 키 파일만 업로드할 수 있습니다.");
             return false;
         }
-    } else if (file_type == "ablestack.json") {
-        if (file_name != "ablestack.json") {
-            alert("'ablestack.json'으로 된 파일만 업로드할 수 있습니다.");
+    } else if (file_type == "cluster.json") {
+        if (file_name != "cluster.json") {
+            alert("'cluster.json'으로 된 파일만 업로드할 수 있습니다.");
             return false;
         }
     }
@@ -1169,6 +1168,34 @@ async function writeSshKeyFile(text1, text2) {
     cockpit.script(["rm -f /root/.ssh/temp_id_rsa.pub"])
 }
 
+/**
+ * Meathod Name : writeConfigFile
+ * Date Created : 2021.08.25
+ * Writer  : 배태주
+ * Description : 해당 호스트에서 클러스터 설정파일 편집을 수행하는 python 프로그램 호출
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.03.11 최초 작성
+ **/
+function writeConfigFile(json_string){
+    cockpit.spawn(["python3", pluginpath+"/python/cluster/cluster_config.py", "insert", "-js", json_string ])
+    .then(function(data){
+        var retVal = JSON.parse(data);
+        if(retVal.code == "200"){
+            // 해당 호스트의 수정된 cluster.json 파일을 다운로드 링크로 만드는 함수 호출
+            createClusterJsonLink();        
+        }else{                
+            createLoggerInfo(":::Please check the cluster.json file.:::");
+            console.log(":::Please check the cluster.json file.::: "+ data);
+        }
+    })
+    .catch(function(data){
+        createLoggerInfo(":::Please check the cluster.json file.:::");
+        console.log(":::Please check the cluster.json file.::: "+ data);
+    });
+
+    
+}
 
 /**
  * Meathod Name : writeHostsFile
@@ -1271,8 +1298,8 @@ function inputPnIntoTimeServer() {
     let currentHostName = $('#form-input-current-host-name').val();
 
     $('#'+ tbody_tr).each(function(index){
-        hostName = $(this).find('td').eq(0).text();
-        pn_ip = $(this).find('td').eq(3).text();
+        hostName = $(this).find('td').eq(1).text();
+        pn_ip = $(this).find('td').eq(4).text();
         
         if(index < 2){
             $('#form-input-cluster-config-time-server-ip-'+(index+1)).val(pn_ip);
