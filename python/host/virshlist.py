@@ -10,7 +10,6 @@ libvirt domain 들의 정보를 수집하는 스크립트입니다.
 최초작성일 : 2021-03-22
 '''
 import os
-from tkinter import E
 import sh
 import pprint
 import json
@@ -87,7 +86,7 @@ for vm in vms:
                 vm['GW'] = items[1]
         except Exception as e:
             pass
-        
+
         try :
             vm['MOLD_SERVICE_STATUE'] = ssh('-o', 'StrictHostKeyChecking=no', 'ccvm-mngt', 'systemctl is-active cloudstack-management.service').stdout.decode().splitlines()
         except Exception as e:
