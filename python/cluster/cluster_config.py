@@ -89,6 +89,8 @@ def insert(args):
                     "scvmCn": p_val["scvmCn"]
                 })
 
+        result = json.loads(python3(pluginpath + '/python/cluster/cluster_hosts_setting.py', 'host_only').stdout.decode())
+
         # json 변환 정보 cluster.json 파일 수정
         with open(json_file_path, "w") as cluster_json:
             cluster_json.write(json.dumps(json_data, indent=4))

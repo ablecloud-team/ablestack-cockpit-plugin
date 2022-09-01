@@ -20,7 +20,7 @@ $(document).ready(function(){
 
     $('#button-open-modal-wizard-storage-cluster').hide();
     $('#button-open-modal-wizard-storage-vm').hide();
-    $('#button-open-modal-wizard-cloud-vm').show();
+    $('#button-open-modal-wizard-cloud-vm').hide();
     $('#button-link-storage-center-dashboard').hide();
     $('#button-link-cloud-center').hide();
     $('#button-open-modal-wizard-monitoring-center').hide();
@@ -123,6 +123,7 @@ $('#button-open-modal-wizard-storage-vm').on('click', function(){
 });
 
 $('#button-open-modal-wizard-storage-cluster').on('click', function(){
+    readSshKeyFile();
     $('#div-modal-wizard-cluster-config-prepare').show();
 });
 
@@ -400,9 +401,9 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
 function checkConfigStatus(){
     //createLoggerInfo("checkConfigStatus() start");
     return new Promise((resolve) => {
-        cockpit.spawn(['grep', '-c', 'ccvm-mngt', '/etc/hosts'])
+        cockpit.spawn(['grep', '-c', 'ablecube', '/etc/hosts'])
             .then(data=>{
-                if(data){
+                if(data >= 1){
                     cockpit.spawn(['cat', '/root/.ssh/id_rsa.pub'])
                         .then(data=>{
                             sessionStorage.setItem("ccfg_status", "true");
@@ -722,7 +723,7 @@ function checkDeployStatus(){
     // 배포 상태 조회 전 버튼 hide 처리
     $('#button-open-modal-wizard-storage-cluster').hide();
     $('#button-open-modal-wizard-storage-vm').hide();
-    $('#button-open-modal-wizard-cloud-vm').show();
+    $('#button-open-modal-wizard-cloud-vm').hide();
     $('#button-link-storage-center-dashboard').hide();
     $('#button-link-cloud-center').hide();
     $('#button-open-modal-wizard-monitoring-center').hide();

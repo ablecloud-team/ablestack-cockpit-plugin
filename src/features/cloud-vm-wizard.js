@@ -1354,73 +1354,73 @@ function setCcvmReviewInfo(){
  */
 function validateCloudCenterVm(){
 
-    var valicate_check = true;
+    var validate_check = true;
 
     var svc_bool = $('input[type=checkbox][id="form-checkbox-svc-network"]').is(":checked");
 
     if($('#form-input-cloud-vm-failover-cluster-host1-name').val() == ""){ //host1 name
         alert("클러스터 호스트1의 이름을 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if ($('#form-input-cloud-vm-failover-cluster-host2-name').val() == "") { //host2 name
         alert("클러스터 호스트2의 이름을 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if ($('#form-input-cloud-vm-failover-cluster-host3-name').val() == "") { //host3 name
         alert("클러스터 호스트3의 이름을 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if ($('select#form-modal-select-cloud-vm-compute-cpu-core option:checked').val() == "") { //cpu
         alert("CPU core를 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if ($('select#form-select-cloud-vm-compute-memory option:checked').val() == "") { //memory
         alert("Memory를 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if ($('select#form-select-cloud-vm-mngt-parent option:checked').val() == "") { //관리용 bridge
         alert("관리용네트워크를 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if (svc_bool && $('select#form-select-cloud-vm-svc-parent option:checked').val() == "") {//서비스용 bridge
         alert("서비스네트워크를 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if ($('#div-textarea-cluster-config-confirm-hosts-file-ccvm').val() == "") { //hosts 파일
         alert("Hosts 파일을 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if ($('#form-input-cloud-vm-hostname').val() == "") { //클라우드센터 가상머신 호스트명
         alert("클라우드센터 가상머신의 호스트명 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if ($('#form-input-cloud-vm-mngt-nic-ip').val() == "") { //관리 NIC IP
         alert("관리 NIC IP를 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if ($('#form-input-cloud-vm-mngt-gw').val() == "") { //관리 NIC Gateway
         alert("관리 NIC Gateway를 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if (svc_bool && $('#form-input-cloud-vm-svc-nic-ip').val() == "") { //서비스 NIC IP
         alert("서비스 NIC IP를 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if (svc_bool && $('#form-input-cloud-vm-svc-gw').val() == "") { //서비스 NIC Gateway
         alert("서비스 NIC Gateway를 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if ( $('#form-textarea-cloud-vm-ssh-private-key-file').val() == "") { //SSH 개인 Key 정보
         alert("SSH 개인 Key 파일을 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if ( $('#form-textarea-cloud-vm-ssh-public-key-file').val() == "") { //SSH 공개 Key 정보
         alert("SSH 공개 Key 파일을 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if(!checkHostFormat($("#form-input-cloud-vm-hostname").val())){
         alert("호스트명 입력 형식을 확인해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if(!checkCidrFormat($("#form-input-cloud-vm-mngt-nic-ip").val())){
         alert("관리 NIC IP 형식을 확인해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if(!checkIp($("#form-input-cloud-vm-mngt-gw").val())){
         alert("관리 NIC Gateway 형식을 확인해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if(svc_bool && !checkCidrFormat($("#form-input-cloud-vm-svc-nic-ip").val())){
         alert("서비스 NIC IP 형식을 확인해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if(svc_bool && !checkIp($("#form-input-cloud-vm-svc-gw").val())){
         alert("서비스 NIC Gateway 형식을 확인해주세요.");
-        valicate_check = false;
+        validate_check = false;
     }
 
-    return valicate_check;
+    return validate_check;
 }
 
 /**
