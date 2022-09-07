@@ -15,8 +15,7 @@ import pprint
 import json
 import socket
 import subprocess
-from subprocess import check_output
-from subprocess import call
+
 
 from ablestack import *
 from sh import ssh
@@ -84,6 +83,14 @@ for vm in vms:
             for line in ret[:]:
                 items = line.split()
                 vm['GW'] = items[1]
+        except Exception as e:
+            pass
+        # DNS 정보 확인
+        try:
+            ret = ssh('-o','StrictHostKeyChecking=no', 'ccvm-mngt', '/usr/bin/cat', '-n', '/etc/resolv.conf', '|', 'awk', '"$1 == 2 {print $3}"').stdout.decode().splitlines()
+            for line in ret[:]:
+                items = line.split()
+                vm['DNS'] = items[0]
         except Exception as e:
             pass
 

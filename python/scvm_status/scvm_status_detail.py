@@ -49,6 +49,7 @@ def statusDeteil():
     manageNicParent = 'N/A'
     manageNicIp = 'N/A'
     manageNicGw = 'N/A'
+    manageNicDns = 'N/A'
     storageServerNicType = 'N/A'
     storageServerNicParent = 'N/A'
     storageServerNicIp = 'N/A'
@@ -106,25 +107,30 @@ def statusDeteil():
             if rootDiskSize == "" :
                 rootDiskSize = "N/A"
             output = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm df -h | grep '\-root ' | awk '{print $4}'"], universal_newlines=True, shell=True, env=env)
-            rootDiskAvail = output.strip();
+            rootDiskAvail = output.strip()
             if rootDiskAvail == "" :
                 rootDiskAvail = "N/A"
             output = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm df -h | grep '\-root ' | awk '{print $5}'"], universal_newlines=True, shell=True, env=env)
-            rootDiskUsePer = output.strip();                
+            rootDiskUsePer = output.strip()              
             if rootDiskUsePer == "" :
                 rootDiskUsePer = "N/A"
             
             '''management Nic Gw정보 확인'''
             output = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm /usr/sbin/route -n | grep -P '^0.0.0.0|UG' | awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
-            manageNicGw = output.strip();
+            manageNicGw = output.strip()
             if manageNicGw == "" :
                 manageNicGw = "N/A"
+            
+            output = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm /usr/bin/cat -n /etc/resolv.conf | awk '$1 == 2 {print $3}'"], universal_newlines=True, shell=True, env=env)
+            manageNicDns = output.strip()
+            if manageNicDns == "":
+                manageNicDns = "N/A"
         else : 
             rootDiskSize = 'N/A'     
             rootDiskAvail = 'N/A'
             rootDiskUsePer = 'N/A'
             manageNicGw = 'N/A'
-        
+            manageNicDns = 'N/A'
         '''scvm 관리 nic 확인 시 리턴값 0이면 정상, 아니면 비정상'''
         rc = call(["cat /etc/hosts | grep scvm-mngt"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:
@@ -157,7 +163,7 @@ def statusDeteil():
         rc = call(["cat /etc/hosts | grep scvm$"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if rc == 0:
             output = check_output(["cat /etc/hosts | grep scvm$ | awk '{print $1}'"], universal_newlines=True, shell=True, env=env)
-            storageServerNicIp = output.strip();
+            storageServerNicIp = output.strip()
             rc = call(["virsh domifaddr --domain scvm --source agent --full | grep -w " + storageServerNicIp], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             if rc == 0:
                 storageServerNicMacAddr = check_output(["virsh domifaddr --domain scvm --source agent --full | grep -w " + storageServerNicIp + "| awk '{print $2}'"], universal_newlines=True, shell=True, env=env)
@@ -221,6 +227,7 @@ def statusDeteil():
             'manageNicParent': manageNicParent,
             'manageNicIp': manageNicIp,
             'manageNicGw': manageNicGw,
+            'manageNicDns' : manageNicDns,
             'storageServerNicType': storageServerNicType,
             'storageServerNicParent': storageServerNicParent,
             'storageServerNicIp': storageServerNicIp,
@@ -245,6 +252,7 @@ def statusDeteil():
             'manageNicParent': manageNicParent,
             'manageNicIp': manageNicIp,
             'manageNicGw': manageNicGw,
+            'manageNicDns' : manageNicDns,
             'storageServerNicType': storageServerNicType,
             'storageServerNicParent': storageServerNicParent,
             'storageServerNicIp': storageServerNicIp,

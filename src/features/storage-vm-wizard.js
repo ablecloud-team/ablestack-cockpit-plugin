@@ -808,6 +808,7 @@ function deployStorageCenterVM() {
                 var pn_prefix = $('#form-input-storage-vm-public-ip').val().split("/")[1];
                 var cn_ip = $('#form-input-storage-vm-cluster-ip').val().split("/")[0];
                 var cn_prefix = $('#form-input-storage-vm-cluster-ip').val().split("/")[1];
+                var dns = $('#form-input-storage-vm-dns').val();
 
                 var create_scvm_cloudinit_cmd = ['python3', pluginpath + '/python/vm/create_scvm_cloudinit.py'
                                         ,"-f1",pluginpath+"/tools/vmconfig/scvm/hosts","-t1", $("#div-textarea-cluster-config-confirm-hosts-file-scvm").val() // hosts 파일
@@ -823,6 +824,9 @@ function deployStorageCenterVM() {
                                     ];
                 if(mgmt_gw != ""){
                     create_scvm_cloudinit_cmd.push('--mgmt-gw',mgmt_gw);
+                }
+                if(dns != ""){
+                    create_scvm_cloudinit_cmd.push('--dns',dns);
                 }
                 if(console_log){console.log(create_scvm_cloudinit_cmd);}
                 cockpit.spawn(create_scvm_cloudinit_cmd)
@@ -1279,6 +1283,7 @@ function setReviewInfo(){
     var mngt_ip = $('#form-input-storage-vm-mgmt-ip').val();
     var mngt_gw = $('#form-input-storage-vm-mgmt-gw').val();
     var mngt_vlan = $('#form-input-storage-vm-mgmt-vlan').val();
+    var dns = $('#form-input-storage-vm-dns').val();
 
     $('#span-storage-vm-mngt-ip-info').empty();
     var mngt_el = "";    
@@ -1297,6 +1302,11 @@ function setReviewInfo(){
 
     if(mngt_vlan != '') {
         mngt_el += "Vlan : "+mngt_vlan+"</br>";
+    }
+    if(dns != ''){
+        mngt_el += "DNS : 미입력</br>";
+    }else {
+        mngt_el += "DNS : "+dns+"</br>";
     }
     
     $('#span-storage-vm-mngt-ip-info').append(mngt_el);
@@ -1442,6 +1452,9 @@ function validateStorageVm(){
     }else if(!checkCidrFormat($("#form-input-storage-vm-cluster-ip").val())){
         alert("스토리지 복제 NIC IP 형식을 확인해주세요.");
         valicate_check = false;
+    }else if (!checkIp($("#form-input-storage-vm-dns").val()) && $("#form-input-storage-vm-dns").val() != ""){
+        alert("DNS 형식을 확인해주세요.");
+        valicate_check = false;
     }
 
     return valicate_check;
@@ -1514,6 +1527,7 @@ function validateStorageVm(){
     $("#form-input-storage-vm-public-vlan").val("");
     $("#form-input-storage-vm-cluster-ip").val("");
     $("#form-input-storage-vm-cluster-vlan").val("");
+    $("#form-input-stroage-vm-dns").val("");
 }
 
 /**
