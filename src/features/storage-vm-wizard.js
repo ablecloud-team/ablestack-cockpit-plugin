@@ -441,7 +441,7 @@ $('#form-radio-hosts-new-scvm').on('click', function () {
     $('#form-input-cluster-config-host-number-minus-scvm').removeAttr('disabled');
     $('#form-input-cluster-config-host-number-scvm').removeAttr('disabled');
     $('#form-table-tbody-cluster-config-existing-host-profile-scvm tr').remove();
-    $('#form-input-storage-vm-hosts-file').val("")
+    $('#form-input-storage-vm-hosts-file').val("");
 });
 
 // Host 파일 준비 방법 중 기존 파일 사용을 클릭하는 경우 Host 프로파일 디비전을 숨기고 Hosts 파일 디비전은 보여준다.
@@ -520,6 +520,7 @@ $('#form-radio-hosts-file-scvm').on('click', function () {
 //         return;
 //     }
 // });
+
 // Host 파일 준비 중 "구성할 호스트"를 변경하는 '+', '-' 기능 
 $('#form-input-cluster-config-host-number-plus-scvm').on('click', function () {
     let num = $("#form-input-cluster-config-host-number-scvm").val();
@@ -1506,6 +1507,7 @@ function validateStorageVm(){
     $("#form-input-storage-vm-public-vlan").val("");
     $("#form-input-storage-vm-cluster-ip").val("");
     $("#form-input-storage-vm-cluster-vlan").val("");
+    $("#form-input-ccvm-mngt-ip").val("");
 }
 
 /**

@@ -296,6 +296,30 @@
                                             </table>
                                         </div>
                                     </div>
+                                    <div class="pf-c-form__group" id="div-cluster-ccvm-mngt-ip" style="display:none">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-ccvm-mngt-ip">
+                                                <span class="pf-c-form__label-text">ccvm mngt ip</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <input class="pf-c-form-control" style="width:19%" type="text" id="form-input-cluster-ccvm-mngt-ip" name="form-input-cluster-ccvm-mngt-ip" required="required" disabled/> 
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-cluster-pcs-hostname" style="display:none">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-pcs-hostname1">
+                                                <span class="pf-c-form__label-text">pcs cluster</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <input class="pf-c-form-control" style="width:19%" type="text" id="form-input-cluster-pcs-hostname1" name="form-input-cluster-pcs-hostname1" required="required" disabled/>
+                                            <input class="pf-c-form-control" style="width:19%" type="text" id="form-input-cluster-pcs-hostname2" name="form-input-cluster-pcs-hostname2" required="required" disabled/>
+                                            <input class="pf-c-form-control" style="width:19%" type="text" id="form-input-cluster-pcs-hostname3" name="form-input-cluster-pcs-hostname3" required="required" disabled/>
+                                        </div>
+                                    </div>
                                 </section>
                             </form>
                         </div>
@@ -457,7 +481,7 @@
                                         <dl class="pf-c-description-list" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text">클러스터 구성 파일 준비</span>
+                                                    <span class="pf-c-description-list__text">클러스터 구성 준비</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text" id="span-hosts-file"></div>
@@ -526,6 +550,42 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-cluster-config-deploy">
+                            <p id='cluster-progress-step-text'>
+                                클러스터 구성 준비 중입니다. 전체 3단계 중 1단계 진행 중입니다.
+                            </p>
+
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-cluster-progress-step1">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">SSH Key File 생성</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-cluster-progress-step2">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">Cluster Config 및 Hosts 파일 생성</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-cluster-progress-step3">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">시간서버 설정 생성 및 마무리</span>
+                            </div>
+                        </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cluster-config-finish">
                             <p>
                                 ABLESTACK 클러스터 구성을 위한 모든 설정이 완료되었습니다. <br/>
@@ -550,7 +610,6 @@
                             </div>
                             <!-- <div id="os-type" hidden>
                             <div id="host-name" hidden> -->
-                            </div>
                         </div>
                     </main>
                 </div>

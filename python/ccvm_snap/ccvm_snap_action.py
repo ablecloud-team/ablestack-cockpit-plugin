@@ -127,7 +127,7 @@ def backupCcvmSnap(args):
             if result == 0:
                 return createReturn(code=200, val="CCVM Snapshot Backup Create Success")
             else:
-                return createReturn(code=500, val="CCVM Snapshot Backup Create Fail. Snapshot backup is possible only in the stop or start state1")
+                return createReturn(code=500, val="CCVM Snapshot Backup Create Fail. Snapshot backup is possible only in the stop or start state")
 
         else :
             return createReturn(code=500, val="CCVM Snapshot Backup Create Fail. Snapshot backup is possible only in the stop or start state")

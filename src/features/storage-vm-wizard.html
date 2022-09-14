@@ -480,7 +480,7 @@
                                     <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-storage-vm-hostname">
-                                                <span class="pf-c-form__label-text">호스트명</span>
+                                                <span class="pf-c-form__label-text">호스트명(scvm)</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
@@ -538,6 +538,8 @@
                                             <input class="pf-c-form-control" style="width:10%" type="text" id="form-input-storage-vm-cluster-vlan" name="form-input-storage-vm-cluster-vlan"/>
                                         </div>
                                     </div>
+                                    <input type="text" id="form-input-ccvm-mngt-ip" name="form-input-ccvm-mngt-ip" hidden/>
+                                    
                                 </section>
                             </form>
                         </div>
@@ -684,7 +686,7 @@
                                         <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text">클러스터 구성 파일 준비</span>
+                                                    <span class="pf-c-description-list__text">클러스터 구성 준비</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
@@ -699,7 +701,7 @@
                                             </div>
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text">호스트명</span>
+                                                    <span class="pf-c-description-list__text">호스트명(scvm)</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
@@ -770,7 +772,7 @@
                         </div>
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-vm-config-deploy">
                             <p id='progress-step-text'>
-                                스토리지 가상머신을 배포 중입니다. 전체 4단계 중 1단계 진행 중입니다.  
+                                스토리지 가상머신을 배포 중입니다. 전체 4단계 중 1단계 진행 중입니다.
                             </p>
 
                             <div class="pf-c-content" style="margin-top:30px;margin-left:15px">

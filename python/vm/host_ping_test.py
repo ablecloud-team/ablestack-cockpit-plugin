@@ -56,7 +56,7 @@ def hostPingTest(args):
             else:
                 item["host"] = host
                 item["status"] = 'down'
-                ret_text += host+"와 네트워크 테스트 실패하였습니다\n"
+                ret_text += host+" network ip ping test failed\n"
 
             ret_val.append(item)
 

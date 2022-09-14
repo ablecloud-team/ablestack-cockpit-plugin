@@ -748,6 +748,7 @@ function checkDeployStatus(){
     const step8 = sessionStorage.getItem("wall_monitoring_status");
 
     console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6 + ", step7 :: " + step7 + ", step8 :: " + step8);
+    $('#button-open-modal-wizard-cloud-vm').show();
     // 배포 상태조회 
     if(step1!="true"){
         // 클러스터 구성준비 버튼 show
