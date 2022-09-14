@@ -118,8 +118,7 @@ def changeHosts(args):
         return createReturn(code=200, val="")
     except Exception as e:
         # 결과값 리턴
-        print(e)
-        return createReturn(code=500, val="Please check the \"cluster.json\" file.")
+        return createReturn(code=500, val="Please check the \"cluster.json\" file. : "+e)
 
 def hostOnly(args):
     ret = changeHosts(args)

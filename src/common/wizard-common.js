@@ -490,8 +490,9 @@ function checkHostName(option) {
                         }
 
                         // cluster_host_yn은 신규 클러스터 호스트 = new, 추가 호스트 = add / hostsJson에 현재 호스트명과 동일한 호스트명이 존재하면 추가하지 않음
-                        cluster_host_yn = $('input[name=radio-cluster-host]:checked').val()
-                        if(cluster_host_yn=="add" && option == "") {
+                        // cluster_host_yn = $('input[name=radio-cluster-host]:checked').val()
+                        // if(cluster_host_yn=="add" && option == "") {
+                        if(option == "") {
                             if(add_tr_yn){
                                 insert_tr += "<tr style='border-bottom: solid 1px #dcdcdc'>";
                                 insert_tr += "  <td contenteditable='true'>"+max_index+"</td>";
@@ -678,8 +679,12 @@ function tableToHostsText(table_tr_obj, option){
     let hsots_text = "";
     // 현재 ablecube 호스트의 이름
     let current_host_name = $("#form-input-current-host-name"+option).val();
-
-    if(option == "-scvm"){
+    
+    if(option == ""){
+        if($("#form-input-cluster-ccvm-mngt-ip").val() != ""){
+            hsots_text += $("#form-input-cluster-ccvm-mngt-ip").val() + "\t" + "ccvm-mngt" + "\t" + "ccvm" + "\n";
+        }
+    }else if(option == "-scvm"){
         if($("#form-input-ccvm-mngt-ip").val() != ""){
             hsots_text += $("#form-input-ccvm-mngt-ip").val() + "\t" + "ccvm-mngt" + "\t" + "ccvm" + "\n";
         }
@@ -994,6 +999,52 @@ function tableToClusterConfigJsonString(radio_value, option){
             validate_check = true;
             return false;
         } 
+    });
+    return validate_check;
+}
+
+/**
+ * Meathod Name : checkDuplicateCcvmIp()
+ * Date Created : 2022.09.14
+ * Writer  : 배태주
+ * Description : table에 입력된 ip값에 중복된 ccvm-mngt-ip가 존재하는지 확인
+ * Parameter : ip, radio_value, option
+ * Return  : 
+ * History  : 2022.09.14 최초 작성
+ **/
+ function checkDuplicateCcvmIp(ip, radio_value, option){
+
+    let table_tr_obj;
+    let validate_check = false;
+
+    if (radio_value == "new") {
+        table_tr_obj = $('#form-table-tbody-cluster-config-new-host-profile'+option+' tr');
+
+    } else if (radio_value == "existing") {
+        table_tr_obj = $('#form-table-tbody-cluster-config-existing-host-profile'+option+' tr');
+    }
+    
+    table_tr_obj.each(function(index_num){
+        // $(this).find('td').eq(0) 순서는 아래와 같습니다.
+        // eq(0) : index
+        // eq(1) : 호스트 명
+        // eq(2) : 호스트 IP (ablecube)
+        // eq(3) : SCVM MNGT IP
+        // eq(4) : 호스트 PN IP (ablecube-pn)
+        // eq(5) : SCVM PN IP
+        // eq(6) : SCVM CN IP
+
+        let host_ip = $(this).find('td').eq(2).text().trim();
+        let scvm_mngt_ip = $(this).find('td').eq(3).text().trim();
+        let host_pn_ip = $(this).find('td').eq(4).text().trim();
+        let scvm_pn_ip = $(this).find('td').eq(5).text().trim();
+        let scvm_cn_ip = $(this).find('td').eq(6).text().trim();
+
+        if (ip == host_ip || ip == scvm_mngt_ip || ip == host_pn_ip || ip == scvm_pn_ip || ip == scvm_cn_ip) {
+            alert((index_num+1)+"번 idx에 CCVM 관리 IP와 중복된 IP가 존재합니다.");
+            validate_check = true;
+            return false;
+        }
     });
     return validate_check;
 }

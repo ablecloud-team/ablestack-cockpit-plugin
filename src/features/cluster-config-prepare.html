@@ -296,28 +296,48 @@
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="pf-c-form__group" id="div-cluster-ccvm-mngt-ip" style="display:none">
+                                    <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-ccvm-mngt-ip">
-                                                <span class="pf-c-form__label-text">ccvm mngt ip</span>
+                                                <span class="pf-c-form__label-text">CCVM 관리 IP</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <input class="pf-c-form-control" style="width:19%" type="text" id="form-input-cluster-ccvm-mngt-ip" name="form-input-cluster-ccvm-mngt-ip" required="required" disabled/> 
+                                            <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cluster-ccvm-mngt-ip" name="form-input-cluster-ccvm-mngt-ip" placeholder="xxx.xxx.xxx.xxx 형식으로 입력"/>
                                         </div>
                                     </div>
-                                    <div class="pf-c-form__group" id="div-cluster-pcs-hostname" style="display:none">
+                                    <div class="pf-c-form__group">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label" for="form-input-cluster-pcs-hostname1">
-                                                <span class="pf-c-form__label-text">pcs cluster</span>
+                                                <span class="pf-c-form__label-text">PCS 호스트명 #1</span>
                                                 <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <input class="pf-c-form-control" style="width:19%" type="text" id="form-input-cluster-pcs-hostname1" name="form-input-cluster-pcs-hostname1" required="required" disabled/>
-                                            <input class="pf-c-form-control" style="width:19%" type="text" id="form-input-cluster-pcs-hostname2" name="form-input-cluster-pcs-hostname2" required="required" disabled/>
-                                            <input class="pf-c-form-control" style="width:19%" type="text" id="form-input-cluster-pcs-hostname3" name="form-input-cluster-pcs-hostname3" required="required" disabled/>
+                                            <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cluster-pcs-hostname1" name="form-input-cluster-pcs-hostname1"/>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-pcs-hostname2">
+                                                <span class="pf-c-form__label-text">PCS 호스트명 #2</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cluster-pcs-hostname2" name="form-input-cluster-pcs-hostname2"/>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label" for="form-input-cluster-pcs-hostname3">
+                                                <span class="pf-c-form__label-text">PCS 호스트명 #3</span>
+                                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                            </label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-cluster-pcs-hostname3" name="form-input-cluster-pcs-hostname3"/>
                                         </div>
                                     </div>
                                 </section>
@@ -470,7 +490,7 @@
                                 </div>
                                 <h3>
                                     <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-hosts-file">
-                                        <span class="pf-c-accordion__toggle-text">클러스터 구성 Json 파일</span>
+                                        <span class="pf-c-accordion__toggle-text">클러스터 구성 파일</span>
                                         <span class="pf-c-accordion__toggle-icon">
                                             <i class="fas fa-angle-right" aria-hidden="true"></i>
                                         </span>
@@ -497,6 +517,38 @@
                                                         <!-- div-textarea-cluster-config-confirm-json-conf는 cluster.json 파일 정보를 저장하는 영역 -->
                                                         <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-json-conf" type="text" hidden></textarea>
                                                     </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">CCVM 관리 IP</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text" id="div-cluster-ccvm-mngt-ip"></div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">PCS 호스트명 #1</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text" id="div-cluster-pcs-hostname1"></div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">PCS 호스트명 #2</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text" id="div-cluster-pcs-hostname2"></div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">PCS 호스트명 #3</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text" id="div-cluster-pcs-hostname3"></div>
                                                 </dd>
                                             </div>
                                         </dl>

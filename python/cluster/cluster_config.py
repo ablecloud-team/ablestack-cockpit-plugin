@@ -116,8 +116,7 @@ def insert(args):
         return createReturn(code=200, val="Cluster Config insert Success")
     except Exception as e:
         # 결과값 리턴
-        print(e)
-        return createReturn(code=500, val="Please check the \"cluster.json\" file.")
+        return createReturn(code=500, val="Please check the \"cluster.json\" file. : "+e)
 
 # ccvm 배포할 때 사용됨
 # 모든 호스트 및 scvm에 적용
@@ -167,7 +166,6 @@ def insertScvmHost(args):
                 return createReturn(code=500, val=ping_result["val"])
     except Exception as e:
         # 결과값 리턴
-        # print(e)
         return createReturn(code=500, val=return_val)
 
 # cluster 구성 준비 메뉴에서 추가 호스트인 경우에 실행됨
@@ -233,7 +231,6 @@ def insertAllHost(args):
                 return createReturn(code=500, val=ping_result["val"])
     except Exception as e:
         # 결과값 리턴
-        # print(e)
         return createReturn(code=500, val=return_val)
 
 # Press the green button in the gutter to run the script.

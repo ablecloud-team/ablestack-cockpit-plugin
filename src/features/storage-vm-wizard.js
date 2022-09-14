@@ -442,6 +442,9 @@ $('#form-radio-hosts-new-scvm').on('click', function () {
     $('#form-input-cluster-config-host-number-scvm').removeAttr('disabled');
     $('#form-table-tbody-cluster-config-existing-host-profile-scvm tr').remove();
     $('#form-input-storage-vm-hosts-file').val("");
+
+    $("#form-input-ccvm-mngt-ip").val("");
+    $("#form-input-ccvm-mngt-ip").attr('disabled', false);
 });
 
 // Host 파일 준비 방법 중 기존 파일 사용을 클릭하는 경우 Host 프로파일 디비전을 숨기고 Hosts 파일 디비전은 보여준다.
@@ -459,6 +462,9 @@ $('#form-radio-hosts-file-scvm').on('click', function () {
     $('#form-input-cluster-config-host-number-plus-scvm').attr('disabled', 'true');
     $('#form-input-cluster-config-host-number-minus-scvm').attr('disabled', 'true');
     $('#form-input-cluster-config-host-number-scvm').attr('disabled', 'true');
+
+    $("#form-input-ccvm-mngt-ip").val("");
+    $("#form-input-ccvm-mngt-ip").attr('disabled', true);
 });
 
 // Host 파일 준비 중 "현재 호스트 번호"를 변경하는 '+', '-' 기능 
@@ -856,7 +862,7 @@ function deployStorageCenterVM() {
                                                 } else {
                                                     setScvmProgressFail(4);
                                                     createLoggerInfo(result.val);
-                                                    alert(result.val);            
+                                                    alert(result.val);
                                                 }
                                             })
                                             .catch(function(data){
@@ -1331,6 +1337,12 @@ function setReviewInfo(){
 
     $('#span-storage-vm-storage-traffic-ip-info').append(traffic_ip_el);
 
+    if($("#form-input-ccvm-mngt-ip").val() == ""){
+        $('#span-ccvm-mngt-ip').text("미입력");
+    } else {
+        $('#span-ccvm-mngt-ip').text($("#form-input-ccvm-mngt-ip").val());
+    }
+
     //-----SSH Key 정보-----
     var ssh_private_key_url = $('#form-input-storage-vm-ssh-private-key-file').val();
     if(ssh_private_key_url == '') {
@@ -1407,7 +1419,7 @@ function validateStorageVm(){
     }else if($('#div-textarea-cluster-config-confirm-hosts-file-scvm').val().trim() == "") {
         alert("클러스터 구성 프로파일 정보를 확인해 주세요.");
         validate_check = false;
-    }else if(validateClusterConfigProfile(host_file_type, option)) { //cluster config 유효성 검사
+    }else if(validateClusterConfigProfile(host_file_type, option_scvm)) { //cluster config 유효성 검사
         validate_check = false;
     }else if($("#form-input-storage-vm-hostname").val() == ""){
         alert("호스트명을 입력해주세요.");
@@ -1423,6 +1435,12 @@ function validateStorageVm(){
         validate_check = false;
     }else if($("#form-input-storage-vm-cluster-ip").val() == ""){
         alert("스토리지 복제 NIC IP를 입력해주세요.");
+        validate_check = false;
+    }else if ($('#form-input-ccvm-mngt-ip').val() == "") {
+        alert("CCVM 관리 IP정보를 입력해주세요.");
+        validate_check = false;
+    }else if(!checkIp($('#form-input-ccvm-mngt-ip').val())){
+        alert("CCVM 관리 IP 형식을 확인해주세요.");
         validate_check = false;
     }else if($('#form-input-storage-vm-ssh-private-key-file').val() == ""){
         alert("SSH 개인 Key 파일을 입력해주세요.");

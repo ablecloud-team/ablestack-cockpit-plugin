@@ -272,7 +272,7 @@ $('#button-execution-modal-cloud-vm-snap-backup').on('click', function(){
     $('#div-modal-spinner').show();
 
     $("#modal-status-alert-title").html("클라우드센터VM 복구용 스냅샷 생성 실패");
-    $("#modal-status-alert-body").html("복구용 스냅샷 생성을 실패하였습니다. 클라우드센터VM 상태를 점검해주세요.");
+    $("#modal-status-alert-body").html("복구용 스냅샷 생성을 실패하였습니다.");
 
     // 복구용 스냅샷 생성
     cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ccvm_snap/ccvm_snap_action.py', 'backup'])
