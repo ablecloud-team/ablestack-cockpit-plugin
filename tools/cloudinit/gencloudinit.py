@@ -340,15 +340,14 @@ ccvm용 네트워크설정(스토리지 네트워크 추가 없음)하는 부분
 :param 없음
 :return yaml 파일
 """
-def ccvmGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str, sn_dns:str):
+def ccvmGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str):
     with open(f'{tmpdir}/network-config.mgmt', 'rt') as f:
         yam = yaml.load(f)
 
-    if sn_nic is not None or sn_ip is not None or sn_prefix is not None or sn_dns is not None or sn_gw is not None :
+    if sn_nic is not None or sn_ip is not None or sn_prefix is not None or sn_gw is not None :
         yam['network']['config'].append({'name': sn_nic,
                                          'subnets': [{'address': f'{sn_ip}/{sn_prefix}',
                                                       'gateway': sn_gw,
-                                                      'dns nameserver' : sn_dns,
                                                       'type': 'static'}],
                                          'type': 'physical'})
     with open(f'{tmpdir}/network-config', 'wt') as f:
@@ -485,7 +484,7 @@ def main(args):
     pn_nic=None, pn_ip=None, cn_nic=None, cn_ip=None, 
     """
     if args.type == 'ccvm':
-        ret = ccvmGen(sn_nic=args.sn_nic, sn_ip=args.sn_ip, sn_prefix=args.sn_prefix, sn_gw=args.sn_gw,sn_dns=args.sn_dns)
+        ret = ccvmGen(sn_nic=args.sn_nic, sn_ip=args.sn_ip, sn_prefix=args.sn_prefix, sn_gw=args.sn_gw)
     elif args.type == 'scvm':
         ret = scvmGen(pn_nic=args.pn_nic, pn_ip=args.pn_ip, pn_prefix=args.pn_prefix, cn_nic=args.cn_nic, cn_ip=args.cn_ip, cn_prefix=args.cn_prefix, master=args.master)
     ret = genCloudInit(filename=args.iso_path)
