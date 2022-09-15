@@ -23,7 +23,7 @@ $('#button-execution-modal-cloud-vm-start').on('click', function(){
     $('#div-modal-start-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터VM을 시작하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStart'], { host: ccvm_instance.cmdExeHost})
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStart'], { host: pcs_exe_host})
     .then(function(data){
         var retVal = JSON.parse(data);
 
@@ -60,7 +60,7 @@ $('#button-execution-modal-cloud-vm-stop').on('click', function(){
     $('#div-modal-stop-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터VM을 정지하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStop'], { host: ccvm_instance.cmdExeHost})
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStop'], { host: pcs_exe_host})
     .then(function(data){
         var retVal = JSON.parse(data);
 
@@ -92,7 +92,7 @@ $('#button-execution-modal-cloud-vm-cleanup').on('click', function(){
     $('#div-modal-cleanup-cloud-vm').hide();
     $('#div-modal-spinner-header-txt').text('클라우드센터 클러스터를 클린업하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsCleanup'], { host: ccvm_instance.cmdExeHost})
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsCleanup'], { host: pcs_exe_host})
     .then(function(data){
         var retVal = JSON.parse(data);
         createLoggerInfo("cloud cluster cleanup spawn success");
@@ -126,7 +126,7 @@ $('#button-execution-modal-cloud-vm-migration').on('click', function(){
         $('#div-modal-migration-cloud-vm').hide();
         $('#div-modal-spinner-header-txt').text('클라우드센터VM을 마이그레이션하고 있습니다.');
         $('#div-modal-spinner').show();
-        cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsMigration', '--target', valSelect], { host: ccvm_instance.cmdExeHost})
+        cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsMigration', '--target', valSelect], { host: pcs_exe_host})
         .then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
@@ -151,7 +151,7 @@ $('#button-cloud-cluster-migration').on('click', function(){
 
 $('#button-cloud-vm-snap-rollback').on('click', function(){
     $('#form-select-cloud-vm-snap option').remove();
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ccvm_snap/ccvm_snap_action.py', 'list'])
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ccvm_snap/ccvm_snap_action.py', 'list'], { host: pcs_exe_host})
     .then(function(data){
         var retVal = JSON.parse(data);
         if(retVal.code == 200){
@@ -218,14 +218,13 @@ $('#button-execution-modal-cloud-vm-snap-rollback-confirm').on('click', function
 
     $("#modal-status-alert-title").html("클라우드센터VM 스냅샷 복구 실패");
     $("#modal-status-alert-body").html("스냅샷 복구를 실패하였습니다. 클라우드센터VM 상태를 점검해주세요.</br>(클라우드센터VM이 정지상태인 경우에만 복구가능합니다.)");
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/pcs/main.py', 'status', '--resource', 'cloudcenter_res'])
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/pcs/main.py', 'status', '--resource', 'cloudcenter_res'], { host: pcs_exe_host})
     .then(function(data){
         var retVal = JSON.parse(data);
-        if(retVal.code == 200 && retVal.role == "Stopped"){
-            
+        if(retVal.code == 200 && retVal.val.role == "Stopped"){
             // 스냅샷 복구
             var valSelect = $('#form-select-cloud-vm-snap option:selected').val();
-            cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ccvm_snap/ccvm_snap_action.py', 'rollback', "--snap-name", valSelect])
+            cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ccvm_snap/ccvm_snap_action.py', 'rollback', "--snap-name", valSelect], { host: pcs_exe_host})
             .then(function(data){
                 $('#div-modal-spinner').hide();
 
@@ -243,6 +242,10 @@ $('#button-execution-modal-cloud-vm-snap-rollback-confirm').on('click', function
                 $('#div-modal-status-alert').show();
                 createLoggerInfo("rollback cloud vm snapshot spawn error : " + data);
             });
+        }else{
+            $('#div-modal-spinner').hide();
+            $('#div-modal-status-alert').show();
+            createLoggerInfo("rollback cloud vm snapshot status error : " + data);
         }
     }).catch(function(data){
         $('#div-modal-spinner').hide();
@@ -275,7 +278,7 @@ $('#button-execution-modal-cloud-vm-snap-backup').on('click', function(){
     $("#modal-status-alert-body").html("복구용 스냅샷 생성을 실패하였습니다.");
 
     // 복구용 스냅샷 생성
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ccvm_snap/ccvm_snap_action.py', 'backup'])
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ccvm_snap/ccvm_snap_action.py', 'backup'], { host: pcs_exe_host})
     .then(function(data){
         $('#div-modal-spinner').hide();
 
@@ -419,7 +422,7 @@ function CardCloudClusterStatus(){
         $("#cccs-back-color").attr('class','pf-c-label pf-m-orange');
         $("#cccs-cluster-icon").attr('class','fas fa-fw fa-exclamation-triangle');
 
-        cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsDetail' ], { host: "10.10.3.1"})
+        cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsDetail' ], { host: pcs_exe_host})
         .then(function(data){
             cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ablestack_json/ablestackJson.py', 'status', '--depth1', 'bootstrap', '--depth2', 'ccvm' ])
                 .then(function (bootstrap_data){

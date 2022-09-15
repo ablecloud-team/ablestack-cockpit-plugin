@@ -19,7 +19,7 @@ from sh import python3
 from python_hosts import Hosts, HostsEntry
 
 json_file_path = pluginpath+"/tools/properties/cluster.json"
-hosts_file_path = pluginpath+"/tools/properties/hosts"
+hosts_file_path = "/etc/hosts"
 # hosts_file_path = "/etc/hosts"
 def createArgumentParser():
     '''

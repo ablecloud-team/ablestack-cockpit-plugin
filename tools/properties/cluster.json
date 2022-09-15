@@ -1,7 +1,7 @@
 {
     "clusterConfig": {
         "ccvm": {
-            "ip": "10.10.11.10"
+            "ip": "10.10.3.10"
         },
         "pcsCluster": {
             "hostname1": "ablecube1",
@@ -12,38 +12,38 @@
             {
                 "index": "1",
                 "hostname": "ablecube1",
-                "ablecube": "10.10.1.11",
-                "scvmMngt": "10.10.1.15",
-                "ablecubePn": "10.10.1.19",
-                "scvm": "10.10.1.113",
-                "scvmCn": "10.10.1.117"
+                "ablecube": "10.10.3.1",
+                "scvmMngt": "10.10.3.11",
+                "ablecubePn": "100.100.3.1",
+                "scvm": "100.100.3.11",
+                "scvmCn": "200.200.3.11"
             },
             {
                 "index": "2",
                 "hostname": "ablecube2",
-                "ablecube": "10.10.1.12",
-                "scvmMngt": "10.10.1.16",
-                "ablecubePn": "10.10.1.110",
-                "scvm": "10.10.1.114",
-                "scvmCn": "10.10.1.118"
+                "ablecube": "10.10.3.2",
+                "scvmMngt": "10.10.3.12",
+                "ablecubePn": "100.100.3.2",
+                "scvm": "100.100.3.12",
+                "scvmCn": "200.200.3.12"
             },
             {
                 "index": "3",
                 "hostname": "ablecube3",
-                "ablecube": "10.10.1.13",
-                "scvmMngt": "10.10.1.17",
-                "ablecubePn": "10.10.1.111",
-                "scvm": "10.10.1.115",
-                "scvmCn": "10.10.1.119"
+                "ablecube": "10.10.3.3",
+                "scvmMngt": "10.10.3.13",
+                "ablecubePn": "100.100.3.3",
+                "scvm": "100.100.3.13",
+                "scvmCn": "200.200.3.13"
             },
             {
                 "index": "4",
                 "hostname": "ablecube4",
-                "ablecube": "10.10.1.14",
-                "scvmMngt": "10.10.1.18",
-                "ablecubePn": "10.10.1.112",
-                "scvm": "10.10.1.116",
-                "scvmCn": "10.10.1.120"
+                "ablecube": "10.10.254.182",
+                "scvmMngt": "10.10.3.14",
+                "ablecubePn": "100.100.3.4",
+                "scvm": "100.100.3.14",
+                "scvmCn": "200.200.3.14"
             }
         ]
     }

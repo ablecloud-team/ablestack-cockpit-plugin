@@ -62,7 +62,7 @@ def hostPingTest(args):
 
         # ex : ssh root@host echo 명령을 수행시 인증이 되어있으면 바로 응답이 오는데 인증이 되어있지 않으면 정상응답이 오지 않음
         # 핑거프린트 해결을 위해 ssh-scan.py 호출
-        python3(pluginpath+'/python/host/ssh-scan.py')
+        #python3(pluginpath+'/python/host/ssh-scan.py')
 
         if ret_text == "":
             return createReturn(code=200, val="host ping test success")

@@ -539,11 +539,11 @@ function checkHostName(option) {
                                     // 호스트명을 세팅
                                     $("#form-input-storage-vm-hostname").val("scvm"+host_index);
                                     // 관리 NIC IP 및 CIDR 기본 입력
-                                    $("#form-input-storage-vm-mgmt-ip").val($(this).find('td').eq(3).text().trim()+"/16");
+                                    $("#form-input-storage-vm-mgmt-ip").val($(this).find('td').eq(3).text().trim()+"/");
                                     // 스토리지 서버 NIC IP
-                                    $("#form-input-storage-vm-public-ip").val($(this).find('td').eq(5).text().trim()+"/16");
+                                    $("#form-input-storage-vm-public-ip").val($(this).find('td').eq(5).text().trim()+"/24");
                                     // 스토리지 복제 NIC IP
-                                    $("#form-input-storage-vm-cluster-ip").val($(this).find('td').eq(6).text().trim()+"/16");
+                                    $("#form-input-storage-vm-cluster-ip").val($(this).find('td').eq(6).text().trim()+"/24");
                         
                                     return false;
                                 }
@@ -559,7 +559,7 @@ function checkHostName(option) {
 
                             // 값 세팅
                             if(confJson.clusterConfig.ccvm.ip != "" && confJson.clusterConfig.ccvm.ip != null){
-                                $("#form-input-cloud-vm-mngt-nic-ip").val(confJson.clusterConfig.ccvm.ip+"/16");
+                                $("#form-input-cloud-vm-mngt-nic-ip").val(confJson.clusterConfig.ccvm.ip+"/");
                             }
 
                             if(confJson.clusterConfig.pcsCluster.hostname1 != "" && confJson.clusterConfig.pcsCluster.hostname1 != null){

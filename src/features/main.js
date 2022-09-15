@@ -11,6 +11,7 @@ this.ccvm_instance = new CloudCenterVirtualMachine();
 ccvm_instance = this.ccvm_instance;
 $(document).ccvm_instance = ccvm_instance;
 pluginpath = '/usr/share/cockpit/ablestack';
+let pcs_exe_host = "";
 
 $(document).ready(function(){
     $('#dropdown-menu-storage-cluster-status').hide();
@@ -59,13 +60,29 @@ $(document).ready(function(){
     $('#div-modal-storage-cluster-maintenance-update').load("./src/features/storage-cluster-maintenance-update.html");
     $('#div-modal-storage-cluster-maintenance-update').hide();
 
-    // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
-    Promise.all([pcsExeHost(), checkConfigStatus(), checkStorageClusterStatus(),
-        checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
-            scanHostKey();
-            checkDeployStatus();
+    cockpit.spawn(['python3', pluginpath + '/python/pcs/pcsExehost.py'])
+    .then(function (data) {
+        let retVal = JSON.parse(data);
+        pcs_exe_host = retVal.val;
+        ribbonWorker();
+        //30초마다 화면 정보 갱신
+        setInterval(() => {
+            createLoggerInfo("Start collecting ablestack status information : setInterval()");
+            // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
+            ribbonWorker();
+        }, 10000);
+    })
+    .catch(function (err) {
+        ribbonWorker();
+        //30초마다 화면 정보 갱신
+        setInterval(() => {
+            createLoggerInfo("Start collecting ablestack status information : setInterval()");
+            // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
+            ribbonWorker();
+        }, 10000);
+        createLoggerInfo("pcsExeHost err");
+        console.log("pcsExeHost err : " + err);
     });
-
 });
 // document.ready 영역 끝
 
@@ -906,7 +923,7 @@ function saveHostInfo(){
     cockpit.spawn(['python3', pluginpath + '/python/pcs/pcsExehost.py'])
     .then(function (data) {
         let retVal = JSON.parse(data);
-        alert(retVal.val)
+        pcs_exe_host = retVal.val;
     })
     .catch(function (err) {
         createLoggerInfo("pcsExeHost err");
@@ -945,20 +962,16 @@ function saveHostInfo(){
         createLoggerInfo("resetBootstrap ccvm err");
         console.log("resetBootstrap ccvm err : " + err);
     });
-} 
+}
 
-//30초마다 화면 정보 갱신
-setInterval(() => {
-    createLoggerInfo("Start collecting ablestack status information : setInterval()");
+function ribbonWorker() {
     // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
     Promise.all([pcsExeHost(), checkConfigStatus(), checkStorageClusterStatus(),
         checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
             scanHostKey();
             checkDeployStatus();
     });
-}, 30000);
-
-
+}
 
 /**
  * Meathod Name : readFile

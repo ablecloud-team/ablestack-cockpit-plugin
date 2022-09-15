@@ -87,7 +87,7 @@ def jsonUpdate():
             ret = createReturn(code=200, val=ret_val)
 
     except Exception as e:
-        ret = createReturn(code=600, val='ERROR')
+        ret = createReturn(code=500, val='ERROR')
         print ('EXCEPTION : ',e)
 
     return ret
@@ -98,12 +98,13 @@ def jsonAllUpdate():
         json_data["bootstrap"]["scvm"] = "true"
         json_data["bootstrap"]["ccvm"] = "true"
         json_data["monitoring"]["wall"] = "true"
+
         with open(file_path, 'w') as outfile:
             json.dump(json_data, outfile, indent=4)
-        ret = createReturn(code=200, val="ablestack.json all option change true")
+            ret = createReturn(code=200, val="ablestack.json all option change true")
 
     except Exception as e:
-        ret = createReturn(code=600, val='ablestack.json all option change ERROR')
+        ret = createReturn(code=500, val='ablestack.json all option change ERROR')
         print ('EXCEPTION : ',e)
 
     return ret

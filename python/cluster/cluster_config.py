@@ -171,7 +171,7 @@ def insertScvmHost(args):
 # cluster 구성 준비 메뉴에서 추가 호스트인 경우에 실행됨
 # 모든 호스트, ccvm, scvm (클러스터 구성 준비 호스트에서는 제외 : 클러스터 구성 준비 단계에서는 해당 호스트에 scvm이 없는 상태이기 때문에 작업할 수 없음)
 def insertAllHost(args):
-    return_val = "The ping test failed. Check ablecube hosts and ccvm and scvms network IPs."
+    return_val = "The ping test failed. Check ablecube hosts and ccvm and scvms network IPs. Please check the config.json file."
 
     try:
         if args.json_string is not None:
@@ -187,19 +187,19 @@ def insertAllHost(args):
                 if args.exclude_hostname != p_val1["hostname"]:
                     ping_check_list.append(p_val1["scvmMngt"])
 
-            ping_check_list.append(args.ccvm_mngt_ip)            
-
-            ping_result = json.loads(python3(pluginpath+'/python/vm/host_ping_test.py', '-hns',ping_check_list).stdout.decode())
+            ping_check_list.append(args.ccvm_mngt_ip)
+            ping_result = json.loads(python3(pluginpath+'/python/vm/host_ping_test.py', '-hns', ping_check_list).stdout.decode())
 
             if ping_result["code"] == 200:
                 # 명령 수행이 가능한 상태인지 체크하는 부분
-                return_val = "Command execution test failed. Check the ablecube hosts and ccvm and scvms status."
+                return_val = "Command execution test failed. Check the ablecube hosts and ccvm and scvms status. Please check the config.json file or ip"
 
                 for p_val2 in param_json:
                     ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', p_val2["ablecube"], "echo ok").stdout.strip().decode()
                     if ret != "ok":
                         return createReturn(code=500, val=return_val + " : " + p_val2["ablecube"])
 
+                    # 호스트 추가시 클러스터 구성단계에서는 scvm이 배포되기 전이므로 해당 scvm에 echo 테스트 명령을 수행할 수 없음
                     if args.exclude_hostname != p_val2["hostname"]:
                         ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', p_val2["scvmMngt"], "echo ok").stdout.strip().decode()
                         if ret != "ok":
@@ -210,7 +210,7 @@ def insertAllHost(args):
                     return createReturn(code=500, val=return_val + " : " + args.ccvm_mngt_ip)
                 
                 # 원격 ablecube 호스트 및 scvm의 hosts 정보를 수정하는 명령 수행
-                return_val = "insertAllHost Failed to modify cluster_config.py and hosts file"
+                return_val = "insertAllHost Failed to modify cluster_config.py and hosts file."
                 for p_val3 in param_json:
                     if p_val3["hostname"] == 'ablecube4': #개발 완료후 제거
                         cmd_str = "python3 /usr/share/cockpit/ablestack/python/cluster/cluster_config.py insert"

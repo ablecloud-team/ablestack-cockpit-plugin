@@ -76,7 +76,7 @@ def selectPcsExeHost(args):
         return createReturn(code=200, val=hostname)
     except Exception as e:
         # 결과값 리턴
-        return createReturn(code=500, val="Please check the \"cluster.json\" file.")
+        return createReturn(code=500, val="Please check the \"cluster.json\" file. : " + e)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

@@ -226,16 +226,8 @@ class CloudCenterVirtualMachine {
                 // }
                 ccvm_instance.runningHost = obj.val.started;
                 ccvm_instance.clusterdHost = obj.val.clustered_host;
-                ccvm_instance.cmdExeHost = "";
-                for (var i = 0; i <= obj.val.nodes.length; i++) {
-                    if (obj.val.nodes[i].online == "true") {
-                        ccvm_instance.cmdExeHost = obj.val.nodes[i].host;
-                        break;
-                    }
-                }
-
                 var remotePcsStatus = ['/usr/bin/ssh', '-o', 'StrictHostKeyChecking=no', ccvm_instance.runningHost, '/usr/bin/python3', pluginpath +'/python/host/virshlist.py'];
-                cockpit.spawn(remotePcsStatus)
+                cockpit.spawn(remotePcsStatus, { host: pcs_exe_host})
                     .then(ccvm_instance.checkVIRSHOK)
                     .catch(ccvm_instance.checkVIRSHERR)
             } else if(obj.code == 500) {
@@ -277,7 +269,7 @@ class CloudCenterVirtualMachine {
         let status_span = $("#description-cloud-vm-status");
         let a = ccvm_instance.createDescriptionListText("span-cloud-vm-status", 'orange', "상태 체크 중 &bull;&bull;&bull;&nbsp;&nbsp;&nbsp;<svg class='pf-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
         status_span[0].children[0].replaceWith(a); 
-        cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/pcs/main.py', 'status', '--resource', 'cloudcenter_res'], { host: ccvm_instance.cmdExeHost})
+        cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/pcs/main.py', 'status', '--resource', 'cloudcenter_res'], { host: pcs_exe_host})
             .then(ccvm_instance.checkPCSOK)
             .catch(ccvm_instance.checkPCSERR)
 
