@@ -95,12 +95,12 @@ $('#button-execution-modal-cloud-vm-cleanup').on('click', function(){
     cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsCleanup'], { host: pcs_exe_host})
     .then(function(data){
         var retVal = JSON.parse(data);
+        $('#div-modal-spinner').hide();
         createLoggerInfo("cloud cluster cleanup spawn success");
     }).catch(function(data){
         createLoggerInfo("cloud cluster cleanup spawn error");
         console.log('cloud-cluster-cleanup spawn error');
     });
-    $('#div-modal-spinner').hide();
 });
 
 $('#button-cancel-modal-cloud-vm-cleanup').on('click', function(){
@@ -148,34 +148,111 @@ $('#button-cloud-cluster-migration').on('click', function(){
 /** cloud vm migration modal 관련 action end */
 
 
-/** cloud vm cleanup modal 관련 action start */
-$('#button-cloud-cluster-cleanup').on('click', function(){
-    $('#div-modal-cleanup-cloud-vm').show();
-});
-$('#button-close-modal-cloud-vm-cleanup').on('click', function(){
-    $('#div-modal-cleanup-cloud-vm').hide();
+/** wall config update modal 관련 action start */
+function wall_config_update_modal(){
+    $('#div-modal-monitoring-config-update').show();
+}
+
+$('#button-close-modal-monitoring-config-update').on('click', function(){
+    $('#div-modal-monitoring-config-update').hide();
 });
 
-$('#button-execution-modal-cloud-vm-cleanup').on('click', function(){
-    $('#dropdown-menu-cloud-cluster-status').toggle();
-    $('#div-modal-cleanup-cloud-vm').hide();
-    $('#div-modal-spinner-header-txt').text('클라우드센터 클러스터를 클린업하고 있습니다.');
+$('#button-execution-modal-monitoring-config-update').on('click', function(){
+    var console_log = true;
+    $('#div-modal-monitoring-config-update').hide();
+    $('#div-modal-spinner-header-txt').text('모니터링센터 수집 정보를 업데이트하고 있습니다.');
     $('#div-modal-spinner').show();
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsCleanup'], { host: pcs_exe_host})
-    .then(function(data){
-        var retVal = JSON.parse(data);
-        createLoggerInfo("cloud cluster cleanup spawn success");
-    }).catch(function(data){
-        createLoggerInfo("cloud cluster cleanup spawn error");
-        console.log('cloud-cluster-cleanup spawn error');
+
+    $("#modal-status-alert-title").html("모니터링 수집 정보를 업데이트");
+    $("#modal-status-alert-body").html("모니터링센터 수집 정보 업데이트를 실패하였습니다.<br/>클라우드센터 가상머신 상태를 확인해주세요.");
+    createLoggerInfo("update_wall_config() start");
+
+    cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "ping", "--target",  "ccvm"])
+    .then(function(data){var retVal = JSON.parse(data);
+        if(retVal.code == 200){
+            $("#modal-status-alert-title").html("모니터링 수집 정보를 업데이트");
+            $("#modal-status-alert-body").html("모니터링센터 수집 정보 업데이트를 실패하였습니다.<br/>cluster.json 파일을 확인해주세요.");
+            // cluster.json 파일 읽어 오기
+            cockpit.spawn(["cat", "/usr/share/cockpit/ablestack/tools/properties/cluster.json"])
+            .then(function(data){
+                const pythonPath = '/usr/share/ablestack/ablestack-wall/python/';
+                var config_json = JSON.parse(data);
+                ccvm_ip = config_json.clusterConfig.ccvm.ip;
+
+                // ccvm의 /usr/share/ablestack/ablestack-wall/python/config_wall.py을 실행시키기 위한 명령어 생성
+                var prometheus_config_cmd = ['python3', pythonPath + 'config_wall.py', 'update','--ccvm', ccvm_ip];
+                prometheus_config_cmd.push('--cube');
+                for(var i = 0 ; i < config_json.clusterConfig.hosts.length ; i ++ ){
+                    prometheus_config_cmd.push(config_json.clusterConfig.hosts[i].ablecube);
+                }
+
+                prometheus_config_cmd.push('--scvm');
+                for(var i = 0 ; i < config_json.clusterConfig.hosts.length ; i ++ ){
+                    prometheus_config_cmd.push(config_json.clusterConfig.hosts[i].scvmMngt);
+                }
+
+                if (console_log) { console.log(prometheus_config_cmd); }
+                cockpit.spawn(prometheus_config_cmd, { host: ccvm_ip })
+                .then(function(data){
+                    var config_update_data = JSON.parse(data);
+                    if (console_log) { console.log(config_update_data); }
+                    if(config_update_data.code=="200") { //정상
+                        $('#div-modal-spinner').hide();
+                        $("#modal-status-alert-body").html("모니터링센터 수집 정보 업데이트를 성공하였습니다");
+                        $('#div-modal-status-alert').show();
+                        createLoggerInfo("update prometheus.yml config spawn success");
+                    } else {
+                        $('#div-modal-spinner').hide();
+                        $("#modal-status-alert-body").html("모니터링센터 수집 정보 업데이트를 실패하였습니다.<br/>prometheus.yml 설정을 실패하였습니다.");
+                        $('#div-modal-status-alert').show();
+                        createLoggerInfo(config_update_data.val);
+                    }
+                })
+                .catch(function(data){
+                    $('#div-modal-spinner').hide();
+                    $('#div-modal-status-alert').show();
+                    createLoggerInfo(":::update_wall_config() Error prometheus_config_cmd ::: error");
+                    console.log(":::update_wall_config() Error prometheus_config_cmd :::" + data);
+                });
+            })
+            .catch(function(data){
+                $('#div-modal-spinner').hide();
+                $('#div-modal-status-alert').show();
+                createLoggerInfo(":::update_wall_config() Error ::: error");
+                console.log(":::update_wall_config() Error :::" + data);
+            });            
+        }else{
+            $('#div-modal-spinner').hide();
+            $('#div-modal-status-alert').show();
+            createLoggerInfo(":::update_wall_config() Error ::: error");
+            console.log(":::update_wall_config() Error :::" + data);
+        }
+    })
+    .catch(function(data){
+        $('#div-modal-spinner').hide();
+        $('#div-modal-status-alert').show();
+        createLoggerInfo(":::update_wall_config() Error ::: error");
+        console.log(":::update_wall_config() Error :::" + data);
     });
-    $('#div-modal-spinner').hide();
+
+
+
+
+
+
+
+
+
+
+
 });
 
-$('#button-cancel-modal-cloud-vm-cleanup').on('click', function(){
-    $('#div-modal-cleanup-cloud-vm').hide();
+$('#button-cancel-modal-monitoring-config-update').on('click', function(){
+    $('#div-modal-monitoring-config-update').hide();
 });
-/** cloud vm cleanup modal 관련 action end */
+/** wall config update modal 관련 action end */
+
+
 
 
 /** cloud vm snap rollback modal 관련 action start */
@@ -558,7 +635,7 @@ function CardCloudClusterStatus(){
                         console.log('wall true in')
                         $('#ccvm-before-monitoring-run').html('');
                         $('#ccvm-after-monitoring-run').html('<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-linkto-wall" onclick="wall_link_go()">모니터링센터 대시보드 연결</a>');
-                        $('#ccvm-monitoring-config-update').html('<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-update-wall-config" onclick="update_wall_config()">모니터링센터 수집 정보 업데이트</a>');
+                        $('#ccvm-monitoring-config-update').html('<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-update-wall-config" onclick="wall_config_update_modal()">모니터링센터 수집 정보 업데이트</a>');
                     }
                 }).catch(function(data){
                     createLoggerInfo("ClusterStatusInfo spawn error(ablestackJson.py error");
@@ -780,91 +857,5 @@ function wall_link_go(){
         })
         .catch(function(data){
             //console.log(":::Error:::");
-        });
-}
-
-/**
- * Meathod Name : update_wall_config
- * Date Created : 2022.09.16
- * Writer  : 배태주
- * Description : 모니터링 수집 정보를 업데이트 하는 기능 (prometheus.yml 팡일)
- * Parameter : 없음
- * Return  : 없음
- * History  : 2022.09.16 최초 작성
- */
- function update_wall_config(){
-    var console_log = true;
-    $("#modal-status-alert-title").html("모니터링 수집 정보를 업데이트");
-    $("#modal-status-alert-body").html("모니터링센터 수집 정보 업데이트를 실패하였습니다.<br/>Cluster.json 파일을 확인해주세요.");
-    createLoggerInfo("update_wall_config() start");
-    
-    // cluster.json 파일 읽어 오기
-    cockpit.spawn(["cat", "/usr/share/cockpit/ablestack/tools/properties/cluster.json"])
-    .then(function(data){
-        const pythonPath = '/usr/share/ablestack/ablestack-wall/python/';
-        var config_json = JSON.parse(data);
-        ccvm_ip = config_json.clusterConfig.ccvm.ip;
-
-        var prometheus_config_cmd = ['python3', pythonPath + 'config_wall.py', 'config','--ccvm', ccvm_ip];
-        prometheus_config_cmd.push('--cube');
-        for(var i = 0 ; i < config_json.clusterConfig.hosts.length ; i ++ ){
-            prometheus_config_cmd.push(config_json.clusterConfig.hosts[i].ablecube);
-        }
-
-        prometheus_config_cmd.push('--scvm');
-        for(var i = 0 ; i < config_json.clusterConfig.hosts.length ; i ++ ){
-            prometheus_config_cmd.push(config_json.clusterConfig.hosts[i].scvmMngt);
-        }
-
-        if (console_log) { console.log(prometheus_config_cmd); }
-
-        // cockpit.spawn(prometheus_config_cmd, { host: ccvm_ip })
-
-        // console.log(config_json);
-
-        // config_wall.py 실행시키기 (config_wall.py 파일은 ccvm 내부에 존재)
-    })
-    .catch(function(data){
-        createLoggerInfo(":::update_wall_config() Error ::: error");
-        $('#div-modal-status-alert').show();
-        console.log(":::update_wall_config() Error :::" + data);
-    });
-
-    return 0;
-
-    //scvm ping 체크
-    cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "ping", "--target",  "ccvm"])
-        .then(function(data){
-            var retVal = JSON.parse(data);
-            if(retVal.code == 200){
-                //scvm 의 cloudinit 실행이 완료되었는지 확인하기 위한 명렁
-                cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "status", "--target",  "ccvm"])
-                    .then(function(data){
-                        var retVal = JSON.parse(data);
-                        console.log('cloudinit-status : '+retVal.val);
-                        //cloudinit status: done 일때
-                        if(retVal.code == 200 && retVal.val == "status: done"){
-                            $('#modal-title-scvm-status').text("클라우드 센터 가상머신 Bootstrap 실행");
-                            $('#modal-description-scvm-status').html("<p>클라우드 센터 가상머신의 Bootstrap.sh 파일을 실행 하시겠습니까??</p>");
-                            $('#button-storage-vm-status-update').html("실행");
-                            $('#scvm-status-update-cmd').val("bootstrap_ccvm");
-                            $('#div-modal-storage-vm-status-update').show();
-                        }else{
-                            $('#div-modal-status-alert').show();
-                        }
-                    })
-                    .catch(function(data){
-                        createLoggerInfo(":::ccvm_bootstrap_run() Error ::: error");
-                        $('#div-modal-status-alert').show();
-                        console.log(":::ccvm_bootstrap_run() Error :::" + data);
-                    });
-            }else{
-                $('#div-modal-status-alert').show();
-            }
-        })
-        .catch(function(data){
-            createLoggerInfo(":::scvm_bootstrap_run() Error ::: error");
-            $('#div-modal-status-alert').show();
-            console.log(":::scvm_bootstrap_run() Error :::" + data);
         });
 }
