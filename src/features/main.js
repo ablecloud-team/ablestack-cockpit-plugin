@@ -26,6 +26,7 @@ $(document).ready(function(){
     $('#button-link-cloud-center').hide();
     $('#button-open-modal-wizard-monitoring-center').hide();
     $('#button-link-monitoring-center').hide();
+    $('#button-config-file-download').hide();
 
     $('#div-modal-wizard-storage-vm').load("./src/features/storage-vm-wizard.html");
     $('#div-modal-wizard-storage-vm').hide();
@@ -70,7 +71,7 @@ $(document).ready(function(){
             createLoggerInfo("Start collecting ablestack status information : setInterval()");
             // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
             ribbonWorker();
-        }, 10000);
+        }, 30000);
     })
     .catch(function (err) {
         ribbonWorker();
@@ -79,7 +80,7 @@ $(document).ready(function(){
             createLoggerInfo("Start collecting ablestack status information : setInterval()");
             // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
             ribbonWorker();
-        }, 10000);
+        }, 30000);
         createLoggerInfo("pcsExeHost err");
         console.log("pcsExeHost err : " + err);
     });
@@ -162,8 +163,8 @@ $('#button-link-storage-center-dashboard').on('click', function(){
             // 스토리지센터 연결
             window.open(retVal.val);
         }else{
-            $("#modal-status-alert-title").html("스토리지센터 연결")
-            $("#modal-status-alert-body").html(retVal.val)
+            $("#modal-status-alert-title").html("스토리지센터 연결");
+            $("#modal-status-alert-body").html(retVal.val);
             $('#div-modal-status-alert').show();
         }
     })
@@ -182,8 +183,8 @@ $('#button-link-cloud-center').on('click', function(){
             if(retVal.code == 200){
                 window.open(retVal.val);
             }else{
-                $("#modal-status-alert-title").html("클라우드센터 연결")
-                $("#modal-status-alert-body").html(retVal.val)
+                $("#modal-status-alert-title").html("클라우드센터 연결");
+                $("#modal-status-alert-body").html(retVal.val);
                 $('#div-modal-status-alert').show();
             }
         })
@@ -318,8 +319,8 @@ $('#span-modal-wizard-cluster-config-finish-db-dump-file-download').on('click', 
  * History  : 2021.04.10 최초 작성
  */
 function scvm_bootstrap_run(){
-    $("#modal-status-alert-title").html("스토리지 센터 가상머신 상태 체크")
-    $("#modal-status-alert-body").html("스토리지 센터 가상머신에 cloudinit 실행이 완료되지 않아<br>Bootstrap을 실행할 수 없습니다.<br><br>잠시 후 다시 실행해 주세요.")
+    $("#modal-status-alert-title").html("스토리지 센터 가상머신 상태 체크");
+    $("#modal-status-alert-body").html("스토리지 센터 가상머신에 cloudinit 실행이 완료되지 않아<br>Bootstrap을 실행할 수 없습니다.<br><br>잠시 후 다시 실행해 주세요.");
     createLoggerInfo("scvm_bootstrap_run() start");
     //scvm ping 체크
     cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "ping", "--target",  "scvm"])
@@ -745,6 +746,7 @@ function checkDeployStatus(){
     $('#button-link-cloud-center').hide();
     $('#button-open-modal-wizard-monitoring-center').hide();
     $('#button-link-monitoring-center').hide();
+    $('#button-config-file-download').hide();
     /*
        가상머신 배포 및 클러스터 구성 상태를 세션 스토리지에서 조회 
        - 클러스터 구성준비 상태 = false, true
@@ -772,6 +774,7 @@ function checkDeployStatus(){
         $('#button-open-modal-wizard-storage-cluster').show();
         showRibbon('warning','스토리지센터 및 클라우드센터 VM이 배포되지 않았습니다. 클러스터 구성준비를 진행하십시오.');
     }else{
+        $('#button-config-file-download').show();
         if(step2=="HEALTH_ERR"||step2==null){
             // 클러스터 구성준비 버튼, 스토리지센터 VM 배포 버튼 show
             $('#button-open-modal-wizard-storage-cluster').show();
@@ -961,6 +964,16 @@ function saveHostInfo(){
     .catch(function(err){
         createLoggerInfo("resetBootstrap ccvm err");
         console.log("resetBootstrap ccvm err : " + err);
+    });
+    //wall monitoring 프로퍼티 초기화
+    cockpit.spawn(["python3", pluginpath+"/python/ablestack_json/ablestackJson.py", "update", "--depth1", "monitoring", "--depth2", "wall", "--value", "false"])
+    .then(function(data){        
+        createLoggerInfo("resetBootstrap wall ok");
+        console.log("resetBootstrap wall ok");
+    })
+    .catch(function(err){
+        createLoggerInfo("resetBootstrap wall err");
+        console.log("resetBootstrap wall err : " + err);
     });
 }
 
