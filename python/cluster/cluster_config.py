@@ -151,14 +151,14 @@ def insertScvmHost(args):
                 # 원격 ablecube 호스트 및 scvm의 hosts 정보를 수정하는 명령 수행
                 return_val = "insertScvmHost Failed to modify cluster_config.py and hosts file."
                 for p_val3 in param_json:
-                    if p_val3["hostname"] == 'ablecube4': #개발 완료후 제거
-                        cmd_str = "python3 /usr/share/cockpit/ablestack/python/cluster/cluster_config.py insert"
-                        cmd_str += " -js '" + args.json_string + "'"
-                        cmd_str += " -co withScvm"
+                # if p_val3["hostname"] == 'ablecube4': #개발 완료후 제거
+                    cmd_str = "python3 /usr/share/cockpit/ablestack/python/cluster/cluster_config.py insert"
+                    cmd_str += " -js '" + args.json_string + "'"
+                    cmd_str += " -co withScvm"
 
-                        ret = ssh('-o', 'StrictHostKeyChecking=no', p_val3["ablecube"], cmd_str, " -cmi "+args.ccvm_mngt_ip, " -pcl "+args.pcs_cluster_list[0] +" "+ args.pcs_cluster_list[1] +" "+ args.pcs_cluster_list[2]).stdout.decode()
-                        if json.loads(ret)["code"] != 200:
-                            return createReturn(code=500, val=return_val + " : " + p_val3["ablecube"])
+                    ret = ssh('-o', 'StrictHostKeyChecking=no', p_val3["ablecube"], cmd_str, " -cmi "+args.ccvm_mngt_ip, " -pcl "+args.pcs_cluster_list[0] +" "+ args.pcs_cluster_list[1] +" "+ args.pcs_cluster_list[2]).stdout.decode()
+                    if json.loads(ret)["code"] != 200:
+                        return createReturn(code=500, val=return_val + " : " + p_val3["ablecube"])
 
                 #모든 작업이 수행 완료되면 성공결과 return
                 return createReturn(code=200, val="Cluster Config insertScvmHost Success")
@@ -212,18 +212,18 @@ def insertAllHost(args):
                 # 원격 ablecube 호스트 및 scvm의 hosts 정보를 수정하는 명령 수행
                 return_val = "insertAllHost Failed to modify cluster_config.py and hosts file."
                 for p_val3 in param_json:
-                    if p_val3["hostname"] == 'ablecube4': #개발 완료후 제거
-                        cmd_str = "python3 /usr/share/cockpit/ablestack/python/cluster/cluster_config.py insert"
-                        cmd_str += " -js '" + args.json_string + "'"
-                        
-                        if args.exclude_hostname != p_val3["hostname"]:
-                            cmd_str += " -co withScvm"
-                        else:
-                            cmd_str += " -co withCcvm"
+                # if p_val3["hostname"] == 'ablecube4': #개발 완료후 제거
+                    cmd_str = "python3 /usr/share/cockpit/ablestack/python/cluster/cluster_config.py insert"
+                    cmd_str += " -js '" + args.json_string + "'"
+                    
+                    if args.exclude_hostname != p_val3["hostname"]:
+                        cmd_str += " -co withScvm"
+                    else:
+                        cmd_str += " -co withCcvm"
 
-                        ret = ssh('-o', 'StrictHostKeyChecking=no', p_val3["ablecube"], cmd_str, " -cmi "+args.ccvm_mngt_ip, " -pcl "+args.pcs_cluster_list[0] +" "+ args.pcs_cluster_list[1] +" "+ args.pcs_cluster_list[2]).stdout.decode()
-                        if json.loads(ret)["code"] != 200:
-                            return createReturn(code=500, val=return_val + " : " + p_val3["ablecube"])
+                    ret = ssh('-o', 'StrictHostKeyChecking=no', p_val3["ablecube"], cmd_str, " -cmi "+args.ccvm_mngt_ip, " -pcl "+args.pcs_cluster_list[0] +" "+ args.pcs_cluster_list[1] +" "+ args.pcs_cluster_list[2]).stdout.decode()
+                    if json.loads(ret)["code"] != 200:
+                        return createReturn(code=500, val=return_val + " : " + p_val3["ablecube"])
 
                 #모든 작업이 수행 완료되면 성공결과 return
                 return createReturn(code=200, val="Cluster Config insertAllHost Success")
