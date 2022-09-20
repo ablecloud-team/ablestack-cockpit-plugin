@@ -15,8 +15,7 @@ import pprint
 import json
 import socket
 import subprocess
-from subprocess import check_output
-from subprocess import call
+
 
 from ablestack import *
 from sh import ssh
@@ -79,10 +78,21 @@ for vm in vms:
                     items = line.split()
                     vm['nictype'] = items[1]
                     vm['nicbridge'] = items[2]
-        ret = ssh('-o', 'StrictHostKeyChecking=no', 'ccvm-mngt', '/usr/sbin/route', '-n', '|', 'grep', '-P', '"^0.0.0.0|UG"').stdout.decode().splitlines()
-        for line in ret[:]:
-            items = line.split()
-            vm['GW'] = items[1]
+        try:
+            ret = ssh('-o', 'StrictHostKeyChecking=no', 'ccvm-mngt', '/usr/sbin/route', '-n', '|', 'grep', '-P', '"^0.0.0.0|UG"').stdout.decode().splitlines()
+            for line in ret[:]:
+                items = line.split()
+                vm['GW'] = items[1]
+        except Exception as e:
+            pass
+        # DNS 정보 확인
+        try:
+            ret = ssh('-o','StrictHostKeyChecking=no', 'ccvm-mngt', '/usr/bin/cat', '-n', '/etc/resolv.conf', '|', 'awk', '"$1 == 2 {print $3}"').stdout.decode().splitlines()
+            for line in ret[:]:
+                items = line.split()
+                vm['DNS'] = items[0]
+        except Exception as e:
+            pass
 
         try :
             vm['MOLD_SERVICE_STATUE'] = ssh('-o', 'StrictHostKeyChecking=no', 'ccvm-mngt', 'systemctl is-active cloudstack-management.service').stdout.decode().splitlines()
