@@ -641,6 +641,9 @@ function checkStorageVmStatus(){
                 if(retVal.val.manageNicGw !="N/A"){
                     $('#scvm-manage-nic-gw').text("GW : " + retVal.val.manageNicGw);
                 }
+                if(retVal.val.manageNicDns != "N/A"){
+                    $('#scvm-manage-nic-dns').text("DNS : " + retVal.val.manageNicDns);
+                }
                 if(retVal.val.storageServerNicType !="N/A"){
                     $('#scvm-storage-server-nic-type').text("서버용 NIC Type : " + retVal.val.storageServerNicType);
                     if( retVal.val.storageServerNicParent !="N/A"){

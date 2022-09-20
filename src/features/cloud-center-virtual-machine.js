@@ -131,6 +131,9 @@ class CloudCenterVirtualMachine {
                     $("#div-cloud-vm-nic-gw-text").text(
                         "GW : " + vm['GW']
                     );
+                    $("#div-cloud-vm-nic-dns-text").text(
+                        "DNS : " + vm['DNS']
+                    );
                     $("#div-cloud-vm-nic-prefix-text").text(
                         "PREFIX : " + vm['prefix']
                     );

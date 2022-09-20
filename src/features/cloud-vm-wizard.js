@@ -868,6 +868,11 @@ function deployCloudCenterVM() {
                             // host 파일 /usr/share/cockpit/ablestack/tools/vmconfig/ccvm/cloudinit 경로에 hosts, ssh key 파일 저장
                             setProgressStep("span-ccvm-progress-step2",2);
                             setProgressStep("span-ccvm-progress-step3",1);
+                            var host_name = $('#form-input-cloud-vm-hostname').val();
+                            var mgmt_ip = $('#form-input-cloud-vm-mngt-nic-ip').val().split("/")[0];
+                            var mgmt_prefix = $('#form-input-cloud-vm-mngt-nic-ip').val().split("/")[1];
+                            var mngt_gw = $('#form-input-cloud-vm-mngt-gw').val();
+                            var dns = $('#form-input-cloud-vm-dns').val();
                             
                             create_ccvm_cloudinit_cmd = ['python3', pluginpath + '/python/vm/create_ccvm_cloudinit.py'
                                                     ,"-f1",pluginpath+"/tools/vmconfig/ccvm/hosts","-t1", $("#div-textarea-cluster-config-confirm-hosts-file-ccvm").val() // hosts 파일
@@ -878,15 +883,22 @@ function deployCloudCenterVM() {
                                                     ,'--mgmt-nic','enp0s20'
                                                     ,'--mgmt-ip',mgmt_ip
                                                     ,'--mgmt-prefix',mgmt_prefix
-                                                    ,'--mgmt-gw',mngt_gw
                                                 ];
-                            
+                            //GATEWAY가 공백이 아닐 시 삽입
+                            if(mngt_gw != ""){
+                                create_ccvm_cloudinit_cmd.push('--mgmt-gw',mngt_gw);
+                            }
+                            // DNS가 공백이 아닐 시 삽입
+                            if(dns != ""){
+                                create_ccvm_cloudinit_cmd.push('--dns',dns);
+                            }
                             var svc_bool = $('input[type=checkbox][id="form-checkbox-svc-network"]').is(":checked");
                             if(svc_bool){
                                 var sn_ip = $('#form-input-cloud-vm-svc-nic-ip').val().split("/")[0];
                                 var sn_prefix = $('#form-input-cloud-vm-svc-nic-ip').val().split("/")[1];
                                 var sn_gw = $('#form-input-cloud-vm-svc-gw').val();
-                                create_ccvm_cloudinit_cmd.push('--sn-nic','enp0s21','--sn-ip',sn_ip,'--sn-prefix',sn_prefix,'--sn-gw',sn_gw)
+                                var sn_dns = $('#form-input-cloud-vm-svc-dns').val();
+                                create_ccvm_cloudinit_cmd.push('--sn-nic','enp0s21','--sn-ip',sn_ip,'--sn-prefix',sn_prefix,'--sn-gw',sn_gw,'--sn-dns',sn_dns);
                             }
                             if(console_log){console.log(create_ccvm_cloudinit_cmd);}
                             cockpit.spawn(create_ccvm_cloudinit_cmd)
@@ -1125,12 +1137,14 @@ function resetCcvmNetworkInfo(){
     $("#form-input-cloud-vm-mngt-nic-ip").val("");
     $("#form-input-cloud-vm-mngt-vlan").val("");
     $("#form-input-cloud-vm-mngt-gw").val("");
+    $("#form-input-cloud-vm-dns").val("");
     $("#form-input-cloud-vm-svc-nic-ip").val("");
     $("#form-input-cloud-vm-svc-vlan").val("");
     $("#form-input-cloud-vm-svc-gw").val("");
     $("#form-input-cloud-vm-failover-cluster-host1-name").val("");
     $("#form-input-cloud-vm-failover-cluster-host2-name").val("");
     $("#form-input-cloud-vm-failover-cluster-host3-name").val("");
+    $("#form-input-cloud-vm-svc-dns").val("");
 }
 
 /**
@@ -1308,6 +1322,13 @@ function setCcvmReviewInfo(){
     } else {
         $('#span-cloud-vm-additional-mgmt-gateway').text(ccvm_mngt_gateway);
     }
+    //DNS
+    var ccvm_dns = $('#form-input-cloud-vm-dns').val();
+    if(ccvm_dns == '') {
+        $('#span-cloud-vm-additional-dns').text("미입력");
+    } else {
+        $('#span-cloud-vm-additional-dns').text(ccvm_dns);
+    }
 
     if(svc_bool){
         //서비스 NIC IP
@@ -1333,10 +1354,19 @@ function setCcvmReviewInfo(){
         } else {
             $('#span-cloud-vm-additional-svc-gateway').text(ccvm_svc_gateway);
         }
+        
+        //서비스 DNS
+        var ccvm_svc_dns = $('#form-input-cloud-vm-svc-dns').val();
+        if(ccvm_svc_dns == ''){
+            $('#span-cloud-vm-additional-svc-dns').text("미입력");
+        } else {
+            $('#span-cloud-vm-additional-svc-dns').text(ccvm_svc_dns);
+        }
     } else {
         $('#span-cloud-vm-additional-svc-ipaddr').text("N/A");
         $('#span-cloud-vm-additional-svc-vlan-id').text("N/A");
         $('#span-cloud-vm-additional-svc-gateway').text("N/A");
+        $('#span-cloud-vm-additional-svc-dns').text("N/A");
     }
     //-----SSH Key 정보-----
     var ssh_private_key_url = $('#form-input-cloud-vm-ssh-private-key-file').val();
@@ -1394,7 +1424,10 @@ function validateCloudCenterVm(){
         validate_check = false;
     } else if ($('#form-input-cloud-vm-mngt-gw').val() == "") { //관리 NIC Gateway
         alert("관리 NIC Gateway를 입력해주세요.");
-        validate_check = false;
+        valicate_check = false;
+    } else if($("#form-input-cloud-vm-dns").val() != "" && !checkIp($("#form-input-cloud-vm-dns").val())){
+        alert("DNS 형식을 확인해주세요.");
+        valicate_check = false;
     } else if (svc_bool && $('#form-input-cloud-vm-svc-nic-ip').val() == "") { //서비스 NIC IP
         alert("서비스 NIC IP를 입력해주세요.");
         validate_check = false;
@@ -1422,7 +1455,7 @@ function validateCloudCenterVm(){
     } else if(!checkCidrFormat($("#form-input-cloud-vm-mngt-nic-ip").val())){
         alert("관리 NIC IP 형식을 확인해주세요.");
         validate_check = false;
-    } else if(!checkIp($("#form-input-cloud-vm-mngt-gw").val())){
+    } else if(!checkIp($("#form-input-cloud-vm-mngt-gw").val()) && $('#form-input-cloud-vm-mngt-gw').val() != ""){
         alert("관리 NIC Gateway 형식을 확인해주세요.");
         validate_check = false;
     } else if(svc_bool && !checkCidrFormat($("#form-input-cloud-vm-svc-nic-ip").val())){
@@ -1431,6 +1464,9 @@ function validateCloudCenterVm(){
     } else if(svc_bool && !checkIp($("#form-input-cloud-vm-svc-gw").val())){
         alert("서비스 NIC Gateway 형식을 확인해주세요.");
         validate_check = false;
+    } else if(svc_bool && !checkIp($("#form-input-cloud-vm-svc-dns").val()) && $("#form-input-cloud-vm-svc-dns").val() != "") {
+        alert("서비스 DNS 형식을 확인해주세요.");
+        valicate_check = false;
     }
 
     return validate_check;
