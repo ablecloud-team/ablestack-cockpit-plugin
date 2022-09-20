@@ -667,26 +667,37 @@ function CardCloudClusterStatus(){
                 if(retVal.val.active == 'true'){
                     $('#cccs-resource-status').text('실행중');
                     $('#cccs-execution-node').text(retVal.val.started);
-                    $('#button-cloud-cluster-start').prop('disabled', true);
-                    $('#button-cloud-cluster-stop').prop('disabled', false);
-                    $('#button-cloud-cluster-cleanup').prop('disabled', false);
-                    $('#button-cloud-cluster-migration').prop('disabled', false);
-                    $('#button-cloud-cluster-connect').prop('disabled', false);
+
+                    $("#button-cloud-cluster-start").addClass('pf-m-disabled');
+                    $("#button-cloud-cluster-stop").removeClass('pf-m-disabled');
+                    $("#button-cloud-cluster-cleanup").removeClass('pf-m-disabled');
+                    $("#button-cloud-cluster-migration").removeClass('pf-m-disabled');
+                    $("#button-cloud-cluster-connect").removeClass('pf-m-disabled');
+                    $("#card-action-cloud-vm-change").addClass('pf-m-disabled');
+                    $("#button-cloud-vm-snap-backup").removeClass('pf-m-disabled');
+                    $("#button-cloud-vm-snap-rollback").addClass('pf-m-disabled');
+                    $("#button-mold-service-control").removeClass('pf-m-disabled');
+                    $("#button-mold-db-control").removeClass('pf-m-disabled');
+                    $("#card-action-cloud-vm-db-dump").removeClass('pf-m-disabled');
+
                     $('#form-select-cloud-vm-migration-node').append(selectHtml);
-                    $('#card-action-cloud-vm-change').attr('disabled', true);
-                    $('#button-cloud-vm-snap-rollback').attr('disabled', true);
                 }else if(retVal.val.active == 'false'){
                     $('#cccs-resource-status').text('정지됨');
                     $('#cccs-execution-node').text('N/A');
                     $('#div-mold-service-status').text('N/A');
                     $('#div-mold-db-status').text('N/A');
-                    $('#button-cloud-cluster-start').prop('disabled', false);
-                    $('#button-cloud-cluster-stop').prop('disabled', true);
-                    $('#button-cloud-cluster-cleanup').prop('disabled', false);
-                    $('#button-cloud-cluster-migration').prop('disabled', true);
-                    $('#button-cloud-cluster-connect').prop('disabled', true);
-                    $('#card-action-cloud-vm-change').attr('disabled', false);
-                    $('#button-cloud-vm-snap-rollback').attr('disabled', false);
+
+                    $("#button-cloud-cluster-start").removeClass('pf-m-disabled');
+                    $("#button-cloud-cluster-stop").addClass('pf-m-disabled');
+                    $("#button-cloud-cluster-cleanup").removeClass('pf-m-disabled');
+                    $("#button-cloud-cluster-migration").addClass('pf-m-disabled');
+                    $("#button-cloud-cluster-connect").addClass('pf-m-disabled');
+                    $("#card-action-cloud-vm-change").removeClass('pf-m-disabled');
+                    $("#button-cloud-vm-snap-backup").removeClass('pf-m-disabled');
+                    $("#button-cloud-vm-snap-rollback").removeClass('pf-m-disabled');
+                    $("#button-mold-service-control").addClass('pf-m-disabled');
+                    $("#button-mold-db-control").addClass('pf-m-disabled');
+                    $("#card-action-cloud-vm-db-dump").addClass('pf-m-disabled');
                 }
                 $('#cccs-low-info').text('클라우드센터 클러스터가 구성되었습니다.');
                 $('#cccs-low-info').attr('style','color: var(--pf-global--success-color--100)')
@@ -774,6 +785,8 @@ function cccc_link_go(){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
                 window.open(retVal.val);
+            }else{
+                alert("클라우드센터에 연결할 수 없습니다.\n클라우드센터 가상머신 및 Mold 서비스를 확인해주세요.");
             }
         })
         .catch(function(data){
@@ -853,6 +866,8 @@ function wall_link_go(){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
                 window.open(retVal.val);
+            }else{
+                alert("모니터링센터 대시보드에 연결할 수 없습니다.\n클라우드센터 가상머신 및 Wall 서비스를 확인해주세요.");
             }
         })
         .catch(function(data){
