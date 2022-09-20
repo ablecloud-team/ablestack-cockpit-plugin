@@ -1439,9 +1439,6 @@ function validateStorageVm(){
     }else if($("#form-input-storage-vm-mgmt-ip").val()  == ""){
         alert("관리 NIC IP를 입력해주세요.");
         validate_check = false;
-    }else if($("#form-input-storage-vm-mgmt-gw").val() == ""){
-        alert("관리 NIC Gateway를 입력해주세요.");
-        validate_check = false;
     }else if($("#form-input-storage-vm-public-ip").val() == ""){
         alert("스토리지 서버 NIC IP를 입력해주세요.");
         validate_check = false;
@@ -1454,18 +1451,12 @@ function validateStorageVm(){
     }else if(!checkIp($('#form-input-ccvm-mngt-ip').val())){
         alert("CCVM 관리 IP 형식을 확인해주세요.");
         validate_check = false;
-    }else if($('#form-input-storage-vm-ssh-private-key-file').val() == ""){
-        alert("SSH 개인 Key 파일을 입력해주세요.");
-        validate_check = false;
-    }else if($('#form-input-storage-vm-ssh-public-key-file').val() == ""){
-        alert("SSH 공개 Key 파일을 입력해주세요.");
-        validate_check = false;
     }else if(!checkHostFormat($("#form-input-storage-vm-hostname").val())){
         alert("호스트명 입력 형식을 확인해주세요.");
         validate_check = false;
     }else if(!checkCidrFormat($("#form-input-storage-vm-mgmt-ip").val())){
         alert("관리 NIC IP 형식을 확인해주세요.");
-        valicate_check = false;
+        validate_check = false;
     }else if($("#form-input-storage-vm-mgmt-gw").val() != "" && !checkIp($("#form-input-storage-vm-mgmt-gw").val())){
         alert("관리 NIC Gateway 형식을 확인해주세요.");
         validate_check = false;
@@ -1477,7 +1468,13 @@ function validateStorageVm(){
         validate_check = false;
     }else if (!checkIp($("#form-input-storage-vm-dns").val()) && $("#form-input-storage-vm-dns").val() != ""){
         alert("DNS 형식을 확인해주세요.");
-        valicate_check = false;
+        validate_check = false;
+    }else if($('#form-input-storage-vm-ssh-private-key-file').val() == ""){
+        alert("SSH 개인 Key 파일을 입력해주세요.");
+        validate_check = false;
+    }else if($('#form-input-storage-vm-ssh-public-key-file').val() == ""){
+        alert("SSH 공개 Key 파일을 입력해주세요.");
+        validate_check = false;
     }
 
     return validate_check;

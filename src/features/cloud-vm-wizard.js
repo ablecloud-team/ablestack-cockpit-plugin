@@ -1422,32 +1422,14 @@ function validateCloudCenterVm(){
     } else if ($('#form-input-cloud-vm-mngt-nic-ip').val() == "") { //관리 NIC IP
         alert("관리 NIC IP를 입력해주세요.");
         validate_check = false;
-    } else if ($('#form-input-cloud-vm-mngt-gw').val() == "") { //관리 NIC Gateway
-        alert("관리 NIC Gateway를 입력해주세요.");
-        valicate_check = false;
     } else if($("#form-input-cloud-vm-dns").val() != "" && !checkIp($("#form-input-cloud-vm-dns").val())){
         alert("DNS 형식을 확인해주세요.");
-        valicate_check = false;
+        validate_check = false;
     } else if (svc_bool && $('#form-input-cloud-vm-svc-nic-ip').val() == "") { //서비스 NIC IP
         alert("서비스 NIC IP를 입력해주세요.");
         validate_check = false;
     } else if (svc_bool && $('#form-input-cloud-vm-svc-gw').val() == "") { //서비스 NIC Gateway
         alert("서비스 NIC Gateway를 입력해주세요.");
-        validate_check = false;
-    } else if ( $('#form-textarea-cloud-vm-ssh-private-key-file').val() == "") { //SSH 개인 Key 정보
-        alert("SSH 개인 Key 파일을 입력해주세요.");
-        validate_check = false;
-    } else if ( $('#form-textarea-cloud-vm-ssh-public-key-file').val() == "") { //SSH 공개 Key 정보
-        alert("SSH 공개 Key 파일을 입력해주세요.");
-        validate_check = false;
-    } else if($('#form-input-cloud-vm-failover-cluster-host1-name').val() == ""){ //host1 name
-        alert("클러스터 호스트1의 이름을 입력해주세요.");
-        validate_check = false;
-    } else if ($('#form-input-cloud-vm-failover-cluster-host2-name').val() == "") { //host2 name
-        alert("클러스터 호스트2의 이름을 입력해주세요.");
-        validate_check = false;
-    } else if ($('#form-input-cloud-vm-failover-cluster-host3-name').val() == "") { //host3 name
-        alert("클러스터 호스트3의 이름을 입력해주세요.");
         validate_check = false;
     } else if(!checkHostFormat($("#form-input-cloud-vm-hostname").val())){
         alert("호스트명 입력 형식을 확인해주세요.");
@@ -1466,7 +1448,22 @@ function validateCloudCenterVm(){
         validate_check = false;
     } else if(svc_bool && !checkIp($("#form-input-cloud-vm-svc-dns").val()) && $("#form-input-cloud-vm-svc-dns").val() != "") {
         alert("서비스 DNS 형식을 확인해주세요.");
-        valicate_check = false;
+        validate_check = false;
+    } else if ( $('#form-textarea-cloud-vm-ssh-private-key-file').val() == "") { //SSH 개인 Key 정보
+        alert("SSH 개인 Key 파일을 입력해주세요.");
+        validate_check = false;
+    } else if ( $('#form-textarea-cloud-vm-ssh-public-key-file').val() == "") { //SSH 공개 Key 정보
+        alert("SSH 공개 Key 파일을 입력해주세요.");
+        validate_check = false;
+    } else if($('#form-input-cloud-vm-failover-cluster-host1-name').val() == ""){ //host1 name
+        alert("클러스터 호스트1의 이름을 입력해주세요.");
+        validate_check = false;
+    } else if ($('#form-input-cloud-vm-failover-cluster-host2-name').val() == "") { //host2 name
+        alert("클러스터 호스트2의 이름을 입력해주세요.");
+        validate_check = false;
+    } else if ($('#form-input-cloud-vm-failover-cluster-host3-name').val() == "") { //host3 name
+        alert("클러스터 호스트3의 이름을 입력해주세요.");
+        validate_check = false;
     }
 
     return validate_check;
