@@ -310,31 +310,55 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
         var icon = $('#'+span_id).children('span').children('span').children("i");
         var progress_text = $('#'+span_id).children('span').children('p');
 
+        var smtp_yn_bool = $('input[type=checkbox][id="form-checkbox-smtp-yn"]').is(":checked");
+
         // 초기화
         span.removeClass('pf-m-blue pf-m-green pf-m-orange pf-m-red');
         icon.removeClass('fa-info-circle fa-check-circle fa-play fa-exclamation-circle');
 
-        if(status == "proceeding" || status==1){
-            if(span.attr('id') == "span-wall-progress-step1"){
-                $('#wall-progress-step-text').text('Wall 모니터링센터를 구성 중입니다. 전체 3단계 중 1단계 진행 중입니다.');
-            } else if(span.attr('id') == "span-wall-progress-step2"){
-                $('#wall-progress-step-text').text('Wall 모니터링센터를 구성 중입니다. 전체 3단계 중 2단계 진행 중입니다.');
-            } else if(span.attr('id') == "span-wall-progress-step3"){
-                $('#wall-progress-step-text').text('Wall 모니터링센터를 구성 중입니다. 전체 3단계 중 3단계 진행 중입니다.');
+        if (!smtp_yn_bool) {
+            if(status == "proceeding" || status==1){
+                if(span.attr('id') == "span-wall-progress-step1"){
+                    $('#wall-progress-step-text').text('Wall 모니터링센터를 구성 중입니다. 전체 2단계 중 1단계 진행 중입니다.');
+                } else if(span.attr('id') == "span-wall-progress-step2"){
+                    $('#wall-progress-step-text').text('Wall 모니터링센터를 구성 중입니다. 전체 2단계 중 2단계 진행 중입니다.');
+                }
+    
+                span.addClass('pf-m-orange');
+                icon.addClass('fa-play');
+                progress_text.text('진행중');
+            } else if(status=="completed" || status==2){
+                span.addClass('pf-m-green');
+                icon.addClass('fa-check-circle');
+                progress_text.text('완료됨');
+            } else if(status=="aborted" || status==3){
+                span.addClass('pf-m-red');
+                icon.addClass('fa-exclamation-circle');
+                progress_text.text('중단됨');
             }
-
-            span.addClass('pf-m-orange');
-            icon.addClass('fa-play');
-            progress_text.text('진행중');
-        } else if(status=="completed" || status==2){
-            span.addClass('pf-m-green');
-            icon.addClass('fa-check-circle');
-            progress_text.text('완료됨');
-        } else if(status=="aborted" || status==3){
-            span.addClass('pf-m-red');
-            icon.addClass('fa-exclamation-circle');
-            progress_text.text('중단됨');
-        }
+        } else {
+            if(status == "proceeding" || status==1){
+                if(span.attr('id') == "span-wall-progress-step1"){
+                    $('#wall-progress-step-text').text('Wall 모니터링센터를 구성 중입니다. 전체 3단계 중 1단계 진행 중입니다.');
+                } else if(span.attr('id') == "span-wall-progress-step2"){
+                    $('#wall-progress-step-text').text('Wall 모니터링센터를 구성 중입니다. 전체 3단계 중 2단계 진행 중입니다.');
+                } else if(span.attr('id') == "span-wall-progress-step3"){
+                    $('#wall-progress-step-text').text('Wall 모니터링센터를 구성 중입니다. 전체 3단계 중 3단계 진행 중입니다.');
+                }
+    
+                span.addClass('pf-m-orange');
+                icon.addClass('fa-play');
+                progress_text.text('진행중');
+            } else if(status=="completed" || status==2){
+                span.addClass('pf-m-green');
+                icon.addClass('fa-check-circle');
+                progress_text.text('완료됨');
+            } else if(status=="aborted" || status==3){
+                span.addClass('pf-m-red');
+                icon.addClass('fa-exclamation-circle');
+                progress_text.text('중단됨');
+            }
+        }        
     }else{
         alert("진행 상태를 잘못 입력했습니다.");
     }
