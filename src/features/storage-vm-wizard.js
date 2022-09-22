@@ -60,6 +60,8 @@ $(document).ready(function(){
     setSshKeyFileReader($('#form-input-storage-vm-ssh-public-key-file'), 'id_rsa.pub', setScvmSshPublicKeyInfo);
     
     checkHostName(option_scvm);
+
+    $('#form-radio-hosts-file-scvm').click();
 });
 // document ready 끝
 

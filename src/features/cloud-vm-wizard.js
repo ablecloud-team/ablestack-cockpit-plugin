@@ -58,6 +58,8 @@ $(document).ready(function(){
     setSshKeyFileReader($('#form-input-cloud-vm-ssh-public-key-file'), 'id_rsa.pub', setCcvmSshPublicKeyInfo);
 
     checkHostName(option_ccvm);
+
+    $('#form-radio-hosts-file-ccvm').click();
 });
 
 /* Document Ready 이벤트 처리 끝 */

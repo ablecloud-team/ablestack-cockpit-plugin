@@ -99,7 +99,6 @@ $('#nav-button-cluster-config-time-server').on('click', function () {
         $('#span-timeserver2-required').hide();
         $('#span-timeserver3-required').hide();
         $('#form-input-cluster-config-time-server-ip-2').removeAttr('required');
-        $('#form-input-cluster-config-time-server-ip-3').removeAttr('required');
         // 현재 host radio 버튼 숨김
         $('#div-timeserver-host-num').hide();
         // radio 버튼 클릭 시 ip 정보 초기화
@@ -142,7 +141,6 @@ $('#nav-button-cluster-config-review').on('click', function () {
         $('#span-timeserver2-required').hide();
         $('#span-timeserver3-required').hide();
         $('#form-input-cluster-config-time-server-ip-2').removeAttr('required');
-        $('#form-input-cluster-config-time-server-ip-3').removeAttr('required');
         // 현재 host radio 버튼 숨김
         $('#div-timeserver-host-num').hide();
         // radio 버튼 클릭 시 ip 정보 초기화
@@ -238,7 +236,6 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
             $('#span-timeserver2-required').hide();
             $('#span-timeserver3-required').hide();
             $('#form-input-cluster-config-time-server-ip-2').removeAttr('required');
-            $('#form-input-cluster-config-time-server-ip-3').removeAttr('required');
             // 현재 host radio 버튼 숨김
             $('#div-timeserver-host-num').hide();
             // radio 버튼 클릭 시 ip 정보 초기화
@@ -692,7 +689,6 @@ $('#form-radio-timeserver-ext').on('click', function () {
     $('#span-timeserver2-required').hide();
     $('#span-timeserver3-required').hide();
     $('#form-input-cluster-config-time-server-ip-2').removeAttr('required');
-    $('#form-input-cluster-config-time-server-ip-3').removeAttr('required');
     // 현재 host radio 버튼 숨김
     $('#div-timeserver-host-num').hide();
     // radio 버튼 클릭 시 ip 정보 초기화
@@ -704,7 +700,6 @@ $('#form-radio-timeserver-int').on('click', function () {
     $('#span-timeserver2-required').show();
     $('#span-timeserver3-required').show();
     $('#form-input-cluster-config-time-server-ip-2').attr('required', 'required');
-    $('#form-input-cluster-config-time-server-ip-3').attr('required', 'required');
     // 현재 host radio 버튼 보임
     $('#div-timeserver-host-num').show();
     $('input[name=form-input-cluster-config-timeserver]').val("");
@@ -1215,7 +1210,6 @@ function putTimeServerValueIntoTextarea(radio_value) {
     }
     $('#div-cluster-config-confirm-time-server-1').text($('#form-input-cluster-config-time-server-ip-1').val());
     $('#div-cluster-config-confirm-time-server-2').text($('#form-input-cluster-config-time-server-ip-2').val());
-    $('#div-cluster-config-confirm-time-server-3').text($('#form-input-cluster-config-time-server-ip-3').val());
 }
 
 
@@ -1382,16 +1376,24 @@ function inputPnIntoTimeServer() {
     }
 
     let currentHostName = $('#form-input-current-host-name').val();
-    $('#form-input-cluster-config-time-server-ip-3').val("");
 
     $('#'+ tbody_tr).each(function(index){
+        idx_num = $(this).find('td').eq(0).text();
         hostName = $(this).find('td').eq(1).text();
         pn_ip = $(this).find('td').eq(4).text();
         
         if(index < 2){
             $('#form-input-cluster-config-time-server-ip-'+(index+1)).val(pn_ip);
-        }else if(currentHostName == hostName) {//호스트 네임을 가져와서 해당 시간서버 3번에 세팅한다.
-            $('#form-input-cluster-config-time-server-ip-3').val(pn_ip);
+        }
+        
+        if(currentHostName == hostName) {//호스트 네임을 가져와서 시간 서버의 종류를 선택한다. (Master Server, Second Server, Other Server)
+            if(idx_num == 1){
+                $('#form-radio-timeserver-host-num-1').prop('checked', true);
+            }else if(idx_num == 2){
+                $('#form-radio-timeserver-host-num-2').prop('checked', true);
+            }else{
+                $('#form-radio-timeserver-host-num-3').prop('checked', true);
+            }
         }
     });
 }
@@ -1472,10 +1474,8 @@ function validateClusterConfigPrepare(timeserver_type) {
     // time server가 외부일 때는 IP, 문자열 입력 가능하나 내부일 때는 IP형식으로만 입력 가능
     let timeserver_ip_check_external_1 = checkHostFormat($('#div-cluster-config-confirm-time-server-1').text());
     let timeserver_ip_check_external_2 = checkHostFormat($('#div-cluster-config-confirm-time-server-2').text());
-    let timeserver_ip_check_external_3 = checkHostFormat($('#div-cluster-config-confirm-time-server-3').text());
     let timeserver_ip_check_internal_1 = checkHostFormat($('#div-cluster-config-confirm-time-server-1').text());
     let timeserver_ip_check_internal_2 = checkHostFormat($('#div-cluster-config-confirm-time-server-2').text());
-    let timeserver_ip_check_internal_3 = checkHostFormat($('#div-cluster-config-confirm-time-server-3').text());
 
     let host_file_type = $('input[name=radio-hosts-file]:checked').val();
 
@@ -1532,9 +1532,6 @@ function validateClusterConfigPrepare(timeserver_type) {
         } else if (timeserver_ip_check_external_2 == false && $('#div-cluster-config-confirm-time-server-2').text() != "") {
             alert("시간 서버 2번 IP정보를 확인해 주세요.");
             validate_check = false;
-        } else if (timeserver_ip_check_external_3 == false && $('#div-cluster-config-confirm-time-server-3').text() != "") {
-            alert("시간 서버 3번 IP정보를 확인해 주세요.");
-            validate_check = false;
         }
     } else if (timeserver_type == "internal") {
         if (timeserver_ip_check_internal_1 == false) {
@@ -1542,9 +1539,6 @@ function validateClusterConfigPrepare(timeserver_type) {
             validate_check = false;
         } else if (timeserver_ip_check_internal_2 == false) {
             alert("시간 서버 2번 정보를 확인해 주세요.");
-            validate_check = false;
-        } else if (timeserver_ip_check_internal_3 == false) {
-            alert("시간 서버 3번 정보를 확인해 주세요.");
             validate_check = false;
         }
     }
@@ -1565,7 +1559,7 @@ function validateClusterConfigPrepare(timeserver_type) {
     timeserver_type = $('input[name=radio-timeserver]:checked').val();
     let timeserver_current_host_num = $('input[name=radio-timeserver_host_num]:checked').val();
     let timeserver_confirm_ip_list = new Array();
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 2; i++) {
         timeserver_confirm_ip_list.push($('#form-input-cluster-config-time-server-ip-' + i).val());
     }
     timeserver_confirm_ip_list = timeserver_confirm_ip_list.filter(function (item) {
