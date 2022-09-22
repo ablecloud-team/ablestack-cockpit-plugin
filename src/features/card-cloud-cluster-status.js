@@ -297,6 +297,100 @@ $('#button-execution-modal-cloud-vm-snap-backup').on('click', function(){
 });
 /** cloud vm snap backup modal 관련 action end */
 
+/** Mold 서비스 제어 관련 action start */
+$('#button-mold-service-control').on('click', function(){
+    $('#div-modal-mold-service-control').show();
+});
+
+$('#button-close-mold-service-control').on('click', function(){
+    $('#div-modal-mold-service-control').hide();
+});
+
+$('#button-cancel-modal-mold-service-control').on('click', function(){
+    $('#div-modal-mold-service-control').hide();
+});
+
+$('#button-execution-modal-mold-service-control').on('click', function(){
+    
+    var valSelect = $('#form-select-mold-service-control option:selected').val();
+    var txtSelect = $('#form-select-mold-service-control option:selected').text();
+
+    $('#div-modal-mold-service-control').hide();
+    $('#div-modal-spinner-header-txt').text('Mold 서비스를 '+txtSelect+'하고 있습니다.');
+    $('#div-modal-spinner').show();////
+
+    $("#modal-status-alert-title").html("Mold 서비스 "+txtSelect+" 실패");
+    $("#modal-status-alert-body").html("Mold 서비스 "+txtSelect+"을(를) 실패하였습니다. 클라우드센터VM 상태를 점검해주세요.");
+
+    // Mold 서비스 작업
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ccvm_service/ccvm_service_control.py', valSelect, '-sn', 'cloudstack-management.service'])
+    .then(function(data){
+        $('#div-modal-spinner').hide();
+        var retVal = JSON.parse(data);
+        if(retVal.code == 200){
+            $("#modal-status-alert-title").html("Mold 서비스 "+txtSelect+" 완료");
+            $("#modal-status-alert-body").html("Mold 서비스 "+txtSelect+"을(를) 완료하였습니다.");
+            $('#div-modal-status-alert').show();
+            createLoggerInfo("mold service control spawn success");
+        } else {
+            $('#div-modal-status-alert').show();
+            createLoggerInfo(retVal.val);
+        }
+    }).catch(function(data){
+        $('#div-modal-spinner').hide();
+        $('#div-modal-status-alert').show();
+        createLoggerInfo("mold service control spawn error : " + data);
+    });
+});
+/** Mold 서비스 제어 modal 관련 action end */
+
+/** Mold DB 제어 관련 action start */
+$('#button-mold-db-control').on('click', function(){
+    $('#div-modal-mold-db-control').show();
+});
+
+$('#button-close-mold-db-control').on('click', function(){
+    $('#div-modal-mold-db-control').hide();
+});
+
+$('#button-cancel-modal-mold-db-control').on('click', function(){
+    $('#div-modal-mold-db-control').hide();
+});
+
+$('#button-execution-modal-mold-db-control').on('click', function(){
+    
+    var valSelect = $('#form-select-mold-db-control option:selected').val();
+    var txtSelect = $('#form-select-mold-db-control option:selected').text();
+
+    $('#div-modal-mold-db-control').hide();
+    $('#div-modal-spinner-header-txt').text('Mold DB를 '+txtSelect+'하고 있습니다.');
+    $('#div-modal-spinner').show();////
+
+    $("#modal-status-alert-title").html("Mold DB "+txtSelect+" 실패");
+    $("#modal-status-alert-body").html("Mold DB "+txtSelect+"을(를) 실패하였습니다. 클라우드센터VM 상태를 점검해주세요.");
+
+    // Mold DB 작업
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ccvm_service/ccvm_service_control.py', valSelect, '-sn', 'mysqld'])
+    .then(function(data){
+        $('#div-modal-spinner').hide();
+        var retVal = JSON.parse(data);
+        if(retVal.code == 200){
+            $("#modal-status-alert-title").html("Mold DB "+txtSelect+" 완료");
+            $("#modal-status-alert-body").html("Mold DB "+txtSelect+"을(를) 완료하였습니다.");
+            $('#div-modal-status-alert').show();
+            createLoggerInfo("mold db control spawn success");
+        } else {
+            $('#div-modal-status-alert').show();
+            createLoggerInfo(retVal.val);
+        }
+    }).catch(function(data){
+        $('#div-modal-spinner').hide();
+        $('#div-modal-status-alert').show();
+        createLoggerInfo("mold db control spawn error : " + data);
+    });
+});
+/** Mold DB 제어 modal 관련 action end */
+
 $('#cloud-cluster-connect').on('click', function(){
     //클라우드센터 연결
     cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/url/create_address.py', 'cloudCenter'])
@@ -408,6 +502,8 @@ function CardCloudClusterStatus(){
                 }else if(retVal.val.active == 'false'){
                     $('#cccs-resource-status').text('정지됨');
                     $('#cccs-execution-node').text('N/A');
+                    $('#div-mold-service-status').text('N/A');
+                    $('#div-mold-db-status').text('N/A');
                     $('#button-cloud-cluster-start').prop('disabled', false);
                     $('#button-cloud-cluster-stop').prop('disabled', true);
                     $('#button-cloud-cluster-cleanup').prop('disabled', false);
