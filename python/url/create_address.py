@@ -47,10 +47,6 @@ def cloudCenter(action, H=False):
              # http 접속되지않는 경우
             return createReturn(code=500, val="클라우드센터에 정상적으로 연결되지 않습니다. <br>클라우드센터 서비스 상태를 확인하거나, 잠시 후에 다시 시도해주십시오.")
 
-    else:
-        # 클라우드센터 가상머신
-        value = 'https://'+ip+':9000'
-
     if H: 
         return json.dumps(json.loads(createReturn(code=200, val=value, retname=action)), indent=4) 
 
