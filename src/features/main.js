@@ -11,6 +11,7 @@ this.ccvm_instance = new CloudCenterVirtualMachine();
 ccvm_instance = this.ccvm_instance;
 $(document).ccvm_instance = ccvm_instance;
 pluginpath = '/usr/share/cockpit/ablestack';
+let pcs_exe_host = "";
 
 $(document).ready(function(){
     $('#dropdown-menu-storage-cluster-status').hide();
@@ -25,6 +26,7 @@ $(document).ready(function(){
     $('#button-link-cloud-center').hide();
     $('#button-open-modal-wizard-monitoring-center').hide();
     $('#button-link-monitoring-center').hide();
+    $('#button-config-file-download').hide();
 
     $('#div-modal-wizard-storage-vm').load("./src/features/storage-vm-wizard.html");
     $('#div-modal-wizard-storage-vm').hide();
@@ -59,13 +61,29 @@ $(document).ready(function(){
     $('#div-modal-storage-cluster-maintenance-update').load("./src/features/storage-cluster-maintenance-update.html");
     $('#div-modal-storage-cluster-maintenance-update').hide();
 
-    // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
-    Promise.all([checkConfigStatus(), checkStorageClusterStatus(),
-        checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
-            scanHostKey();
-            checkDeployStatus();
+    cockpit.spawn(['python3', pluginpath + '/python/pcs/pcsExehost.py'])
+    .then(function (data) {
+        let retVal = JSON.parse(data);
+        pcs_exe_host = retVal.val;
+        ribbonWorker();
+        //30초마다 화면 정보 갱신
+        setInterval(() => {
+            createLoggerInfo("Start collecting ablestack status information : setInterval()");
+            // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
+            ribbonWorker();
+        }, 30000);
+    })
+    .catch(function (err) {
+        ribbonWorker();
+        //30초마다 화면 정보 갱신
+        setInterval(() => {
+            createLoggerInfo("Start collecting ablestack status information : setInterval()");
+            // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
+            ribbonWorker();
+        }, 30000);
+        createLoggerInfo("pcsExeHost err");
+        console.log("pcsExeHost err : " + err);
     });
-
 });
 // document.ready 영역 끝
 
@@ -123,6 +141,7 @@ $('#button-open-modal-wizard-storage-vm').on('click', function(){
 });
 
 $('#button-open-modal-wizard-storage-cluster').on('click', function(){
+    readSshKeyFile();
     $('#div-modal-wizard-cluster-config-prepare').show();
 });
 
@@ -144,8 +163,8 @@ $('#button-link-storage-center-dashboard').on('click', function(){
             // 스토리지센터 연결
             window.open(retVal.val);
         }else{
-            $("#modal-status-alert-title").html("스토리지센터 연결")
-            $("#modal-status-alert-body").html(retVal.val)
+            $("#modal-status-alert-title").html("스토리지센터 연결");
+            $("#modal-status-alert-body").html(retVal.val);
             $('#div-modal-status-alert').show();
         }
     })
@@ -164,8 +183,8 @@ $('#button-link-cloud-center').on('click', function(){
             if(retVal.code == 200){
                 window.open(retVal.val);
             }else{
-                $("#modal-status-alert-title").html("클라우드센터 연결")
-                $("#modal-status-alert-body").html(retVal.val)
+                $("#modal-status-alert-title").html("클라우드센터 연결");
+                $("#modal-status-alert-body").html(retVal.val);
                 $('#div-modal-status-alert').show();
             }
         })
@@ -300,8 +319,8 @@ $('#span-modal-wizard-cluster-config-finish-db-dump-file-download').on('click', 
  * History  : 2021.04.10 최초 작성
  */
 function scvm_bootstrap_run(){
-    $("#modal-status-alert-title").html("스토리지 센터 가상머신 상태 체크")
-    $("#modal-status-alert-body").html("스토리지 센터 가상머신에 cloudinit 실행이 완료되지 않아<br>Bootstrap을 실행할 수 없습니다.<br><br>잠시 후 다시 실행해 주세요.")
+    $("#modal-status-alert-title").html("스토리지 센터 가상머신 상태 체크");
+    $("#modal-status-alert-body").html("스토리지 센터 가상머신에 cloudinit 실행이 완료되지 않아<br>Bootstrap을 실행할 수 없습니다.<br><br>잠시 후 다시 실행해 주세요.");
     createLoggerInfo("scvm_bootstrap_run() start");
     //scvm ping 체크
     cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "ping", "--target",  "scvm"])
@@ -400,9 +419,9 @@ $('#menu-item-linkto-storage-center-vm').on('click', function(){
 function checkConfigStatus(){
     //createLoggerInfo("checkConfigStatus() start");
     return new Promise((resolve) => {
-        cockpit.spawn(['grep', '-c', 'ccvm-mngt', '/etc/hosts'])
+        cockpit.spawn(['grep', '-c', 'ablecube', '/etc/hosts'])
             .then(data=>{
-                if(data){
+                if(data >= 1){
                     cockpit.spawn(['cat', '/root/.ssh/id_rsa.pub'])
                         .then(data=>{
                             sessionStorage.setItem("ccfg_status", "true");
@@ -730,6 +749,7 @@ function checkDeployStatus(){
     $('#button-link-cloud-center').hide();
     $('#button-open-modal-wizard-monitoring-center').hide();
     $('#button-link-monitoring-center').hide();
+    $('#button-config-file-download').hide();
     /*
        가상머신 배포 및 클러스터 구성 상태를 세션 스토리지에서 조회 
        - 클러스터 구성준비 상태 = false, true
@@ -750,12 +770,14 @@ function checkDeployStatus(){
     const step8 = sessionStorage.getItem("wall_monitoring_status");
 
     console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6 + ", step7 :: " + step7 + ", step8 :: " + step8);
+
     // 배포 상태조회 
     if(step1!="true"){
         // 클러스터 구성준비 버튼 show
         $('#button-open-modal-wizard-storage-cluster').show();
         showRibbon('warning','스토리지센터 및 클라우드센터 VM이 배포되지 않았습니다. 클러스터 구성준비를 진행하십시오.');
     }else{
+        $('#button-config-file-download').show();
         if(step2=="HEALTH_ERR"||step2==null){
             // 클러스터 구성준비 버튼, 스토리지센터 VM 배포 버튼 show
             $('#button-open-modal-wizard-storage-cluster').show();
@@ -892,8 +914,28 @@ function saveHostInfo(){
         createLoggerInfo("keyscan err");
         console.log("keyscan err : " + err);
     });
-} 
-    
+}
+
+/**
+ * Meathod Name : pcsExeHost
+ * Date Created : 2022.09.14
+ * Writer  : 배태주
+ * Description : pcs 클러스터 명령이 가능한 호스트의 정보를 세팅하는 함수
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2022.09.14 최초 작성
+ */
+ function pcsExeHost(){
+    cockpit.spawn(['python3', pluginpath + '/python/pcs/pcsExehost.py'])
+    .then(function (data) {
+        let retVal = JSON.parse(data);
+        pcs_exe_host = retVal.val;
+    })
+    .catch(function (err) {
+        createLoggerInfo("pcsExeHost err");
+        console.log("pcsExeHost err : " + err);
+    });
+}
 
 /**
  * Meathod Name : resetBootstrap
@@ -926,20 +968,26 @@ function saveHostInfo(){
         createLoggerInfo("resetBootstrap ccvm err");
         console.log("resetBootstrap ccvm err : " + err);
     });
-} 
+    //wall monitoring 프로퍼티 초기화
+    cockpit.spawn(["python3", pluginpath+"/python/ablestack_json/ablestackJson.py", "update", "--depth1", "monitoring", "--depth2", "wall", "--value", "false"])
+    .then(function(data){        
+        createLoggerInfo("resetBootstrap wall ok");
+        console.log("resetBootstrap wall ok");
+    })
+    .catch(function(err){
+        createLoggerInfo("resetBootstrap wall err");
+        console.log("resetBootstrap wall err : " + err);
+    });
+}
 
-//30초마다 화면 정보 갱신
-setInterval(() => {
-    createLoggerInfo("Start collecting ablestack status information : setInterval()");
+function ribbonWorker() {
     // 배포상태 조회(비동기)완료 후 배포상태에 따른 요약리본 UI 설정
-    Promise.all([checkConfigStatus(), checkStorageClusterStatus(),
+    Promise.all([pcsExeHost(), checkConfigStatus(), checkStorageClusterStatus(),
         checkStorageVmStatus(), CardCloudClusterStatus(), new CloudCenterVirtualMachine().checkCCVM()]).then(function(){
             scanHostKey();
             checkDeployStatus();
     });
-}, 30000);
-
-
+}
 
 /**
  * Meathod Name : readFile

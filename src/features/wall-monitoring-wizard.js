@@ -792,87 +792,87 @@ function setWallReviewInfo() {
  */
 function validateWallMonitoringVm() {
 
-    var valicate_check = true;
+    var validate_check = true;
     var smtp_yn_bool = $('input[type=checkbox][id="form-checkbox-smtp-yn"]').is(":checked");
     var host_count = $('input[type=text][id="form-input-wall-host-number"]').val();
 
     if ($('#form-input-wall-host-number').val() == "") {
         alert("호스트 수를 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     }
     else if (!$.isNumeric($("#form-input-wall-host-number").val())) {
         alert("호스트 수를 숫자로 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     }
     else if ($('#form-input-wall-monitoring-ccvm-ip').val() == "") {
         alert("CCVM 관리 IP를 입력해주세요.");
-        valicate_check = false;
+        validate_check = false;
     }
     else if (!checkIp($("#form-input-wall-monitoring-ccvm-ip").val())) {
         alert("CCVM 관리 IP 형식을 확인해주세요.");
-        valicate_check = false;
+        validate_check = false;
     }
 
     for(var i = 1 ; i <= host_count ; i ++ ){
-        if (valicate_check && $('#form-input-wall-monitoring-cubehost'+i+'-ip').val() == "") {
+        if (validate_check && $('#form-input-wall-monitoring-cubehost'+i+'-ip').val() == "") {
             alert('Cube'+i+' 관리 IP를 입력해주세요.');
-            valicate_check = false;
+            validate_check = false;
         }
 
-        if (valicate_check && !checkIp($('#form-input-wall-monitoring-cubehost'+i+'-ip').val())) {
+        if (validate_check && !checkIp($('#form-input-wall-monitoring-cubehost'+i+'-ip').val())) {
             alert('Cube'+i+' 관리 IP 형식을 확인해주세요.');
-            valicate_check = false;
+            validate_check = false;
         }
     }
 
     for(var i = 1 ; i <= host_count ; i ++ ){
-        if (valicate_check && $('#form-input-wall-monitoring-scvm'+i+'-ip').val() == "") {
+        if (validate_check && $('#form-input-wall-monitoring-scvm'+i+'-ip').val() == "") {
             alert('SCVM'+i+' 관리 IP를 입력해주세요.');
-            valicate_check = false;
+            validate_check = false;
         }
 
-        if (valicate_check && !checkIp($('#form-input-wall-monitoring-scvm'+i+'-ip').val())) {
+        if (validate_check && !checkIp($('#form-input-wall-monitoring-scvm'+i+'-ip').val())) {
             alert('SCVM'+i+' 관리 IP 형식을 확인해주세요.');
-            valicate_check = false;
+            validate_check = false;
         }
     }
 
-    if(valicate_check){
+    if(validate_check){
         if (smtp_yn_bool && $('#form-input-wall-smtp-server-ip').val() == "") {
             alert("SMTP 서버를 입력해주세요.");
-            valicate_check = false;
+            validate_check = false;
         }
         //else if (smtp_yn_bool && !checkIp($("#form-input-wall-smtp-server-ip").val())) {
         //    alert("SMTP 서버 IP 형식을 확인해주세요.");
-        //    valicate_check = false;
+        //    validate_check = false;
         //}
         else if (smtp_yn_bool && $('#form-input-wall-smtp-server-port').val() == "") {
             alert("SMTP 서버 Port를 입력해주세요.");
-            valicate_check = false;
+            validate_check = false;
         }
         else if (smtp_yn_bool && !$.isNumeric($("#form-input-wall-smtp-server-port").val())) {
             alert("SMTP 서버 Port 형식을 확인해주세요.");
-            valicate_check = false;
+            validate_check = false;
         }
         else if (smtp_yn_bool && $('#form-input-wall-smtp-email-addr').val() == "") {
             alert("관리자 이메일 주소를 입력해주세요.");
-            valicate_check = false;
+            validate_check = false;
         }
         else if (smtp_yn_bool && !checkEmail($("#form-input-wall-smtp-email-addr").val())) {
             alert("관리자 이메일 주소 형식을 확인해주세요.");
-            valicate_check = false;
+            validate_check = false;
         }
         else if (smtp_yn_bool && $('#form-input-wall-smtp-email-pw').val() == "") {
             alert("이메일 비밀번호를 입력해주세요.");
-            valicate_check = false;
+            validate_check = false;
         }
         else if (smtp_yn_bool && !checkEmail($("#form-input-wall-smtp-receive-email-addr").val())) {
             alert("수신 이메일 주소 형식을 확인해주세요.");
-            valicate_check = false;
+            validate_check = false;
         }
     }
 
-    return valicate_check;
+    return validate_check;
 }
 
 /**
