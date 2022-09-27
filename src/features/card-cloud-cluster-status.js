@@ -393,7 +393,7 @@ $('#button-execution-modal-cloud-vm-snap-backup').on('click', function(){
         var retVal = JSON.parse(data);
         if(retVal.code == 200){
             $("#modal-status-alert-title").html("클라우드센터VM 복구용 스냅샷 생성 완료");
-            $("#modal-status-alert-body").html("스냅샷 복구용 스냅샷 생성을 완료하였습니다. 클라우드센터VM을 시작해주세요.");
+            $("#modal-status-alert-body").html("스냅샷 복구용 스냅샷 생성을 완료하였습니다.");
             $('#div-modal-status-alert').show();
             createLoggerInfo("backup cloud vm snapshot spawn success");
         } else {
