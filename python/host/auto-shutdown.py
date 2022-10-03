@@ -53,10 +53,10 @@ def parseArgs():
 
 '''
 함수명 : checkMount
-주요 기능 : 전체 시스템 종료 전, ccvm의 secondary 저장소가 umount되었는지 체크하고 필요 시 umount를 실행합니다. 
+주요 기능 : 전체 시스템 종료 전, 호스트에 mount되어있는 볼륨이 umount되었는지 체크하고 필요 시 umount를 실행합니다. 
 '''
 def checkMount():
-    # try:
+    try:
         #호스트 리스트 추출 (hosts 파일에서 특정 단어 "-pn"을 포함한 2열 값 출력)
         output_host_list = subprocess.check_output("grep '\-pn' /etc/hosts | awk '{print $2}'", shell=True)
         data_host_list = output_host_list.decode('utf8')
@@ -68,31 +68,47 @@ def checkMount():
         hostname = data_hostname.splitlines()
 
         #마운트 해제(/etc/fstab 파일에 UUID로 시작되는 마운트 경로 검색한 후 해제)
-        mount_path_list = subprocess.check_output("grep -v ^# /etc/fstab | grep ^UUID | awk '{print $1}'", universal_newlines=True, shell=True, env=env)
-        os.environ['MOUNT_PATH'] = mount_path_list[:-1]
-        # print(os.getenv('MOUNT_PATH'))
+        
         for host in hosts:
             if hostname[0] != host:
                 # 명령을 내린 호스트를 제외한 호스트의 마운트 해제
-                rc = call(['ssh root@'+host+' umount ' +MOUNT_PATH'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-                if rc == 0:
+                mount_path_list = subprocess.check_output("ssh root@"+host+" grep -v ^# /etc/fstab | grep ^UUID | awk '{print $1}'", universal_newlines=True, shell=True, env=env)
+                mount_path_list = mount_path_list[:-1]
+                # UUID로 시작되는 마운트 경로가 존재할 경우 마운트 해제
+                if "UUID" in mount_path_list:
+                    mount_path_list = mount_path_list.splitlines()
+                    for mount_path in mount_path_list:
+                        # rc = call(['ssh root@'+host+' umount ' +mount_path], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                        rc = call(['ssh root@'+host+' echo ' +mount_path+ '\">>\" /root/test.txt'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                    if rc == 0:
+                        retVal = True
+                        retCode = 200
+                    else :
+                        retVal = False
+                        retCode = 500
+                else :
                     retVal = True
                     retCode = 200
-                else :
-                    retVal = False
-                    retCode = 500
         # 명령을 내린 호스트를 가장 마지막에 실행
-        subprocess.check_output("export mount_path_list=`grep -v ^# /etc/fstab | grep '^..' | awk '{print $1}'`", shell=True)
-        rc = call(['ssh root@'+hostname[0]+' umount ' +MOUNT_PATHh'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        if rc == 0:
+        mount_path_list = subprocess.check_output("ssh root@"+hostname[0]+" grep -v ^# /etc/fstab | grep ^UUID | awk '{print $1}'", universal_newlines=True, shell=True, env=env)
+        mount_path_list = mount_path_list[:-1]
+        if "UUID" in mount_path_list:
+            mount_path_list = mount_path_list.splitlines()
+            for mount_path in mount_path_list:
+                # rc = call(['ssh root@'+hostname[0]+' umount ' +mount_path], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                rc = call(['ssh root@'+hostname[0]+' echo ' +mount_path+ '\">>\" /root/test.txt'], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            if rc == 0:
+                retVal = True
+                retCode = 200
+            else :
+                retVal = False
+                retCode = 500
+        else :
             retVal = True
             retCode = 200
-        else :
-            retVal = False
-            retCode = 500
-        ret = createReturn(code=retCode, val=retVal, retname='Hosts Shutdown')
+        ret = createReturn(code=retCode, val=retVal, retname='Umount Volume')
     except Exception as e:
-        ret = createReturn(code=retCode, val='host shutdown error', retname='Hosts Shutdown Error')
+        ret = createReturn(code=retCode, val='Umount Volume Error', retname='Umount Volume Error')
     return print(json.dumps(json.loads(ret), indent=4))
     return print('end')
 

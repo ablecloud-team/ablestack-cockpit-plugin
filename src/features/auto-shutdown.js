@@ -15,22 +15,22 @@ $('#button-close1, #button-close-auto-shutdown').on('click', function(){
 $('#button-auto-shutdown').on('click', async function(){
     $('#dropdown-menu-storage-cluster-status').toggle();
     $('#div-modal-auto-shutdown').hide();
-    $('#div-modal-spinner-header-txt').text('전체 시스템 자동 종료를 시작합니다.-테스트');
+    $('#div-modal-spinner-header-txt').text('전체 시스템 자동 종료를 시작합니다.');
     console.log("전체 시스템 자동 종료를 시작합니다");  
     $('#div-modal-spinner').show();
 
     createLoggerInfo("button-auto-shutdown click");
     var cmd = $('#auto-shutdown-cmd').val();
     
-    // 6.	nfs umount 체크
+    // 6. Mount 해제 여부를 체크
     $('#dropdown-menu-cloud-cluster-status').toggle();
-    $('#div-modal-spinner-header-txt').text('Mount 여부를 체크를 하고 있습니다.');
+    $('#div-modal-spinner-header-txt').text('Mount 해제 여부를 체크를 하고 있습니다.');
     createLoggerInfo("mount-status mountCheck");
-    cockpit.spawn(['/usr/bin/python3', 'pluginpath+"/python/host/auto-shutdown.py', 'check_mount'])
+    cockpit.spawn(["/usr/bin/python3", pluginpath+"/python/host/auto-shutdown.py", "check_mount"])
     .then(function(data){
         var retVal = JSON.parse(data);
         if(retVal.code == 200){
-            console.log("mount 체크 여부 성공"); 
+            console.log("Mount 체크 성공"); 
             // // 7.	클라우드센터 가상머신 정지
             // $('#dropdown-menu-cloud-cluster-status').toggle();
             // $('#div-modal-spinner-header-txt').text('클라우드센터VM을 정지하고 있습니다.');
@@ -120,13 +120,13 @@ $('#button-auto-shutdown').on('click', async function(){
             //     console.log('button-execution-modal-cloud-vm-stop spawn error');
             // });
         }else{
-            $('#div-modal-spinner-header-txt').text('NFS Mount 해제 오류');
+            $('#div-modal-spinner-header-txt').text('Mount 해제 오류');
             createLoggerInfo(":::nfs check Error:::");
             console.log(":::nfs check Error::: " +data);
         }
     }).catch(function(data){
-        $('#div-modal-spinner-header-txt').text('NFS Mount 해제 오류');
-        $('#modal-description-auto-shutdown').html("<p>NFS Mount 해제 오류로 중단되었습니다.</p>");
+        $('#div-modal-spinner-header-txt').text('Mount 해제 오류');
+        $('#modal-description-auto-shutdown').html("<p>Mount 해제 오류로 중단되었습니다.</p>");
         failedAutoShutdown();
         createLoggerInfo("nfs check error");
         console.log('button-execution-modal-cloud-vm-stop spawn error');
