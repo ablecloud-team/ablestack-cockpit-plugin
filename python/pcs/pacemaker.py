@@ -63,6 +63,7 @@ class Pacemaker:
         systemctl('enable', '--now', 'corosync.service')
         systemctl('enable', '--now', 'pacemaker.service')
         pcs('property', 'set', 'stonith-enabled=false')
+        pcs('resource', 'defaults', 'update', 'resource-stickiness=1')
 
         ret_val = {'cluster name :':self.cluster_name, 'hosts': self.hostnames}
         ret = createReturn(code=200, val=ret_val)
