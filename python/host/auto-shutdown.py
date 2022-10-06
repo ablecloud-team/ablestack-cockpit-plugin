@@ -114,11 +114,11 @@ def stopStorageVMs():
         for host in hosts:
             if hostname[0] != host:
                 # 명령을 내린 호스트를 제외한 스토리지센터 가상머신 종료
-                result = check_output(["ssh root@" + host + " 'python3 python/scc_status/scc_status_update.py stop'"], universal_newlines=True, shell=True, env=env)
+                result = check_output(["ssh root@" + host + " 'python3 python/scc_status/scvm_status_update.py stop'"], universal_newlines=True, shell=True, env=env)
                 json_data = json.loads(result)
                 result_code_list.append(json_data["code"])
         # 명령을 내린 호스트를 가장 마지막에 실행
-        result = check_output(["ssh root@" + hostname[0] + " 'python/scc_status/scc_status_update.py stop'"], universal_newlines=True, shell=True, env=env)
+        result = check_output(["ssh root@" + hostname[0] + " 'python/scc_status/scvm_status_update.py stop'"], universal_newlines=True, shell=True, env=env)
         '''스토리지 가상머신 정지 명령 후 리턴값 0은 정상, 아닐경우 비정상'''
         json_data = json.loads(result)
         result_code_list.append(json_data["code"])

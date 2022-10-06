@@ -24,6 +24,7 @@ $('#modal-input-auto-shutdown-mount').on('click', function(){
 $('#button-auto-shutdown').on('click', async function(){
     $('#dropdown-menu-storage-cluster-status').toggle();
     $('#div-modal-auto-shutdown').hide();
+    $('#modal-div-auto-shutdown-mount').hide();
     $('#div-modal-spinner-header-txt').text('전체 시스템 자동 종료를 시작합니다.');
     console.log("전체 시스템 자동 종료를 시작합니다");
     $('#div-modal-spinner').show();
@@ -156,4 +157,5 @@ function failedAutoShutdown() {
     $('#div-modal-auto-shutdown').show();
     $('#button-close-auto-shutdown').hide();
     $('#button-auto-shutdown').hide();
+    $('#modal-div-auto-shutdown-mount').hide();
 }

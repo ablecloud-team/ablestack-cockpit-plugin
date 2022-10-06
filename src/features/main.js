@@ -271,6 +271,7 @@ $('#menu-item-set-auto-shutdown-step-two').on('click',function(){
     $('#div-modal-auto-shutdown').show();
     $('#button-auto-shutdown').show();
     $('#button-close-auto-shutdown').show();
+    $('#modal-div-auto-shutdown-mount').show();
 });
 
 
