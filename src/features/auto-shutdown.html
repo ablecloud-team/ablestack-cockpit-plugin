@@ -17,8 +17,20 @@
       </header>
       <div class="pf-c-modal-box__body" id="modal-description-auto-shutdown">
       </div>
+      <!-- <section class="pf-c-page__main-section pf-m-light"> -->
+        <div class="pf-c-modal-box__body pf-l-flex pf-m-align-items-center">
+          <p>볼륨 마운트 해제 확인</p>
+          <label class="pf-c-switch">
+            <input id="modal-input-auto-shutdown-mount" class="pf-c-switch__input" type="checkbox" aria-label="볼륨 마운트 체크">
+            <span class="pf-c-switch__toggle">
+              <div id="modal-switch-auto-shutdown-mount" class="pf-c-switch__toggle-icon" aria-hidden="true">
+              </div>
+            </span>
+          </label>
+        </div>
+      <!-- </section> -->
       <footer class="pf-c-modal-box__footer">
-        <button class="pf-c-button pf-m-primary" type="button" id="button-auto-shutdown">실행</button>
+        <button class="pf-c-button pf-m-primary" type="button" id="button-auto-shutdown" disabled>실행</button>
         <button class="pf-c-button pf-m-link" type="button" id="button-close-auto-shutdown">취소</button>
       </footer>
     </div>

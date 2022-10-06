@@ -266,7 +266,7 @@ $('#menu-item-set-storage-center-vm-resource-update').on('click', function(){
 
 // 전체 시스템 종료 버튼 클릭시 modal의 설명 세팅
 $('#menu-item-set-auto-shutdown-step-two').on('click',function(){
-    $('#modal-description-auto-shutdown').html("<p>전체 시스템을 '종료' 하시겠습니까?</p>");
+    $('#modal-description-auto-shutdown').html("전체 시스템을 '종료' 하시겠습니까?<br><br> 사전에 각 호스트에 Mount된 볼륨을 해제해야 합니다. 해제 후, 아래 스위치를 클릭하여 계속 진행합니다.");
     $('#auto-shutdown-cmd').val("start");
     $('#div-modal-auto-shutdown').show();
     $('#button-auto-shutdown').show();

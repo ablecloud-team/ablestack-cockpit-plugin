@@ -34,25 +34,6 @@ def parseArgs():
 
 '''
 함수명 : checkMount
-주요 기능 : 전체 시스템 종료 전, ccvm의 secondary 저장소가 umount되었는지 체크하고 필요 시 umount를 실행합니다. 
-'''
-# def checkMount():
-#     try:
-#         result = check_output(["ssh root@ccvm findmnt | grep '/nfs/secondary' | awk '{print $2}' | sort -u"], universal_newlines=True, shell=True, env=env)
-#         #ccvm에서 "/nfs/secondary" 경로 umount되었는지 체크
-#         if result.strip().find('/nfs/secondary') != -1:
-#             retVal = True
-#             retCode = 200
-#         else:
-#             retVal = False
-#             retCode = 500
-#         ret = createReturn(code=retCode, val=retVal, retname='Storage Center VM Status')
-#     except Exception as e:
-#         ret = createReturn(code=500, val='virsh start error', retname='Storage Center VM Status Error')
-#     return print(json.dumps(json.loads(ret), indent=4))
-
-'''
-함수명 : checkMount
 주요 기능 : 전체 시스템 종료 전, 호스트에 mount되어있는 볼륨이 umount되었는지 체크하고 필요 시 umount를 실행합니다. 
 '''
 def checkMount():
