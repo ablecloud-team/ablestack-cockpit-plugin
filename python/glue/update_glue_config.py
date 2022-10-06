@@ -64,7 +64,8 @@ def updateAllHostGlueConfig(args):
 
         # 명령수행 호스트에 ceph.conf 파일 업데이트
         return_val = "ceph config generate-minimal-conf command failed. Check cube host /etc/ceph/ceph.client.admin.keyring or ceph.conf"
-        ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', "localhost", "ceph config generate-minimal-conf > /etc/ceph/ceph_temp.conf | mv -f /etc/ceph/ceph_temp.conf /etc/ceph/ceph.conf").stdout.strip().decode()
+        ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', "localhost", "ceph config generate-minimal-conf > /etc/ceph/ceph_temp.conf").stdout.strip().decode()
+        ret += ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', "localhost", "mv -f /etc/ceph/ceph_temp.conf /etc/ceph/ceph.conf").stdout.strip().decode()
 
         if ret == '':
             # ping test로 네트워크가 연결되어 있는지 상태 체크하는 부분
