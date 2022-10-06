@@ -466,7 +466,7 @@ $('#button-execution-modal-update-glue-config').on('click', function(){
     $("#modal-status-alert-body").html("전체 호스트 Glue 설정 업데이트를 실패하였습니다.<br/>cube호스트, SCVM 상태를 확인해주세요.");
     createLoggerInfo("all_host_glue_config_update_modal() start");
 
-    cockpit.spawn(["python3", pluginpath+"/python/cloudinit_status/cloudinit_status.py", "ping", "--target",  "ccvm"])
+    cockpit.spawn(["python3", pluginpath+"/python/glue/update_glue_config.py", "update"])
     .then(function(data){var retVal = JSON.parse(data);
         if(retVal.code == 200){
             $('#div-modal-spinner').hide();

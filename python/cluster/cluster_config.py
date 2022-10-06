@@ -151,7 +151,6 @@ def insertScvmHost(args):
                 # 원격 ablecube 호스트 및 scvm의 hosts 정보를 수정하는 명령 수행
                 return_val = "insertScvmHost Failed to modify cluster_config.py and hosts file."
                 for p_val3 in param_json:
-                # if p_val3["hostname"] == 'ablecube4': #개발 완료후 제거
                     cmd_str = "python3 /usr/share/cockpit/ablestack/python/cluster/cluster_config.py insert"
                     cmd_str += " -js '" + args.json_string + "'"
                     cmd_str += " -co withScvm"
@@ -212,7 +211,6 @@ def insertAllHost(args):
                 # 원격 ablecube 호스트 및 scvm의 hosts 정보를 수정하는 명령 수행
                 return_val = "insertAllHost Failed to modify cluster_config.py and hosts file."
                 for p_val3 in param_json:
-                # if p_val3["hostname"] == 'ablecube4': #개발 완료후 제거
                     cmd_str = "python3 /usr/share/cockpit/ablestack/python/cluster/cluster_config.py insert"
                     cmd_str += " -js '" + args.json_string + "'"
                     

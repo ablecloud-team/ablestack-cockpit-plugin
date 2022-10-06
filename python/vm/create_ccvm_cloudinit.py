@@ -112,7 +112,7 @@ def createCcvmCloudinit(args):
     else:
         for host_name in args.host_names:
             os.system("ssh root@"+host_name+" 'mkdir -p "+pluginpath+"/tools/vmconfig/ccvm'")
-            os.system("scp "+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso")
+            os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso")
 
     # 결과값 리턴
     if success_bool:

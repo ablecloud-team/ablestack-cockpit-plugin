@@ -126,12 +126,12 @@ def hostOnly(args):
 
 def withScvm(args):
     ret = changeHosts(args)
-    os.system("scp "+ hosts_file_path +" root@scvm-mngt:/etc/hosts > /dev/null")
+    os.system("scp -q "+ hosts_file_path +" root@scvm-mngt:/etc/hosts")
     return ret
     
 def withCcvm(args):
     ret = changeHosts(args)
-    os.system("scp "+ hosts_file_path +" root@ccvm-mngt:/etc/hosts > /dev/null")
+    os.system("scp -q "+ hosts_file_path +" root@ccvm-mngt:/etc/hosts")
     return ret
 
 # Press the green button in the gutter to run the script.
