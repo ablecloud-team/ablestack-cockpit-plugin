@@ -443,7 +443,7 @@ $('#form-radio-hosts-new-scvm').on('click', function () {
     $('#form-input-cluster-config-host-number-minus-scvm').removeAttr('disabled');
     $('#form-input-cluster-config-host-number-scvm').removeAttr('disabled');
     $('#form-table-tbody-cluster-config-existing-host-profile-scvm tr').remove();
-    $('#form-input-storage-vm-hosts-file').val("");
+    // $('#form-input-storage-vm-hosts-file').val("");
 
     $("#form-input-ccvm-mngt-ip").val("");
     $("#form-input-ccvm-mngt-ip").attr('disabled', false);
@@ -467,6 +467,17 @@ $('#form-radio-hosts-file-scvm').on('click', function () {
 
     $("#form-input-ccvm-mngt-ip").val("");
     $("#form-input-ccvm-mngt-ip").attr('disabled', true);
+    
+    cockpit.spawn(["cat", pluginpath + "/tools/properties/cluster.json"])
+    .then(function(data){
+        var clusterJsonConf = JSON.parse(data);
+        settingProfile(clusterJsonConf, option_scvm);
+    })
+    .catch(function(data){
+        createLoggerInfo("cluster.json 파일 읽기 실패");
+        console.log("cluster.json 파일 읽기 실패" + data);
+    });
+
 });
 
 // Host 파일 준비 중 "현재 호스트 번호"를 변경하는 '+', '-' 기능 
@@ -644,19 +655,19 @@ $('#form-input-cluster-config-host-number-scvm').on('change', function () {
 // });
 
 // Hosts 기존 파일 선택 시 hidden textarea 내용을 선택한 파일의 내용으로 변경
-$('#form-input-storage-vm-hosts-file').on('click', function () {
-    let hosts_input = document.querySelector('#form-input-storage-vm-hosts-file');
-    let file_type = "cluster.json";
-    fileReaderIntoTableFunc(hosts_input, file_type, option_scvm);
+// $('#form-input-storage-vm-hosts-file').on('click', function () {
+//     let hosts_input = document.querySelector('#form-input-storage-vm-hosts-file');
+//     let file_type = "cluster.json";
+//     fileReaderIntoTableFunc(hosts_input, file_type, option_scvm);
 
-    $('#form-input-storage-vm-hosts-file').val("");
-});
+//     $('#form-input-storage-vm-hosts-file').val("");
+// });
 // Hosts 기존 파일 선택 시, 파일 선택 취소 시 table 초기화
-$('#form-input-storage-vm-hosts-file').on('change', function () {
-    if ($(this).val() == "") {
-        $('#form-table-tbody-cluster-config-existing-host-profile-scvm tr').remove();
-    }
-});
+// $('#form-input-storage-vm-hosts-file').on('change', function () {
+//     if ($(this).val() == "") {
+//         $('#form-table-tbody-cluster-config-existing-host-profile-scvm tr').remove();
+//     }
+// });
 
 // 마법사 "배포 실행 버튼 모달창"
 $('#button-cancel-modal-storage-wizard-confirm').on('click', function () {
@@ -1311,7 +1322,8 @@ function setReviewInfo(){
     if(mngt_vlan != '') {
         mngt_el += "Vlan : "+mngt_vlan+"</br>";
     }
-    if(dns != ''){
+
+    if(dns == ''){
         mngt_el += "DNS : 미입력</br>";
     }else {
         mngt_el += "DNS : "+dns+"</br>";
@@ -1530,7 +1542,7 @@ function validateStorageVm(){
  */
  function resetScvmNetworkInfo(){
     //input 초기화
-    $("#form-input-storage-vm-hosts-file").val("");
+    // $("#form-input-storage-vm-hosts-file").val("");
     $("#form-input-storage-vm-hostname").val("");
     $("#form-input-storage-vm-mgmt-ip").val("");
     $("#form-input-storage-vm-mgmt-vlan").val("");
