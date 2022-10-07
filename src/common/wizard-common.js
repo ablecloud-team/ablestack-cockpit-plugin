@@ -613,19 +613,19 @@ function settingProfile(clusterJsonConf, option){
 
         if(clusterJsonConf.clusterConfig.pcsCluster.hostname1 != "" && clusterJsonConf.clusterConfig.pcsCluster.hostname1 != null){
             $("#form-input-cloud-vm-failover-cluster-host1-name").val(clusterJsonConf.clusterConfig.pcsCluster.hostname1);
-        }else{
+        }else if(clusterJsonConf.clusterConfig.hosts.length > 0 && clusterJsonConf.clusterConfig.hosts[0].hostname != "" && clusterJsonConf.clusterConfig.hosts[0].hostname != null){
             $("#form-input-cloud-vm-failover-cluster-host1-name").val(clusterJsonConf.clusterConfig.hosts[0].hostname);
         }
 
         if(clusterJsonConf.clusterConfig.pcsCluster.hostname2 != "" && clusterJsonConf.clusterConfig.pcsCluster.hostname2 != null){
             $("#form-input-cloud-vm-failover-cluster-host2-name").val(clusterJsonConf.clusterConfig.pcsCluster.hostname2);
-        }else{
+        }else if(clusterJsonConf.clusterConfig.hosts.length > 1 && clusterJsonConf.clusterConfig.hosts[1].hostname != "" && clusterJsonConf.clusterConfig.hosts[1].hostname != null){
             $("#form-input-cloud-vm-failover-cluster-host2-name").val(clusterJsonConf.clusterConfig.hosts[1].hostname);
         }
 
         if(clusterJsonConf.clusterConfig.pcsCluster.hostname3 != "" && clusterJsonConf.clusterConfig.pcsCluster.hostname3 != null){
             $("#form-input-cloud-vm-failover-cluster-host3-name").val(clusterJsonConf.clusterConfig.pcsCluster.hostname3);
-        }else{
+        }else if(clusterJsonConf.clusterConfig.hosts.length > 2 && clusterJsonConf.clusterConfig.hosts[2].hostname != "" && clusterJsonConf.clusterConfig.hosts[2].hostname != null){
             $("#form-input-cloud-vm-failover-cluster-host3-name").val(clusterJsonConf.clusterConfig.hosts[2].hostname);
         }
     }
