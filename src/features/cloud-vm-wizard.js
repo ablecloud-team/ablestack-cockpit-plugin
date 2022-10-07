@@ -939,8 +939,8 @@ function deployCloudCenterVM() {
                                                     cockpit.spawn(pcs_config)
                                                         .then(function(data){
                                                             //결과 값 json으로 return
-                                                            var result = JSON.parse(data);
-                                                            if(result.code=="200"){
+                                                            var ccvm_result = JSON.parse(data);
+                                                            if(ccvm_result.code=="200"){
                                                                 createLoggerInfo("deployCloudCenterVM success");
                                                                 setProgressStep("span-ccvm-progress-step5",2);
                                                                 //최종 화면 호출
