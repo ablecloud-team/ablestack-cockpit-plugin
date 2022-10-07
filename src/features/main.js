@@ -447,6 +447,53 @@ function checkConfigStatus(){
     });
 }
 
+/** all hosts update glue config modal 관련 action start */
+function all_host_glue_config_update_modal(){
+    $('#div-modal-update-glue-config').show();
+}
+
+$('#button-close-modal-update-glue-config').on('click', function(){
+    $('#div-modal-update-glue-config').hide();
+});
+
+$('#button-execution-modal-update-glue-config').on('click', function(){
+    var console_log = true;
+    $('#div-modal-update-glue-config').hide();
+    $('#div-modal-spinner-header-txt').text('전체 호스트 Glue 설정 업데이트하고 있습니다.');
+    $('#div-modal-spinner').show();
+
+    $("#modal-status-alert-title").html("전체 호스트 Glue 설정 업데이트");
+    $("#modal-status-alert-body").html("전체 호스트 Glue 설정 업데이트를 실패하였습니다.<br/>cube호스트, SCVM 상태를 확인해주세요.");
+    createLoggerInfo("all_host_glue_config_update_modal() start");
+
+    cockpit.spawn(["python3", pluginpath+"/python/glue/update_glue_config.py", "update"])
+    .then(function(data){var retVal = JSON.parse(data);
+        if(retVal.code == 200){
+            $('#div-modal-spinner').hide();
+            $("#modal-status-alert-body").html("모니터링센터 수집 정보 업데이트를 성공하였습니다");
+            $('#div-modal-status-alert').show();
+            createLoggerInfo("all cube hosts, scvms update keyring and ceph.confg spawn success");
+        }else{
+            $('#div-modal-spinner').hide();
+            $('#div-modal-status-alert').show();
+            createLoggerInfo(":::all_host_glue_config_update_modal() Error ::: error");
+            console.log(":::all_host_glue_config_update_modal() Error :::" + data);
+        }
+    })
+    .catch(function(data){
+        $('#div-modal-spinner').hide();
+        $('#div-modal-status-alert').show();
+        createLoggerInfo(":::all_host_glue_config_update_modal() Error ::: error");
+        console.log(":::all_host_glue_config_update_modal() Error :::" + data);
+    });
+});
+
+$('#button-cancel-modal-update-glue-config').on('click', function(){
+    $('#div-modal-update-glue-config').hide();
+});
+/** all hosts update glue config modal 관련 action end */
+
+
 /**
  * Meathod Name : checkStorageClusterStatus
  * Date Created : 2021.03.31
@@ -475,6 +522,7 @@ function checkStorageClusterStatus(){
             }else{  //bootstrap.sh 실행 후
                 sessionStorage.setItem("scvm_bootstrap_status","true"); 
                 $("#scvm-after-bootstrap-run").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-linkto-storage-center' onclick='scc_link_go()'>스토리지센터 연결</a>");
+                $("#scvm-after-update-glue-config").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-update-glue-config' onclick='all_host_glue_config_update_modal()'>전체 호스트 Glue 설정 업데이트</a>");
                 $("#scvm-before-bootstrap-run").html("");
             }      
         })
@@ -506,6 +554,7 @@ function checkStorageClusterStatus(){
                     $('#scc-status-check').text("스토리지센터 클러스터가 구성되었습니다.");
                     $('#scc-status-check').attr("style","color: var(--pf-global--success-color--100)");
                     $("#menu-item-linkto-storage-center").removeClass('pf-m-disabled');
+                    $("#menu-item-update-glue-config").removeClass('pf-m-disabled');
                     $("#scc-css").attr('class','pf-c-label pf-m-green');
                     $("#scc-icon").attr('class','fas fa-fw fa-check-circle');
                 }else if(retVal.val.cluster_status == "HEALTH_WARN"){
@@ -513,6 +562,7 @@ function checkStorageClusterStatus(){
                     $('#scc-status-check').text("스토리지센터 클러스터가 구성되었습니다.");
                     $('#scc-status-check').attr("style","color: var(--pf-global--success-color--100)");
                     $("#menu-item-linkto-storage-center").removeClass('pf-m-disabled');
+                    $("#menu-item-update-glue-config").removeClass('pf-m-disabled');
                     $("#scc-css").attr('class','pf-c-label pf-m-orange');
                     $("#scc-icon").attr('class','fas fa-fw fa-exclamation-triangle');
                 }else if(retVal.val.cluster_status == "HEALTH_ERR"){
@@ -524,6 +574,7 @@ function checkStorageClusterStatus(){
                     $('#scc-status-check').text("스토리지센터 클러스터가 구성되지 않았습니다.");
                     $('#scc-status-check').attr("style","color: var(--pf-global--danger-color--100)");
                     $("#menu-item-linkto-storage-center").addClass('pf-m-disabled');
+                    $("#menu-item-update-glue-config").addClass('pf-m-disabled');
                 }
 
                 //json으로 넘겨 받은 값들 세팅
@@ -579,6 +630,7 @@ function checkStorageClusterStatus(){
                 $("#menu-item-set-maintenance-mode").addClass('pf-m-disabled');
                 $("#menu-item-unset-maintenance-mode").addClass('pf-m-disabled');
                 $("#menu-item-linkto-storage-center").addClass('pf-m-disabled');
+                $("#menu-item-update-glue-config").addClass('pf-m-disabled');
                 $("#menu-item-bootstrap-run").addClass('pf-m-disabled');
                 resolve();
             });

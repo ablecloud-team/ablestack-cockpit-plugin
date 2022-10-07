@@ -78,6 +78,7 @@
                                                         <li id="scvm-after-bootstrap-run"></li>
                                                         <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 없을때 표시-->
                                                         <li id="scvm-before-bootstrap-run"></li>
+                                                        <li id="scvm-after-update-glue-config"></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -984,6 +985,26 @@
             </div>
         </div>
         <!-- 모니터링센터 수집 정보 업데이트 : Modal 영역 끝 -->
+
+        <!-- 전체 호스트 Glue 설정 업데이트 : Modal 영역 시작 -->
+        <div id="div-modal-update-glue-config" class="pf-c-backdrop" style="display:none">
+            <div class="pf-l-bullseye">
+                <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="All Hosts Update Glue Config">
+                    <button id="button-close-modal-update-glue-config" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                    <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">전체 호스트 Glue 설정 업데이트</span></h1></header>
+                    <div class="pf-c-modal-box__body">
+                        <div>전체 호스트 Glue 설정 업데이트를 진행하시겠습니까?</div>
+                    </div>
+                    <footer class="pf-c-modal-box__footer">
+                        <button id="button-execution-modal-update-glue-config" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                        <button id="button-cancel-modal-update-glue-config" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+        <!-- 전체 호스트 Glue 설정 업데이트 : Modal 영역 끝 -->
         
         <!-- 모달 영역 끝  -->
 

@@ -173,7 +173,7 @@ $('#button-execution-modal-monitoring-config-update').on('click', function(){
             $("#modal-status-alert-title").html("모니터링 수집 정보를 업데이트");
             $("#modal-status-alert-body").html("모니터링센터 수집 정보 업데이트를 실패하였습니다.<br/>cluster.json 파일을 확인해주세요.");
             // cluster.json 파일 읽어 오기
-            cockpit.spawn(["cat", "/usr/share/cockpit/ablestack/tools/properties/cluster.json"])
+            cockpit.spawn(["cat", pluginpath + "/tools/properties/cluster.json"])
             .then(function(data){
                 const pythonPath = '/usr/share/ablestack/ablestack-wall/python/';
                 var config_json = JSON.parse(data);
@@ -234,25 +234,12 @@ $('#button-execution-modal-monitoring-config-update').on('click', function(){
         createLoggerInfo(":::update_wall_config() Error ::: error");
         console.log(":::update_wall_config() Error :::" + data);
     });
-
-
-
-
-
-
-
-
-
-
-
 });
 
 $('#button-cancel-modal-monitoring-config-update').on('click', function(){
     $('#div-modal-monitoring-config-update').hide();
 });
 /** wall config update modal 관련 action end */
-
-
 
 
 /** cloud vm snap rollback modal 관련 action start */
@@ -393,7 +380,7 @@ $('#button-execution-modal-cloud-vm-snap-backup').on('click', function(){
         var retVal = JSON.parse(data);
         if(retVal.code == 200){
             $("#modal-status-alert-title").html("클라우드센터VM 복구용 스냅샷 생성 완료");
-            $("#modal-status-alert-body").html("스냅샷 복구용 스냅샷 생성을 완료하였습니다. 클라우드센터VM을 시작해주세요.");
+            $("#modal-status-alert-body").html("스냅샷 복구용 스냅샷 생성을 완료하였습니다.");
             $('#div-modal-status-alert').show();
             createLoggerInfo("backup cloud vm snapshot spawn success");
         } else {
@@ -534,7 +521,7 @@ $('#button-config-file-download').on('click', function(){
         alert(error);
     });
 
-    cockpit.file("/usr/share/cockpit/ablestack/tools/properties/cluster.json").read()
+    cockpit.file(pluginpath + "/tools/properties/cluster.json").read()
     .then((content, tag) => {    
         let hosts_download = 'span-modal-wizard-cluster-config-hosts-file-download';
         // 다운로드 링크 생성 전 유효성 검정

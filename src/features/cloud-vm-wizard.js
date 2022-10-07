@@ -463,6 +463,7 @@ $('#form-checkbox-svc-network').on('change', function(){
         $('#form-input-cloud-vm-svc-nic-ip').attr('disabled', false);
         $('#form-input-cloud-vm-svc-vlan').attr('disabled', false);
         $('#form-input-cloud-vm-svc-gw').attr('disabled', false);
+        $('#form-input-cloud-vm-svc-dns').attr('disabled', false);
     }
     else {
         // 서비스네트워크를 사용하지 않음으로 선택한 경우 서비스네트워크 브릿지 선택상자를 비활성화 함
@@ -472,6 +473,7 @@ $('#form-checkbox-svc-network').on('change', function(){
         $('#form-input-cloud-vm-svc-nic-ip').attr('disabled', true);
         $('#form-input-cloud-vm-svc-vlan').attr('disabled', true);
         $('#form-input-cloud-vm-svc-gw').attr('disabled', true);
+        $('#form-input-cloud-vm-svc-dns').attr('disabled', true);
     }
 });
 
@@ -492,7 +494,7 @@ $('#form-radio-hosts-new-ccvm').on('click', function () {
     $('#form-input-cluster-config-host-number-minus-ccvm').removeAttr('disabled');
     $('#form-input-cluster-config-host-number-ccvm').removeAttr('disabled');
     $('#form-table-tbody-cluster-config-existing-host-profile-ccvm tr').remove();
-    $('#form-input-cloud-vm-hosts-file').val("");
+    // $('#form-input-cloud-vm-hosts-file').val("");
 });
 
 // Host 파일 준비 방법 중 기존 파일 사용을 클릭하는 경우 Host 프로파일 디비전을 숨기고 Hosts 파일 디비전은 보여준다.
@@ -510,6 +512,16 @@ $('#form-radio-hosts-file-ccvm').on('click', function () {
     $('#form-input-cluster-config-host-number-plus-ccvm').attr('disabled', 'true');
     $('#form-input-cluster-config-host-number-minus-ccvm').attr('disabled', 'true');
     $('#form-input-cluster-config-host-number-ccvm').attr('disabled', 'true');
+
+    cockpit.spawn(["cat", pluginpath + "/tools/properties/cluster.json"])
+    .then(function(data){
+        var clusterJsonConf = JSON.parse(data);
+        settingProfile(clusterJsonConf, option_ccvm);
+    })
+    .catch(function(data){
+        createLoggerInfo("cluster.json 파일 읽기 실패");
+        console.log("cluster.json 파일 읽기 실패" + data);
+    });
 });
 
 // Host 파일 준비 중 "현재 호스트 번호"를 변경하는 '+', '-' 기능 
@@ -687,19 +699,19 @@ $('#form-input-cluster-config-host-number-ccvm').on('change', function () {
 // });
 
 // Hosts 기존 파일 선택 시 hidden textarea 내용을 선택한 파일의 내용으로 변경
-$('#form-input-cloud-vm-hosts-file').on('click', function () {
-    let hosts_input = document.querySelector('#form-input-cloud-vm-hosts-file');
-    let file_type = "cluster.json";
+// $('#form-input-cloud-vm-hosts-file').on('click', function () {
+//     let hosts_input = document.querySelector('#form-input-cloud-vm-hosts-file');
+//     let file_type = "cluster.json";
     
-    fileReaderIntoTableFunc(hosts_input, file_type, option_ccvm);
-    $('#form-input-cloud-vm-hosts-file').val("");
-});
+//     fileReaderIntoTableFunc(hosts_input, file_type, option_ccvm);
+//     $('#form-input-cloud-vm-hosts-file').val("");
+// });
 // Hosts 기존 파일 선택 시, 파일 선택 취소 시 table 초기화
-$('#form-input-cloud-vm-hosts-file').on('change', function () {
-    if ($(this).val() == "") {
-        $('#form-table-tbody-cluster-config-existing-host-profile-ccvm tr').remove();
-    }
-});
+// $('#form-input-cloud-vm-hosts-file').on('change', function () {
+//     if ($(this).val() == "") {
+//         $('#form-table-tbody-cluster-config-existing-host-profile-ccvm tr').remove();
+//     }
+// });
 
 // 마법사 "배포 실행 버튼 모달창"
 $('#button-cancel-modal-cloud-wizard-confirm').on('click', function () {
@@ -927,8 +939,8 @@ function deployCloudCenterVM() {
                                                     cockpit.spawn(pcs_config)
                                                         .then(function(data){
                                                             //결과 값 json으로 return
-                                                            var result = JSON.parse(data);
-                                                            if(result.code=="200"){
+                                                            var ccvm_result = JSON.parse(data);
+                                                            if(ccvm_result.code=="200"){
                                                                 createLoggerInfo("deployCloudCenterVM success");
                                                                 setProgressStep("span-ccvm-progress-step5",2);
                                                                 //최종 화면 호출
@@ -1080,6 +1092,7 @@ function resetSvcNetworkValues(){
         $("#form-input-cloud-vm-svc-nic-ip").val("");
         $("#form-input-cloud-vm-svc-vlan").val("");
         $("#form-input-cloud-vm-svc-gw").val("");
+        $("#form-input-cloud-vm-svc-dns").val("");
     }
 }
 
@@ -1143,10 +1156,10 @@ function resetCcvmNetworkInfo(){
     $("#form-input-cloud-vm-svc-nic-ip").val("");
     $("#form-input-cloud-vm-svc-vlan").val("");
     $("#form-input-cloud-vm-svc-gw").val("");
+    $("#form-input-cloud-vm-svc-dns").val("");
     $("#form-input-cloud-vm-failover-cluster-host1-name").val("");
     $("#form-input-cloud-vm-failover-cluster-host2-name").val("");
     $("#form-input-cloud-vm-failover-cluster-host3-name").val("");
-    $("#form-input-cloud-vm-svc-dns").val("");
 }
 
 /**

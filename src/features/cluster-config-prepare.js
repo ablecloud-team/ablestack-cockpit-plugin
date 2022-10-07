@@ -1157,7 +1157,7 @@ function checkClusterConfigPrepareFileName(file_name, file_type) {
             return false;
         }
     } else if (file_type == "cluster.json") {
-        if (file_name != "cluster.json") {
+        if (!file_name.match("cluster") && !file_name.match(".json")) {
             alert("'cluster.json'으로 된 파일만 업로드할 수 있습니다.");
             return false;
         }

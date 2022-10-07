@@ -364,17 +364,17 @@
                                                 </label>
                                             </div>
                                             <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
-                                                <div class="pf-c-radio">
-                                                    <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-new-ccvm" name="radio-hosts-file-ccvm" value="new" checked disabled/>
+                                                <div class="pf-c-radio" style="display: none;">
+                                                    <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-new-ccvm" name="radio-hosts-file-ccvm" value="new" disabled/>
                                                     <label class="pf-c-radio__label" for="form-radio-hosts-new-ccvm">신규 생성</label>
                                                 </div>
                                                 <div class="pf-c-radio">
-                                                    <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-file-ccvm" name="radio-hosts-file-ccvm" value="existing" />
-                                                    <label class="pf-c-radio__label" for="form-radio-hosts-file-ccvm">기존 파일 사용</label>
+                                                    <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-file-ccvm" name="radio-hosts-file-ccvm" value="existing" checked/>
+                                                    <label class="pf-c-radio__label" for="form-radio-hosts-file-ccvm">해당 호스트 파일 사용</label>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="pf-c-form__group" id="div-form-hosts-file-ccvm">
+                                        <!-- <div class="pf-c-form__group" id="div-form-hosts-file-ccvm">
                                             <div class="pf-c-form__group-label">
                                                 <label class="pf-c-form__label" for="form-input-cloud-vm-hosts-file">
                                                     <span class="pf-c-form__label-text">클러스터 구성 파일</span>
@@ -383,7 +383,7 @@
                                             <div class="pf-c-form__group-control">
                                                 <input class="pf-c-form-control" style="width:60%" type="file" id="form-input-cloud-vm-hosts-file" name="form-input-cloud-vm-hosts-file"/>
                                             </div>
-                                        </div>
+                                        </div> -->
                                         <div class="pf-c-form__group">
                                             <div class="pf-c-form__group-label">
                                                 <label class="pf-c-form__label" for="form-input-current-host-name-ccvm">
@@ -818,7 +818,7 @@
                                                         IP Addr : <span id="span-cloud-vm-additional-svc-ipaddr"></span><br/>      
                                                         VLAN ID : <span id="span-cloud-vm-additional-svc-vlan-id"></span><br/>       
                                                         Gateway : <span id="span-cloud-vm-additional-svc-gateway"></span><br/>
-                                                        DNS : <span id="span-cloud-vm-addtional-svc-dns"></span>                                           
+                                                        DNS : <span id="span-cloud-vm-additional-svc-dns"></span>                                           
                                                     </div>
                                                 </dd>
                                             </div>

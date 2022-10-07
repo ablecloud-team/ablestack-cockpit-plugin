@@ -90,7 +90,7 @@ def createSecretKey(host_names):
 
     for host_name in host_names:    
 
-        os.system("scp "+pluginpath+"/tools/vmconfig/ccvm/secret.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/secret.xml")
+        os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/secret.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/secret.xml")
 
         # virsh secret-list 11111111-1111-1111-1111-111111111111 값이 존재하는지 확인
         secret_val = subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-list | grep  11111111-1111-1111-1111-111111111111'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
@@ -172,7 +172,7 @@ def createCcvmXml(args):
         # 클러스터 구성한 호스트에 파일 복사
         for host_name in args.host_names:
 
-            os.system("scp "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
+            os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
 
             # pcs 클러스터 할 호스트 전체의 폴더 권한 수정
             os.system("ssh root@"+host_name+" 'chmod 755 -R "+pluginpath+"/tools/vmconfig/ccvm'")

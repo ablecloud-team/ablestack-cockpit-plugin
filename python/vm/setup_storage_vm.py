@@ -50,6 +50,8 @@ def setupStorageVm(args):
     # scvm.qcow2 파일 권한 설정
     os.system("chmod 666 /var/lib/libvirt/images/scvm.qcow2")
 
+    os.system("yes|cp -rf /usr/share/cockpit/ablestack/tools/vmconfig/ /usr/share/ablestack/")
+
     # virsh 초기화   
     check_err = os.system("virsh define "+pluginpath+"/tools/vmconfig/scvm/scvm.xml > /dev/null")
     if check_err != 0 :
