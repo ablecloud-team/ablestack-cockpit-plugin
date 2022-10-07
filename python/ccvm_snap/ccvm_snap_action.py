@@ -73,7 +73,7 @@ def listCcvmSnap(args):
 def rollbackCcvmSnap(args):
     try:        
         # ccvm 스냅 롤백
-        result = os.system("rbd snap rollback "+pool_name+"/"+ccvm_image_name+"@"+args.snap_name)
+        result = os.system("rbd snap rollback --no-progress"+pool_name+"/"+ccvm_image_name+"@"+args.snap_name)
         
         if result == 0:
             return createReturn(code=200, val="CCVM Snapshot Rollback Success")
@@ -127,7 +127,7 @@ def backupCcvmSnap(args):
             if result == 0:
                 return createReturn(code=200, val="CCVM Snapshot Backup Create Success")
             else:
-                return createReturn(code=500, val="CCVM Snapshot Backup Create Fail. Snapshot backup is possible only in the stop or start state1")
+                return createReturn(code=500, val="CCVM Snapshot Backup Create Fail. Snapshot backup is possible only in the stop or start state")
 
         else :
             return createReturn(code=500, val="CCVM Snapshot Backup Create Fail. Snapshot backup is possible only in the stop or start state")

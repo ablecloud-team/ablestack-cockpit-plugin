@@ -17,7 +17,7 @@ def parseArgs():
 
     parser = argparse.ArgumentParser(description='Cloud-Init status check',
                                      epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
-    parser.add_argument('action', choices=['status','create','update','delete'], help='choose one of the actions')
+    parser.add_argument('action', choices=['status','create','update','delete','allUpdate'], help='choose one of the actions')
     parser.add_argument('--depth1', metavar='name', type=str, help='ablestack.json 1 depth key')
     parser.add_argument('--depth2', metavar='name', type=str, help='ablestack.json 2 depth key')
     parser.add_argument('--value', metavar='name', type=str, help='ablestack.json value')
@@ -87,7 +87,24 @@ def jsonUpdate():
             ret = createReturn(code=200, val=ret_val)
 
     except Exception as e:
-        ret = createReturn(code=600, val='ERROR')
+        ret = createReturn(code=500, val='ERROR')
+        print ('EXCEPTION : ',e)
+
+    return ret
+
+def jsonAllUpdate():
+    try:
+        json_data = openAblestackJson()
+        json_data["bootstrap"]["scvm"] = "true"
+        json_data["bootstrap"]["ccvm"] = "true"
+        json_data["monitoring"]["wall"] = "true"
+
+        with open(file_path, 'w') as outfile:
+            json.dump(json_data, outfile, indent=4)
+            ret = createReturn(code=200, val="ablestack.json all option change true")
+
+    except Exception as e:
+        ret = createReturn(code=500, val='ablestack.json all option change ERROR')
         print ('EXCEPTION : ',e)
 
     return ret
@@ -100,4 +117,7 @@ if __name__ == '__main__':
         print(ret)
     elif (args.action) == 'update':
         ret = jsonUpdate()
+        print(ret)
+    elif (args.action) == 'allUpdate':
+        ret = jsonAllUpdate()
         print(ret)

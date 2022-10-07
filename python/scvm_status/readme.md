@@ -21,7 +21,7 @@ json 형태의 return값 확인
         "rdisk": "70.00 GiB",
         "manageNicType": "virtio",
         "manageNicParent": "bridge0",
-        "manageNicIp": "10.10.1.11/16",
+        "manageNicIp": "10.10.1.11/24",
         "manageNicGw": "XXX",
         "storageServerNicType": "virtio",
         "storageServerNicParent": "br-PN",

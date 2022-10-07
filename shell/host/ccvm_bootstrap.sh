@@ -100,6 +100,17 @@ done
 
 rm -rf /root/uefi.properties
 
+
+#tpm 설정 파일 생성
+echo -e "host.tpm.enable=true" > /root/tpm.properties
+
+for host in $hosts
+do
+  scp -o StrictHostKeyChecking=no /root/tpm.properties $host:/etc/cloudstack/agent/
+done
+
+rm -rf /root/tpm.properties
+
 #systemvm template 등록
 /usr/share/cloudstack-common/scripts/storage/secondary/cloud-install-sys-tmplt \
 -m /nfs/secondary \

@@ -161,7 +161,27 @@ network-config파일의 관리 네트워크 부분을 생성하는 함수
 def genManagement(mgmt_nic: str, mgmt_ip: str, mgmt_prefix: int, mgmt_gw: str, dns: str):
     yam = {'network': {'version': 1, 'config': []}}
 
-    yam['network']['config'] = [{'name': mgmt_nic,
+    if mgmt_gw == None:
+        if dns == None:
+            yam['network']['config'] = [{'name': mgmt_nic,
+                                 'subnets': [{'address': f'{mgmt_ip}/{mgmt_prefix}',
+                                              'type': 'static'}],
+                                 'type': 'physical'}]
+        else:
+            yam['network']['config'] = [{'name': mgmt_nic,
+                                 'subnets': [{'address': f'{mgmt_ip}/{mgmt_prefix}',
+                                              'dns_nameservers' : [dns],
+                                              'type': 'static'}],
+                                'type': 'physical'}]
+    else:
+        if dns == None:
+            yam['network']['config'] = [{'name': mgmt_nic,
+                                 'subnets': [{'address': f'{mgmt_ip}/{mgmt_prefix}',
+                                              'gateway': mgmt_gw,
+                                              'type': 'static'}],
+                                 'type': 'physical'}]
+        else:
+            yam['network']['config'] = [{'name': mgmt_nic,
                                  'subnets': [{'address': f'{mgmt_ip}/{mgmt_prefix}',
                                               'dns_nameservers': [dns],
                                               'gateway': mgmt_gw,
@@ -320,7 +340,7 @@ ccvm용 네트워크설정(스토리지 네트워크 추가 없음)하는 부분
 :param 없음
 :return yaml 파일
 """
-def ccvmGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str ):
+def ccvmGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str):
     with open(f'{tmpdir}/network-config.mgmt', 'rt') as f:
         yam = yaml.load(f)
 
