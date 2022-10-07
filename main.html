@@ -79,6 +79,10 @@
                                                         <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 없을때 표시-->
                                                         <li id="scvm-before-bootstrap-run"></li>
                                                         <li id="scvm-after-update-glue-config"></li>
+                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-set-auto-shutdown-step-two" >전체 시스템 자동 종료</button>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -800,6 +804,9 @@
 
         <!-- 스토리지센터 VM 시작, 정지 : ./src/features/storage-vm-status-update.html을 내용으로 load -->
         <div class="pf-c-backdrop" id="div-modal-storage-vm-status-update"></div>
+
+        <!-- 전체 시스템 종료 : ./src/features/auto-shutdown.html을 내용으로 load -->
+        <div class="pf-c-backdrop" id="div-modal-auto-shutdown"></div>
 
         <!-- 클라우드센터VM 스냅샷 복구  : Modal 영역 시작 -->
         <div id="div-modal-cloud-vm-snap-rollback" class="pf-c-backdrop" style="display:none">
