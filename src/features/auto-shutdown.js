@@ -45,7 +45,7 @@ $('#button-auto-shutdown').on('click', async function(){
             $('#dropdown-menu-cloud-cluster-status').toggle();
             $('#div-modal-spinner-header-txt').text('클라우드센터VM을 정지하고 있습니다.');
             createLoggerInfo("cloud-cluster-status pcsStop");
-            cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStop'])
+            cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsStop'], { host: pcs_exe_host})
             .then(function(data){
                 var retVal = JSON.parse(data);
                 if(retVal.code == 200){
@@ -58,7 +58,7 @@ $('#button-auto-shutdown').on('click', async function(){
                     // 변경 버튼 클릭 이벤트
                     $('#div-modal-spinner-header-txt').text('스토리지 클러스터 유지보수모드 변경중입니다.');
                     createLoggerInfo("scc-maintenance-update set");
-                    cockpit.spawn(["python3", pluginpath+"/python/scc_status/scc_status_update.py", "set_noout" ])
+                    cockpit.spawn(["python3", pluginpath+"/python/scc_status/scc_status_update.py", "set_noout" ], { host: pcs_exe_host})
                     .then(function(data){            
                         var retVal = JSON.parse(data);
                         if(retVal.code == "200"){
@@ -67,7 +67,7 @@ $('#button-auto-shutdown').on('click', async function(){
                             // 9.	스토리지센터 가상머신 정지
                             $('#div-modal-spinner-header-txt').text('스토리지센터 가상머신 상태 변경중입니다.');
                             createLoggerInfo("scvm_status_update stop");
-                            cockpit.spawn(["python3", pluginpath+"/python/host/auto-shutdown.py","stop_scvms"])
+                            cockpit.spawn(["python3", pluginpath+"/python/host/auto-shutdown.py","stop_scvms"], { host: pcs_exe_host})
                             .then(function(data){
                                 var retVal = JSON.parse(data);
                                 if(retVal.code == "200"){
