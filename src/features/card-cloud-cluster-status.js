@@ -666,6 +666,7 @@ function CardCloudClusterStatus(){
                     $("#button-mold-service-control").removeClass('pf-m-disabled');
                     $("#button-mold-db-control").removeClass('pf-m-disabled');
                     $("#card-action-cloud-vm-db-dump").removeClass('pf-m-disabled');
+                    $("#menu-item-set-auto-shutdown-step-two").removeClass('pf-m-disabled');
 
                     $('#form-select-cloud-vm-migration-node').append(selectHtml);
                 }else if(retVal.val.active == 'false'){
@@ -685,6 +686,7 @@ function CardCloudClusterStatus(){
                     $("#button-mold-service-control").addClass('pf-m-disabled');
                     $("#button-mold-db-control").addClass('pf-m-disabled');
                     $("#card-action-cloud-vm-db-dump").addClass('pf-m-disabled');
+                    $("#menu-item-set-auto-shutdown-step-two").addClass('pf-m-disabled');
                 }
                 $('#cccs-low-info').text('클라우드센터 클러스터가 구성되었습니다.');
                 $('#cccs-low-info').attr('style','color: var(--pf-global--success-color--100)')
