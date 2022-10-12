@@ -97,6 +97,16 @@ def listPCIInterface(classify=None):
 :return: dict
 """
 def listDiskInterface(H=False, classify=None):
+    # disk_path result ex) ['sdb', '/dev/disk/by-path/pci-0000:58:00.0-scsi-0:2:0:0']
+    disk_path = []
+    stream = os.popen("ls -l /dev/disk/by-path/ | awk '{ if($11 != \"\") print substr($11,\"7\",length($11))\" \"\"/dev/disk/by-path/\"$9}'")
+    output = stream.read()
+    lines = output.splitlines()
+    for line in lines:
+        line_sp = line.split()
+        if len(line_sp) == 2:
+            disk_path.append(line_sp)
+   
     # output = nmcli_cmd('-c', 'no', '-f', 'TYPE,ACTIVE,DEVICE,STATE,SLAVE', 'con', 'show')
     # output = nmcli_cmd('-c', 'no', '-f', 'ALL', 'con', 'show')
     # outputs = output.splitlines()
@@ -108,8 +118,11 @@ def listDiskInterface(H=False, classify=None):
     newbd = []
     for dev in bd:
         if 'loop' not in dev['type']:
+            for dp in disk_path:
+                if dev["name"] == dp[0]:
+                    dev["path"] = dp[1]
             newbd.append(dev)
-
+            
     item['blockdevices'] = newbd
     # print(output)
 
