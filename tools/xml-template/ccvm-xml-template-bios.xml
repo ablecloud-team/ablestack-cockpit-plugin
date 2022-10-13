@@ -28,7 +28,7 @@
     <suspend-to-disk enabled='no'/>
   </pm>
   <devices>
-    <emulator>/usr/libexec/qemu-kvm</emulator>
+    <emulator>/usr/local/bin/qemu-system-x86_64</emulator>
 <!--ccvm_cloudinit-->
     <disk type='network' device='disk'>
       <source protocol='rbd' name='rbd/ccvm'>
