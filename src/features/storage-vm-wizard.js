@@ -999,8 +999,10 @@ function setDiskInfo(){
                         var check_disable = 'disabled';
                     }
 
+                    //2022.10.12 디스크 경로를 /dev/sdb 형식이 아닌 /dev/disk/by-path/ 경로에서 참조 하도록 수정
                     el += '<div class="pf-c-check">';
-                    el += '<input class="pf-c-check__input" type="checkbox" id="form-checkbox-disk'+i+'" name="form-checkbox-disk" value="/dev/'+lun_pci_list[i].name+'" '+check_disable+' />';
+                    // el += '<input class="pf-c-check__input" type="checkbox" id="form-checkbox-disk'+i+'" name="form-checkbox-disk" value="/dev/'+lun_pci_list[i].name+'" '+check_disable+' />';
+                    el += '<input class="pf-c-check__input" type="checkbox" id="form-checkbox-disk'+i+'" name="form-checkbox-disk" value="'+lun_pci_list[i].path+'" '+check_disable+' />';
                     el += '<label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-disk'+i+'">/dev/'+lun_pci_list[i].name+' '+lun_pci_list[i].state+' '+lun_pci_list[i].size+' '+lun_pci_list[i].model+' '+partition_text+'</label>';
                     el += '</div>';    
                 }
