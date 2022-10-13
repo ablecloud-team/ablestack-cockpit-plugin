@@ -122,7 +122,7 @@ def listDiskInterface(H=False, classify=None):
                 if dev["name"] == dp[0]:
                     dev["path"] = dp[1]
             newbd.append(dev)
-
+            
     item['blockdevices'] = newbd
     # print(output)
 

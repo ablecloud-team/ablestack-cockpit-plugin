@@ -60,6 +60,9 @@ $(document).ready(function(){
     // 스토리지 클러스터 유지보수 모드 변경 페이지 로드
     $('#div-modal-storage-cluster-maintenance-update').load("./src/features/storage-cluster-maintenance-update.html");
     $('#div-modal-storage-cluster-maintenance-update').hide();
+    // 전체 시스템 종료 페이지 로드
+    $('#div-modal-auto-shutdown').load("./src/features/auto-shutdown.html");
+    $('#div-modal-auto-shutdown').hide();
 
     cockpit.spawn(['python3', pluginpath + '/python/pcs/pcsExehost.py'])
     .then(function (data) {
@@ -260,6 +263,17 @@ $('#menu-item-set-storage-center-vm-resource-update').on('click', function(){
     $("#form-select-storage-vm-memory-update option[value="+ sessionStorage.getItem("scvm_momory").split(' ')[0] +"]").prop('disabled',true);
     $('#div-modal-storage-vm-resource-update').show();
 });
+
+// 전체 시스템 종료 버튼 클릭시 modal의 설명 세팅
+$('#menu-item-set-auto-shutdown-step-two').on('click',function(){
+    $('#modal-description-auto-shutdown').html("전체 시스템을 '종료' 하시겠습니까?<br><br> 사전에 각 호스트에 Mount된 볼륨을 해제해야 합니다. 해제 후, 아래 스위치를 클릭하여 계속 진행합니다.");
+    $('#auto-shutdown-cmd').val("start");
+    $('#div-modal-auto-shutdown').show();
+    $('#button-auto-shutdown').show();
+    $('#button-close-auto-shutdown').show();
+    $('#modal-div-auto-shutdown-mount').show();
+});
+
 
 //div-modal-status-alert modal 닫기
 $('#modal-status-alert-button-close1, #modal-status-alert-button-close2').on('click', function(){
