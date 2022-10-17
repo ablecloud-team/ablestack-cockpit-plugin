@@ -52,9 +52,9 @@ cephadm --image "$image" bootstrap \
         ceph config set global container_image $image && \
         ceph config set global mgr/cephadm/container_image_base $image && \
         ceph config set client rbd_cache_policy writeback && \
-        ceph config set client rbd_cache_size 1073741824 && \
-        ceph config set client rbd_cache_max_dirty 805306368 && \
-        ceph config set client rbd_cache_target_dirty 536870912 && \
+        ceph config set client rbd_cache_size 4294967296 && \
+        ceph config set client rbd_cache_max_dirty 3221225472 && \
+        ceph config set client rbd_cache_target_dirty 2147483648 && \
         ceph config set client rbd_cache_max_dirty_age 5.0 && \
         ceph config set mgr mgr/cephadm/container_image_alertmanager localhost:5000/prom/alertmanager:ablestack && \
         ceph config set mgr mgr/cephadm/container_image_grafana localhost:5000/ceph/ceph-grafana:ablestack && \
