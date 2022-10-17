@@ -40,6 +40,7 @@
       <source protocol='rbd' name='rbd/ccvm'>
         <host name='scvm' port='6789'/>
       </source>
+      <driver name='qemu' type='raw' cache='writeback' io='io_uring'/>
       <auth username='admin'>
         <secret type='ceph' uuid='11111111-1111-1111-1111-111111111111'/>
       </auth>
@@ -103,7 +104,7 @@
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
     </controller>
     <controller type='scsi' index='0' model='virtio-scsi'>
-      <address type='pci' domain='0x0000' bus='0x07' slot='0x01' function='0x0'/>
+      <address type='pci' domain='0x0000' bus='0x07' slot='0x00' function='0x0'/>
     </controller>
     <!--management_network_bridge-->
     <!--service_network_bridge-->
