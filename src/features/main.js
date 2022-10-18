@@ -484,7 +484,7 @@ $('#button-execution-modal-update-glue-config').on('click', function(){
     .then(function(data){var retVal = JSON.parse(data);
         if(retVal.code == 200){
             $('#div-modal-spinner').hide();
-            $("#modal-status-alert-body").html("모니터링센터 수집 정보 업데이트를 성공하였습니다");
+            $("#modal-status-alert-body").html("전체 호스트 Glue 설정 업데이트를 성공하였습니다");
             $('#div-modal-status-alert').show();
             createLoggerInfo("all cube hosts, scvms update keyring and ceph.confg spawn success");
         }else{
