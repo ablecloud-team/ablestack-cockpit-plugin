@@ -154,6 +154,7 @@ $('#button-open-modal-wizard-cloud-vm').on('click', function(){
 
 $('#button-open-modal-wizard-monitoring-center').on('click', function(){
     $('#div-modal-wizard-wall-monitoring').show();
+    autoConfigWallIP();
 });
 
 $('#button-link-storage-center-dashboard').on('click', function(){
