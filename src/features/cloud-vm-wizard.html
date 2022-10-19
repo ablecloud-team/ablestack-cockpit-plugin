@@ -623,8 +623,7 @@
                         <div class="pf-c-wizard__main-body" id="div-modal-wizard-cloud-vm-ssh-key">
                             <div class="pf-c-content">
                                 <p>
-                                    클라우드센터 VM과 호스트, 그리고 ABLESTACK을 구성하고 있는 가상머신들과의 SSH 연결을 위해 SSH Key를 설정합니다. 
-                                    미리 생성한 SSH Key 파일을 등록할 수 있습니다. 
+                                    클라우드센터 VM과 호스트, 그리고 ABLESTACK을 구성하고 있는 가상머신들과의 SSH 연결을 위해 SSH Key를 설정합니다. 기본적으로 현재 호스트의 SSH Key 파일을 자동으로 등록하며, 필요시 다운로드 한 SSH Key 파일로 등록 가능합니다.
                                 </p>
                                 <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
                                     <section class="pf-c-form__section">
@@ -637,7 +636,7 @@
                                             </div>
                                             <div class="pf-c-form__group-control pf-m-inline">
                                                 <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-private-key-file" name="form-input-cloud-vm-ssh-private-key-file"/>
-                                                <textarea class="pf-c-form-control" type="text" id="form-textarea-cloud-vm-ssh-private-key-file" hidden></textarea>
+                                                <textarea class="pf-c-form-control" style="width:70%" type="text" id="form-textarea-cloud-vm-ssh-private-key-file" disabled></textarea>
                                             </div>
                                         </div>
                                         <div class="pf-c-form__group">
@@ -649,7 +648,7 @@
                                             </div>
                                             <div class="pf-c-form__group-control pf-m-inline">
                                                 <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-public-key-file" name="form-input-cloud-vm-ssh-public-key-file"/>
-                                                <textarea class="pf-c-form-control" type="text" id="form-textarea-cloud-vm-ssh-public-key-file" hidden></textarea>
+                                                <textarea class="pf-c-form-control" style="width:70%" type="text" id="form-textarea-cloud-vm-ssh-public-key-file" disabled></textarea>
                                             </div>
                                         </div>
                                     </section>

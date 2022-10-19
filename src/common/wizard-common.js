@@ -632,6 +632,40 @@ function settingProfile(clusterJsonConf, option){
 }
 
 /**
+ * Meathod Name : settingSshKey
+ * Date Created : 2022.10.19
+ * Writer  : 배태주
+ * Description : scvm, ccvm의 ssh key 정보를 해당 호스트의 ssh key 파일로 자동세팅 되도록 개선
+ * Parameter : 없음
+ * Return  : 없음
+ **/
+ function settingSshKey(option){
+    cockpit.spawn(['cat', '/root/.ssh/id_rsa'])
+    .then(data=>{;
+        if(option == "-scvm"){
+            $('#form-textarea-storage-vm-ssh-private-key-file').val(data);
+        }else if(option == "-ccvm"){
+            $('#form-textarea-cloud-vm-ssh-private-key-file').val(data);
+        }
+    }).catch(function(err){
+         createLoggerInfo("호스트의 id_rsa 파일 읽기 실패" + err);
+         console.log("호스트의 id_rsa 파일 읽기 실패" + err);
+    });
+
+    cockpit.spawn(['cat', '/root/.ssh/id_rsa.pub'])
+    .then(data=>{;
+        if(option == "-scvm"){
+            $('#form-textarea-storage-vm-ssh-public-key-file').val(data);
+        }else if(option == "-ccvm"){
+            $('#form-textarea-cloud-vm-ssh-public-key-file').val(data);
+        }
+    }).catch(function(err){
+         createLoggerInfo("호스트의 id_rsa.pub 파일 읽기 실패" + err);
+         console.log("호스트의 id_rsa.pub 파일 읽기 실패" + err);
+    });
+}
+
+/**
  * Meathod Name : changeAlias2
  * Date Created : 2021.11.01
  * Writer  : 류홍욱

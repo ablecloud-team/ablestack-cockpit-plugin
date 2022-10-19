@@ -59,6 +59,10 @@ $(document).ready(function(){
     //ssh 공개 key 파일 선택 이벤트 세팅
     setSshKeyFileReader($('#form-input-storage-vm-ssh-public-key-file'), 'id_rsa.pub', setScvmSshPublicKeyInfo);
     
+    //SSH Key 정보 자동 세팅
+    settingSshKey(option_scvm);
+
+    //현재 호스트 명 세팅
     checkHostName(option_scvm);
 
     $('#form-radio-hosts-file-scvm').click();
@@ -1372,14 +1376,14 @@ function setReviewInfo(){
     }
 
     //-----SSH Key 정보-----
-    var ssh_private_key_url = $('#form-input-storage-vm-ssh-private-key-file').val();
+    var ssh_private_key_url = $('#form-textarea-storage-vm-ssh-private-key-file').val();
     if(ssh_private_key_url == '') {
         $('#span-storage-vm-private-key-file').text("미입력");
     } else {
         $('#span-storage-vm-private-key-file').text(ssh_private_key_url);
     }
 
-    var ssh_public_key_url = $('#form-input-storage-vm-ssh-public-key-file').val();
+    var ssh_public_key_url = $('#form-textarea-storage-vm-ssh-public-key-file').val();
     if(ssh_public_key_url == '') {
         $('#span-storage-vm-public-key-file').text("미입력");
     } else {
@@ -1485,10 +1489,10 @@ function validateStorageVm(){
     }else if (!checkIp($("#form-input-storage-vm-dns").val()) && $("#form-input-storage-vm-dns").val() != ""){
         alert("DNS 형식을 확인해주세요.");
         validate_check = false;
-    }else if($('#form-input-storage-vm-ssh-private-key-file').val() == ""){
+    }else if($('#form-textarea-storage-vm-ssh-private-key-file').val() == ""){
         alert("SSH 개인 Key 파일을 입력해주세요.");
         validate_check = false;
-    }else if($('#form-input-storage-vm-ssh-public-key-file').val() == ""){
+    }else if($('#form-textarea-storage-vm-ssh-public-key-file').val() == ""){
         alert("SSH 공개 Key 파일을 입력해주세요.");
         validate_check = false;
     }
