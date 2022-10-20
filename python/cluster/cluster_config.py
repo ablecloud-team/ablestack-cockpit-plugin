@@ -33,6 +33,9 @@ def createArgumentParser():
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
     parser.add_argument('action', choices=['insert','insertScvmHost','insertAllHost'], help='choose one of the actions')
     parser.add_argument('-cmi', '--ccvm-mngt-ip', metavar='[coludcenter vm IP information]', type=str, help='input Value to coludcenter vm IP information')
+    parser.add_argument('-mnc', '--mngt-nic-cidr', metavar='[management Nic cidr]', type=str, help='input Value to management Nic cidr')
+    parser.add_argument('-mng', '--mngt-nic-gw', metavar='[management Nic gateway]', type=str, help='input Value to management Nic gateway')
+    parser.add_argument('-mnd', '--mngt-nic-dns', metavar='[management Nic DNS]', type=str, help='management Nic DNS')
     parser.add_argument('-pcl', '--pcs-cluster-list', metavar=('[hostname1]','[hostname2]','[hostname3]'), type=str, nargs=3, help='input Value to three host names')
     parser.add_argument('-js', '--json-string', metavar='[json string text]', type=str, help='input Value to json string text')
     parser.add_argument('-co', '--copy-option', choices=['hostOnly','withScvm','withCcvm'], metavar='[hosts file copy option]', default="hostOnly", type=str, help='choose one of the actions')
@@ -76,6 +79,15 @@ def insert(args):
                 json_data["clusterConfig"]["pcsCluster"]["hostname2"] = args.pcs_cluster_list[1]
             if args.pcs_cluster_list[2] is not None:
                 json_data["clusterConfig"]["pcsCluster"]["hostname3"] = args.pcs_cluster_list[2]
+        
+        if args.mngt_nic_cidr is not None:
+            json_data["clusterConfig"]["mngtNic"]["cidr"] = args.mngt_nic_cidr
+
+        if args.mngt_nic_gw is not None:
+            json_data["clusterConfig"]["mngtNic"]["gw"] = args.mngt_nic_gw
+
+        if args.mngt_nic_dns is not None:
+            json_data["clusterConfig"]["mngtNic"]["dns"] = args.mngt_nic_dns
         
         if args.json_string is not None:
             # 파라미터로 받아온 json으로 변환
@@ -213,6 +225,15 @@ def insertAllHost(args):
                 for p_val3 in param_json:
                     cmd_str = "python3 /usr/share/cockpit/ablestack/python/cluster/cluster_config.py insert"
                     cmd_str += " -js '" + args.json_string + "'"
+
+                    if args.mngt_nic_cidr is not None:
+                        cmd_str += " -mnc "+args.mngt_nic_cidr
+
+                    if args.mngt_nic_gw is not None:
+                        cmd_str += " -mng "+args.mngt_nic_gw
+
+                    if args.mngt_nic_dns is not None:
+                        cmd_str += " -mnd "+args.mngt_nic_dns
                     
                     if args.exclude_hostname != p_val3["hostname"]:
                         cmd_str += " -co withScvm"

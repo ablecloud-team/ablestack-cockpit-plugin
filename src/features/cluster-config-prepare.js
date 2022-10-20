@@ -128,6 +128,9 @@ $('#nav-button-cluster-config-review').on('click', function () {
     let host_file_type = $('input[name=radio-hosts-file]:checked').val();
     
     $("#div-cluster-ccvm-mngt-ip").text($("#form-input-cluster-ccvm-mngt-ip").val());
+    $("#div-cluster-mngt-nic-cidr").text($("#form-input-cluster-mngt-nic-cidr").val());
+    $("#div-cluster-mngt-nic-gw").text($("#form-input-cluster-mngt-nic-gateway").val());
+    $("#div-cluster-mngt-nic-dns").text($("#form-input-cluster-mngt-nic-dns").val());
     $("#div-cluster-pcs-hostname1").text($("#form-input-cluster-pcs-hostname1").val());
     $("#div-cluster-pcs-hostname2").text($("#form-input-cluster-pcs-hostname2").val());
     $("#div-cluster-pcs-hostname3").text($("#form-input-cluster-pcs-hostname3").val());
@@ -217,6 +220,9 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
         let host_file_type = $('input[name=radio-hosts-file]:checked').val();
 
         $("#div-cluster-ccvm-mngt-ip").text($("#form-input-cluster-ccvm-mngt-ip").val());
+        $("#div-cluster-mngt-nic-cidr").text($("#form-input-cluster-mngt-nic-cidr").val());
+        $("#div-cluster-mngt-nic-gw").text($("#form-input-cluster-mngt-nic-gateway").val());
+        $("#div-cluster-mngt-nic-dns").text($("#form-input-cluster-mngt-nic-dns").val());
         $("#div-cluster-pcs-hostname1").text($("#form-input-cluster-pcs-hostname1").val());
         $("#div-cluster-pcs-hostname2").text($("#form-input-cluster-pcs-hostname2").val());
         $("#div-cluster-pcs-hostname3").text($("#form-input-cluster-pcs-hostname3").val());
@@ -302,6 +308,12 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
 
             // ccvm_mngt_ip
             var ccvm_mgmt_ip = $('#form-input-cluster-ccvm-mngt-ip').val();
+
+            // 관리 NIC 정보
+            var mngt_nic_cidr =  $("#form-input-cluster-mngt-nic-cidr").val();
+            var mngt_nic_gateway = $("#form-input-cluster-mngt-nic-gateway").val();
+            var mngt_nic_dns = $("#form-input-cluster-mngt-nic-dns").val();
+
             // pcs 클러스터 구성할 호스트 1~3번 정보
             var host1_name = $('#form-input-cluster-pcs-hostname1').val();
             var host2_name = $('#form-input-cluster-pcs-hostname2').val();
@@ -318,6 +330,16 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
                 let cluster_host_yn = $('input[name=radio-cluster-host]:checked').val() 
                 if(cluster_host_yn == "new"){
                     var cluster_config_cmd = ["python3", pluginpath+"/python/cluster/cluster_config.py", "insert", "-js", ret_json_string, '-cmi', ccvm_mgmt_ip, '-pcl', host1_name, host2_name, host3_name];
+                    if(mngt_nic_cidr != ""){
+                        cluster_config_cmd.push("-mnc",mngt_nic_cidr)
+                    }
+                    if(mngt_nic_gateway != ""){
+                        cluster_config_cmd.push("-mng",mngt_nic_gateway)
+                    }
+                    if(mngt_nic_dns != ""){
+                        cluster_config_cmd.push("-mnd",mngt_nic_dns)
+                    }
+
                     if(console_log){console.log(cluster_config_cmd);}
                     cockpit.spawn(cluster_config_cmd)
                     .then(function(data){
@@ -348,6 +370,15 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
                     var exclude_hostname = $('#form-input-current-host-name').val();
 
                     var host_ping_test_and_cluster_config_cmd = ['python3', pluginpath + '/python/cluster/cluster_config.py', 'insertAllHost', '-js', ret_json_string, '-cmi', ccvm_mgmt_ip, '-pcl', host1_name, host2_name, host3_name, '-eh', exclude_hostname];
+                    if(mngt_nic_cidr != ""){
+                        host_ping_test_and_cluster_config_cmd.push("-mnc",mngt_nic_cidr)
+                    }
+                    if(mngt_nic_gateway != ""){
+                        host_ping_test_and_cluster_config_cmd.push("-mng",mngt_nic_gateway)
+                    }
+                    if(mngt_nic_dns != ""){
+                        host_ping_test_and_cluster_config_cmd.push("-mnd",mngt_nic_dns)
+                    }
                     if(console_log){console.log(host_ping_test_and_cluster_config_cmd);}
                     cockpit.spawn(host_ping_test_and_cluster_config_cmd)
                     .then(function(data){
@@ -496,11 +527,17 @@ $('#form-radio-hosts-new').on('click', function () {
     $('#form-input-cluster-config-hosts-file').val("");
 
     $("#form-input-cluster-ccvm-mngt-ip").val("");
+    $("#form-input-cluster-mngt-nic-cidr").val("");
+    $("#form-input-cluster-mngt-nic-gateway").val("");
+    $("#form-input-cluster-mngt-nic-dns").val("");
     $("#form-input-cluster-pcs-hostname1").val("");
     $("#form-input-cluster-pcs-hostname2").val("");
     $("#form-input-cluster-pcs-hostname3").val("");
 
     $("#form-input-cluster-ccvm-mngt-ip").attr('disabled', false);
+    $("#form-input-cluster-mngt-nic-cidr").attr('disabled', false);
+    $("#form-input-cluster-mngt-nic-gateway").attr('disabled', false);
+    $("#form-input-cluster-mngt-nic-dns").attr('disabled', false);
     $("#form-input-cluster-pcs-hostname1").attr('disabled', false);
     $("#form-input-cluster-pcs-hostname2").attr('disabled', false);
     $("#form-input-cluster-pcs-hostname3").attr('disabled', false);
@@ -523,11 +560,17 @@ $('#form-radio-hosts-file').on('click', function () {
     $('#form-input-cluster-config-hosts-file').val("");
 
     $("#form-input-cluster-ccvm-mngt-ip").val("");
+    $("#form-input-cluster-mngt-nic-cidr").val("");
+    $("#form-input-cluster-mngt-nic-gateway").val("");
+    $("#form-input-cluster-mngt-nic-dns").val("");
     $("#form-input-cluster-pcs-hostname1").val("");
     $("#form-input-cluster-pcs-hostname2").val("");
     $("#form-input-cluster-pcs-hostname3").val("");
 
     $("#form-input-cluster-ccvm-mngt-ip").attr('disabled', true);
+    $("#form-input-cluster-mngt-nic-cidr").attr('disabled', true);
+    $("#form-input-cluster-mngt-nic-gateway").attr('disabled', true);
+    $("#form-input-cluster-mngt-nic-dns").attr('disabled', true);
     $("#form-input-cluster-pcs-hostname1").attr('disabled', true);
     $("#form-input-cluster-pcs-hostname2").attr('disabled', true);
     $("#form-input-cluster-pcs-hostname3").attr('disabled', true);
@@ -1480,6 +1523,9 @@ function validateClusterConfigPrepare(timeserver_type) {
     let host_file_type = $('input[name=radio-hosts-file]:checked').val();
 
     let ccvm_mngt_ip = $('#form-input-cluster-ccvm-mngt-ip').val().trim();
+    let mngt_nic_cidr =  $("#form-input-cluster-mngt-nic-cidr").val();
+    let mngt_nic_gateway = $("#form-input-cluster-mngt-nic-gateway").val();
+    let mngt_nic_dns = $("#form-input-cluster-mngt-nic-dns").val();
     let pcs_host1 = $('#form-input-cluster-pcs-hostname1').val().trim();
     let pcs_host2 = $('#form-input-cluster-pcs-hostname2').val().trim();
     let pcs_host3 = $('#form-input-cluster-pcs-hostname3').val().trim();
@@ -1502,6 +1548,18 @@ function validateClusterConfigPrepare(timeserver_type) {
     } else if(!checkIp(ccvm_mngt_ip)){
         alert("CCVM 관리 IP 형식을 확인해주세요.");
         validate_check = false;
+    } else if(mngt_nic_cidr != "" && !$.isNumeric(mngt_nic_cidr)){
+        alert("관리 NIC CIDR는 숫자만 입력 가능합니다.");
+        validate_check = false;
+    } else if(mngt_nic_cidr != "" && !(mngt_nic_cidr >= 0 && mngt_nic_cidr <= 32) ){
+        alert("관리 NIC CIDR 범위는 0~32 입니다.");
+        validate_check = false;
+    } else if(mngt_nic_gateway != "" && !checkIp(mngt_nic_gateway)){
+        alert("관리 NIC Gateway 형식을 확인해주세요.");
+        validate_check = false;
+    } else if(mngt_nic_dns != "" && !checkIp(mngt_nic_dns)){
+        alert("관리 NIC DNS 형식을 확인해주세요.");
+        validate_check = false;
     } else if (pcs_host1 == "") {
         alert("PCS 호스트명1을 입력해주세요.");
         validate_check = false;
@@ -1522,6 +1580,12 @@ function validateClusterConfigPrepare(timeserver_type) {
         validate_check = false;
     } else if(pcs_host1 == pcs_host2 || pcs_host1 == pcs_host3 || pcs_host2 == pcs_host3){
         alert("중복된 PCS 호스트명 존재합니다.");
+        validate_check = false;
+    } else if (pcsHostNameCheck(host_file_type, pcs_host1, option)) { //host1 name
+        validate_check = false;
+    } else if (pcsHostNameCheck(host_file_type, pcs_host2, option)) { //host2 name
+        validate_check = false;
+    } else if (pcsHostNameCheck(host_file_type, pcs_host3, option)) { //host3 name
         validate_check = false;
     } else if (checkDuplicateCcvmIp(ccvm_mngt_ip, host_file_type, option)) { // config 유효성 검사
         validate_check = false;

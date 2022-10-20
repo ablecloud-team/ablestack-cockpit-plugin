@@ -514,6 +514,9 @@ function checkHostName(option) {
 function settingProfile(clusterJsonConf, option){
     let hostsJson = clusterJsonConf.clusterConfig.hosts;
     let hostCnt = clusterJsonConf.clusterConfig.hosts.length; // 설정파일에서 읽어온 node 수
+    let c_mngt_cidr = clusterJsonConf.clusterConfig.mngtNic.cidr;
+    let c_mngt_gw = clusterJsonConf.clusterConfig.mngtNic.gw;
+    let c_mngt_dns = clusterJsonConf.clusterConfig.mngtNic.dns;
 
     let insert_tr = "";
     let max_index = 0;
@@ -557,6 +560,9 @@ function settingProfile(clusterJsonConf, option){
         }
         
         $("#form-input-cluster-ccvm-mngt-ip").val(clusterJsonConf.clusterConfig.ccvm.ip);
+        $("#form-input-cluster-mngt-nic-cidr").val(clusterJsonConf.clusterConfig.mngtNic.cidr);
+        $("#form-input-cluster-mngt-nic-gateway").val(clusterJsonConf.clusterConfig.mngtNic.gw);
+        $("#form-input-cluster-mngt-nic-dns").val(clusterJsonConf.clusterConfig.mngtNic.dns);
         $("#form-input-cluster-pcs-hostname1").val(clusterJsonConf.clusterConfig.pcsCluster.hostname1);
         $("#form-input-cluster-pcs-hostname2").val(clusterJsonConf.clusterConfig.pcsCluster.hostname2);
         $("#form-input-cluster-pcs-hostname3").val(clusterJsonConf.clusterConfig.pcsCluster.hostname3);
@@ -574,21 +580,33 @@ function settingProfile(clusterJsonConf, option){
         $("#form-input-storage-vm-hostname").val("");
         $("#form-input-storage-vm-mgmt-ip").val("");
         $("#form-input-storage-vm-mgmt-gw").val("");
+        $("#form-input-storage-vm-dns").val("");
         $("#form-input-storage-vm-public-ip").val("");
         $("#form-input-storage-vm-cluster-ip").val("");
         $("#form-input-ccvm-mngt-ip").val("");
 
-        //
+        //ccvm 관리 ip 세팅
         $("#form-input-ccvm-mngt-ip").val(clusterJsonConf.clusterConfig.ccvm.ip);
 
         $('#form-table-tbody-cluster-config-existing-host-profile-scvm tr').each(function(){
             let host_name = $(this).find('td').eq(1).text().trim();
             if(current_host_name_scvm == host_name && host_name != null){
                 let host_index = $(this).find('td').eq(0).text().trim();
+                
                 // 호스트명을 세팅
                 $("#form-input-storage-vm-hostname").val("scvm"+host_index);
                 // 관리 NIC IP 및 CIDR 기본 입력
-                $("#form-input-storage-vm-mgmt-ip").val($(this).find('td').eq(3).text().trim()+"/");
+                if(c_mngt_cidr != ""){
+                    $("#form-input-storage-vm-mgmt-ip").val($(this).find('td').eq(3).text().trim()+"/"+c_mngt_cidr);
+                }else{
+                    $("#form-input-storage-vm-mgmt-ip").val($(this).find('td').eq(3).text().trim()+"/");
+                }
+                if(c_mngt_gw != ""){
+                    $("#form-input-storage-vm-mgmt-gw").val(c_mngt_gw);
+                }
+                if(c_mngt_dns != ""){
+                    $("#form-input-storage-vm-dns").val(c_mngt_dns);
+                }
                 // 스토리지 서버 NIC IP
                 $("#form-input-storage-vm-public-ip").val($(this).find('td').eq(5).text().trim()+"/24");
                 // 스토리지 복제 NIC IP
@@ -602,13 +620,25 @@ function settingProfile(clusterJsonConf, option){
     if(option == "-ccvm"){
         // 세팅 값 초기화
         $("#form-input-cloud-vm-mngt-nic-ip").val("");
+        $("#form-input-cloud-vm-mngt-gw").val("");
+        $("#form-input-cloud-vm-dns").val("");
         $("#form-input-cloud-vm-failover-cluster-host1-name").val("");
         $("#form-input-cloud-vm-failover-cluster-host2-name").val("");
         $("#form-input-cloud-vm-failover-cluster-host3-name").val("");
 
         // 값 세팅
         if(clusterJsonConf.clusterConfig.ccvm.ip != "" && clusterJsonConf.clusterConfig.ccvm.ip != null){
-            $("#form-input-cloud-vm-mngt-nic-ip").val(clusterJsonConf.clusterConfig.ccvm.ip+"/");
+            if(c_mngt_cidr != ""){
+                $("#form-input-cloud-vm-mngt-nic-ip").val(clusterJsonConf.clusterConfig.ccvm.ip+"/"+c_mngt_cidr);
+            }else{
+                $("#form-input-cloud-vm-mngt-nic-ip").val(clusterJsonConf.clusterConfig.ccvm.ip+"/");
+            }
+        }
+        if(c_mngt_gw != ""){
+            $("#form-input-cloud-vm-mngt-gw").val(c_mngt_gw);
+        }
+        if(c_mngt_dns != ""){
+            $("#form-input-cloud-vm-dns").val(c_mngt_dns);
         }
 
         if(clusterJsonConf.clusterConfig.pcsCluster.hostname1 != "" && clusterJsonConf.clusterConfig.pcsCluster.hostname1 != null){
@@ -1165,4 +1195,53 @@ function checkDupIpCnt(ip, index_num, table_tr_obj){
     });
 
     return duplication_ip_cnt;
+}
+
+/**
+ * Meathod Name : pcsHostNameCheck()
+ * Date Created : 2022.10.20
+ * Writer  : 배태주
+ * Description : 호스트명 리스트에 pcs 호스트명이 존재하는지 확인하는 함수
+ * Parameter : host_file_type, pcs_host_name, option
+ * Return  : num
+ * History  : 2022.10.12 최초 작성
+ **/
+function pcsHostNameCheck(host_file_type, pcs_host_name, option){
+
+    let table_tr_obj;
+    let validate_check = false;
+
+    if (host_file_type == "new") {
+        table_tr_obj = $('#form-table-tbody-cluster-config-new-host-profile'+option+' tr');
+    } else if (host_file_type == "existing") {
+        table_tr_obj = $('#form-table-tbody-cluster-config-existing-host-profile'+option+' tr');
+    }
+
+    var check_cnt = 0;
+    
+    table_tr_obj.each(function(index_num){
+        // $(this).find('td').eq(0) 순서는 아래와 같습니다.
+        // eq(0) : index
+        // eq(1) : 호스트 명
+        // eq(2) : 호스트 IP (ablecube)
+        // eq(3) : SCVM MNGT IP
+        // eq(4) : 호스트 PN IP (ablecube-pn)
+        // eq(5) : SCVM PN IP
+        // eq(6) : SCVM CN IP
+
+        let idx = $(this).find('td').eq(0).text().trim();
+        let host_name = $(this).find('td').eq(1).text().trim();
+        
+        // 점검항목 1 : 빈 값이 있으면 안됨
+        if (pcs_host_name == host_name){
+            check_cnt += 1;
+        }
+    });
+
+    if(check_cnt == 0){
+        alert("호스트 프로파일에 PCS 호스트명이 "+pcs_host_name+"와 동일한 호스트명이 존재하지 않습니다.");
+        validate_check = true;
+    }
+
+    return validate_check;
 }
