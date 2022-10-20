@@ -176,6 +176,8 @@ def createCcvmXml(args):
 
             # pcs 클러스터 할 호스트 전체의 폴더 권한 수정
             os.system("ssh root@"+host_name+" 'chmod 755 -R "+pluginpath+"/tools/vmconfig/ccvm'")
+            os.system("ssh root@"+host_name+" 'mkdir -p /usr/share/ablestack/vmconfig'")
+            os.system("ssh root@"+host_name+" 'cp -rf "+pluginpath+"/tools/vmconfig/ccvm /usr/share/ablestack/vmconfig/'")
 
         #작업파일 지우기
         os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml "+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml.bak "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml.bak")

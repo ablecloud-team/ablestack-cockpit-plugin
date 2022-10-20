@@ -885,9 +885,12 @@ function validateWallMonitoringVm() {
  * History  : 2021.09.07 최초 작성
  */
 $('input[type=text][id="form-input-wall-host-number"]').on('change', function () {
-
     var host_count = $('input[type=text][id="form-input-wall-host-number"]').val();
+    setWallIpInput(host_count);
+});
 
+function setWallIpInput(host_count){
+    $('input[type=text][id="form-input-wall-host-number"]').val(host_count);
     if(host_count >= 3 && host_count <= 100){
         $('#div-wall-ccvm-ip-area').empty();
         $('#div-wall-cubehost-ip-area').empty();
@@ -1020,7 +1023,27 @@ $('input[type=text][id="form-input-wall-host-number"]').on('change', function ()
     } else {
         alert("호스트 수는 3 이상 100 이하로 입력할 수 있습니다.");
     }
-});
+}
 
+function autoConfigWallIP(){
+    // cluster.json 읽어 오기
+    cockpit.spawn(["cat", pluginpath + "/tools/properties/cluster.json"])
+    .then(function(data){
+        var clusterJsonConf = JSON.parse(data);
+        // node 수를 확인하여 입력 박스 만들기
+        var host_count = clusterJsonConf.clusterConfig.hosts.length;
+        setWallIpInput(host_count);
+        // 인풋 박스에 값 자동 설정 하기
+        $("#form-input-wall-monitoring-ccvm-ip").val(clusterJsonConf.clusterConfig.ccvm.ip);
+        for (let i = 0 ; i < host_count ; i++){
+            $("#form-input-wall-monitoring-cubehost"+(i+1)+"-ip").val(clusterJsonConf.clusterConfig.hosts[i].ablecube);
+            $("#form-input-wall-monitoring-scvm"+(i+1)+"-ip").val(clusterJsonConf.clusterConfig.hosts[i].scvmMngt);
+        }
+    })
+    .catch(function(data){
+        createLoggerInfo("cluster.json 파일 읽기 실패");
+        console.log("cluster.json 파일 읽기 실패" + data);
+    });
+}
 
 /* 함수 정의 끝 */

@@ -830,6 +830,7 @@ function cccc_link_go(){
                         step7 = sessionStorage.getItem("ccvm_bootstrap_status");
                         if(retVal.code == 200 && retVal.val == "status: done" && step7 == "true"){
                             $('#div-modal-wizard-wall-monitoring').show();
+                            autoConfigWallIP();
                         }else{
                             $('#div-modal-status-alert').show();
                         }

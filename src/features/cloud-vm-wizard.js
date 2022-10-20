@@ -57,6 +57,11 @@ $(document).ready(function(){
     //ssh 공개 key 파일 선택 이벤트 세팅
     setSshKeyFileReader($('#form-input-cloud-vm-ssh-public-key-file'), 'id_rsa.pub', setCcvmSshPublicKeyInfo);
 
+
+    //SSH Key 정보 자동 세팅
+    settingSshKey(option_ccvm);
+
+    //현재 호스트 명 세팅
     checkHostName(option_ccvm);
 
     $('#form-radio-hosts-file-ccvm').click();
@@ -1384,14 +1389,14 @@ function setCcvmReviewInfo(){
         $('#span-cloud-vm-additional-svc-dns').text("N/A");
     }
     //-----SSH Key 정보-----
-    var ssh_private_key_url = $('#form-input-cloud-vm-ssh-private-key-file').val();
+    var ssh_private_key_url = $('#form-textarea-cloud-vm-ssh-private-key-file').val();
     if(ssh_private_key_url == '') {
         $('#span-cloud-vm-ssh-private-key-file').text("미입력");
     } else {
         $('#span-cloud-vm-ssh-private-key-file').text(ssh_private_key_url);
     }
 
-    var ssh_public_key_url = $('#form-input-cloud-vm-ssh-public-key-file').val();
+    var ssh_public_key_url = $('#form-textarea-cloud-vm-ssh-public-key-file').val();
     if(ssh_public_key_url == '') {
         $('#span-cloud-vm-ssh-public-key-file').text("미입력");
     } else {
@@ -1478,6 +1483,12 @@ function validateCloudCenterVm(){
         validate_check = false;
     } else if ($('#form-input-cloud-vm-failover-cluster-host3-name').val() == "") { //host3 name
         alert("클러스터 호스트3의 이름을 입력해주세요.");
+        validate_check = false;
+    } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host1-name').val(), option_ccvm)) { //host1 name
+        validate_check = false;
+    } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host2-name').val(), option_ccvm)) { //host2 name
+        validate_check = false;
+    } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host3-name').val(), option_ccvm)) { //host3 name
         validate_check = false;
     }
 

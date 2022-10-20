@@ -79,7 +79,8 @@ $('#button-storage-vm-status-update').on('click', function(){
             createLoggerInfo(":::scvm delete Error:::");
             console.log(":::scvm delete Error:::"+data);
         });        
-    }else if(cmd == "bootstrap"){//SCC bootstrap실행 버튼 클릭시        
+    }else if(cmd == "bootstrap"){//SCC bootstrap실행 버튼 클릭시
+        $('#div-modal-spinner-header-txt').text('스토리지센터 가상머신 bootstrap을 실행 중입니다.');
         // /root/bootstrap.sh 파일을 실행함.
         cockpit.spawn(["sh", pluginpath+"/shell/host/bootstrap_run.sh","scvm"])
         .then(function(data){
@@ -91,7 +92,7 @@ $('#button-storage-vm-status-update').on('click', function(){
             console.log("bootstrap_run_check() Error : " + data);        
         });
     }else if(cmd == "bootstrap_ccvm"){//CCC bootstrap실행 버튼 클릭시
-        $('#div-modal-spinner-header-txt').text('클라우드센터 가상머신 상태 변경중입니다.');
+        $('#div-modal-spinner-header-txt').text('클라우드센터 가상머신 bootstrap을 실행 중입니다.');
         // /root/bootstrap.sh 파일을 실행함.
         cockpit.spawn(["sh", pluginpath+"/shell/host/bootstrap_run.sh","ccvm"])
             .then(function(data){
