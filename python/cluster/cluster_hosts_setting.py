@@ -115,6 +115,8 @@ def changeHosts(args):
             
         my_hosts.write()
 
+        python3(pluginpath+'/python/host/ssh-scan.py')
+
         return createReturn(code=200, val="")
     except Exception as e:
         # 결과값 리턴
@@ -126,12 +128,14 @@ def hostOnly(args):
 
 def withScvm(args):
     ret = changeHosts(args)
-    os.system("scp -q "+ hosts_file_path +" root@scvm-mngt:/etc/hosts")
+    os.system("scp -q -o StrictHostKeyChecking=no " + hosts_file_path + " root@scvm-mngt:/etc/hosts")
+    # os.system("scp -q "+ hosts_file_path +" root@scvm-mngt:/etc/hosts")
     return ret
     
 def withCcvm(args):
     ret = changeHosts(args)
-    os.system("scp -q "+ hosts_file_path +" root@ccvm-mngt:/etc/hosts")
+    os.system("scp -q -o StrictHostKeyChecking=no " + hosts_file_path + " root@ccvm-mngt:/etc/hosts")
+    # os.system("scp -q "+ hosts_file_path +" root@ccvm-mngt:/etc/hosts")
     return ret
 
 # Press the green button in the gutter to run the script.
