@@ -66,17 +66,17 @@ def updateAllHostGlueConfig(args):
 
         # 명령수행 호스트에 ceph.conf 파일 업데이트
         return_val = "ceph config generate-minimal-conf command failed. Check cube host /etc/ceph/ceph.client.admin.keyring or ceph.conf"
-        ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', hostname, "ceph config generate-minimal-conf > /etc/ceph/ceph_temp.conf").stdout.strip().decode()
-        ret += ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', hostname, "mv -f /etc/ceph/ceph_temp.conf /etc/ceph/ceph.conf").stdout.strip().decode()
-
-        if ret == '':
+        ret_num = os.system("ceph config generate-minimal-conf > /etc/ceph/ceph_temp.conf")
+        ret_num += os.system("mv -f /etc/ceph/ceph_temp.conf /etc/ceph/ceph.conf")
+    
+        if ret_num == 0:
             # ping test로 네트워크가 연결되어 있는지 상태 체크하는 부분
             return_val = "The ping test failed. Check ablecube cube hosts and scvms network IPs. Please check the config.json file."
 
             host_list = []
             for f_val1 in json_data["clusterConfig"]["hosts"]:
-                host_list.append(f_val1["ablecubePn"])
-                host_list.append(f_val1["scvm"])
+                host_list.append(f_val1["ablecube"])
+                host_list.append(f_val1["scvmMngt"])
 
             ping_result = json.loads(python3(pluginpath+'/python/vm/host_ping_test.py', '-hns', host_list).stdout.decode())
 
@@ -84,20 +84,25 @@ def updateAllHostGlueConfig(args):
                 # 명령 수행이 가능한 상태인지 체크하는 부분
                 return_val = "Command execution test failed. Check the ablecube cube hosts and scvms status. Please check the config.json file or ip"
                 for f_val2 in json_data["clusterConfig"]["hosts"]:
-                    ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', f_val2["ablecubePn"], "echo ok").stdout.strip().decode()
+                    ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', f_val2["ablecube"], "echo ok").stdout.strip().decode()
                     if ret != "ok":
-                        return createReturn(code=500, val=return_val + " : " + f_val2["ablecubePn"])
+                        return createReturn(code=500, val=return_val + " : " + f_val2["ablecube"])
 
-                    ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', f_val2["scvm"], "echo ok").stdout.strip().decode()
+                    ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', f_val2["scvmMngt"], "echo ok").stdout.strip().decode()
                     if ret != "ok":
-                        return createReturn(code=500, val=return_val + " : " + f_val2["scvm"])
+                        return createReturn(code=500, val=return_val + " : " + f_val2["scvmMngt"])
                 
                 # cube 호스트 및 scvm에 keyring, ceph.conf 파일 전송
                 return_val = "cube host and scvm scp keyring, ceph.conf Failed"
 
                 for f_val3 in json_data["clusterConfig"]["hosts"]:
-                    os.system("scp -q /etc/ceph/* root@"+f_val3["ablecubePn"]+":/etc/ceph/")
-                    os.system("scp -q /etc/ceph/* root@"+f_val3["scvm"]+":/etc/ceph/")
+                    ret_scp = os.system("scp -q /etc/ceph/* root@"+f_val3["ablecube"]+":/etc/ceph/")
+                    if ret_scp != 0:
+                        return createReturn(code=500, val=f_val3["ablecube"]+" : Glue Config copy Failed.")
+
+                    ret_scp = os.system("scp -q /etc/ceph/* root@"+f_val3["scvmMngt"]+":/etc/ceph/")
+                    if ret_scp != 0:
+                        return createReturn(code=500, val=f_val3["scvmMngt"]+" : Glue Config copy Failed.")
 
                 #모든 작업이 수행 완료되면 성공결과 return
                 return createReturn(code=200, val="Glue Config All cube host and scvm update Success")

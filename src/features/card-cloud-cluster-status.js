@@ -209,7 +209,7 @@ $('#button-execution-modal-monitoring-config-update').on('click', function(){
                     }
                 })
                 .catch(function(data){
-                    $("#modal-status-alert-body").html("모니터링센터 수집 정보 업데이트를 실패하였습니다.<br/>다시 실행해 주세요.");
+                    $("#modal-status-alert-body").html("모니터링센터 수집 정보 업데이트를 실패하였습니다.<br/>업데이트를 다시 실행해 주세요.");
                     $('#div-modal-spinner').hide();
                     $('#div-modal-status-alert').show();
                     createLoggerInfo(":::update_wall_config() Error prometheus_config_cmd ::: error");
