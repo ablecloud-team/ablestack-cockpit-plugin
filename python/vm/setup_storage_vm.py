@@ -45,12 +45,19 @@ def setupStorageVm(args):
     success_bool = True    
     
     # 스토리지 가상머신용 qcow2 이미지 생성
-    os.system("yes|cp -f /var/lib/libvirt/images/ablestack-template-back.qcow2 /var/lib/libvirt/images/scvm.qcow2")
+    check_err = os.system("yes|cp -f /var/lib/libvirt/images/ablestack-template-back.qcow2 /var/lib/libvirt/images/scvm.qcow2")
+    if check_err != 0 :
+        success_bool = False
 
     # scvm.qcow2 파일 권한 설정
-    os.system("chmod 666 /var/lib/libvirt/images/scvm.qcow2")
-
-    os.system("yes|cp -rf /usr/share/cockpit/ablestack/tools/vmconfig/ /usr/share/ablestack/")
+    check_err = os.system("chmod 666 /var/lib/libvirt/images/scvm.qcow2")
+    if check_err != 0 :
+        success_bool = False
+    
+    # vmconfig/scvm 설정 파일 백업
+    check_err = os.system("yes|cp -rf /usr/share/cockpit/ablestack/tools/vmconfig/ /usr/share/ablestack/")
+    if check_err != 0 :
+        success_bool = False
 
     # virsh 초기화   
     check_err = os.system("virsh define "+pluginpath+"/tools/vmconfig/scvm/scvm.xml > /dev/null")

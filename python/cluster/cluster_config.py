@@ -123,9 +123,20 @@ def insert(args):
         with open(json_file_path, "w") as cluster_json:
             cluster_json.write(json.dumps(json_data, indent=4))
 
-        result = json.loads(python3(pluginpath + '/python/cluster/cluster_hosts_setting.py', args.copy_option).stdout.decode())
-        
-        return createReturn(code=200, val="Cluster Config insert Success")
+        # hosts 파일 복사 실패시 3번 시도까지 하도록 개선
+        result = {}
+        for i in [1,2,3]:
+            result = json.loads(python3(pluginpath + '/python/cluster/cluster_hosts_setting.py', args.copy_option).stdout.decode())
+            if result["code"] == 200:
+                break
+            else:
+                result = json.loads(python3(pluginpath + '/python/cluster/cluster_hosts_setting.py', args.copy_option).stdout.decode())
+
+        if result["code"] != 200:
+            return createReturn(code=500, val=return_val + " : " + p_val3["ablecube"])
+        else:
+            return createReturn(code=200, val="Cluster Config insert Success")
+
     except Exception as e:
         # 결과값 리턴
         return createReturn(code=500, val="Please check the \"cluster.json\" file. : "+e)

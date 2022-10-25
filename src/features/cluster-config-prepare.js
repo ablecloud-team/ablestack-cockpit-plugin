@@ -1581,12 +1581,12 @@ function validateClusterConfigPrepare(timeserver_type) {
     } else if(pcs_host1 == pcs_host2 || pcs_host1 == pcs_host3 || pcs_host2 == pcs_host3){
         alert("중복된 PCS 호스트명 존재합니다.");
         validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, pcs_host1, option)) { //host1 name
-        validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, pcs_host2, option)) { //host2 name
-        validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, pcs_host3, option)) { //host3 name
-        validate_check = false;
+    // } else if (pcsHostNameCheck(host_file_type, pcs_host1, option)) { //host1 name
+    //     validate_check = false;
+    // } else if (pcsHostNameCheck(host_file_type, pcs_host2, option)) { //host2 name
+    //     validate_check = false;
+    // } else if (pcsHostNameCheck(host_file_type, pcs_host3, option)) { //host3 name
+    //     validate_check = false;
     } else if (checkDuplicateCcvmIp(ccvm_mngt_ip, host_file_type, option)) { // config 유효성 검사
         validate_check = false;
     } else if (timeserver_type == "external") {

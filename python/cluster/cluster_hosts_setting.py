@@ -117,7 +117,7 @@ def changeHosts(args):
 
         python3(pluginpath+'/python/host/ssh-scan.py')
 
-        return createReturn(code=200, val="")
+        return createReturn(code=200, val="hosts file config success.")
     except Exception as e:
         # 결과값 리턴
         return createReturn(code=500, val="Please check the \"cluster.json\" file. : "+e)

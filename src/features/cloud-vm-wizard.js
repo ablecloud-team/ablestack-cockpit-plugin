@@ -952,8 +952,8 @@ function deployCloudCenterVM() {
                                                                 showDivisionCloudVMConfigFinish();
                                                             } else {
                                                                 setProgressFail(5);
-                                                                createLoggerInfo(result.val);
-                                                                alert(result.val);            
+                                                                createLoggerInfo(ccvm_result.val);
+                                                                alert(ccvm_result.val);            
                                                             }
                                                         })
                                                         .catch(function(data){
@@ -1484,12 +1484,12 @@ function validateCloudCenterVm(){
     } else if ($('#form-input-cloud-vm-failover-cluster-host3-name').val() == "") { //host3 name
         alert("클러스터 호스트3의 이름을 입력해주세요.");
         validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host1-name').val(), option_ccvm)) { //host1 name
-        validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host2-name').val(), option_ccvm)) { //host2 name
-        validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host3-name').val(), option_ccvm)) { //host3 name
-        validate_check = false;
+    // } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host1-name').val(), option_ccvm)) { //host1 name
+    //     validate_check = false;
+    // } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host2-name').val(), option_ccvm)) { //host2 name
+    //     validate_check = false;
+    // } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host3-name').val(), option_ccvm)) { //host3 name
+    //     validate_check = false;
     }
 
     return validate_check;
