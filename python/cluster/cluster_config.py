@@ -129,8 +129,6 @@ def insert(args):
             result = json.loads(python3(pluginpath + '/python/cluster/cluster_hosts_setting.py', args.copy_option).stdout.decode())
             if result["code"] == 200:
                 break
-            else:
-                result = json.loads(python3(pluginpath + '/python/cluster/cluster_hosts_setting.py', args.copy_option).stdout.decode())
 
         if result["code"] != 200:
             return createReturn(code=500, val=return_val + " : " + p_val3["ablecube"])

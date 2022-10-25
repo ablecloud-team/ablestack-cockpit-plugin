@@ -154,8 +154,7 @@ def createCcvmXml(args):
                 ret_num = os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
                 if ret_num == 0:
                     break
-                else:
-                    ret_num = os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
+                    
             if ret_num != 0:
                 return createReturn(code=500, val="pcs 클러스터 호스트에 ccvm.xml 복사 실패")
 
@@ -164,8 +163,7 @@ def createCcvmXml(args):
                 ret_num = os.system("ssh root@"+host_name+" 'chmod 755 -R "+pluginpath+"/tools/vmconfig/ccvm'")
                 if ret_num == 0:
                     break
-                else:
-                    ret_num = os.system("ssh root@"+host_name+" 'chmod 755 -R "+pluginpath+"/tools/vmconfig/ccvm'")
+
             if ret_num != 0:
                 return createReturn(code=500, val="pcs 클러스터 할 호스트 전체의 폴더 권한 수정 실패")
 
@@ -174,8 +172,7 @@ def createCcvmXml(args):
                 ret_num = os.system("ssh root@"+host_name+" 'mkdir -p /usr/share/ablestack/vmconfig'")
                 if ret_num == 0:
                     break
-                else:
-                    ret_num = os.system("ssh root@"+host_name+" 'mkdir -p /usr/share/ablestack/vmconfig'")
+
             if ret_num != 0:
                 return createReturn(code=500, val="pcs 클러스터 할 호스트 설정 백업전 폴더 생성 실패")
 
@@ -185,8 +182,7 @@ def createCcvmXml(args):
                 ret_num = os.system("ssh root@"+host_name+" 'cp -rf "+pluginpath+"/tools/vmconfig/ccvm /usr/share/ablestack/vmconfig/'")
                 if ret_num == 0:
                     break
-                else:
-                    ret_num = os.system("ssh root@"+host_name+" 'cp -rf "+pluginpath+"/tools/vmconfig/ccvm /usr/share/ablestack/vmconfig/'")
+
             if ret_num != 0:
                 return createReturn(code=500, val="pcs 클러스터 할 호스트 설정 복제 실패")
 

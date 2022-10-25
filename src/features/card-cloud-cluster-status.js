@@ -209,6 +209,7 @@ $('#button-execution-modal-monitoring-config-update').on('click', function(){
                     }
                 })
                 .catch(function(data){
+                    $("#modal-status-alert-body").html("모니터링센터 수집 정보 업데이트를 실패하였습니다.<br/>다시 실행해 주세요.");
                     $('#div-modal-spinner').hide();
                     $('#div-modal-status-alert').show();
                     createLoggerInfo(":::update_wall_config() Error prometheus_config_cmd ::: error");
@@ -630,7 +631,7 @@ function CardCloudClusterStatus(){
             });
             var retVal = JSON.parse(data);
             if(retVal.code == '200'){
-                var nodeText = '(';
+                var nodeText = '( ';
                 var selectHtml = '<option selected="" value="null">노드를 선택해주세요.</option>';
                 $('#form-select-cloud-vm-migration-node option').remove();
 
@@ -641,9 +642,9 @@ function CardCloudClusterStatus(){
                     }
                     if(i == (Object.keys(retVal.val.clustered_host).length - 1)){
 
-                        nodeText = nodeText + ')';
+                        nodeText = nodeText + ' )';
                     }else{
-                        nodeText = nodeText + ',';
+                        nodeText = nodeText + ', ';
                     }
                 }
                 $('#cccs-back-color').attr('class','pf-c-label pf-m-green');

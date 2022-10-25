@@ -118,8 +118,7 @@ def createCcvmCloudinit(args):
                 ret_num = os.system("ssh root@"+host_name+" 'mkdir -p "+pluginpath+"/tools/vmconfig/ccvm'")
                 if ret_num == 0:
                     break
-                else:
-                    ret_num = os.system("ssh root@"+host_name+" 'mkdir -p "+pluginpath+"/tools/vmconfig/ccvm'")
+
             if ret_num != 0:
                 return createReturn(code=500, val=host_name + " : pcs 클러스터 호스트에 /vmconfig/ccvm 폴더생성 명령 실패")
             
@@ -128,8 +127,7 @@ def createCcvmCloudinit(args):
                 ret_num = os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso")
                 if ret_num == 0:
                     break
-                else:
-                    ret_num = os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso")
+                    
             if ret_num != 0:
                 return createReturn(code=500, val=host_name + " : pcs 클러스터 호스트에 /ccvm/ccvm-cloudinit.iso 복사 실패")
 

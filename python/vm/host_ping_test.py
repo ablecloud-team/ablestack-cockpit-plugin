@@ -71,7 +71,7 @@ def hostPingTest(args):
 
     except Exception as e:
         # 결과값 리턴
-        print(e)
+        #print(e)
         return createReturn(code=500, val={})
 
 # Press the green button in the gutter to run the script.

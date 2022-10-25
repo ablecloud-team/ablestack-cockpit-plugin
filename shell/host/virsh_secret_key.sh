@@ -23,10 +23,10 @@ secret_val=$(virsh secret-list | grep  11111111-1111-1111-1111-111111111111)
 ceph_admin_key=$(ceph auth get-key client.admin)
 
 if [ "$secret_val" == "" ]; then
-	virsh secret-define /usr/share/cockpit/ablestack/tools/vmconfig/ccvm/secret.xml
-    virsh secret-set-value --secret 11111111-1111-1111-1111-111111111111 --base64 $ceph_admin_key
+	virsh secret-define /usr/share/cockpit/ablestack/tools/vmconfig/ccvm/secret.xml > /dev/null
+    virsh secret-set-value --secret 11111111-1111-1111-1111-111111111111 --base64 $ceph_admin_key > /dev/null
 else
-    virsh secret-undefine 11111111-1111-1111-1111-111111111111
-    virsh secret-define /usr/share/cockpit/ablestack/tools/vmconfig/ccvm/secret.xml
-    virsh secret-set-value --secret 11111111-1111-1111-1111-111111111111 --base64 $ceph_admin_key
+    virsh secret-undefine 11111111-1111-1111-1111-111111111111 > /dev/null
+    virsh secret-define /usr/share/cockpit/ablestack/tools/vmconfig/ccvm/secret.xml > /dev/null
+    virsh secret-set-value --secret 11111111-1111-1111-1111-111111111111 --base64 $ceph_admin_key > /dev/null
 fi
