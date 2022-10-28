@@ -1198,7 +1198,7 @@ function checkDupIpCnt(ip, index_num, table_tr_obj){
 }
 
 /**
- * Meathod Name : pcsHostNameCheck()
+ * Meathod Name : pcsHostPnIpCheck()
  * Date Created : 2022.10.20
  * Writer  : 배태주
  * Description : 호스트명 리스트에 pcs 호스트명이 존재하는지 확인하는 함수
@@ -1206,7 +1206,7 @@ function checkDupIpCnt(ip, index_num, table_tr_obj){
  * Return  : num
  * History  : 2022.10.12 최초 작성
  **/
-function pcsHostNameCheck(host_file_type, pcs_host_name, option){
+function pcsHostPnIpCheck(host_file_type, pcs_host_pn_ip, option){
 
     let table_tr_obj;
     let validate_check = false;
@@ -1218,7 +1218,8 @@ function pcsHostNameCheck(host_file_type, pcs_host_name, option){
     }
 
     var check_cnt = 0;
-    
+    let host_pn_ip = "";
+
     table_tr_obj.each(function(index_num){
         // $(this).find('td').eq(0) 순서는 아래와 같습니다.
         // eq(0) : index
@@ -1229,17 +1230,16 @@ function pcsHostNameCheck(host_file_type, pcs_host_name, option){
         // eq(5) : SCVM PN IP
         // eq(6) : SCVM CN IP
 
-        let idx = $(this).find('td').eq(0).text().trim();
-        let host_name = $(this).find('td').eq(1).text().trim();
+        host_pn_ip = $(this).find('td').eq(4).text().trim();
         
         // 점검항목 1 : 빈 값이 있으면 안됨
-        if (pcs_host_name == host_name){
+        if (pcs_host_pn_ip == host_pn_ip){
             check_cnt += 1;
         }
     });
 
     if(check_cnt == 0){
-        alert("호스트 프로파일에 PCS 호스트명이 "+pcs_host_name+"와 동일한 호스트명이 존재하지 않습니다.");
+        alert("호스트 프로파일에 호스트 PN IP가 " + pcs_host_pn_ip + "와 동일한 PN IP가 존재하지 않습니다.");
         validate_check = true;
     }
 

@@ -478,11 +478,12 @@ $('#button-execution-modal-update-glue-config').on('click', function(){
     $('#div-modal-spinner').show();
 
     $("#modal-status-alert-title").html("전체 호스트 Glue 설정 업데이트");
-    $("#modal-status-alert-body").html("전체 호스트 Glue 설정 업데이트를 실패하였습니다.<br/>cube호스트, SCVM 상태를 확인해주세요.");
+    $("#modal-status-alert-body").html("전체 호스트 Glue 설정 업데이트를 실패하였습니다.<br/>CUBE 호스트, SCVM 상태를 확인해주세요.");
     createLoggerInfo("all_host_glue_config_update_modal() start");
 
     cockpit.spawn(["python3", pluginpath+"/python/glue/update_glue_config.py", "update"])
-    .then(function(data){var retVal = JSON.parse(data);
+    .then(function(data){
+        var retVal = JSON.parse(data);
         if(retVal.code == 200){
             $('#div-modal-spinner').hide();
             $("#modal-status-alert-body").html("전체 호스트 Glue 설정 업데이트를 성공하였습니다");

@@ -1561,31 +1561,31 @@ function validateClusterConfigPrepare(timeserver_type) {
         alert("관리 NIC DNS 형식을 확인해주세요.");
         validate_check = false;
     } else if (pcs_host1 == "") {
-        alert("PCS 호스트명1을 입력해주세요.");
+        alert("PCS 호스트1 PN IP를 입력해주세요.");
         validate_check = false;
-    } else if(!checkHostFormat(pcs_host1)){
-        alert("PCS 호스트명1 형식을 확인해주세요.");
+    } else if(!checkIp(pcs_host1)){
+        alert("PCS 호스트1 PN IP 형식을 확인해주세요.");
         validate_check = false;
     } else if (pcs_host2 == "") {
-        alert("PCS 호스트명2을 입력해주세요.");
+        alert("PCS 호스트2 PN IP를 입력해주세요.");
         validate_check = false;
-    } else if(!checkHostFormat(pcs_host2)){
-        alert("PCS 호스트명2 형식을 확인해주세요.");
+    } else if(!checkIp(pcs_host2)){
+        alert("PCS 호스트2 PN IP 형식을 확인해주세요.");
         validate_check = false;
     } else if (pcs_host3 == "") {
-        alert("PCS 호스트명3을 입력해주세요.");
+        alert("PCS 호스트3 PN IP를 입력해주세요.");
         validate_check = false;
-    } else if(!checkHostFormat(pcs_host3)){
-        alert("PCS 호스트명3 형식을 확인해주세요.");
+    } else if(!checkIp(pcs_host3)){
+        alert("PCS 호스트3 PN IP 형식을 확인해주세요.");
         validate_check = false;
     } else if(pcs_host1 == pcs_host2 || pcs_host1 == pcs_host3 || pcs_host2 == pcs_host3){
-        alert("중복된 PCS 호스트명 존재합니다.");
+        alert("중복된 PCS 호스트 PN IP가 존재합니다.");
         validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, pcs_host1, option)) { //host1 name
+    } else if (pcsHostPnIpCheck(host_file_type, pcs_host1, option)) { //host1 name
         validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, pcs_host2, option)) { //host2 name
+    } else if (pcsHostPnIpCheck(host_file_type, pcs_host2, option)) { //host2 name
         validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, pcs_host3, option)) { //host3 name
+    } else if (pcsHostPnIpCheck(host_file_type, pcs_host3, option)) { //host3 name
         validate_check = false;
     } else if (checkDuplicateCcvmIp(ccvm_mngt_ip, host_file_type, option)) { // config 유효성 검사
         validate_check = false;

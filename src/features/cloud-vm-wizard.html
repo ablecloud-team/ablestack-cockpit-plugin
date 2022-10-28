@@ -90,7 +90,7 @@
                                             <div class="pf-c-form__field-group-header"  style="padding-bottom:8px;">
                                                 <div class="pf-c-form__field-group-header-main">
                                                     <div class="pf-c-form__field-group-header-title">
-                                                        <div class="pf-c-form__field-group-header-title-text">호스트 #1 정보</div>
+                                                        <div class="pf-c-form__field-group-header-title-text">PCS 호스트 #1 정보</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -98,7 +98,7 @@
                                                 <div class="pf-c-form__group" style="padding:0px;">
                                                     <div class="pf-c-form__group-label">
                                                         <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host1-name">
-                                                            <span class="pf-c-form__label-text">Hostname</span>
+                                                            <span class="pf-c-form__label-text">PN IP</span>
                                                             <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                                         </label>
                                                     </div>
@@ -125,7 +125,7 @@
                                             <div class="pf-c-form__field-group-header"  style="padding-bottom:8px;">
                                                 <div class="pf-c-form__field-group-header-main">
                                                     <div class="pf-c-form__field-group-header-title">
-                                                        <div class="pf-c-form__field-group-header-title-text">호스트 #2 정보</div>
+                                                        <div class="pf-c-form__field-group-header-title-text">PCS 호스트 #2 정보</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -133,7 +133,7 @@
                                                 <div class="pf-c-form__group" style="padding:0px;">
                                                     <div class="pf-c-form__group-label">
                                                         <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host2-name">
-                                                            <span class="pf-c-form__label-text">Hostname</span>
+                                                            <span class="pf-c-form__label-text">PN IP</span>
                                                             <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                                         </label>
                                                     </div>
@@ -160,7 +160,7 @@
                                             <div class="pf-c-form__field-group-header"  style="padding-bottom:8px;">
                                                 <div class="pf-c-form__field-group-header-main">
                                                     <div class="pf-c-form__field-group-header-title">
-                                                        <div class="pf-c-form__field-group-header-title-text">호스트 #3 정보</div>
+                                                        <div class="pf-c-form__field-group-header-title-text">PCS 호스트 #3 정보</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -168,7 +168,7 @@
                                                 <div class="pf-c-form__group" style="padding:0px;">
                                                     <div class="pf-c-form__group-label">
                                                         <label class="pf-c-form__label" for="form-input-cloud-vm-failover-cluster-host3-name">
-                                                            <span class="pf-c-form__label-text">Hostname</span>
+                                                            <span class="pf-c-form__label-text">PN IP</span>
                                                             <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                                                         </label>
                                                     </div>
@@ -635,7 +635,7 @@
                                                 </label>
                                             </div>
                                             <div class="pf-c-form__group-control pf-m-inline">
-                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-private-key-file" name="form-input-cloud-vm-ssh-private-key-file"/>
+                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-private-key-file" name="form-input-cloud-vm-ssh-private-key-file" hidden/>
                                                 <textarea class="pf-c-form-control" style="width:70%" type="text" id="form-textarea-cloud-vm-ssh-private-key-file" disabled></textarea>
                                             </div>
                                         </div>
@@ -647,7 +647,7 @@
                                                 </label>
                                             </div>
                                             <div class="pf-c-form__group-control pf-m-inline">
-                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-public-key-file" name="form-input-cloud-vm-ssh-public-key-file"/>
+                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-cloud-vm-ssh-public-key-file" name="form-input-cloud-vm-ssh-public-key-file" hidden/>
                                                 <textarea class="pf-c-form-control" style="width:70%" type="text" id="form-textarea-cloud-vm-ssh-public-key-file" disabled></textarea>
                                             </div>
                                         </div>
@@ -883,31 +883,31 @@
                                             </div>
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text">Host #1 정보</span>
+                                                    <span class="pf-c-description-list__text">PCS 호스트 #1</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host1-name"></span><br/>
+                                                        PN IP : <span id="span-cloud-vm-failover-cluster-host1-name"></span><br/>
                                                     </div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text">Host #2 정보</span>
+                                                    <span class="pf-c-description-list__text">PCS 호스트 #2</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host2-name"></span><br/>
+                                                        PN IP : <span id="span-cloud-vm-failover-cluster-host2-name"></span><br/>
                                                     </div>
                                                 </dd>
                                             </div>
                                             <div class="pf-c-description-list__group">
                                                 <dt class="pf-c-description-list__term">
-                                                    <span class="pf-c-description-list__text">Host #3 정보</span>
+                                                    <span class="pf-c-description-list__text">PCS 호스트 #3</span>
                                                 </dt>
                                                 <dd class="pf-c-description-list__description">
                                                     <div class="pf-c-description-list__text">
-                                                        Hostname : <span id="span-cloud-vm-failover-cluster-host3-name"></span><br/>
+                                                        PN IP : <span id="span-cloud-vm-failover-cluster-host3-name"></span><br/>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -984,9 +984,6 @@
                                 </ul>
                                 <p>
                                     위의 모든 작업은 클라우드센터 VM의 웹 관리콘솔을 이용해 진행합니다. 
-                                </p>
-                                <p>
-                                    추가 호스트 SCVM인 경우 Glue 대시보드에 접속하여 SCVM 추가 작업을 진행 해주세요.
                                 </p>
                             </div>
                         </div>

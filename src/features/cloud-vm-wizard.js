@@ -952,8 +952,8 @@ function deployCloudCenterVM() {
                                                                 showDivisionCloudVMConfigFinish();
                                                             } else {
                                                                 setProgressFail(5);
-                                                                createLoggerInfo(result.val);
-                                                                alert(result.val);            
+                                                                createLoggerInfo(ccvm_result.val);
+                                                                alert(ccvm_result.val);            
                                                             }
                                                         })
                                                         .catch(function(data){
@@ -1419,6 +1419,10 @@ function validateCloudCenterVm(){
     let host_file_type = $('input[name=radio-hosts-file-ccvm]:checked').val();
     var svc_bool = $('input[type=checkbox][id="form-checkbox-svc-network"]').is(":checked");
 
+    let pcs_host1 = $('#form-input-cloud-vm-failover-cluster-host1-name').val().trim();
+    let pcs_host2 = $('#form-input-cloud-vm-failover-cluster-host2-name').val().trim();
+    let pcs_host3 = $('#form-input-cloud-vm-failover-cluster-host3-name').val().trim();
+
     if ($('select#form-modal-select-cloud-vm-compute-cpu-core option:checked').val() == "") { //cpu
         alert("CPU core를 입력해주세요.");
         validate_check = false;
@@ -1475,20 +1479,32 @@ function validateCloudCenterVm(){
     } else if ( $('#form-textarea-cloud-vm-ssh-public-key-file').val() == "") { //SSH 공개 Key 정보
         alert("SSH 공개 Key 파일을 입력해주세요.");
         validate_check = false;
-    } else if($('#form-input-cloud-vm-failover-cluster-host1-name').val() == ""){ //host1 name
-        alert("클러스터 호스트1의 이름을 입력해주세요.");
+    } else if (pcs_host1 == "") {
+        alert("PCS 호스트1 PN IP를 입력해주세요.");
         validate_check = false;
-    } else if ($('#form-input-cloud-vm-failover-cluster-host2-name').val() == "") { //host2 name
-        alert("클러스터 호스트2의 이름을 입력해주세요.");
+    } else if(!checkIp(pcs_host1)){
+        alert("PCS 호스트1 PN IP 형식을 확인해주세요.");
         validate_check = false;
-    } else if ($('#form-input-cloud-vm-failover-cluster-host3-name').val() == "") { //host3 name
-        alert("클러스터 호스트3의 이름을 입력해주세요.");
+    } else if (pcs_host2 == "") {
+        alert("PCS 호스트2 PN IP를 입력해주세요.");
         validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host1-name').val(), option_ccvm)) { //host1 name
+    } else if(!checkIp(pcs_host2)){
+        alert("PCS 호스트2 PN IP 형식을 확인해주세요.");
         validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host2-name').val(), option_ccvm)) { //host2 name
+    } else if (pcs_host3 == "") {
+        alert("PCS 호스트3 PN IP를 입력해주세요.");
         validate_check = false;
-    } else if (pcsHostNameCheck(host_file_type, $('#form-input-cloud-vm-failover-cluster-host3-name').val(), option_ccvm)) { //host3 name
+    } else if(!checkIp(pcs_host3)){
+        alert("PCS 호스트3 PN IP 형식을 확인해주세요.");
+        validate_check = false;
+    } else if(pcs_host1 == pcs_host2 || pcs_host1 == pcs_host3 || pcs_host2 == pcs_host3){
+        alert("중복된 PCS 호스트 PN IP가 존재합니다.");
+        validate_check = false;
+    } else if (pcsHostPnIpCheck(host_file_type, pcs_host1, option_ccvm)) { //host1 name
+        validate_check = false;
+    } else if (pcsHostPnIpCheck(host_file_type, pcs_host2, option_ccvm)) { //host2 name
+        validate_check = false;
+    } else if (pcsHostPnIpCheck(host_file_type, pcs_host3, option_ccvm)) { //host3 name
         validate_check = false;
     }
 

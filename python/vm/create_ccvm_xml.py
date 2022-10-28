@@ -13,6 +13,7 @@ import sys
 import fileinput
 import random
 import os
+import json
 import subprocess
 
 from ablestack import *
@@ -74,39 +75,14 @@ def generateDecToHex():
     return hex_list
 
 def createSecretKey(host_names):
+
+    for host_name in host_names:
+        ret_num = os.system("ssh root@"+host_name+" 'sh "+pluginpath+"/shell/host/virsh_secret_key.sh'")
+        # 쉘 스크립트 실행 실패
+        if ret_num != 0 :
+            return createReturn(code=500, val=host_name+" : pcs 클러스터 secret.xm 설정 실패 ")
     
-    # secret.xml 생성
-    cmd = "cat > "+pluginpath+"/tools/vmconfig/ccvm/secret.xml <<EOF\n"
-    cmd += "<secret ephemeral='no' private='no'>\n"
-    cmd += "    <uuid>11111111-1111-1111-1111-111111111111</uuid>\n"
-    cmd += "    <usage type='ceph'>\n"
-    cmd += "        <name>client.admin secret</name>\n"
-    cmd += "    </usage>\n"
-    cmd += "</secret>\n"
-    cmd += "EOF\n"
-    os.system(cmd)
-
-    # 이미 3대의 호스트 /usr/share/cockpit/ablestack/tools/vmconfig/secret/secret.xml 경로에 secret.xml이 존재 한다고 가정
-
-    for host_name in host_names:    
-
-        os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/secret.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/secret.xml")
-
-        # virsh secret-list 11111111-1111-1111-1111-111111111111 값이 존재하는지 확인
-        secret_val = subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-list | grep  11111111-1111-1111-1111-111111111111'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-
-        # ceph_admin_key를 받아오기 위한 변수
-        ceph_admin_key = subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='ceph auth get-key client.admin'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-        ecret_set_value_cmd = 'virsh secret-set-value --secret 11111111-1111-1111-1111-111111111111 --base64 ' + ceph_admin_key[0].decode()
-
-        if secret_val[0].decode() == '': # secret이 정의되어 있지 않으면 생성
-
-            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-define '+pluginpath+'/tools/vmconfig/ccvm/secret.xml'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd=ecret_set_value_cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-        else: # secret이 정의되어 있으면 삭제후 재생성
-            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-undefine 11111111-1111-1111-1111-111111111111'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd='virsh secret-define '+pluginpath+'/tools/vmconfig/ccvm/secret.xml'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-            subprocess.Popen("ssh {user}@{host} {cmd}".format(user='root', host=host_name, cmd=ecret_set_value_cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    return createReturn(code=200, val="pcs 클러스터 secret.xm 설정 성공")
 
 def createCcvmXml(args):
     try:
@@ -169,26 +145,57 @@ def createCcvmXml(args):
                 # 라인 수정
                 sys.stdout.write(line)
 
-        # 클러스터 구성한 호스트에 파일 복사
         for host_name in args.host_names:
 
-            os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
+            ret_num = 0
+
+            # pcs 클러스터 호스트에 ccvm.xml 복사 실패
+            for i in [1,2,3]:
+                ret_num = os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
+                if ret_num == 0:
+                    break
+                    
+            if ret_num != 0:
+                return createReturn(code=500, val="pcs 클러스터 호스트에 ccvm.xml 복사 실패")
 
             # pcs 클러스터 할 호스트 전체의 폴더 권한 수정
-            os.system("ssh root@"+host_name+" 'chmod 755 -R "+pluginpath+"/tools/vmconfig/ccvm'")
-            os.system("ssh root@"+host_name+" 'mkdir -p /usr/share/ablestack/vmconfig'")
-            os.system("ssh root@"+host_name+" 'cp -rf "+pluginpath+"/tools/vmconfig/ccvm /usr/share/ablestack/vmconfig/'")
+            for i in [1,2,3]:
+                ret_num = os.system("ssh root@"+host_name+" 'chmod 755 -R "+pluginpath+"/tools/vmconfig/ccvm'")
+                if ret_num == 0:
+                    break
+
+            if ret_num != 0:
+                return createReturn(code=500, val="pcs 클러스터 할 호스트 전체의 폴더 권한 수정 실패")
+
+            # pcs 클러스터 할 호스트 설정 백업전 폴더 생성
+            for i in [1,2,3]:
+                ret_num = os.system("ssh root@"+host_name+" 'mkdir -p /usr/share/ablestack/vmconfig'")
+                if ret_num == 0:
+                    break
+
+            if ret_num != 0:
+                return createReturn(code=500, val="pcs 클러스터 할 호스트 설정 백업전 폴더 생성 실패")
+
+
+            # pcs 클러스터 할 호스트 설정 복제
+            for i in [1,2,3]:
+                ret_num = os.system("ssh root@"+host_name+" 'cp -rf "+pluginpath+"/tools/vmconfig/ccvm /usr/share/ablestack/vmconfig/'")
+                if ret_num == 0:
+                    break
+
+            if ret_num != 0:
+                return createReturn(code=500, val="pcs 클러스터 할 호스트 설정 복제 실패")
 
         #작업파일 지우기
         os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml "+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml.bak "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml.bak")
 
         # 결과값 리턴
-        return createReturn(code=200, val={})        
+        return createReturn(code=200, val="클라우드센터 가상머신 xml 생성 성공")        
 
     except Exception as e:
         # 결과값 리턴
-        print(e)
-        return createReturn(code=500, val={})
+        # print(e)
+        return createReturn(code=500, val="클라우드센터 가상머신 xml 생성 에러 : " + e)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -203,8 +210,14 @@ if __name__ == '__main__':
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
     # secret.xml 생성 및 virsh 등록
-    createSecretKey(args.host_names)
+    secret_ret = json.loads(createSecretKey(args.host_names))
+    
+    if secret_ret["code"] == 200 :
+        ret = createCcvmXml(args)
+        print(ret)
+    else:
+        print(secret_ret)
 
     # 실제 로직 부분 호출 및 결과 출력
-    ret = createCcvmXml(args)
-    print(ret)
+    
+    
