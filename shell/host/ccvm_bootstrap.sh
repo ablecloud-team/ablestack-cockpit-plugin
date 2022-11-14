@@ -59,6 +59,15 @@ systemctl enable --now nfs-server.service
 mkdir /nfs/primary
 mkdir /nfs/secondary
 
+# crush ruleset class 추가
+ceph osd getcrushmap -o original
+crushtool -d original >> original.txt
+
+sed -i 's/step take default$/step take default class ssd/g' original.txt
+
+crushtool -c original.txt -o adjusted
+ceph osd setcrushmap -i adjusted
+rm -rf original.txt
 
 
 ################# Setting Database
@@ -127,4 +136,3 @@ done
 rm -rf /usr/share/ablestack/*.tar
 # Delete bootstrap script file
 rm -rf /root/bootstrap.sh
-
