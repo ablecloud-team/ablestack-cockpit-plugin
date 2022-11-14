@@ -93,7 +93,7 @@ done
 
 cloudstack-setup-management  2>&1 | tee -a $LOGFILE
 
-systemctl enable --now cloudstack-management
+systemctl enable cloudstack-management
 
 #UEFI 설정 파일 생성
 echo -e "guest.nvram.template.secure=/usr/share/edk2/ovmf/OVMF_VARS.secboot.fd
@@ -137,3 +137,9 @@ rm -rf /usr/share/ablestack/*.tar
 # Delete bootstrap script file
 rm -rf /root/bootstrap.sh
 
+# podman 삭제
+systemctl stop localregistry.service
+podman rm localregistry
+podman rmi $(podman images -qa) -f
+dnf remove podman -y
+shutdown -r now
