@@ -1449,55 +1449,134 @@ function inputPnIntoTimeServer() {
  * Parameter : timeserver_confirm_ip_text(설정확인 단계에서의 ip주소 값), file_type(외부 또는 로컬서버) , timeserver_current_host_num(현재 설정 중인 호스트 번호)
  * Return  : 없음
  * History  : 2021.04.12 수정
+ * History  : 2022.11.15 수정 : 1. 간헐적으로 chrony.conf가 정상적으로 변경되지 않는 문제가 있어서 수정함
+ *                             2. 문제의 원인은 비동기 처리방식인 cockpit.script()가 너무 많이 사용되어 발생
+ *                             3. cockpit.script() 사용을 최소화 하여 문제 해결
  **/
+
+// async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserver_current_host_num) {
+//     let chrony_file_root = "/etc/chrony.conf"
+//     cockpit.script(["sed -i '/^server /d' /" + chrony_file_root + ""])
+//     cockpit.script(["sed -i '/^pool /d' /" + chrony_file_root + ""])
+
+//     // 외부 시간 서버
+//     if (file_type == "external") {
+//         // chrony.conf 파일 서버 리스트 부분 초기화
+//         cockpit.script(["sed -i '/^#allow /d' /" + chrony_file_root + ""])
+//         cockpit.script(["sed -i '/^allow /d' /" + chrony_file_root + ""])
+//         // cockpit.script(["sed -i '/allow /d' /" + chrony_file_root + ""])
+//         cockpit.script(["sed -i '/^local stratum /d' /" + chrony_file_root + ""])
+//         cockpit.script(["sed -i '/local stratum /d' /" + chrony_file_root + ""])
+//         // cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\#allow 192.168.0.0/16\" /" + chrony_file_root + ""])
+//         cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\#local stratum 10\" /" + chrony_file_root + ""])
+//         for (let i in timeserver_confirm_ip_text) {
+//             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[i] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
+//         }
+//         let allow_ip = "0.0.0.0/0";
+//         cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
+//     }
+//     // 로컬 시간 서버
+//     if (file_type == "internal") {
+//         // chrony.conf 파일 서버 리스트 부분 초기화
+//         cockpit.script(["sed -i '/^#allow /d' /" + chrony_file_root + ""])
+//         cockpit.script(["sed -i '/^allow /d' /" + chrony_file_root + ""])
+//         cockpit.script(["sed -i '/^#local stratum /d' /" + chrony_file_root + ""])
+//         cockpit.script(["sed -i '/^local stratum /d' /" + chrony_file_root + ""])
+//         if (timeserver_current_host_num == 1) {
+//             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
+//         }
+//         if (timeserver_current_host_num == 2) {
+//             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[0] + " prefer iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
+//             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[1] + " minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
+//         }
+//         if (timeserver_current_host_num == 3) {
+//             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[1] + " prefer iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
+//             cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
+//         }
+//         // 공통 수정 부분
+//         let allow_ip = "0.0.0.0/0";
+//         cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
+//         cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\local stratum 10\" /" + chrony_file_root + ""])
+//         // chronyd restart
+//         cockpit.script(["systemctl restart chronyd"])
+//     }
+// }
 
 async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserver_current_host_num) {
     let chrony_file_root = "/etc/chrony.conf"
-    // chrony.conf 파일 서버 리스트 부분 초기화
-    cockpit.script(["sed -i '/^server /d' /" + chrony_file_root + ""])
-    cockpit.script(["sed -i '/^pool /d' /" + chrony_file_root + ""])
+    let chrony_text = "";
+    
+    chrony_text +="# These servers were defined in the installation:"+"\n";
+    chrony_text +="# Use public servers from the pool.ntp.org project."+"\n";
+    chrony_text +="# Please consider joining the pool (http://www.pool.ntp.org/join.html)."+"\n";
 
-    // 외부 시간 서버
-    if (file_type == "external") {
-        // chrony.conf 파일 서버 리스트 부분 초기화
-        cockpit.script(["sed -i '/^#allow /d' /" + chrony_file_root + ""])
-        cockpit.script(["sed -i '/^allow /d' /" + chrony_file_root + ""])
-        // cockpit.script(["sed -i '/allow /d' /" + chrony_file_root + ""])
-        cockpit.script(["sed -i '/^local stratum /d' /" + chrony_file_root + ""])
-        cockpit.script(["sed -i '/local stratum /d' /" + chrony_file_root + ""])
-        // cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\#allow 192.168.0.0/16\" /" + chrony_file_root + ""])
-        cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\#local stratum 10\" /" + chrony_file_root + ""])
+    if (file_type == "external") {// 외부 시간 서버
         for (let i in timeserver_confirm_ip_text) {
-            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[i] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
+            chrony_text +="server " + timeserver_confirm_ip_text[i] + " iburst"+"\n";
         }
-        let allow_ip = "0.0.0.0/0";
-        cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
-    }
-    // 로컬 시간 서버
-    if (file_type == "internal") {
-        // chrony.conf 파일 서버 리스트 부분 초기화
-        cockpit.script(["sed -i '/^#allow /d' /" + chrony_file_root + ""])
-        cockpit.script(["sed -i '/^allow /d' /" + chrony_file_root + ""])
-        cockpit.script(["sed -i '/^#local stratum /d' /" + chrony_file_root + ""])
-        cockpit.script(["sed -i '/^local stratum /d' /" + chrony_file_root + ""])
+    } else if (file_type == "internal") {// 로컬 시간 서버
         if (timeserver_current_host_num == 1) {
-            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
+            chrony_text +="server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0"+"\n";
+        } else if (timeserver_current_host_num == 2) {
+            chrony_text +="server " + timeserver_confirm_ip_text[1] + " iburst minpoll 0 maxpoll 0"+"\n";
+            chrony_text +="server " + timeserver_confirm_ip_text[0] + " prefer iburst minpoll 0 maxpoll 0"+"\n";
+        } else if (timeserver_current_host_num == 3) {
+            chrony_text +="server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0"+"\n";
+            chrony_text +="server " + timeserver_confirm_ip_text[1] + " prefer iburst minpoll 0 maxpoll 0"+"\n";
         }
-        if (timeserver_current_host_num == 2) {
-            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[0] + " prefer iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
-            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[1] + " minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
-        }
-        if (timeserver_current_host_num == 3) {
-            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[1] + " prefer iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
-            cockpit.script(["sed -i'' -r -e \"/# Please consider joining the pool/a\\server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0\" /" + chrony_file_root + ""])
-        }
-        // 공통 수정 부분
-        let allow_ip = "0.0.0.0/0";
-        cockpit.script(["sed -i'' -r -e \"/# Allow NTP client access from local network/a\\allow " + allow_ip + "\" /" + chrony_file_root + ""])
-        cockpit.script(["sed -i'' -r -e \"/# Serve time even if not synchronized to a time source/a\\local stratum 10\" /" + chrony_file_root + ""])
-        // chronyd restart
-        cockpit.script(["systemctl restart chronyd"])
     }
+    chrony_text +=""+"\n";
+    
+    chrony_text +="# Record the rate at which the system clock gains/losses time."+"\n";
+    chrony_text +="driftfile /var/lib/chrony/drift"+"\n";
+    chrony_text +=""+"\n";
+    chrony_text +="# Allow the system clock to be stepped in the first three updates"+"\n";
+    chrony_text +="# if its offset is larger than 1 second."+"\n";
+    chrony_text +="makestep 1.0 3"+"\n";
+    chrony_text +=""+"\n";
+    chrony_text +="# Enable kernel synchronization of the real-time clock (RTC)."+"\n";
+    chrony_text +="rtcsync"+"\n";
+    chrony_text +=""+"\n";
+    chrony_text +="# Enable hardware timestamping on all interfaces that support it."+"\n";
+    chrony_text +="#hwtimestamp *"+"\n";
+    chrony_text +=""+"\n";
+    chrony_text +="# Increase the minimum number of selectable sources required to adjust"+"\n";
+    chrony_text +="# the system clock."+"\n";
+    chrony_text +="#minsources 2"+"\n";
+    chrony_text +=""+"\n";
+    chrony_text +="# Allow NTP client access from local network."+"\n";
+    chrony_text +="allow 0.0.0.0/0"+"\n";
+    chrony_text +=""+"\n";
+    chrony_text +="# Serve time even if not synchronized to a time source."+"\n";
+    
+    if (file_type == "external") {
+        chrony_text +="#local stratum 10"+"\n";
+    } else if (file_type == "internal") {
+        chrony_text +="local stratum 10"+"\n";
+    }
+    chrony_text +=""+"\n";
+
+    chrony_text +="# Specify file containing keys for NTP authentication."+"\n";
+    chrony_text +="keyfile /etc/chrony.keys"+"\n";
+    chrony_text +=""+"\n";
+    chrony_text +="# Get TAI-UTC offset and leap seconds from the system tz database."+"\n";
+    chrony_text +="leapsectz right/UTC"+"\n";
+    chrony_text +=""+"\n";
+    chrony_text +="# Specify directory for log files."+"\n";
+    chrony_text +="logdir /var/log/chrony"+"\n";
+    chrony_text +=""+"\n";
+    chrony_text +="# Select which information is logged."+"\n";
+    chrony_text +="#log measurements statistics tracking"+"\n";
+    
+    //파일쓰기 재시작
+    cockpit.file(chrony_file_root).replace(chrony_text)
+    .done(function (data) { //성공
+        //재시작
+        cockpit.script(["systemctl restart chronyd"])
+    })
+    .fail(function (error) { //실패
+
+    });
 }
 
 
