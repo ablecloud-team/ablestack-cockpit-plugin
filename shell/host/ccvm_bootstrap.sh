@@ -59,16 +59,9 @@ systemctl enable --now nfs-server.service
 mkdir /nfs/primary
 mkdir /nfs/secondary
 
-# crush ruleset class 추가
-ceph osd getcrushmap -o original
-crushtool -d original >> original.txt
-
-sed -i 's/step take default$/step take default class ssd/g' original.txt
-
-crushtool -c original.txt -o adjusted
-ceph osd setcrushmap -i adjusted
-rm -rf original.txt
-
+# Crushmap 설정 추가 (ceph autoscale)
+scvm=$(grep scvm-mngt /etc/hosts | awk {'print $1'})
+ssh -o StrictHostKeyChecking=no $scvm /usr/local/sbin/setCrushmap.sh
 
 ################# Setting Database
 mysqladmin -uroot password $DATABASE_PASSWD
