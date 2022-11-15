@@ -59,7 +59,7 @@ systemctl enable --now nfs-server.service
 mkdir /nfs/primary
 mkdir /nfs/secondary
 
-# crush ruleset class 추가
+# Crushmap 설정 추가 (ceph autoscale)
 scvm=$(grep scvm-mngt /etc/hosts | awk {'print $1'})
 ssh -o StrictHostKeyChecking=no $scvm /usr/local/sbin/setCrushmap.sh
 
