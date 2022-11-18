@@ -1518,8 +1518,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
         if (timeserver_current_host_num == 1) {
             chrony_text +="server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0"+"\n";
         } else if (timeserver_current_host_num == 2) {
-            chrony_text +="server " + timeserver_confirm_ip_text[1] + " iburst minpoll 0 maxpoll 0"+"\n";
-            chrony_text +="server " + timeserver_confirm_ip_text[0] + " prefer iburst minpoll 0 maxpoll 0"+"\n";
+            chrony_text +="server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0"+"\n";
         } else if (timeserver_current_host_num == 3) {
             chrony_text +="server " + timeserver_confirm_ip_text[0] + " iburst minpoll 0 maxpoll 0"+"\n";
             chrony_text +="server " + timeserver_confirm_ip_text[1] + " prefer iburst minpoll 0 maxpoll 0"+"\n";
