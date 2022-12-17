@@ -896,7 +896,7 @@ function checkDeployStatus(){
                                     let msg ="";
                                     if(step2!="RUNNING"){
                                         msg += '스토리지센터 가상머신이 '+step2+' 상태 입니다.\n';
-                                        msg += '스토리지센터 가상머신이 shut off 상태일 경우 스토리지센터 가상머신 카드에서 스토리지센터 VM을 시작해주세요.';
+                                        msg += '스토리지센터 가상머신이 shut off 상태일 경우 스토리지센터 가상머신 카드에서 스토리지센터 VM을 시작해주세요.\n';
                                         showRibbon('warning', msg);
                                     }
                                     if(step4!="HEALTH_OK"){
