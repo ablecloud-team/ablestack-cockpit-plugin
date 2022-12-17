@@ -17,8 +17,10 @@ import socket
 from ablestack import *
 from sh import python3
 from sh import ssh
+from python_hosts import Hosts, HostsEntry
 
 json_file_path = pluginpath+"/tools/properties/cluster.json"
+hosts_file_path = "/etc/hosts"
 def createArgumentParser():
     '''
     입력된 argument를 파싱하여 dictionary 처럼 사용하게 만들어 주는 parser를 생성하는 함수
@@ -31,7 +33,7 @@ def createArgumentParser():
                                         usage='%(prog)s arguments')
 
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
-    parser.add_argument('action', choices=['insert','insertScvmHost','insertAllHost'], help='choose one of the actions')
+    parser.add_argument('action', choices=['insert','insertScvmHost','insertAllHost','remove'], help='choose one of the actions')
     parser.add_argument('-cmi', '--ccvm-mngt-ip', metavar='[coludcenter vm IP information]', type=str, help='input Value to coludcenter vm IP information')
     parser.add_argument('-mnc', '--mngt-nic-cidr', metavar='[management Nic cidr]', type=str, help='input Value to management Nic cidr')
     parser.add_argument('-mng', '--mngt-nic-gw', metavar='[management Nic gateway]', type=str, help='input Value to management Nic gateway')
@@ -40,6 +42,7 @@ def createArgumentParser():
     parser.add_argument('-js', '--json-string', metavar='[json string text]', type=str, help='input Value to json string text')
     parser.add_argument('-co', '--copy-option', choices=['hostOnly','withScvm','withCcvm'], metavar='[hosts file copy option]', default="hostOnly", type=str, help='choose one of the actions')
     parser.add_argument('-eh', '--exclude-hostname', metavar='[Hostnames to exclude from copying the hosts file to scvm and checking the network]', type=str, help='input Value to exclude hostname')
+    parser.add_argument('-rh', '--remove-hostname', metavar='[Hostnames to remove configuration in cluster]', type=str, help='input Value to remove hostname')
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
@@ -261,6 +264,59 @@ def insertAllHost(args):
         # 결과값 리턴
         return createReturn(code=500, val=return_val)
 
+# 호스트명을 파라미터로 받고 해당 호스트 정보를 cluster_config.py에서 삭제하는 함수
+def remove(args):
+    try:
+        # 수정할 cluster.json 파일 읽어오기
+        json_data = openClusterJson()
+        json_index = 0
+        match_yn = False
+        for f_val in json_data["clusterConfig"]["hosts"]:
+            if f_val["hostname"] == args.remove_hostname:
+                match_yn = True
+                break
+            elif len(json_data["clusterConfig"]["hosts"])-1 > json_index:
+                json_index = json_index+1
+        
+        if match_yn:
+            my_hosts = Hosts(path=hosts_file_path)
+            # hosts 파일 내용 ip로 제거
+            my_hosts.remove_all_matching(address=json_data["clusterConfig"]["hosts"][json_index]["ablecube"])
+            my_hosts.remove_all_matching(address=json_data["clusterConfig"]["hosts"][json_index]["scvmMngt"])
+            my_hosts.remove_all_matching(address=json_data["clusterConfig"]["hosts"][json_index]["ablecubePn"])
+            my_hosts.remove_all_matching(address=json_data["clusterConfig"]["hosts"][json_index]["scvm"])
+            my_hosts.remove_all_matching(address=json_data["clusterConfig"]["hosts"][json_index]["scvmCn"])
+            # hosts 파일 내용 도메인으로 제거
+            my_hosts.remove_all_matching(name=json_data["clusterConfig"]["hosts"][json_index]["hostname"])
+            my_hosts.remove_all_matching(name="scvm"+ str(json_index) +"-mngt")
+            my_hosts.remove_all_matching(name="ablecube"+ str(json_index) +"-pn")
+            my_hosts.remove_all_matching(name="scvm"+ str(json_index))
+            my_hosts.remove_all_matching(name="scvm"+ str(json_index) +"-cn")
+            my_hosts.write()
+
+            #json_data 삭제
+            del(json_data["clusterConfig"]["hosts"][json_index])
+
+        # json 변환 정보 cluster.json 파일 수정
+        with open(json_file_path, "w") as outfile:
+            outfile.write(json.dumps(json_data, indent=4))
+
+        # hosts 파일 복사 실패시 3번 시도까지 하도록 개선
+        result = {}
+        for i in [1,2,3]:
+            result = json.loads(python3(pluginpath + '/python/cluster/cluster_hosts_setting.py', args.copy_option).stdout.decode())
+            if result["code"] == 200:
+                break
+
+        if result["code"] != 200:
+            return createReturn(code=500, val=return_val + " : " + p_val3["ablecube"])
+        else:
+            return createReturn(code=200, val="Cluster Config remove Success")
+
+    except Exception as e:
+        # 결과값 리턴
+        return createReturn(code=500, val="Please check the \"cluster.json\" file. : "+e)
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # parser 생성
@@ -282,4 +338,7 @@ if __name__ == '__main__':
         print(ret)
     elif args.action == 'insertAllHost':
         ret = insertAllHost(args)
+        print(ret)
+    elif args.action == 'remove':
+        ret = remove(args)
         print(ret)
