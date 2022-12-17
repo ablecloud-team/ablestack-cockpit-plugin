@@ -896,18 +896,18 @@ function checkDeployStatus(){
                                     let msg ="";
                                     if(step2!="RUNNING"){
                                         msg += '스토리지센터 가상머신이 '+step2+' 상태 입니다.\n';
-                                        msg += '스토리지센터 가상머신이 shut off 상태일 경우 스토리지센터 가상머신 카드에서 스토리지센터 VM을 시작해주세요. \n' ;
+                                        msg += '스토리지센터 가상머신이 shut off 상태일 경우 스토리지센터 가상머신 카드에서 스토리지센터 VM을 시작해주세요.';
                                         showRibbon('warning', msg);
                                     }
                                     if(step4!="HEALTH_OK"){
                                         msg += '스토리지센터 클러스터가 '+step4+' 상태 입니다.\n';
-                                        msg += 'oout, nobackfill, norecover flag인 경우 의도하지 않은 유지보수 모드일 경우 스토리지센터 클러스터 상태 카드에서 유지보수 모드 해제해주세요. \n';
+                                        msg += 'oout, nobackfill, norecover flag인 경우 의도하지 않은 유지보수 모드일 경우 스토리지센터 클러스터 상태 카드에서 유지보수 모드 해제해주세요.\n';
                                         msg += '스토리지센터 클러스터 상태가 Monitor clock detected 인 경우 cube host, scvm, ccvm의 ntp 시간 동기화 작업을 해야합니다.';
                                         showRibbon('warning', msg);
                                     }
                                     if(step6!="RUNNING"){
                                         msg += '클라우드센터 가상머신이 '+step6+' 상태 입니다.\n';
-                                        msg += '클라우드센터 가상머신 Mold 서비스 , DB 상태를 확인하여 정지상태일 경우 서비스 재시작 \n';
+                                        msg += '클라우드센터 가상머신 Mold 서비스 , DB 상태를 확인하여 정지상태일 경우 서비스 재시작\n';
                                         msg += '또는 클라우드센터 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
                                         showRibbon('warning', msg);
                                     }
