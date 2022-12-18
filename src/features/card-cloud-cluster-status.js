@@ -895,7 +895,7 @@ $('#button-execution-modal-ccvm-dup-deploy').on('click', function(){
 
     if(validate_check){
         $('#div-modal-ccvm-dup-deploy').hide();
-        $('#div-modal-spinner-header-txt').text('클라우드센터 가상머신 이중화를 진행중입니다.\n 구성 시간은 15분 정도 소요됩니다. ');
+        $('#div-modal-spinner-header-txt').text('클라우드센터 이중화 진행중 (약 15분 소요)');
         $('#div-modal-spinner').show();
     
         $("#modal-status-alert-title").html("클라우드센터 가상머신 이중화 실패");
