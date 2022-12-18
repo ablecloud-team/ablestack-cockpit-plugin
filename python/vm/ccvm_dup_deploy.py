@@ -14,6 +14,7 @@ import fileinput
 import random
 import os
 import json
+import time
 
 from ablestack import *
 from sh import python3
@@ -42,6 +43,19 @@ def createArgumentParser():
 
     return parser
 
+def generateMacAddress():
+
+    # The first line is defined for specified vendor
+    
+    mac = [ 0x00, 0x24, 0x81,
+        random.randint(0x00, 0x7f),
+        random.randint(0x00, 0xff),
+        random.randint(0x00, 0xff) ]
+
+    mac_address = ':'.join(map(lambda x: "%02x" % x, mac))
+
+    return mac_address
+
 json_file_path = pluginpath+"/tools/properties/cluster.json"
 def openClusterJson():
     try:
@@ -57,8 +71,16 @@ ccvm_config_path = pluginpath+"/tools/vmconfig/ccvm"
 ccvm_config_file = pluginpath+"/tools/vmconfig/ccvm/ccvm.xml"
 ccvm_dup_config_path = pluginpath+"/tools/vmconfig/ccvm_dup"
 ccvm_dup_config_file = pluginpath+"/tools/vmconfig/ccvm_dup/ccvm_dup.xml"
+ccvm_dup_bootstrap_file = pluginpath+"/shell/host/ccvm_dup_bootstrap.sh"
 def createDupCcvm(args):
     try:
+        success_bool = True
+
+        # ceph rbd 이미지 삭제
+        result = os.system("rbd ls -p rbd | grep ccvm_dup > /dev/null")
+        if result == 0:
+            os.system("rbd rm rbd/ccvm_dup")
+
         # 기존 가상머신 xml 편집 (가상머신명, cloudinit.iso 경로, rbd 경로 파일 명)
         os.system("rm -rf "+ccvm_dup_config_path)
         os.system("mkdir "+ccvm_dup_config_path)
@@ -70,31 +92,83 @@ def createDupCcvm(args):
         with open(ccvm_dup_config_file, "wt") as file:
             x = x.replace("ccvm", "ccvm_dup")
             file.write(x)
+        
+        with fileinput.FileInput(ccvm_dup_config_file, inplace=True, backup='.bak' ) as fi:
+            for line in fi:
+                if '<mac address=' in line:
+                    line = "      <mac address='"+generateMacAddress()+"'/>\n"
+
+                sys.stdout.write(line)
 
         # ccvm_dup-cloudinit.iso 생성
         hosts_file = "/etc/hosts"
         privkey = "/root/.ssh/id_rsa"
         pubkey = "/root/.ssh/id_rsa.pub"
-        mngt_nic = "bridge0"
+        mngt_nic = "enp0s20"
 
         json_data = openClusterJson()
         mgmt_prefix = str(json_data["clusterConfig"]["mngtNic"]["cidr"])
         mgmt_gw = json_data["clusterConfig"]["mngtNic"]["gw"]
         dns = json_data["clusterConfig"]["mngtNic"]["dns"]
+        ccvm_ip = json_data["clusterConfig"]["ccvm"]["ip"]
+
+        with open(ccvm_dup_bootstrap_file, "rt") as file:
+            x = file.read()
+            
+        with open(ccvm_dup_bootstrap_file, "wt") as file:
+            x = x.replace("DBSERVERIP",ccvm_ip)
+            file.write(x)
 
         if mgmt_gw == None:
             if dns == None:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname','ccvm_dup','--hosts',hosts_file,'--privkey',privkey,'--pubkey',pubkey,'--mgmt-nic',mngt_nic,'--mgmt-ip',args.mngt_ip,'--mgmt-prefix',mgmt_prefix,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname','ccvm_dup','--hosts',hosts_file,'--privkey',privkey,'--pubkey',pubkey,'--mgmt-nic',mngt_nic,'--mgmt-ip',args.mngt_ip,'--mgmt-prefix',mgmt_prefix,'--iso-path',pluginpath+'/tools/vmconfig/ccvm_dup/ccvm_dup-cloudinit.iso','ccvm_dup').stdout.decode())
             else:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname','ccvm_dup','--hosts',hosts_file,'--privkey',privkey,'--pubkey',pubkey,'--mgmt-nic',mngt_nic,'--mgmt-ip',args.mngt_ip,'--mgmt-prefix',mgmt_prefix,'--dns',dns,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname','ccvm_dup','--hosts',hosts_file,'--privkey',privkey,'--pubkey',pubkey,'--mgmt-nic',mngt_nic,'--mgmt-ip',args.mngt_ip,'--mgmt-prefix',mgmt_prefix,'--dns',dns,'--iso-path',pluginpath+'/tools/vmconfig/ccvm_dup/ccvm_dup-cloudinit.iso','ccvm_dup').stdout.decode())
         else:
             if dns == None:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname','ccvm_dup','--hosts',hosts_file,'--privkey',privkey,'--pubkey',pubkey,'--mgmt-nic',mngt_nic,'--mgmt-ip',args.mngt_ip,'--mgmt-prefix',mgmt_prefix,'--mgmt-gw', mgmt_gw,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname','ccvm_dup','--hosts',hosts_file,'--privkey',privkey,'--pubkey',pubkey,'--mgmt-nic',mngt_nic,'--mgmt-ip',args.mngt_ip,'--mgmt-prefix',mgmt_prefix,'--mgmt-gw', mgmt_gw,'--iso-path',pluginpath+'/tools/vmconfig/ccvm_dup/ccvm_dup-cloudinit.iso','ccvm_dup').stdout.decode())
             else:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname','ccvm_dup','--hosts',hosts_file,'--privkey',privkey,'--pubkey',pubkey,'--mgmt-nic',mngt_nic,'--mgmt-ip',args.mngt_ip,'--mgmt-prefix',mgmt_prefix,'--mgmt-gw', mgmt_gw,'--dns', dns,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())  
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname','ccvm_dup','--hosts',hosts_file,'--privkey',privkey,'--pubkey',pubkey,'--mgmt-nic',mngt_nic,'--mgmt-ip',args.mngt_ip,'--mgmt-prefix',mgmt_prefix,'--mgmt-gw', mgmt_gw,'--dns', dns,'--iso-path',pluginpath+'/tools/vmconfig/ccvm_dup/ccvm_dup-cloudinit.iso','ccvm_dup').stdout.decode())
+
+        # 설정파일 각 호스트에 복사
+        for host_name in json_data["clusterConfig"]["hosts"]:
+            for i in [1,2,3]:
+                ret_num = os.system("ssh root@"+host_name["hostname"]+" 'ssh-keygen -R "+args.mngt_ip+" > /dev/null 2>&1'")
+                ret_num = os.system("scp -q -r "+pluginpath+"/tools/vmconfig/ccvm_dup root@"+host_name["hostname"]+":"+pluginpath+"/tools/vmconfig/")
+                if ret_num == 0:
+                    break
+                    
+            if ret_num != 0:
+                return createReturn(code=500, val=host_name + " : ccvm_dup 설정파일 복사 실패")
+
+        # ceph 이미지 등록
+        os.system("qemu-img convert -f qcow2 -O rbd /var/lib/libvirt/images/ablestack-template-back.qcow2 rbd:rbd/ccvm_dup")
+        # ccvm image resize
+        os.system("rbd resize -s 500G ccvm_dup")
+
+        result = json.loads(python3(pluginpath+'/python/pcs/main.py', 'create', '--resource', 'cloudcenter_res_dup', '--xml', pluginpath+'/tools/vmconfig/ccvm_dup/ccvm_dup.xml' ).stdout.decode())
+        if result['code'] not in [200]:
+            success_bool = False
+
+        #ccvm이 정상적으로 생성 되었는지 확인
+        domid_check = 0
+        cnt_num = 0
+        while True:
+            time.sleep(1)
+            cnt_num += 1
+            domid_check = os.system("ssh -o StrictHostKeyChecking=no "+args.mngt_ip+" 'echo ok > /dev/null 2>&1'")
+            if domid_check == 0 or cnt_num > 300:
+                break
+        if domid_check != 0:
+            success_bool = False
+
+        os.system("ssh -o StrictHostKeyChecking=no "+args.mngt_ip+" 'sh /root/bootstrap.sh > /dev/null 2>&1'")
 
         # 결과값 리턴
-        return createReturn(code=200, val={})        
+        if success_bool:
+            return createReturn(code=200, val="cloud center duplication setup success")
+        else:
+            return createReturn(code=500, val="cloud center duplication setup fail")
 
     except Exception as e:
         # 결과값 리턴
