@@ -416,7 +416,7 @@ $('#button-execution-modal-mold-service-control').on('click', function(){
 
     $('#div-modal-mold-service-control').hide();
     $('#div-modal-spinner-header-txt').text('Mold 서비스를 '+txtSelect+'하고 있습니다.');
-    $('#div-modal-spinner').show();////
+    $('#div-modal-spinner').show();
 
     $("#modal-status-alert-title").html("Mold 서비스 "+txtSelect+" 실패");
     $("#modal-status-alert-body").html("Mold 서비스 "+txtSelect+"을(를) 실패하였습니다. 클라우드센터VM 상태를 점검해주세요.");
@@ -463,7 +463,7 @@ $('#button-execution-modal-mold-db-control').on('click', function(){
 
     $('#div-modal-mold-db-control').hide();
     $('#div-modal-spinner-header-txt').text('Mold DB를 '+txtSelect+'하고 있습니다.');
-    $('#div-modal-spinner').show();////
+    $('#div-modal-spinner').show();
 
     $("#modal-status-alert-title").html("Mold DB "+txtSelect+" 실패");
     $("#modal-status-alert-body").html("Mold DB "+txtSelect+"을(를) 실패하였습니다. 클라우드센터VM 상태를 점검해주세요.");
@@ -599,7 +599,9 @@ function CardCloudClusterStatus(){
                     }else if (ccvmStatus.ccvm == 'true'){
                         sessionStorage.setItem("ccvm_bootstrap_status","true");
                         console.log('ccvm true in')
-                        $('#ccvm-after-bootstrap-run').html('<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-linkto-storage-center-ccvm" onclick="cccc_link_go()">클라우드센터 연결</a>');
+                        html_text = '<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-linkto-storage-center-ccvm" onclick="cccc_link_go()">클라우드센터 연결</a>'
+                        html_text += '<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-ccvm-dup-deploy" onclick="ccvm_dup_deploy_modal()">클라우드센터 가상머신 이중화</a>'
+                        $('#ccvm-after-bootstrap-run').html(html_text);
                         $('#ccvm-before-bootstrap-run').html('');
                     }
                 }).catch(function(data){
@@ -865,3 +867,59 @@ function wall_link_go(){
             //console.log(":::Error:::");
         });
 }
+
+/** 클라우드센터 가상머신 이중화 관련 action start */
+function ccvm_dup_deploy_modal(){
+    $("#form-input-ccvm-dup-mngt-ip").val("");
+    $('#div-modal-ccvm-dup-deploy').show();
+}
+
+$('#button-close-ccvm-dup-deploy').on('click', function(){
+    $('#div-modal-ccvm-dup-deploy').hide();
+});
+
+$('#button-cancel-modal-ccvm-dup-deploy').on('click', function(){
+    $('#div-modal-ccvm-dup-deploy').hide();
+});
+
+$('#button-execution-modal-ccvm-dup-deploy').on('click', function(){
+    validate_check = true;
+    var dup_mngt_ip = $("#form-input-ccvm-dup-mngt-ip").val();
+    if (dup_mngt_ip == "") {
+        alert("클라우드센터 가상머신 이중화 관리 IP를 입력해주세요.");
+        validate_check = false;
+    } else if(!checkIp(dup_mngt_ip) && dup_mngt_ip != ""){
+        alert("클라우드센터 가상머신 이중화 관리 IP를 확인해주세요.");
+        validate_check = false;
+    }
+
+    if(validate_check){
+        $('#div-modal-ccvm-dup-deploy').hide();
+        $('#div-modal-spinner-header-txt').text('클라우드센터 이중화 진행중 (약 15분 소요)');
+        $('#div-modal-spinner').show();
+    
+        $("#modal-status-alert-title").html("클라우드센터 가상머신 이중화 실패");
+        $("#modal-status-alert-body").html("클라우드센터 가상머신 이중화를 실패하였습니다.");
+    
+        // 이중화 작업
+        cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/vm/ccvm_dup_deploy.py', '-mi', dup_mngt_ip], { host: pcs_exe_host})
+        .then(function(data){
+            $('#div-modal-spinner').hide();
+            var retVal = JSON.parse(data);
+            if(retVal.code == 200){
+                $("#modal-status-alert-title").html("클라우드센터 가상머신 이중화 완료");
+                $("#modal-status-alert-body").html("클라우드센터 가상머신 이중화를 완료하였습니다.");
+                $('#div-modal-status-alert').show();
+                createLoggerInfo("ccvm dup deploy spawn success");
+            } else {
+                $('#div-modal-status-alert').show();
+                createLoggerInfo(retVal.val);
+            }
+        }).catch(function(data){
+            $('#div-modal-spinner').hide();
+            $('#div-modal-status-alert').show();
+            createLoggerInfo("ccvm dup deploy spawn error : " + data);
+        });
+    }
+});
+/** 클라우드센터 가상머신 이중화 관련 action end */

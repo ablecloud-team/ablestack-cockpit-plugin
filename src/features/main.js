@@ -509,6 +509,61 @@ $('#button-cancel-modal-update-glue-config').on('click', function(){
 });
 /** all hosts update glue config modal 관련 action end */
 
+/** remove cube host config modal 관련 action start */
+// 전체 시스템 종료 버튼 클릭시 modal의 설명 세팅
+$('#menu-item-remove-cube-host').on('click',function(){
+    $('#div-modal-remove-cube-host').show();
+});
+
+$('#button-close-modal-remove-cube-host').on('click', function(){
+    $('#div-modal-remove-cube-host').hide();
+});
+
+$('#button-execution-modal-remove-cube-host').on('click', function(){
+    var console_log = true;
+    $('#div-modal-remove-cube-host').hide();
+    $('#div-modal-spinner-header-txt').text('Cube 호스트를 초기화하고 있습니다.');
+    $('#div-modal-spinner').show();
+
+    $("#modal-status-alert-title").html("Cube 호스트 제거");
+    $("#modal-status-alert-body").html("Cube 호스트 제거를 실패하였습니다.");
+    createLoggerInfo("remove_cube_host_modal() start");
+
+    /*
+    todo list
+    1) hosts 파일 초기화
+    2) ablestack.json 초기화
+    3) cluster.json 초기화
+    4) vmconfig 초기화
+    */
+    cockpit.spawn(["python3", pluginpath+"/python/cluster/remove_cube_host.py", "remove"])
+    .then(function(data){
+        var retVal = JSON.parse(data);
+        if(retVal.code == 200){
+            $('#div-modal-spinner').hide();
+            $("#modal-status-alert-body").html("Cube 호스트를 초기화를 성공하였습니다");
+            $('#div-modal-status-alert').show();
+            createLoggerInfo("remove cube host success");
+        }else{
+            $('#div-modal-spinner').hide();
+            $('#div-modal-status-alert').show();
+            createLoggerInfo(":::remove_cube_host_modal() Error ::: error");
+            console.log(":::remove_cube_host_modal() Error :::" + data);
+        }
+    })
+    .catch(function(data){
+        $('#div-modal-spinner').hide();
+        $('#div-modal-status-alert').show();
+        createLoggerInfo(":::remove_cube_host_modal() Error ::: error");
+        console.log(":::remove_cube_host_modal() Error :::" + data);
+    });
+});
+
+$('#button-cancel-modal-remove-cube-host').on('click', function(){
+    $('#div-modal-remove-cube-host').hide();
+});
+/** move cube host config modal 관련 action end */
+
 
 /**
  * Meathod Name : checkStorageClusterStatus
@@ -896,14 +951,19 @@ function checkDeployStatus(){
                                     let msg ="";
                                     if(step2!="RUNNING"){
                                         msg += '스토리지센터 가상머신이 '+step2+' 상태 입니다.\n';
+                                        msg += '스토리지센터 가상머신이 shut off 상태일 경우 스토리지센터 가상머신 카드에서 스토리지센터 VM을 시작해주세요.\n';
                                         showRibbon('warning', msg);
                                     }
                                     if(step4!="HEALTH_OK"){
                                         msg += '스토리지센터 클러스터가 '+step4+' 상태 입니다.\n';
+                                        msg += 'oout, nobackfill, norecover flag인 경우 의도하지 않은 유지보수 모드일 경우 스토리지센터 클러스터 상태 카드에서 유지보수 모드 해제해주세요.\n';
+                                        msg += '스토리지센터 클러스터 상태가 Monitor clock detected 인 경우 cube host, scvm, ccvm의 ntp 시간 동기화 작업을 해야합니다.';
                                         showRibbon('warning', msg);
                                     }
                                     if(step6!="RUNNING"){
                                         msg += '클라우드센터 가상머신이 '+step6+' 상태 입니다.\n';
+                                        msg += '클라우드센터 가상머신 Mold 서비스 , DB 상태를 확인하여 정지상태일 경우 서비스 재시작\n';
+                                        msg += '또는 클라우드센터 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
                                         showRibbon('warning', msg);
                                     }
                                 }
@@ -1144,4 +1204,8 @@ function ribbonWorker() {
         cockpit.file().close()
     }
 }
+
+
+
+
 
