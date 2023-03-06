@@ -13,8 +13,10 @@
         <meta charset="utf-8">
         <link href="../base1/cockpit.css" type="text/css" rel="stylesheet">
         <link href="./css/patternfly.css" type="text/css" rel="stylesheet">
+        <link href="./css/jquery.timepicker.min.css" type="text/css" rel="stylesheet">
         <script src="../base1/cockpit.js"></script>
         <script src="./src/common/jquery-3.5.1.js"></script>
+        <script src="./src/common/jquery.timepicker.min.js"></script>
         <!-- 공통 필요 스타일 및 자바스크립트 영역 끝 -->
  
     </head>
@@ -741,7 +743,7 @@
                                             <label class="pf-c-form__label"><span class="pf-c-form__label-text">반복</span></label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <select id="drop-repeat" aria-label="반복" class="pf-c-form-control" aria-invalid="false" data-ouia-component-type="PF4/FormSelect" data-ouia-safe="true" data-ouia-component-id="OUIA-Generated-FormSelect-default-8">
+                                            <select id="drop-repeat" aria-label="반복" class="pf-c-form-control" style="width: 40%;">
                                                 <option class="" value="no">반복 실행하지 않습니다</option>
                                                 <option class="" value="hourly">한 시간 마다</option>
                                                 <option class="" value="daily">매일</option>
@@ -751,30 +753,35 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="pf-c-form__group" id="div-modal-db-backup-cloud-vm-regular-backup-option-time" style="display:none">
-                                        <div class="pf-c-form__group-label">
-                                            <label class="pf-c-form__label"><span class="pf-c-form__label-text">다음에서 실행</span></label>
+                                    <div class="pf-c-form__group" id="div-modal-db-backup-cloud-vm-regular-backup-option" style="display:none">
+                                        <div class="pf-c-form__group-label"  id="div-modal-db-backup-cloud-vm-regular-backup-time">
+                                            <label class="pf-c-form__label">
+                                                <span class="pf-c-form__label-text">다음에서 실행</span>
+                                            </label>
                                         </div>
-                                        <div class="pf-c-date-picker create-timer-time-picker specific-no-repeat">
-                                            <div class="pf-c-date-picker__input" style="--pf-c-date-picker__input--c-form-control--Width:150px;">
-                                                <div class="pf-c-input-group">
-                                                    <div id="time-picker-1677573033145b56bcc4fs2f">
-                                                        <div style="padding-left: 0px;">
-                                                            <input aria-haspopup="menu" id="time-picker-1677573033145b56bcc4fs2f-input" aria-label="Time picker" placeholder="hh:mm" autocomplete="off" class="pf-c-form-control pf-m-icon pf-m-clock pf-c-form-control" type="text" aria-invalid="false" data-ouia-component-type="PF4/TextInput" data-ouia-safe="true" data-ouia-component-id="OUIA-Generated-TextInputBase-10" value="00:00">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="pf-c-form__group-label" id="div-modal-db-backup-cloud-vm-regular-backup-date">
+                                            <label class="pf-c-form__label">
+                                                <span class="pf-c-form__label-text">다음 실행</span>
+                                            </label>
                                         </div>
-                                        <div class="pf-c-form__group-control">
-                                            <div class="pf-l-flex specific-repeat-group" data-index="0">
-                                                <input class="pf-c-form-control delay-number" type="text" aria-invalid="false" data-ouia-component-type="PF4/TextInput" data-ouia-safe="true" data-ouia-component-id="OUIA-Generated-TextInputBase-13" value="0">
-                                                <div class="pf-m-align-right">
-                                                    <div class="pf-c-input-group">
-                                                        <button aria-disabled="true" aria-label="제거" class="pf-c-button pf-m-secondary pf-m-disabled" disabled="" type="button" data-ouia-component-type="PF4/Button" data-ouia-safe="true" data-ouia-component-id="OUIA-Generated-Button-secondary-8"><svg fill="currentColor" height="1em" width="1em" viewbox="0 0 448 512" aria-hidden="true" role="img" style="vertical-align: -0.125em;"><path d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg></button><button aria-disabled="false" aria-label="추가" class="pf-c-button pf-m-secondary" type="button" data-ouia-component-type="PF4/Button" data-ouia-safe="true" data-ouia-component-id="OUIA-Generated-Button-secondary-9"><svg fill="currentColor" height="1em" width="1em" viewbox="0 0 448 512" aria-hidden="true" role="img" style="vertical-align: -0.125em;"><path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg></button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="pf-c-form__group-control" id="div-modal-db-backup-cloud-vm-regular-backup-option-week">
+                                            <select aria-label="매주 반복" class="pf-c-form-control week-days" style="width: 40%;">
+                                                <option class="" value="mon">월요일</option>
+                                                <option class="" value="tue">화요일</option>
+                                                <option class="" value="wed">수요일</option>
+                                                <option class="" value="thu">목요일</option>
+                                                <option class="" value="fri">금요일</option>
+                                                <option class="" value="sat">토요일</option>
+                                                <option class="" value="sun">일요일</option>
+                                            </select>
+                                        </div>
+                                        <div class="pf-c-form__group-control" id="div-modal-db-backup-cloud-vm-regular-backup-option-time">
+                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-no" class="pf-c-form-control" name="time" style="width: 40%;">
+                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-hourly" class="pf-c-form-control" name="time" style="width: 40%;">
+                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-daily" class="pf-c-form-control" name="time" style="width: 40%;">
+                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-weekly" class="pf-c-form-control" name="time" style="width: 40%;">
+                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-monthly" class="pf-c-form-control" name="time" style="width: 40%;">
+                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-yearly" class="pf-c-form-control" name="time" style="width: 40%;">
                                         </div>
                                     </div>
                                 </div>
@@ -786,7 +793,8 @@
                                 <div class="pf-c-form__group-control">
                                     <div class="pf-l-flex">
                                         <div class="pf-c-check">
-                                            <input id="kdump-settings-compression" class="pf-c-check__input" type="checkbox" aria-invalid="false" data-ouia-component-type="PF4/Checkbox" data-ouia-safe="true" data-ouia-component-id="OUIA-Generated-Checkbox-1"><label class="pf-c-check__label" for="kdump-settings-compression">보존 기간에 따라 파일 삭제 </label>
+                                            <input id="kdump-settings-compression" class="pf-c-check__input" type="checkbox" aria-invalid="false" data-ouia-component-type="PF4/Checkbox" data-ouia-safe="true" data-ouia-component-id="OUIA-Generated-Checkbox-1">
+                                            <label class="pf-c-check__label" for="kdump-settings-compression">보존 기간에 따라 파일 삭제 </label>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group">
@@ -807,7 +815,7 @@
                                             </div>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <select id="drop-repeat" aria-label="반복" class="pf-c-form-control" aria-invalid="false" data-ouia-component-type="PF4/FormSelect" data-ouia-safe="true" data-ouia-component-id="OUIA-Generated-FormSelect-default-8">
+                                            <select id="drop-repeat" aria-label="반복" class="pf-c-form-control">
                                                 <option class="" value="no">반복 실행하지 않습니다</option>
                                                 <option class="" value="hourly">한 시간 마다</option>
                                                 <option class="" value="daily">일</option>

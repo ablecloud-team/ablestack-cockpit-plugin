@@ -17,7 +17,7 @@ $(document).ready(function(){
     $('#dropdown-menu-storage-cluster-status').hide();
     $('#dropdown-menu-cloud-cluster-status').hide();
     $('#dropdown-menu-storage-vm-status').hide();
-    $('#dropdown-menu-cloud-vm-status').hide();
+    // $('#dropdown-menu-cloud-vm-status').hide();
 
     $('#button-open-modal-wizard-storage-cluster').hide();
     $('#button-open-modal-wizard-storage-vm').hide();
@@ -1140,7 +1140,7 @@ function ribbonWorker() {
 
     // ccvm에서 mysqldump 파일을 생성하는 파이썬 파일 실행
     let result="";
-    await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py'])
+    await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py','--hostname','ccvm_dup','--hosts',hosts_file])
     .then(function(data){
         let retVal = JSON.parse(data);
         if (retVal.code == 200) {
@@ -1206,6 +1206,117 @@ function ribbonWorker() {
 }
 
 
+// ccvm db backup 방식에 따라 html 구성 변경
+$('#radio-ccvm-instance-backup').on('click', function () {
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option-repeat').hide();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option').hide();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option-date').hide();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option-week').hide();
+});
+$('#radio-ccvm-regular-backup').on('click', function () {
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option-repeat').show();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option').show();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-time').show();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option-time').show();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-date').hide();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option-week').hide();
+
+    // 정기 백업 선택 시 초기 화면
+    $('#input-ccvm-regular-backup-timepicker-no').show();
+    $('#drop-repeat').val('no');
+    $('#input-ccvm-regular-backup-timepicker-hourly').hide();
+    $('#input-ccvm-regular-backup-timepicker-daily').hide();
+    $('#input-ccvm-regular-backup-timepicker-weekly').hide();
+    $('#input-ccvm-regular-backup-timepicker-monthly').hide();
+    $('#input-ccvm-regular-backup-timepicker-yearly').hide();
+    
+});
+
+$('#drop-repeat').change(function() {
+    if($(this).val() == "no"){
+        $('#input-ccvm-regular-backup-timepicker-no').show();
+        $('#input-ccvm-regular-backup-timepicker-hourly').hide();
+        $('#input-ccvm-regular-backup-timepicker-daily').hide();
+        $('#input-ccvm-regular-backup-timepicker-weekly').hide();
+        $('#input-ccvm-regular-backup-timepicker-monthly').hide();
+        $('#input-ccvm-regular-backup-timepicker-yearly').hide();
+        $('#div-modal-db-backup-cloud-vm-regular-backup-option-date').hide();
+    } else if($(this).val() == "hourly"){
+        $('#input-ccvm-regular-backup-timepicker-no').hide();
+        $('#input-ccvm-regular-backup-timepicker-hourly').show();
+        $('#input-ccvm-regular-backup-timepicker-daily').hide();
+        $('#input-ccvm-regular-backup-timepicker-weekly').hide();
+        $('#input-ccvm-regular-backup-timepicker-monthly').hide();
+        $('#input-ccvm-regular-backup-timepicker-yearly').hide();
+        $('#div-modal-db-backup-cloud-vm-regular-backup-option-date').hide();
+    } else if($(this).val() == "daily"){
+        $('#input-ccvm-regular-backup-timepicker-no').hide();
+        $('#input-ccvm-regular-backup-timepicker-hourly').hide();
+        $('#input-ccvm-regular-backup-timepicker-daily').show();
+        $('#input-ccvm-regular-backup-timepicker-weekly').hide();
+        $('#input-ccvm-regular-backup-timepicker-monthly').hide();
+        $('#input-ccvm-regular-backup-timepicker-yearly').hide();
+        $('#div-modal-db-backup-cloud-vm-regular-backup-option-date').hide();
+    } else if($(this).val() == "weekly"){
+        $('#input-ccvm-regular-backup-timepicker-no').hide();
+        $('#input-ccvm-regular-backup-timepicker-hourly').hide();
+        $('#input-ccvm-regular-backup-timepicker-daily').hide();
+        $('#input-ccvm-regular-backup-timepicker-weekly').show();
+        $('#input-ccvm-regular-backup-timepicker-monthly').hide();
+        $('#input-ccvm-regular-backup-timepicker-yearly').hide();
+        $('#div-modal-db-backup-cloud-vm-regular-backup-option-week').show();
+        $('#div-modal-db-backup-cloud-vm-regular-backup-option-time').show();
+    } else if($(this).val() == "monthly"){
+        alert("저는 "+$(this).val()+"입니다.");
+    }else if($(this).val() == "yearly"){
+        alert("저는 "+$(this).val()+"입니다.");
+    }
+});
+
+// $('input.timepicker').timepicker({
+//     timeFormat: 'h:mm p',
+//     interval: 60,
+//     minTime: '10',
+//     maxTime: '6:00pm',
+//     defaultTime: '11',
+//     startTime: '10:00',
+//     dynamic: false,
+//     dropdown: true,
+//     scrollbar: true
+// });
 
 
+$('#input-ccvm-regular-backup-timepicker-no').timepicker({
+    timeFormat: 'h:mm p',
+    interval: 10,
+    dynamic: false,
+    dropdown: true,
+    scrollbar: true
+});
+
+$('#input-ccvm-regular-backup-timepicker-hourly').timepicker({
+    timeFormat: '0:mm',
+    interval: 1,
+    minMinutes: 00,
+    maxMinutes: 59,
+    dynamic: false,
+    dropdown: true,
+    scrollbar: true
+});
+
+$('#input-ccvm-regular-backup-timepicker-daily').timepicker({
+    timeFormat: 'h:mm p',
+    interval: 10,
+    dynamic: false,
+    dropdown: true,
+    scrollbar: true
+});
+
+$('#input-ccvm-regular-backup-timepicker-weekly').timepicker({
+    timeFormat: 'h:mm p',
+    interval: 10,
+    dynamic: false,
+    dropdown: true,
+    scrollbar: true
+});
 
