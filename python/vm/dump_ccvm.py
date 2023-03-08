@@ -40,6 +40,8 @@ def parseArgs():
                         'instantBackup', 'regularBackup'], help='choose one of the actions')
     parser.add_argument('--path', metavar='name', type=str,
                         nargs='*', help='backup path')
+    parser.add_argument('--date', metavar='name', type=str,
+                        nargs='*', help='backup date')
     # parser.add_argument('--scvm', metavar='name', type=str,
     #                     nargs='*', help='scvm ips')
     # parser.add_argument('--ccvm', metavar='name', type=str,
@@ -53,37 +55,36 @@ def parseArgs():
 def instantBackup(path):
     path = str(path[0])
     now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+    mysqldumpFilePath = path+"/ccvm_dump_"+now+".sql"
 
     os.system("mkdir -p "+path)
 
-    # mysqldump -uuser_id -ppasswd --databases database > path/"backup_"now.sql
     result = subprocess.check_output("mysqldump -u"+user_id+ " -p"+passwd+" --databases "+database+ " > "+path+"/ccvm_dump_"+now+".sql", universal_newlines=True, shell=True, env=env)
-    print(result)
-
-
-# 함수명 : instantBackup
-# 주요 기능 : ccvm의 "cloud" database를 dump하는 함수
-def regularBackup(path):
-
-    # os.system("mkdir -p /root/db_dump/")
-    # # os.system("ssh root@ccvm mkdir -p /root/db_dump")
-
-    # command = []
-    # command.append("mysqldump")
-    # command.append("-u%s" % user_id)
-    # command.append("-p%s" % passwd)
-    # command.append("%s > /root/db_dump/ccvm_dump_%s.sql" % (database, database))
-    # command = " ".join(command)
-    # os.system("ssh root@ccvm " + command)
     
-    os.system("echo "+ path[0])
+    # os.system("echo "+mysqldumpFileName)
+
+    return mysqldumpFilePath
+
+
+# 함수명 : regularBackup
+# 주요 기능 : ccvm의 "cloud" database를 정기적으로 dump하는 함수 (crontab 수정)
+def regularBackup(path):
+    path = str(path[0])
+    now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+    mysqldumpFilePath = path+"/ccvm_dump_"+now+".sql"
+    
+    os.system("mkdir -p "+path)
+
+
+    # result = subprocess.check_output("mysqldump -u"+user_id+ " -p"+passwd+" --databases "+database+ " > "+path+"/ccvm_dump_"+now+".sql", universal_newlines=True, shell=True, env=env)
+
 
 def main():
     args = parseArgs()
     if (args.action) == 'instantBackup':
         try:
-            instantBackup(args.path)
-            ret = createReturn(code=200, val="Creation of mysqldump of ccvm is completed")
+            dump_path = instantBackup(args.path)
+            ret = createReturn(code=200, val=dump_path)
             print(json.dumps(json.loads(ret), indent=4))
 
         except Exception as e:
@@ -94,7 +95,7 @@ def main():
 
     if (args.action) == 'regularBackup':
         try:
-            regularBackup(args.path)
+            regularBackup(args)
             ret = createReturn(code=200, val="Creation of mysqldump of ccvm is completed")
             print(json.dumps(json.loads(ret), indent=4))
 
