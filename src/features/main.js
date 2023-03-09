@@ -1134,27 +1134,28 @@ function ribbonWorker() {
     let dump_sql_file_name = "";
     let radio_ccvm_backup = $('input[name=radio-ccvm-backup]:checked').val();
     let regular_option_ccvm_backup = $('#select-db-backup-cloud-vm-drop-repeat option:selected').val();
-    let regular_input_date_one = "";
-    let regular_input_date_two = "";
+    let regular_input_ccvm_backup_time_one = "";
+    let regular_input_ccvm_backup_time_two = "";
     if (regular_option_ccvm_backup == "no") {
-        regular_input_date_one = $('#input-ccvm-regular-backup-timepicker-no').val();
+        regular_input_ccvm_backup_time_one = $('#input-ccvm-regular-backup-timepicker-no').val();
     }else if (regular_option_ccvm_backup == "hourly") {
-        regular_input_date_one = $('#input-ccvm-regular-backup-timepicker-hourly').val();
+        regular_input_ccvm_backup_time_one = $('#input-ccvm-regular-backup-timepicker-hourly').val();
     }else if (regular_option_ccvm_backup == "daily") {
-        regular_input_date_one = $('#input-ccvm-regular-backup-timepicker-daily').val();
+        regular_input_ccvm_backup_time_one = $('#input-ccvm-regular-backup-timepicker-daily').val();
     }else if (regular_option_ccvm_backup == "weekly") {
-        regular_input_date_one = $('#input-ccvm-regular-backup-timepicker-weekly').val();
-        regular_input_date_two = $('#select-db-backup-cloud-vm-week-days option:selected').val();
+        regular_input_ccvm_backup_time_one = $('#input-ccvm-regular-backup-timepicker-weekly').val();
+        regular_input_ccvm_backup_time_two = $('#select-db-backup-cloud-vm-week-days option:selected').val();
     }else if (regular_option_ccvm_backup == "monthly") {
-        regular_input_date_one = $('#input-ccvm-regular-backup-timepicker-monthly').val();
-        regular_input_date_two = $('#select-db-backup-cloud-vm-days option:selected').val();
+        regular_input_ccvm_backup_time_one = $('#input-ccvm-regular-backup-timepicker-monthly').val();
+        regular_input_ccvm_backup_time_two = $('#select-db-backup-cloud-vm-days option:selected').val();
     }
 
-    alert(regular_option_ccvm_backup);
-    alert(regular_input_date_one);
-    alert(regular_input_date_two);
-    let path = $('#dump-path').val();
-    await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', radio_ccvm_backup, '--path', path, '--repeat', path])
+    // alert(radio_ccvm_backup);
+    // alert(regular_option_ccvm_backup);
+    // alert(regular_input_ccvm_backup_time_one);
+    // alert(regular_input_ccvm_backup_time_two);
+    let regular_input_ccvm_backup_path = $('#dump-path').val();
+    await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', radio_ccvm_backup, '--path', regular_input_ccvm_backup_path, '--repeat', regular_option_ccvm_backup, '--timeone', regular_input_ccvm_backup_time_one, '--timetwo', regular_input_ccvm_backup_time_two])
     .then(function(data){
         console.log(data);
         let retVal = JSON.parse(data);
@@ -1190,7 +1191,7 @@ function ribbonWorker() {
     });
 
     // 파이썬 파일 실행 결과에 따라 다운로드 링크 생성
-    if (result == "200") {
+    if (result == "200" && radio_ccvm_backup == "instantBackup") {
         await cockpit.file(dump_sql_file_path).read()
         .done(function (tag) {
             $('#span-modal-wizard-cluster-config-finish-db-dump-file-download').attr({
@@ -1219,6 +1220,10 @@ function ribbonWorker() {
             console.log("Creation download link of ccvm_mysqldump is failed");
         });
         cockpit.file().close()
+    }else {
+        $('#button-execution-modal-cloud-vm-db-dump').show();
+        $('#button-cancel-modal-cloud-vm-db-dump').show();
+        $('#button-close-modal-cloud-vm-db-dump').show();
     }
 }
 

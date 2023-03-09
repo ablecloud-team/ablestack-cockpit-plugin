@@ -40,12 +40,12 @@ def parseArgs():
                         'instantBackup', 'regularBackup'], help='choose one of the actions')
     parser.add_argument('--path', metavar='name', type=str,
                         nargs='*', help='backup path')
-    parser.add_argument('--date', metavar='name', type=str,
-                        nargs='*', help='backup date')
-    # parser.add_argument('--scvm', metavar='name', type=str,
-    #                     nargs='*', help='scvm ips')
-    # parser.add_argument('--ccvm', metavar='name', type=str,
-    #                     nargs='*', help='ccvm ips')
+    parser.add_argument('--repeat', metavar='name', type=str,
+                        nargs='*', help='repeat')
+    parser.add_argument('--timeone', metavar='name', type=str,
+                        nargs='*', help='timeone')
+    parser.add_argument('--timetwo', metavar='name', type=str,
+                        nargs='*', help='timetwo')
 
     return parser.parse_args()
 
@@ -68,16 +68,30 @@ def instantBackup(path):
 
 # 함수명 : regularBackup
 # 주요 기능 : ccvm의 "cloud" database를 정기적으로 dump하는 함수 (crontab 수정)
-def regularBackup(path):
+def regularBackup(path, repeat, timeone, timetwo):
     path = str(path[0])
+    repeat = str(repeat[0])
+    timeone = str(timeone[0])
     now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
     mysqldumpFilePath = path+"/ccvm_dump_"+now+".sql"
     
-    os.system("mkdir -p "+path)
+    # os.system("mkdir -p "+path)
 
-
+    # result = subprocess.check_output("crontab -e "+ "dd", universal_newlines=True, shell=True, env=env)
     # result = subprocess.check_output("mysqldump -u"+user_id+ " -p"+passwd+" --databases "+database+ " > "+path+"/ccvm_dump_"+now+".sql", universal_newlines=True, shell=True, env=env)
 
+    if (repeat) == 'no':
+        result = subprocess.check_output("echo /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+" | at "+timeone, universal_newlines=True, shell=True, env=env)
+    elif(repeat) == 'hourly':
+        result = subprocess.check_output("echo "+path + repeat + timeone+" >> /root/test.txt", universal_newlines=True, shell=True, env=env)
+    elif(repeat) == 'daily':
+        result = subprocess.check_output("echo "+path + repeat + timeone+" >> /root/test.txt", universal_newlines=True, shell=True, env=env)
+    elif(repeat) == 'weekly':
+        result = subprocess.check_output("echo "+path + repeat + timeone+" >> /root/test.txt", universal_newlines=True, shell=True, env=env)
+    elif(repeat) == 'monthly':
+        result = subprocess.check_output("echo "+path + repeat + timeone+" >> /root/test.txt", universal_newlines=True, shell=True, env=env)
+
+    return path, repeat, timeone, timetwo
 
 def main():
     args = parseArgs()
@@ -95,13 +109,14 @@ def main():
 
     if (args.action) == 'regularBackup':
         try:
-            regularBackup(args)
+            regularBackup(args.path, args.repeat, args.timeone, args.timetwo)
             ret = createReturn(code=200, val="Creation of mysqldump of ccvm is completed")
             print(json.dumps(json.loads(ret), indent=4))
 
         except Exception as e:
             ret = createReturn(code=500, val="Creation of mysqldump of ccvm is failed")
             print(json.dumps(json.loads(ret), indent=4))
+            print(e)
         return ret
 
 if __name__ == "__main__":
