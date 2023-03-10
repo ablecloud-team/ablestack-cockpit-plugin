@@ -1152,8 +1152,8 @@ function ribbonWorker() {
 
     // alert(radio_ccvm_backup);
     // alert(regular_option_ccvm_backup);
-    // alert(regular_input_ccvm_backup_time_one);
-    // alert(regular_input_ccvm_backup_time_two);
+    alert(regular_input_ccvm_backup_time_one);
+    alert(regular_input_ccvm_backup_time_two);
     let regular_input_ccvm_backup_path = $('#dump-path').val();
     await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', radio_ccvm_backup, '--path', regular_input_ccvm_backup_path, '--repeat', regular_option_ccvm_backup, '--timeone', regular_input_ccvm_backup_time_one, '--timetwo', regular_input_ccvm_backup_time_two])
     .then(function(data){
@@ -1192,7 +1192,9 @@ function ribbonWorker() {
 
     // 파이썬 파일 실행 결과에 따라 다운로드 링크 생성
     if (result == "200" && radio_ccvm_backup == "instantBackup") {
-        await cockpit.file(dump_sql_file_path).read()
+        await cockpit.file(dump_sql_file_path,
+            { max_read_size: 104857600
+            }).read()
         .done(function (tag) {
             $('#span-modal-wizard-cluster-config-finish-db-dump-file-download').attr({
                 target: '_blank',
@@ -1233,6 +1235,7 @@ $('#radio-ccvm-instance-backup').on('click', function () {
     $('#div-modal-db-backup-cloud-vm-regular-backup-option').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-date').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-week').hide();
+    $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').show()
 });
 $('#radio-ccvm-regular-backup').on('click', function () {
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-repeat').show();
@@ -1242,6 +1245,7 @@ $('#radio-ccvm-regular-backup').on('click', function () {
     $('#div-modal-db-backup-cloud-vm-regular-backup-date-label').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-week').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-monthly').hide();
+    $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
 
     // 정기 백업 선택 시 초기 화면
     $('#input-ccvm-regular-backup-timepicker-no').show();

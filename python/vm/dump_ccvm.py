@@ -72,6 +72,7 @@ def regularBackup(path, repeat, timeone, timetwo):
     path = str(path[0])
     repeat = str(repeat[0])
     timeone = str(timeone[0])
+    timetwo = str(timetwo[0])
     now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
     mysqldumpFilePath = path+"/ccvm_dump_"+now+".sql"
     
@@ -83,14 +84,16 @@ def regularBackup(path, repeat, timeone, timetwo):
     if (repeat) == 'no':
         result = subprocess.check_output("echo /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+" | at "+timeone, universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'hourly':
-        result = subprocess.check_output("echo "+path + repeat + timeone+" >> /root/test.txt", universal_newlines=True, shell=True, env=env)
+        result = subprocess.check_output("cat <(crontab -l) <(echo */"+timeone+" */1 * * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+") | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'daily':
-        result = subprocess.check_output("echo "+path + repeat + timeone+" >> /root/test.txt", universal_newlines=True, shell=True, env=env)
+        timeone_arr = timeone.split(':')
+        result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'weekly':
-        result = subprocess.check_output("echo "+path + repeat + timeone+" >> /root/test.txt", universal_newlines=True, shell=True, env=env)
+        timeone_arr = timeone.split(':')
+        result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * "+timetwo+" /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'monthly':
-        result = subprocess.check_output("echo "+path + repeat + timeone+" >> /root/test.txt", universal_newlines=True, shell=True, env=env)
-
+        timeone_arr = timeone.split(':')
+        result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" "+timetwo+" * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
     return path, repeat, timeone, timetwo
 
 def main():
