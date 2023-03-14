@@ -13,9 +13,11 @@
         <meta charset="utf-8">
         <link href="../base1/cockpit.css" type="text/css" rel="stylesheet">
         <link href="./css/patternfly.css" type="text/css" rel="stylesheet">
+        <link href="./css/jquery-ui.min.css" type="text/css" rel="stylesheet">
         <link href="./css/jquery.timepicker.min.css" type="text/css" rel="stylesheet">
         <script src="../base1/cockpit.js"></script>
         <script src="./src/common/jquery-3.5.1.js"></script>
+        <script src="./src/common/jquery-ui.min.js"></script>
         <script src="./src/common/jquery.timepicker.min.js"></script>
         <!-- 공통 필요 스타일 및 자바스크립트 영역 끝 -->
  
@@ -780,7 +782,21 @@
                                             <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-weekly" class="pf-c-form-control" name="time" style="width: 40%;">
                                         </div>
                                         <div class="pf-c-form__group-control" id="div-modal-db-backup-cloud-vm-regular-backup-option-monthly">
-                                            <select aria-label="매월 반복" class="pf-c-form-control month-days" id="select-db-backup-cloud-vm-days" style="width: 40%;">
+                                            <select aria-label="매월 반복" class="pf-c-form-control month-days" id="select-db-backup-cloud-vm-months" style="width: 30%;">
+                                                <option class="" value="1">1개월</option>
+                                                <option class="" value="2">2개월</option>
+                                                <option class="" value="3">3개월</option>
+                                                <option class="" value="4">4개월</option>
+                                                <option class="" value="5">5개월</option>
+                                                <option class="" value="6">6개월</option>
+                                                <option class="" value="7">7개월</option>
+                                                <option class="" value="8">8개월</option>
+                                                <option class="" value="9">9개월</option>
+                                                <option class="" value="10">10개월</option>
+                                                <option class="" value="11">11개월</option>
+                                                <option class="" value="12">12개월</option>
+                                            </select>
+                                            <select aria-label="매월 반복" class="pf-c-form-control month-days" id="select-db-backup-cloud-vm-days" style="width: 30%;">
                                                 <option class="" value="1">1일</option>
                                                 <option class="" value="2">2일</option>
                                                 <option class="" value="3">3일</option>
@@ -813,13 +829,12 @@
                                                 <option class="" value="30">30일</option>
                                                 <option class="" value="31">31일</option>
                                             </select>
-                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-monthly" class="pf-c-form-control" name="time" style="width: 40%;">
+                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-monthly" class="pf-c-form-control" name="time" style="width: 30%;">
                                         </div>
                                         <div class="pf-c-form__group-control" id="div-modal-db-backup-cloud-vm-regular-backup-option-time">
                                             <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-no" class="pf-c-form-control" name="time" style="width: 40%;">
                                             <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-hourly" class="pf-c-form-control" name="time" style="width: 40%;">
                                             <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-daily" class="pf-c-form-control" name="time" style="width: 40%;">
-                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-yearly" class="pf-c-form-control" name="time" style="width: 40%;">
                                         </div>
                                     </div>
                                 </div>
@@ -831,7 +846,7 @@
                                 <div class="pf-c-form__group-control">
                                     <div class="pf-l-flex">
                                         <div class="pf-c-check">
-                                            <input id="kdump-settings-compression" class="pf-c-check__input" type="checkbox" aria-invalid="false" data-ouia-component-type="PF4/Checkbox" data-ouia-safe="true" data-ouia-component-id="OUIA-Generated-Checkbox-1">
+                                            <input id="form-input-db-backup-cloud-vm-checkbox" class="pf-c-check__input" type="checkbox" aria-invalid="false">
                                             <label class="pf-c-check__label" for="kdump-settings-compression">보존 기간에 따라 파일 삭제 </label>
                                         </div>
                                     </div>
@@ -839,28 +854,23 @@
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label"><span class="pf-c-form__label-text">다음보다 오래된 파일 삭제</span></label>
                                         </div>
-                                        <div class="pf-c-form__group-control">
-                                            <div class="pf-c-date-picker create-timer-time-picker specific-no-repeat">
-                                                <div class="pf-c-date-picker__input" style="--pf-c-date-picker__input--c-form-control--Width:150px;">
-                                                    <div class="pf-c-input-group">
-                                                        <div id="time-picker-1677201603535cru2yann69d">
-                                                            <div style="padding-left: 0px;">
-                                                                <input aria-haspopup="menu" id="time-picker-1677201603535cru2yann69d-input" aria-label="Time picker" placeholder="hh:mm" autocomplete="off" class="pf-c-form-control pf-m-icon pf-m-clock pf-c-form-control" type="text" aria-invalid="false" data-ouia-component-type="PF4/TextInput" data-ouia-safe="true" data-ouia-component-id="OUIA-Generated-TextInputBase-14" value="00:00">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                        <div class="pf-c-form__group-control pf-m-inline">
+                                            <div class="pf-c-number-input">
+                                              <div class="pf-c-input-group">
+                                                <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-minus" type="button" aria-label="Minus" disabled>
+                                                  <span class="pf-c-number-input__icon">
+                                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                                  </span>
+                                                </button>
+                                                <input class="pf-c-form-control" type="number" maxlength="2" value="1" id="form-input-db-backup-cloud-vm-number" name="form-input-db-backup-cloud-vm-number" style="padding-right:10px;" aria-label="Number input" disabled/>
+                                                <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-plus" type="button" aria-label="Plus" disabled>
+                                                  <span class="pf-c-number-input__icon">
+                                                    <i class="fas fa-plus" aria-hidden="true"></i>
+                                                  </span>
+                                                </button>
+                                              </div>
                                             </div>
-                                        </div>
-                                        <div class="pf-c-form__group-control">
-                                            <select id="drop-repeat" aria-label="반복" class="pf-c-form-control">
-                                                <option class="" value="no">반복 실행하지 않습니다</option>
-                                                <option class="" value="hourly">한 시간 마다</option>
-                                                <option class="" value="daily">일</option>
-                                                <option class="" value="weekly">매주</option>
-                                                <option class="" value="monthly">월 별</option>
-                                                <option class="" value="yearly">매년</option>
-                                            </select>
+                                            <span style="margin-top:10px">일</span>
                                         </div>
                                     </div>
                                 </div>
