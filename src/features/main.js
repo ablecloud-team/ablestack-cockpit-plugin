@@ -143,9 +143,14 @@ $('#button-cancel-modal-cloud-vm-db-dump').on('click', function(){
     $('#input-ccvm-regular-backup-timepicker-daily').hide();
     $('#input-ccvm-regular-backup-timepicker-weekly').hide();
     $('#input-ccvm-regular-backup-timepicker-monthly').hide();
+    $('#input-ccvm-regular-backup-timepicker-no').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-hourly').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-daily').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-weekly').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-monthly').val('0:00');
     $('#select-db-backup-cloud-vm-drop-repeat').val('no');
     $('#select-db-backup-cloud-vm-week-days').val('mon');
-    $('#select-db-backup-cloud-vm-months').val('1');
+    $('#select-db-backup-cloud-vm-months').val('0');
     $('#select-db-backup-cloud-vm-days').val('1');
 });
 
@@ -326,7 +331,7 @@ $('#button-execution-modal-cloud-vm-db-dump').on('click', function () {
     $('#div-modal-wizard-cluster-config-finish-db-dump-file-download-empty-state').show();
     $('#dbdump-prepare-status').html("<svg class='pf-c-spinner pf-m-xl' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100'><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>" +
     "<h1 data-ouia-component-type='PF4/Title' data-ouia-safe='true' data-ouia-component-id='OUIA-Generated-Title-1' class='pf-c-title pf-m-lg'>백업파일 준비 중...</h1><div class='pf-c-empty-state__body'></div>")
-    readFile();
+    ccvmDbBackup();
     $('#div-db-backup').hide();
     $('#button-execution-modal-cloud-vm-db-dump').hide();
     $('#button-cancel-modal-cloud-vm-db-dump').hide();
@@ -1134,7 +1139,7 @@ function ribbonWorker() {
 }
 
 /**
- * Meathod Name : readFile
+ * Meathod Name : ccvmDbBackup
  * Date Created : 2021.10.21
  * Writer  : 류홍욱
  * Description : DB Dump 파일을 로컬 저장소에 저장하고 다운로드 링크를 생성하는 함수
@@ -1142,7 +1147,7 @@ function ribbonWorker() {
  * Return  : 없음
  * History  : 2021.10.26 수정
  */
- async function readFile() {
+ async function ccvmDbBackup() {
     // ccvm에서 mysqldump 파일을 생성하는 파이썬 파일 실행
     let result="";
     let dump_sql_file_path = "";
@@ -1151,6 +1156,8 @@ function ribbonWorker() {
     let regular_option_ccvm_backup = $('#select-db-backup-cloud-vm-drop-repeat option:selected').val();
     let regular_input_ccvm_backup_time_one = "";
     let regular_input_ccvm_backup_time_two = "";
+    let form_input_db_backup_cloud_vm_number = $('#form-input-db-backup-cloud-vm-number').val();
+    
     if (regular_option_ccvm_backup == "no") {
         regular_input_ccvm_backup_time_one = $('#input-ccvm-regular-backup-timepicker-no').val();
     }else if (regular_option_ccvm_backup == "hourly") {
@@ -1169,8 +1176,13 @@ function ribbonWorker() {
         regular_input_ccvm_backup_time_two = $('#input-ccvm-regular-backup-datepicker-yearly').val();
     }
 
+    if (radio_ccvm_backup != "deleteOldBackup") {
+        form_input_db_backup_cloud_vm_number = "";
+    }
+
     let regular_input_ccvm_backup_path = $('#dump-path').val();
-    await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', radio_ccvm_backup, '--path', regular_input_ccvm_backup_path, '--repeat', regular_option_ccvm_backup, '--timeone', regular_input_ccvm_backup_time_one, '--timetwo', regular_input_ccvm_backup_time_two, '--delete', regular_input_ccvm_backup_time_two])
+    await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', radio_ccvm_backup, '--path', regular_input_ccvm_backup_path, '--repeat', 
+    regular_option_ccvm_backup, '--timeone', regular_input_ccvm_backup_time_one, '--timetwo', regular_input_ccvm_backup_time_two, '--delete', form_input_db_backup_cloud_vm_number])
     .then(function(data){
         console.log(data);
         let retVal = JSON.parse(data);
@@ -1244,8 +1256,38 @@ function ribbonWorker() {
     }
 }
 
+/**
+ * Meathod Name : checkConfigStatus
+ * Date Created : 2021.03.23
+ * Writer  : 박다정
+ * Description : 클러스터 구성준비 상태 조회
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2021.03.23 최초 작성
+ */
+function checkDBBackupCronjob(){
+    cockpit.spawn(["cat", pluginpath + "/tools/properties/cluster.json"])
+    .then(function(data){
+        var clusterJsonConf = JSON.parse(data);
+        // node 수를 확인하여 입력 박스 만들기
+        var host_count = clusterJsonConf.clusterConfig.hosts.length;
+        setWallIpInput(host_count);
+        // 인풋 박스에 값 자동 설정 하기
+        $("#form-input-wall-monitoring-ccvm-ip").val(clusterJsonConf.clusterConfig.ccvm.ip);
+        for (let i = 0 ; i < host_count ; i++){
+            $("#form-input-wall-monitoring-cubehost"+(i+1)+"-ip").val(clusterJsonConf.clusterConfig.hosts[i].ablecube);
+            $("#form-input-wall-monitoring-scvm"+(i+1)+"-ip").val(clusterJsonConf.clusterConfig.hosts[i].scvmMngt);
+        }
+    })
+    .catch(function(data){
+        createLoggerInfo("cluster.json 파일 읽기 실패");
+        console.log("cluster.json 파일 읽기 실패" + data);
+    });
+}
+
 // ccvm db backup 방식에 따라 html 구성 변경
 $('#radio-ccvm-instance-backup').on('click', function () {
+    $('#div-db-backup-cloud-vm-manage').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-repeat').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-date').hide();
@@ -1253,6 +1295,7 @@ $('#radio-ccvm-instance-backup').on('click', function () {
     $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide();
 });
 $('#radio-ccvm-regular-backup').on('click', function () {
+    $('#div-db-backup-cloud-vm-manage').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-repeat').show();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option').show();
     $('#div-modal-db-backup-cloud-vm-regular-backup-time-label').show();
@@ -1269,6 +1312,45 @@ $('#radio-ccvm-regular-backup').on('click', function () {
     $('#input-ccvm-regular-backup-timepicker-daily').hide();
     $('#input-ccvm-regular-backup-timepicker-weekly').hide();
     $('#input-ccvm-regular-backup-timepicker-monthly').hide();
+    $('#input-ccvm-regular-backup-timepicker-no').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-hourly').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-daily').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-weekly').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-monthly').val('0:00');
+    $('#select-db-backup-cloud-vm-drop-repeat').val('no');
+    $('#select-db-backup-cloud-vm-week-days').val('mon');
+    $('#select-db-backup-cloud-vm-months').val('1');
+    $('#select-db-backup-cloud-vm-days').val('1');
+    $('#form-input-db-backup-cloud-vm-number').val('');
+    
+});
+$('#radio-ccvm-manage-backup').on('click', function () {
+    $('#div-db-backup-cloud-vm-manage').show();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option-repeat').show();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option').show();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-time-label').show();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option-time').show();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-date-label').hide();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option-week').hide();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-option-monthly').hide();
+    $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
+    $('#input-ccvm-regular-backup-timepicker-no').show();
+    $('#select-db-backup-cloud-vm-drop-repeat').val('no');
+    $('#input-ccvm-regular-backup-timepicker-hourly').hide();
+    $('#input-ccvm-regular-backup-timepicker-daily').hide();
+    $('#input-ccvm-regular-backup-timepicker-weekly').hide();
+    $('#input-ccvm-regular-backup-timepicker-monthly').hide();
+    $('#input-ccvm-regular-backup-timepicker-no').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-hourly').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-daily').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-weekly').val('0:00');
+    $('#input-ccvm-regular-backup-timepicker-monthly').val('0:00');
+    $('#select-db-backup-cloud-vm-drop-repeat').val('no');
+    $('#select-db-backup-cloud-vm-week-days').val('mon');
+    $('#select-db-backup-cloud-vm-months').val('1');
+    $('#select-db-backup-cloud-vm-days').val('1');
+    $('#form-input-db-backup-cloud-vm-number').val('0');
+    // $('#form-input-db-backup-cloud-vm-number-plus').attr('disabled', true);
 });
 
 // db backup 파일 보존 기간 변경하는 '+', '-' 기능 
@@ -1284,17 +1366,17 @@ $('#form-input-db-backup-cloud-vm-number-minus').on('click', function () {
     }
 });
 // db backup 파일 보존 기간 기능 활성화 기능
-$('#form-input-db-backup-cloud-vm-checkbox').on('change', function () {
-    if ($(this).is(':checked') == true) {
-        $('#form-input-db-backup-cloud-vm-number-plus').removeAttr('disabled');
-        $('#form-input-db-backup-cloud-vm-number-minus').removeAttr('disabled');
-        $('#form-input-db-backup-cloud-vm-number').removeAttr('disabled');
-    }else{
-        $('#form-input-db-backup-cloud-vm-number-plus').attr('disabled', true);
-        $('#form-input-db-backup-cloud-vm-number-minus').attr('disabled', true);
-        $('#form-input-db-backup-cloud-vm-number').attr('disabled', true);
-    }
-});
+// $('#form-input-db-backup-cloud-vm-checkbox').on('change', function () {
+//     if ($(this).is(':checked') == true) {
+//         $('#form-input-db-backup-cloud-vm-number-plus').removeAttr('disabled');
+//         $('#form-input-db-backup-cloud-vm-number-minus').removeAttr('disabled');
+//         $('#form-input-db-backup-cloud-vm-number').removeAttr('disabled');
+//     }else{
+//         $('#form-input-db-backup-cloud-vm-number-plus').attr('disabled', true);
+//         $('#form-input-db-backup-cloud-vm-number-minus').attr('disabled', true);
+//         $('#form-input-db-backup-cloud-vm-number').attr('disabled', true);
+//     }
+// });
 
 $('#select-db-backup-cloud-vm-drop-repeat').change(function() {
     if($(this).val() == "no"){
@@ -1367,8 +1449,8 @@ $('#input-ccvm-regular-backup-timepicker-no').timepicker({
 $('#input-ccvm-regular-backup-timepicker-hourly').timepicker({
     timeFormat: '0:mm',
     interval: 1,
-    defaultTime: '0:01',
-    minMinutes: 01,
+    defaultTime: '0:00',
+    minMinutes: 00,
     maxMinutes: 59,
     dynamic: false,
     dropdown: true,

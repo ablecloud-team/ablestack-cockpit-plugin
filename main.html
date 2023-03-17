@@ -725,12 +725,12 @@
                                     <label class="pf-c-form__label" for="servicename"><span class="pf-c-form__label-text">위치</span></label>
                                 </div>
                                 <div class="pf-c-form__group-control">
-                                    <input id="dump-path" class="pf-c-form-control" type="text" aria-invalid="false" data-ouia-component-type="PF4/TextInput" data-ouia-safe="true" data-ouia-component-id="OUIA-Generated-TextInputBase-5" value="/home/db_backup">
+                                    <input id="dump-path" class="pf-c-form-control" type="text" aria-invalid="false" value="/home/db_backup">
                                 </div>
                             </div>
                             <div class="pf-c-form__group">
                                 <div class="pf-c-form__group-label pf-m-no-padding-top">
-                                    <label class="pf-c-form__label"><span class="pf-c-form__label-text">백업 스케쥴 설정</span></label>
+                                    <label class="pf-c-form__label"><span class="pf-c-form__label-text">백업 작업 선택</span></label>
                                 </div>
                                 <div class="pf-c-form__group-control">
                                     <div class="pf-l-flex">
@@ -741,6 +741,33 @@
                                         <div class="pf-c-radio">
                                             <input id="radio-ccvm-regular-backup" name="radio-ccvm-backup" class="pf-c-radio__input" type="radio" aria-invalid="false" value="regularBackup">
                                             <label class="pf-c-radio__label" for="radio-ccvm-regular-backup">정기 백업</label>
+                                        </div>
+                                        <div class="pf-c-radio">
+                                            <input id="radio-ccvm-manage-backup" name="radio-ccvm-backup" class="pf-c-radio__input" type="radio" aria-invalid="false" value="deleteOldBackup">
+                                            <label class="pf-c-radio__label" for="radio-ccvm-manage-backup">백업파일 삭제관리</label>
+                                        </div>
+                                    </div>
+                                    <div class="pf-c-form__group" id="div-modal-db-backup-cloud-vm-regular-backup-activation">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label"><span class="pf-c-form__label-text">정기 백업 활성화</span></label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <article id="networking-firewall-summary">
+                                                <div class="pf-l-flex pf-m-align-items-center">
+                                                    <label class="pf-c-switch pf-c-form-control" for="networking-firewall-switch" style="width: fit-content;border: none;">
+                                                        <input id="networking-firewall-switch" class="pf-c-switch__input" type="checkbox" aria-label="방화벽 활성화">
+                                                        <span class="pf-c-switch__toggle">
+                                                            <div class="pf-c-switch__toggle-icon" aria-hidden="true">
+                                                                <svg fill="currentColor" height="1em" width="1em" viewbox="0 0 512 512" aria-hidden="true" role="img">
+                                                                    <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path>
+                                                                </svg>
+                                                            </div>
+                                                        </span>
+                                                    </label>
+                                                    <span class="side-note font-xs">이후 활성화 2023. 3. 17. 오후 1:56</span>
+                                                </div>
+                                            </article>
+                                            
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group" id="div-modal-db-backup-cloud-vm-regular-backup-option-repeat" style="display:none">
@@ -837,44 +864,49 @@
                                             <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-daily" class="pf-c-form-control" name="time" style="width: 40%;">
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="pf-c-form__group">
-                                <div class="pf-c-form__group-label pf-m-no-padding-top">
-                                    <label class="pf-c-form__label"><span class="pf-c-form__label-text">백업 보존 기간 설정</span></label>
-                                </div>
-                                <div class="pf-c-form__group-control">
-                                    <div class="pf-l-flex">
-                                        <div class="pf-c-check">
-                                            <input id="form-input-db-backup-cloud-vm-checkbox" class="pf-c-check__input" type="checkbox" aria-invalid="false">
-                                            <label class="pf-c-check__label" for="kdump-settings-compression">보존 기간에 따라 파일 삭제 </label>
+                                    <div class="pf-c-form__group" id="div-modal-db-backup-cloud-vm-regular-backup-option-repeat" style="display:none">
+                                        <div class="pf-c-form__group-label">
+                                            <label class="pf-c-form__label"><span class="pf-c-form__label-text">반복</span></label>
+                                        </div>
+                                        <div class="pf-c-form__group-control">
+                                            <select id="select-db-backup-cloud-vm-drop-repeat" aria-label="반복" class="pf-c-form-control" style="width: 40%;">
+                                                <option class="" value="no">반복 실행하지 않습니다</option>
+                                                <option class="" value="hourly">한 시간 마다</option>
+                                                <option class="" value="daily">매일</option>
+                                                <option class="" value="weekly">매주</option>
+                                                <option class="" value="monthly">월 별</option>
+                                                <option class="" value="yearly">매년</option>
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="pf-c-form__group">
+                                    <div class="pf-c-form__group" id="div-db-backup-cloud-vm-manage" style="display:none">
                                         <div class="pf-c-form__group-label">
                                             <label class="pf-c-form__label"><span class="pf-c-form__label-text">다음보다 오래된 파일 삭제</span></label>
                                         </div>
-                                        <div class="pf-c-form__group-control pf-m-inline">
-                                            <div class="pf-c-number-input">
-                                              <div class="pf-c-input-group">
-                                                <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-minus" type="button" aria-label="Minus" disabled>
-                                                  <span class="pf-c-number-input__icon">
-                                                    <i class="fas fa-minus" aria-hidden="true"></i>
-                                                  </span>
-                                                </button>
-                                                <input class="pf-c-form-control" type="number" maxlength="2" value="1" id="form-input-db-backup-cloud-vm-number" name="form-input-db-backup-cloud-vm-number" style="padding-right:10px;" aria-label="Number input" disabled/>
-                                                <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-plus" type="button" aria-label="Plus" disabled>
-                                                  <span class="pf-c-number-input__icon">
-                                                    <i class="fas fa-plus" aria-hidden="true"></i>
-                                                  </span>
-                                                </button>
-                                              </div>
+                                        <div class="pf-c-form__group-control">
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <div class="pf-c-number-input">
+                                                    <div class="pf-c-input-group">
+                                                    <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-minus" type="button" aria-label="Minus">
+                                                        <span class="pf-c-number-input__icon">
+                                                        <i class="fas fa-minus" aria-hidden="true"></i>
+                                                        </span>
+                                                    </button>
+                                                    <input class="pf-c-form-control" type="number" maxlength="2" value="1" id="form-input-db-backup-cloud-vm-number" name="form-input-db-backup-cloud-vm-number" style="padding-right:10px;" aria-label="Number input"/>
+                                                    <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-plus" type="button" aria-label="Plus">
+                                                        <span class="pf-c-number-input__icon">
+                                                        <i class="fas fa-plus" aria-hidden="true"></i>
+                                                        </span>
+                                                    </button>
+                                                    </div>
+                                                </div>
+                                                <span style="margin-top:10px">일</span>
                                             </div>
-                                            <span style="margin-top:10px">일</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            
                         </form>
                     <div class="pf-c-empty-state" id="div-modal-wizard-cluster-config-finish-db-dump-file-download-empty-state" style="display: none;">
                         <div class="pf-c-empty-state__content" id="dbdump-prepare-status"></div>
