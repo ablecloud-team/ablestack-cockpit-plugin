@@ -37,7 +37,7 @@ def parseArgs():
                                      epilog='copyrightⓒ 2023 All rights reserved by ABLECLOUD™')
 
     parser.add_argument('action', choices=[
-                        'instantBackup', 'regularBackup'], help='choose one of the actions')
+                        'instantBackup', 'regularBackup', 'deleteOldBackup', 'checkBackup'], help='choose one of the actions')
     parser.add_argument('--path', metavar='name', type=str,
                         nargs='*', help='backup path')
     parser.add_argument('--repeat', metavar='name', type=str,
@@ -46,8 +46,42 @@ def parseArgs():
                         nargs='*', help='timeone')
     parser.add_argument('--timetwo', metavar='name', type=str,
                         nargs='*', help='timetwo')
-
+    parser.add_argument('--delete', metavar='name', type=str,
+                        nargs='*', help='delete old backup')
+    parser.add_argument('--checkOption', metavar='name', type=str,
+                        nargs='*', help='check-option')
     return parser.parse_args()
+
+
+# 함수명 : checkBackup
+# 주요 기능 : ccvm의 "cloud" databased의 backup 크론잡을 체크하는 함수
+def checkBackup(repeat, checkOption):
+    try:
+        repeat = str(repeat[0])
+        checkOption = str(checkOption[0])
+
+        resultDate = ""
+
+        #  한 번만 실행하는 경우, 백업 또는 삭제 'at' 예약작업을 체크
+        if repeat == 'no':
+            result = subprocess.check_output("at -l | awk '{if ($7==\""+checkOption+"\") print ($2,$3,$4,$5,$6)}'", universal_newlines=True, shell=True, env=env)
+            str_datetime = result.rstrip()
+            format = '%a %b %d %H:%M:%S %Y'
+            resultDate = datetime.datetime.strptime(str_datetime,format)
+
+        #  여러번 실행하는 경우, 백업 또는 삭제 크론잡을 체크
+        elif repeat != 'no':
+            result = subprocess.check_output("at -l | awk '{if ($7==\""+checkOption+"\") print ($2,$3,$4,$5,$6)}'", universal_newlines=True, shell=True, env=env)
+            str_datetime = result.rstrip()
+            format = '%a %b %d %H:%M:%S %Y'
+            resultDate = datetime.datetime.strptime(str_datetime,format)
+
+        resultDate = resultDate.strftime('%Y-%m-%d %H:%M:%S')
+        return resultDate
+        
+    except Exception as e:
+        resultDate = ""
+        return resultDate
 
 
 # 함수명 : instantBackup
@@ -56,12 +90,9 @@ def instantBackup(path):
     path = str(path[0])
     now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
     mysqldumpFilePath = path+"/ccvm_dump_"+now+".sql"
-
     os.system("mkdir -p "+path)
 
     result = subprocess.check_output("mysqldump -u"+user_id+ " -p"+passwd+" --databases "+database+ " > "+path+"/ccvm_dump_"+now+".sql", universal_newlines=True, shell=True, env=env)
-    
-    # os.system("echo "+mysqldumpFileName)
 
     return mysqldumpFilePath
 
@@ -73,18 +104,17 @@ def regularBackup(path, repeat, timeone, timetwo):
     repeat = str(repeat[0])
     timeone = str(timeone[0])
     timetwo = str(timetwo[0])
-    now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-    mysqldumpFilePath = path+"/ccvm_dump_"+now+".sql"
     
-    # os.system("mkdir -p "+path)
-
-    # result = subprocess.check_output("crontab -e "+ "dd", universal_newlines=True, shell=True, env=env)
-    # result = subprocess.check_output("mysqldump -u"+user_id+ " -p"+passwd+" --databases "+database+ " > "+path+"/ccvm_dump_"+now+".sql", universal_newlines=True, shell=True, env=env)
+    os.system("mkdir -p "+path)
+    # 크론잡 초기화 ("instantBackup"이 포함되어있는 크론잡 삭제)
+    subprocess.check_output("grep -lrZ 'instantBackup' /var/spool/at/ | xargs -0 rm -f", universal_newlines=True, shell=True, env=env)
+    subprocess.check_output("crontab -u root -l | grep -v 'instantBackup' | crontab -u root -", universal_newlines=True, shell=True, env=env)
 
     if (repeat) == 'no':
-        result = subprocess.check_output("echo /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+" | at "+timeone, universal_newlines=True, shell=True, env=env)
+        result = subprocess.check_output("echo /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+" | at "+timeone+" -q r", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'hourly':
-        result = subprocess.check_output("cat <(crontab -l) <(echo */"+timeone+" */1 * * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+") | crontab -", universal_newlines=True, shell=True, env=env)
+        timeone_arr = timeone.split(':')
+        result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" */1 * * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'daily':
         timeone_arr = timeone.split(':')
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
@@ -93,8 +123,40 @@ def regularBackup(path, repeat, timeone, timetwo):
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * "+timetwo+" /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'monthly':
         timeone_arr = timeone.split(':')
-        result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" "+timetwo+" * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
-    return path, repeat, timeone, timetwo
+        timetwo_arr = timetwo.split('-')
+        result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" "+str(timetwo_arr[1])+" */"+str(timetwo_arr[0])+" * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
+    # else:
+    #     timeone_arr = timeone.split(':')
+    #     result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" "+timetwo+" * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
+
+# 함수명 : deleteOldBackup
+# 주요 기능 : ccvm의 "cloud" database를 dump한 파일 중, 정해진 기간보다 오래된 파일을 삭제하는 함수
+def deleteOldBackup(path, repeat, timeone, timetwo, delete):
+    path = str(path[0])
+    repeat = str(repeat[0])
+    timeone = str(timeone[0])
+    timetwo = str(timetwo[0])
+    delete = str(delete[0])
+
+    # 크론잡 초기화 ("delete"와 "sql"이 포함되어있는 크론잡 삭제)
+    subprocess.check_output("grep -lrEZ 'ccvm_dump.*delete' /var/spool/at/ | xargs -0 rm -f", universal_newlines=True, shell=True, env=env)
+    subprocess.check_output("crontab -u root -l | grep -Ev 'delete.*sql|sql.*delete' | crontab -u root -", universal_newlines=True, shell=True, env=env)
+
+    if (repeat) == 'no':
+            result = subprocess.check_output("echo find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+delete+" delete | at "+timeone+" -q d", universal_newlines=True, shell=True, env=env)
+    elif(repeat) == 'hourly':
+        timeone_arr = timeone.split(':')
+        result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" */1 * * * find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
+    elif(repeat) == 'daily':
+        timeone_arr = timeone.split(':')
+        result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * * find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
+    elif(repeat) == 'weekly':
+        timeone_arr = timeone.split(':')
+        result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * "+timetwo+" find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
+    elif(repeat) == 'monthly':
+        timeone_arr = timeone.split(':')
+        timetwo_arr = timetwo.split('-')
+        result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" "+str(timetwo_arr[1])+" */"+str(timetwo_arr[0])+" * find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
 
 def main():
     args = parseArgs()
@@ -122,5 +184,33 @@ def main():
             print(e)
         return ret
 
+    if (args.action) == 'deleteOldBackup':
+        try:
+            deleteOldBackup(args.path, args.repeat, args.timeone, args.timetwo, args.delete)
+            ret = createReturn(code=200, val="Creation of mysqldump of ccvm is completed")
+            print(json.dumps(json.loads(ret), indent=4))
+
+        except Exception as e:
+            ret = createReturn(code=500, val="Creation of mysqldump of ccvm is failed")
+            print(json.dumps(json.loads(ret), indent=4))
+            print(e)
+        return ret
+
+    if (args.action) == 'checkBackup':
+        try:
+            dump_check = checkBackup(args.repeat, args.checkOption)
+            if (dump_check) == "":
+                ret = createReturn(code=500, val="Backup Check ERROR")
+                print(json.dumps(json.loads(ret), indent=4))
+            else:
+                ret = createReturn(code=200, val=dump_check)
+                print(json.dumps(json.loads(ret), indent=4))
+
+        except Exception as e:
+            ret = createReturn(code=500, val="Creation of mysqldump of ccvm is failed")
+            print(json.dumps(json.loads(ret), indent=4))
+            print(e)
+        return ret
+    
 if __name__ == "__main__":
     main()

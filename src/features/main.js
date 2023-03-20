@@ -1257,31 +1257,85 @@ function ribbonWorker() {
 }
 
 /**
- * Meathod Name : checkConfigStatus
- * Date Created : 2021.03.23
- * Writer  : 박다정
- * Description : 클러스터 구성준비 상태 조회
+ * Meathod Name : checkDBBackupCronjob
+ * Date Created : 2023.03.20
+ * Writer  : 류홍욱
+ * Description : DB 백업 예약작업(Cronjob, at) 확인하는 함수
  * Parameter : 없음
  * Return  : 없음
- * History  : 2021.03.23 최초 작성
+ * History  : 2023.03.17 최초 작성
  */
+
 function checkDBBackupCronjob(){
-    cockpit.spawn(["cat", pluginpath + "/tools/properties/cluster.json"])
+    let span_ccvm_backup_check = ""
+    let regular_option_ccvm_backup_info = ""
+    let radio_ccvm_backup = $('input[name=radio-ccvm-backup]:checked').val();
+    let regular_option_ccvm_backup = $('#select-db-backup-cloud-vm-drop-repeat option:selected').val();
+    if (radio_ccvm_backup == "regularBackup") {
+        span_ccvm_backup_check = "r";
+    }else if (radio_ccvm_backup == "deleteOldBackup") {
+        span_ccvm_backup_check = "d";
+    }
+    if (regular_option_ccvm_backup == "no") {
+        regular_option_ccvm_backup_info = "반복 없음";
+    }else if (regular_option_ccvm_backup == "hourly") {
+        regular_option_ccvm_backup_info = "한 시간마다";
+    }else if (regular_option_ccvm_backup == "daily") {
+        regular_option_ccvm_backup_info = "매일";
+    }else if (regular_option_ccvm_backup == "weekly") {
+        regular_option_ccvm_backup_info = "매주";
+    }else if (regular_option_ccvm_backup == "monthly") {
+        regular_option_ccvm_backup_info = "매월";
+    }else {
+        regular_option_ccvm_backup_info = "기타";
+    }
+
+    
+    
+
+    cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', 'checkBackup', '--repeat', regular_option_ccvm_backup, 
+    '--checkOption', span_ccvm_backup_check])
     .then(function(data){
-        var clusterJsonConf = JSON.parse(data);
-        // node 수를 확인하여 입력 박스 만들기
-        var host_count = clusterJsonConf.clusterConfig.hosts.length;
-        setWallIpInput(host_count);
-        // 인풋 박스에 값 자동 설정 하기
-        $("#form-input-wall-monitoring-ccvm-ip").val(clusterJsonConf.clusterConfig.ccvm.ip);
-        for (let i = 0 ; i < host_count ; i++){
-            $("#form-input-wall-monitoring-cubehost"+(i+1)+"-ip").val(clusterJsonConf.clusterConfig.hosts[i].ablecube);
-            $("#form-input-wall-monitoring-scvm"+(i+1)+"-ip").val(clusterJsonConf.clusterConfig.hosts[i].scvmMngt);
+        console.log(data);
+        let retVal = JSON.parse(data);
+        if (retVal.code == 200) {
+            dump_check = retVal.val;
+            console.log(dump_check);
+            // dump_sql_file_name = dump_sql_file_path.substr(dump_sql_file_path.lastIndexOf( "/" )+1);
+            $('#switch-ccvm-backup-check').prop('checked', true);
+            $('#span-ccvm-backup-check').text("현재 예약된 작업 : "+dump_check+" ("+regular_option_ccvm_backup_info+")");
+            $("select[name=select-db-backup-cloud-vm]").prop('disabled', false)
+            $("[name=ccvm-regular-backup-time]").prop('disabled', false)
+            createLoggerInfo("Creation of mysqldump of ccvm is completed");
+            console.log("Creation of mysqldump of ccvm is completed");
+            result="200";
+        }else {
+            $('#div-db-backup').show();
+            $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
+            $('#dbdump-prepare-status').html("")
+            $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
+            $('#button-execution-modal-cloud-vm-db-dump').show();
+            $('#button-cancel-modal-cloud-vm-db-dump').show();
+            $('#button-close-modal-cloud-vm-db-dump').show();
+            $('#switch-ccvm-backup-check').prop('checked', false);
+            $('#span-ccvm-backup-check').text("현재 예약된 작업 없음");
+            $("select[name=select-db-backup-cloud-vm]").prop('disabled', true)
+            $("[name=ccvm-regular-backup-time]").prop('disabled', true)
+            createLoggerInfo("Creation of mysqldump of ccvm is failed");
+            console.log("Creation of mysqldump of ccvm is failed");
+            result="500";
         }
-    })
-    .catch(function(data){
-        createLoggerInfo("cluster.json 파일 읽기 실패");
-        console.log("cluster.json 파일 읽기 실패" + data);
+    }).catch(function(data){
+        $('#div-db-backup').show();
+        $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
+        $('#dbdump-prepare-status').html("")
+        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
+        $('#button-execution-modal-cloud-vm-db-dump').show();
+        $('#button-cancel-modal-cloud-vm-db-dump').show();
+        $('#button-close-modal-cloud-vm-db-dump').show();
+        createLoggerInfo("Creation of mysqldump of ccvm is failed");
+        console.log("Creation of mysqldump of ccvm is failed");
+        result="500";
     });
 }
 
@@ -1322,6 +1376,8 @@ $('#radio-ccvm-regular-backup').on('click', function () {
     $('#select-db-backup-cloud-vm-months').val('1');
     $('#select-db-backup-cloud-vm-days').val('1');
     $('#form-input-db-backup-cloud-vm-number').val('');
+
+    checkDBBackupCronjob()
     
 });
 $('#radio-ccvm-manage-backup').on('click', function () {
@@ -1351,6 +1407,18 @@ $('#radio-ccvm-manage-backup').on('click', function () {
     $('#select-db-backup-cloud-vm-days').val('1');
     $('#form-input-db-backup-cloud-vm-number').val('0');
     // $('#form-input-db-backup-cloud-vm-number-plus').attr('disabled', true);
+
+    checkDBBackupCronjob()
+});
+
+// db backup 스위치 토글 기능
+$('#toggle-ccvm-backup-check').click(function(){
+    $('#switch-ccvm-backup-check').prop('checked',function(){
+        return !$(this).prop('checked');
+    });
+    $("select[name=select-db-backup-cloud-vm], [name=ccvm-regular-backup-time]").prop('disabled',function(){
+        return !$(this).prop('disabled');
+    });
 });
 
 // db backup 파일 보존 기간 변경하는 '+', '-' 기능 
@@ -1365,18 +1433,6 @@ $('#form-input-db-backup-cloud-vm-number-minus').on('click', function () {
         $('#form-input-db-backup-cloud-vm-number').val(num * 1 - 1)
     }
 });
-// db backup 파일 보존 기간 기능 활성화 기능
-// $('#form-input-db-backup-cloud-vm-checkbox').on('change', function () {
-//     if ($(this).is(':checked') == true) {
-//         $('#form-input-db-backup-cloud-vm-number-plus').removeAttr('disabled');
-//         $('#form-input-db-backup-cloud-vm-number-minus').removeAttr('disabled');
-//         $('#form-input-db-backup-cloud-vm-number').removeAttr('disabled');
-//     }else{
-//         $('#form-input-db-backup-cloud-vm-number-plus').attr('disabled', true);
-//         $('#form-input-db-backup-cloud-vm-number-minus').attr('disabled', true);
-//         $('#form-input-db-backup-cloud-vm-number').attr('disabled', true);
-//     }
-// });
 
 $('#select-db-backup-cloud-vm-drop-repeat').change(function() {
     if($(this).val() == "no"){

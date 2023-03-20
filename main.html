@@ -755,8 +755,8 @@
                                             <article id="networking-firewall-summary">
                                                 <div class="pf-l-flex pf-m-align-items-center">
                                                     <label class="pf-c-switch pf-c-form-control" for="networking-firewall-switch" style="width: fit-content;border: none;">
-                                                        <input id="networking-firewall-switch" class="pf-c-switch__input" type="checkbox" aria-label="방화벽 활성화">
-                                                        <span class="pf-c-switch__toggle">
+                                                        <input id="switch-ccvm-backup-check" class="pf-c-switch__input" type="checkbox" aria-label="활성화" checked>
+                                                        <span id="toggle-ccvm-backup-check" class="pf-c-switch__toggle">
                                                             <div class="pf-c-switch__toggle-icon" aria-hidden="true">
                                                                 <svg fill="currentColor" height="1em" width="1em" viewbox="0 0 512 512" aria-hidden="true" role="img">
                                                                     <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path>
@@ -764,10 +764,9 @@
                                                             </div>
                                                         </span>
                                                     </label>
-                                                    <span class="side-note font-xs">이후 활성화 2023. 3. 17. 오후 1:56</span>
+                                                    <span id="span-ccvm-backup-check" class="side-note font-xs" style="font-size: smaller;" ></span>
                                                 </div>
                                             </article>
-                                            
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group" id="div-modal-db-backup-cloud-vm-regular-backup-option-repeat" style="display:none">
@@ -775,7 +774,7 @@
                                             <label class="pf-c-form__label"><span class="pf-c-form__label-text">반복</span></label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <select id="select-db-backup-cloud-vm-drop-repeat" aria-label="반복" class="pf-c-form-control" style="width: 40%;">
+                                            <select id="select-db-backup-cloud-vm-drop-repeat" aria-label="반복" class="pf-c-form-control" name="select-db-backup-cloud-vm" style="width: 40%;" disabled>
                                                 <option class="" value="no">반복 실행하지 않습니다</option>
                                                 <option class="" value="hourly">한 시간 마다</option>
                                                 <option class="" value="daily">매일</option>
@@ -797,7 +796,7 @@
                                             </label>
                                         </div>
                                         <div class="pf-c-form__group-control" id="div-modal-db-backup-cloud-vm-regular-backup-option-week">
-                                            <select aria-label="매주 반복" class="pf-c-form-control week-days" id="select-db-backup-cloud-vm-week-days" style="width: 40%;">
+                                            <select aria-label="매주 반복" class="pf-c-form-control week-days" id="select-db-backup-cloud-vm-week-days" name="select-db-backup-cloud-vm" style="width: 40%;" disabled>
                                                 <option class="" value="mon">월요일</option>
                                                 <option class="" value="tue">화요일</option>
                                                 <option class="" value="wed">수요일</option>
@@ -809,7 +808,7 @@
                                             <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-weekly" class="pf-c-form-control" name="time" style="width: 40%;">
                                         </div>
                                         <div class="pf-c-form__group-control" id="div-modal-db-backup-cloud-vm-regular-backup-option-monthly">
-                                            <select aria-label="매월 반복" class="pf-c-form-control month-days" id="select-db-backup-cloud-vm-months" style="width: 30%;">
+                                            <select aria-label="매월 반복" class="pf-c-form-control month-days" id="select-db-backup-cloud-vm-months" name="select-db-backup-cloud-vm" style="width: 30%;" disabled>
                                                 <option class="" value="1">1개월</option>
                                                 <option class="" value="2">2개월</option>
                                                 <option class="" value="3">3개월</option>
@@ -823,7 +822,7 @@
                                                 <option class="" value="11">11개월</option>
                                                 <option class="" value="12">12개월</option>
                                             </select>
-                                            <select aria-label="매월 반복" class="pf-c-form-control month-days" id="select-db-backup-cloud-vm-days" style="width: 30%;">
+                                            <select aria-label="매월 반복" class="pf-c-form-control month-days" id="select-db-backup-cloud-vm-days" name="select-db-backup-cloud-vm" style="width: 30%;" disabled>
                                                 <option class="" value="1">1일</option>
                                                 <option class="" value="2">2일</option>
                                                 <option class="" value="3">3일</option>
@@ -859,9 +858,9 @@
                                             <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-monthly" class="pf-c-form-control" name="time" style="width: 30%;">
                                         </div>
                                         <div class="pf-c-form__group-control" id="div-modal-db-backup-cloud-vm-regular-backup-option-time">
-                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-no" class="pf-c-form-control" name="time" style="width: 40%;">
-                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-hourly" class="pf-c-form-control" name="time" style="width: 40%;">
-                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-daily" class="pf-c-form-control" name="time" style="width: 40%;">
+                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-no" class="pf-c-form-control" name="ccvm-regular-backup-time" style="width: 40%;" disable>
+                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-hourly" class="pf-c-form-control" name="ccvm-regular-backup-time" style="width: 40%;" disable>
+                                            <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-daily" class="pf-c-form-control" name="ccvm-regular-backup-time" style="width: 40%;" disable>
                                         </div>
                                     </div>
                                     <div class="pf-c-form__group" id="div-modal-db-backup-cloud-vm-regular-backup-option-repeat" style="display:none">
@@ -869,7 +868,7 @@
                                             <label class="pf-c-form__label"><span class="pf-c-form__label-text">반복</span></label>
                                         </div>
                                         <div class="pf-c-form__group-control">
-                                            <select id="select-db-backup-cloud-vm-drop-repeat" aria-label="반복" class="pf-c-form-control" style="width: 40%;">
+                                            <select id="select-db-backup-cloud-vm-drop-repeat" aria-label="반복" class="pf-c-form-control" name="select-db-backup-cloud-vm" style="width: 40%;" disabled>
                                                 <option class="" value="no">반복 실행하지 않습니다</option>
                                                 <option class="" value="hourly">한 시간 마다</option>
                                                 <option class="" value="daily">매일</option>
@@ -887,13 +886,13 @@
                                             <div class="pf-c-form__group-control pf-m-inline">
                                                 <div class="pf-c-number-input">
                                                     <div class="pf-c-input-group">
-                                                    <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-minus" type="button" aria-label="Minus">
+                                                    <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-minus" name="ccvm-regular-backup-time" type="button" aria-label="Minus">
                                                         <span class="pf-c-number-input__icon">
                                                         <i class="fas fa-minus" aria-hidden="true"></i>
                                                         </span>
                                                     </button>
-                                                    <input class="pf-c-form-control" type="number" maxlength="2" value="1" id="form-input-db-backup-cloud-vm-number" name="form-input-db-backup-cloud-vm-number" style="padding-right:10px;" aria-label="Number input"/>
-                                                    <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-plus" type="button" aria-label="Plus">
+                                                    <input class="pf-c-form-control" type="number" maxlength="2" value="1" id="form-input-db-backup-cloud-vm-number" name="ccvm-regular-backup-time" style="padding-right:10px;" aria-label="Number input"/>
+                                                    <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-plus" name="ccvm-regular-backup-time" type="button" aria-label="Plus">
                                                         <span class="pf-c-number-input__icon">
                                                         <i class="fas fa-plus" aria-hidden="true"></i>
                                                         </span>
