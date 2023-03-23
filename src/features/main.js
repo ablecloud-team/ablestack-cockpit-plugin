@@ -1270,40 +1270,22 @@ function checkDBBackupCronjob(){
     let span_ccvm_backup_check = ""
     let regular_option_ccvm_backup_info = ""
     let radio_ccvm_backup = $('input[name=radio-ccvm-backup]:checked').val();
-    let regular_option_ccvm_backup = $('#select-db-backup-cloud-vm-drop-repeat option:selected').val();
+    let regular_option_ccvm_backup = "";
     if (radio_ccvm_backup == "regularBackup") {
         span_ccvm_backup_check = "r";
     }else if (radio_ccvm_backup == "deleteOldBackup") {
         span_ccvm_backup_check = "d";
     }
-    if (regular_option_ccvm_backup == "no") {
-        regular_option_ccvm_backup_info = "반복 없음";
-    }else if (regular_option_ccvm_backup == "hourly") {
-        regular_option_ccvm_backup_info = "한 시간마다";
-    }else if (regular_option_ccvm_backup == "daily") {
-        regular_option_ccvm_backup_info = "매일";
-    }else if (regular_option_ccvm_backup == "weekly") {
-        regular_option_ccvm_backup_info = "매주";
-    }else if (regular_option_ccvm_backup == "monthly") {
-        regular_option_ccvm_backup_info = "매월";
-    }else {
-        regular_option_ccvm_backup_info = "기타";
-    }
 
-    
-    
-
-    cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', 'checkBackup', '--repeat', regular_option_ccvm_backup, 
-    '--checkOption', span_ccvm_backup_check])
+    cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', 'checkBackup', '--checkOption', span_ccvm_backup_check])
     .then(function(data){
         console.log(data);
         let retVal = JSON.parse(data);
         if (retVal.code == 200) {
             dump_check = retVal.val;
             console.log(dump_check);
-            // dump_sql_file_name = dump_sql_file_path.substr(dump_sql_file_path.lastIndexOf( "/" )+1);
             $('#switch-ccvm-backup-check').prop('checked', true);
-            $('#span-ccvm-backup-check').text("현재 예약된 작업 : "+dump_check+" ("+regular_option_ccvm_backup_info+")");
+            $('#span-ccvm-backup-check').text("최초 백업 일정 : "+dump_check);
             $("select[name=select-db-backup-cloud-vm]").prop('disabled', false)
             $("[name=ccvm-regular-backup-time]").prop('disabled', false)
             createLoggerInfo("Creation of mysqldump of ccvm is completed");
