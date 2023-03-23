@@ -149,7 +149,7 @@ $('#button-cancel-modal-cloud-vm-db-dump').on('click', function(){
     $('#input-ccvm-regular-backup-timepicker-weekly').val('0:00');
     $('#input-ccvm-regular-backup-timepicker-monthly').val('0:00');
     $('#select-db-backup-cloud-vm-drop-repeat').val('no');
-    $('#select-db-backup-cloud-vm-week-days').val('mon');
+    $('#select-db-backup-cloud-vm-week-days').val('0');
     $('#select-db-backup-cloud-vm-months').val('0');
     $('#select-db-backup-cloud-vm-days').val('1');
 });
@@ -1354,7 +1354,7 @@ $('#radio-ccvm-regular-backup').on('click', function () {
     $('#input-ccvm-regular-backup-timepicker-weekly').val('0:00');
     $('#input-ccvm-regular-backup-timepicker-monthly').val('0:00');
     $('#select-db-backup-cloud-vm-drop-repeat').val('no');
-    $('#select-db-backup-cloud-vm-week-days').val('mon');
+    $('#select-db-backup-cloud-vm-week-days').val('0');
     $('#select-db-backup-cloud-vm-months').val('1');
     $('#select-db-backup-cloud-vm-days').val('1');
     $('#form-input-db-backup-cloud-vm-number').val('');
@@ -1384,7 +1384,7 @@ $('#radio-ccvm-manage-backup').on('click', function () {
     $('#input-ccvm-regular-backup-timepicker-weekly').val('0:00');
     $('#input-ccvm-regular-backup-timepicker-monthly').val('0:00');
     $('#select-db-backup-cloud-vm-drop-repeat').val('no');
-    $('#select-db-backup-cloud-vm-week-days').val('mon');
+    $('#select-db-backup-cloud-vm-week-days').val('0');
     $('#select-db-backup-cloud-vm-months').val('1');
     $('#select-db-backup-cloud-vm-days').val('1');
     $('#form-input-db-backup-cloud-vm-number').val('0');

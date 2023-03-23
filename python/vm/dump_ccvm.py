@@ -13,6 +13,7 @@ import argparse
 import datetime
 import subprocess
 from subprocess import check_output
+from dateutil.relativedelta import relativedelta
 
 from ablestack import *
 
@@ -58,9 +59,14 @@ def parseArgs():
 def checkBackup(checkOption):
     try:
         checkOption = str(checkOption[0])
-        repeatOptionOne = (subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $2}'", universal_newlines=True, shell=True, env=env)).rstrip()
-        resultDate = ""
+        if checkOption == 'r':
+            repeatOptionOne = (subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $2}'", universal_newlines=True, shell=True, env=env)).rstrip()
+            repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
+        elif checkOption == 'd':
+            repeatOptionOne = (subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $2}'", universal_newlines=True, shell=True, env=env)).rstrip()
+            repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
 
+        # resultDate = ""
         if repeatOptionOne == 'hourly':
             repeatOptionOne = '한 시간 마다'
             format = '%Y-%m-%d %H:%M'
@@ -74,54 +80,59 @@ def checkBackup(checkOption):
             repeatOptionOne = '매월'
             format = '%Y-%m-%d %H:%M'
 
+        if repeatOptionOne == '매주':
+            repeatOptionTwo = repeatOptionTwo.rstrip()
+            if repeatOptionTwo == '0':
+                repeatOptionTwo = '월요일'
+            elif repeatOptionTwo == '1':
+                repeatOptionTwo = '화요일'
+            elif repeatOptionTwo == '2':
+                repeatOptionTwo = '수요일'
+            elif repeatOptionTwo == '3':
+                repeatOptionTwo = '목요일'
+            elif repeatOptionTwo == '4':
+                repeatOptionTwo = '금요일'
+            elif repeatOptionTwo == '5':
+                repeatOptionTwo = '토요일'
+            elif repeatOptionTwo == '6':
+                repeatOptionTwo = '일요일'
+            repeatOptionTwo = " "+repeatOptionTwo
+        elif repeatOptionOne == '매월':
+            repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
+            repeatOptionTwo = repeatOptionTwo.rstrip()
+            repeatOptionTwo_arr = repeatOptionTwo.split('-')
+            repeatOptionTwo = repeatOptionTwo_arr[0]+"개월 "+repeatOptionTwo_arr[1]+"일 마다"
+            repeatOptionTwo += " "
+
         # 백업일 경우, 한 번만 실행하는 경우와 반복하는 경우 체크
         if checkOption == 'r':
             result = subprocess.check_output("at -l | awk '{if ($7==\""+checkOption+"\") print ($2,$3,$4,$5,$6)}'", universal_newlines=True, shell=True, env=env)
-            if result == ' ':
+            # 한 번만 실행
+            if result != '':
                 str_datetime = result.rstrip()
                 format = '%a %b %d %H:%M:%S %Y'
                 resultDate = datetime.datetime.strptime(str_datetime, format)
                 resultDate = resultDate.strftime('%Y-%m-%d %H:%M:%S')
                 resultDate += " (반복 없음)"
+            # 반복
             else:
                 result = subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $3, $4}'", universal_newlines=True, shell=True, env=env)
                 str_datetime = result.rstrip()
                 resultDate = datetime.datetime.strptime(str_datetime, format)
                 resultDate = resultDate.strftime('%Y-%m-%d %H:%M')
-                repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
-                if repeatOptionOne == '매주':
-                    repeatOptionTwo = repeatOptionTwo.rstrip()
-                    if repeatOptionTwo == '0':
-                        repeatOptionTwo = '월요일'
-                    elif repeatOptionTwo == '1':
-                        repeatOptionTwo = '화요일'
-                    elif repeatOptionTwo == '2':
-                        repeatOptionTwo = '수요일'
-                    elif repeatOptionTwo == '3':
-                        repeatOptionTwo = '목요일'                        
-                    elif repeatOptionTwo == '4':
-                        repeatOptionTwo = '금요일'
-                    elif repeatOptionTwo == '5':
-                        repeatOptionTwo = '토요일'
-                    elif repeatOptionTwo == '6':
-                        repeatOptionTwo = '일요일'
-                elif repeatOptionOne == '매월':
-                    repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
-                    repeatOptionTwo = repeatOptionTwo.rstrip()
-                    repeatOptionTwo_arr = repeatOptionTwo.split('-')
-                    repeatOptionTwo = repeatOptionTwo_arr[0]+"개월 "+repeatOptionTwo_arr[1]+"일 마다"
-
-                resultDate += " ("+repeatOptionOne+" "+repeatOptionTwo+")"
+                resultDate += " ("+repeatOptionOne+repeatOptionTwo.rstrip()+")"
 
         # 백업 삭제일 경우, 한 번만 실행하는 경우와 반복하는 경우 체크
-        else:
+        elif checkOption == 'd':
             result = subprocess.check_output("at -l | awk '{if ($7==\""+checkOption+"\") print ($2,$3,$4,$5,$6)}'", universal_newlines=True, shell=True, env=env)
-            if result is not None:
+            # 한 번만 실행
+            if result != '':
                 str_datetime = result.rstrip()
                 format = '%a %b %d %H:%M:%S %Y'
                 resultDate = datetime.datetime.strptime(str_datetime,format)
                 resultDate = resultDate.strftime('%Y-%m-%d %H:%M:%S')
                 resultDate += " (반복 없음)"
+            # 반복
             else:
                 result = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $3, $4}'", universal_newlines=True, shell=True, env=env)
                 str_datetime = result.rstrip()
@@ -158,8 +169,10 @@ def regularBackup(path, repeat, timeone, timetwo):
     timeone = str(timeone[0])
     timetwo = str(timetwo[0])
     now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-    now_no_sec = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-    now_hourly_daily = datetime.datetime.now().strftime('%Y-%m-%d')
+    now_no_sec_obj = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+    today = datetime.date.today()
+    now_hourly = datetime.datetime.now().strftime('%Y-%m-%d %H')
+    now_daily = datetime.datetime.now().strftime('%Y-%m-%d')
     
     os.system("mkdir -p "+path)
     # 크론잡 초기화 ("instantBackup"이 포함되어있는 크론잡 삭제)
@@ -171,63 +184,76 @@ def regularBackup(path, repeat, timeone, timetwo):
         result = subprocess.check_output("echo /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+" | at "+timeone+" -q r", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'hourly':
         timeone_arr = timeone.split(':')
-        result = subprocess.check_output("echo -e '#RegularBackup hourly '"+now_hourly_daily+" "+timeone+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
+
+        # date_obj: cockpit에서 입력받은 값
+        date_obj = now_hourly+":"+str(timeone_arr[1])
+        date_obj = date_obj.rstrip()
+
+        # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
+
+        # 백업 예정 날짜가 현재보다 과거일 경우 1일 경과된 날짜를 첫 백업 일정으로 지정
+        if now_no_sec_obj >= date_obj:
+            # print("now_with_hourly_obj(현재) is greater than date_obj(입력받은).")
+            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
+            new_date_obj = date_obj + datetime.timedelta(hours=1)
+            new_date_string = new_date_obj.strftime("%Y-%m-%d %H:%M")
+        else:
+            # print("date_obj(입력받은) is greater than now_with_hourly_obj(현재).")
+            new_date_string = date_obj
+
+        result = subprocess.check_output("echo -e '#RegularBackup hourly '"+new_date_string+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" */1 * * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'daily':
         timeone_arr = timeone.split(':')
 
-        # 현재 날짜에서 1일 증가되는 코드
-        date_obj = datetime.datetime.strptime(now_hourly_daily, "%Y-%m-%d")
-        new_date_obj = date_obj + datetime.timedelta(days=1)
-        new_date_string = new_date_obj.strftime("%Y-%m-%d")
+        # date_obj: cockpit에서 입력받은 값
+        date_obj = now_daily+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])
+        date_obj = date_obj.rstrip()
+  
+        # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
+        
+        # 백업 예정 날짜가 현재보다 과거일 경우 1일 경과된 날짜를 첫 백업 일정으로 지정
+        if now_no_sec_obj >= date_obj:
+            # print("now_with_weekday_obj(현재) is greater than date_obj(입력받은).")
+            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
+            new_date_obj = date_obj + datetime.timedelta(days=1)
+            new_date_string = new_date_obj.strftime("%Y-%m-%d %H:%M")
+        else:
+            # print("date_obj(입력받은) is greater than now_with_weekday_obj(현재).")
+            new_date_string = date_obj
 
-        result = subprocess.check_output("echo -e '#RegularBackup daily '"+now_hourly_daily+" "+timeone+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
+        result = subprocess.check_output("echo -e '#RegularBackup daily '"+new_date_string+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'weekly':
         timeone_arr = timeone.split(':')
 
         # 백업 예정 날짜가 현재보다 과거일 경우 7일 경과된 날짜를 첫 백업 일정으로 지정
-
-        today = datetime.date.today()
-        weekday = today.weekday()
-        # weekday_names = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
-        # print('Today is', weekday_names[weekday])
-
         # date_obj: cockpit에서 입력받은 값
-        date_string = now_hourly_daily+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])+" "+str(weekday)
+        weekday = today.weekday()
+        date_string = now_daily+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])+" "+str(weekday)
         str_datetime = date_string.rstrip()
         date_obj = datetime.datetime.strptime(str_datetime, "%Y-%m-%d %H:%M %w")
         date_obj = date_obj.strftime("%Y-%m-%d %H:%M %w")
-        print(date_obj)
 
-        # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
+        # now_with_weekday_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
         now = datetime.datetime.now()
-        now_no_sec_obj = now.strftime("%Y-%m-%d %H:%M %w")
-        print(now_no_sec_obj)
+        now_with_weekday_obj = now.strftime("%Y-%m-%d %H:%M %w")
 
         # new_date_string : 최종적으로 크론잡에 입력되는 날짜
         new_date_string = str_datetime
-
         
-        
-
-        # print(date_obj)
-        # print(now_no_sec_obj)
-        
-        if now_no_sec_obj > date_obj:
-            print("now_no_sec_obj is greater than date_obj.")
+        if now_with_weekday_obj >= date_obj:
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M %w')
             date_obj = date_obj.strftime('%Y-%m-%d')
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d')
             new_date_obj = date_obj + datetime.timedelta(days=7)
             new_date_string = new_date_obj.strftime("%Y-%m-%d")
-            print(new_date_string)
         else:
-            print("date_obj is greater than now_no_sec_obj.")
+            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M %w')
+            date_obj = date_obj.strftime('%Y-%m-%d')
+            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d')
             new_date_obj = date_obj
             new_date_string = new_date_obj.strftime("%Y-%m-%d")
-
-        # new_date_string = new_date_string.strftime("%Y-%m-%d %H:%M %w")
 
         result = subprocess.check_output("echo -e '#RegularBackup weekly '"+new_date_string+" "+timeone+" "+timetwo+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * "+timetwo+" /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
@@ -235,16 +261,32 @@ def regularBackup(path, repeat, timeone, timetwo):
         timeone_arr = timeone.split(':')
         timetwo_arr = timetwo.split('-')
 
-        # 현재 날짜에서 지정된 달만큼 증가되는 코드
-        date_obj = datetime.datetime.strptime(now_hourly_daily, "%Y-%m-%d")
-        new_date_obj = date_obj + datetime.timedelta(days=int(timetwo_arr[1])*365/12)
-        new_date_string = new_date_obj.strftime("%Y-%m-%d")
+        # 백업 예정 날짜가 현재보다 과거일 경우 지정된 개월 수 이후, 지정된 날을 첫 백업 일정으로 지정
+        # date_obj: cockpit에서 입력받은 값
+        date_obj = datetime.datetime.strptime(now_daily, "%Y-%m-%d")
+        date_obj = date_obj.replace(day=int(timetwo_arr[1]))
+        date_obj = date_obj.strftime("%Y-%m-%d")
+        date_obj = date_obj+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])
+        date_obj = date_obj.rstrip()
+
+        # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
+
+        if now_no_sec_obj >= date_obj:
+            print("now_with_monthly_obj(현재) is greater than date_obj(입력받은).")
+            date_obj = datetime.datetime.strptime(now_daily, "%Y-%m-%d")
+            date_obj = date_obj.replace(day=int(timetwo_arr[1]))
+            date_obj = date_obj + relativedelta(months=int(timetwo_arr[0]))
+            date_obj = date_obj.strftime("%Y-%m-%d")
+            new_date_string = date_obj
+        else:
+            print("date_obj(입력받은) is greater than now_with_monthly_obj(현재).")
+            date_obj = datetime.datetime.strptime(now_daily, "%Y-%m-%d")
+            date_obj = date_obj.replace(day=int(timetwo_arr[1]))
+            date_obj = date_obj.strftime("%Y-%m-%d")
+            new_date_string = date_obj
 
         result = subprocess.check_output("echo -e '#RegularBackup monthly '"+new_date_string+" "+timeone+" "+timetwo+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" "+str(timetwo_arr[1])+" */"+str(timetwo_arr[0])+" * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
-    # else:
-    #     timeone_arr = timeone.split(':')
-    #     result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" "+timetwo+" * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
 
 # 함수명 : deleteOldBackup
 # 주요 기능 : ccvm의 "cloud" database를 dump한 파일 중, 정해진 기간보다 오래된 파일을 삭제하는 함수
@@ -255,6 +297,12 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
     timetwo = str(timetwo[0])
     delete = str(delete[0])
 
+    now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+    now_no_sec_obj = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+    today = datetime.date.today()
+    now_hourly = datetime.datetime.now().strftime('%Y-%m-%d %H')
+    now_daily = datetime.datetime.now().strftime('%Y-%m-%d')
+
     # 크론잡 초기화 ("delete"와 "sql"이 포함되어있는 크론잡 삭제)
     subprocess.check_output("grep -lrEZ 'ccvm_dump.*delete' /var/spool/at/ | xargs -0 rm -f", universal_newlines=True, shell=True, env=env)
     subprocess.check_output("sed -i '/DeleteOldBackup/d' /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
@@ -264,7 +312,23 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
             result = subprocess.check_output("echo find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+delete+" delete | at "+timeone+" -q d", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'hourly':
         timeone_arr = timeone.split(':')
-        result = subprocess.check_output("echo -e '#DeleteOldBackup hourly '"+timeone+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
+
+        # date_obj: cockpit에서 입력받은 값
+        date_obj = now_hourly+":"+str(timeone_arr[1])
+        date_obj = date_obj.rstrip()
+
+        # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
+
+        # 백업 예정 날짜가 현재보다 과거일 경우 1일 경과된 날짜를 첫 백업 일정으로 지정
+        if now_no_sec_obj >= date_obj:
+            # print("now_with_hourly_obj(현재) is greater than date_obj(입력받은).")
+            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
+            new_date_obj = date_obj + datetime.timedelta(hours=1)
+            new_date_string = new_date_obj.strftime("%Y-%m-%d %H:%M")
+        else:
+            # print("date_obj(입력받은) is greater than now_with_hourly_obj(현재).")
+            new_date_string = date_obj
+        result = subprocess.check_output("echo -e '#DeleteOldBackup hourly '"+new_date_string+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" */1 * * * find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'daily':
         timeone_arr = timeone.split(':')
