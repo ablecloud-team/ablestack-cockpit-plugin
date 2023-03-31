@@ -134,6 +134,7 @@ $('#button-cancel-modal-cloud-vm-db-dump').on('click', function(){
     $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스를 백업하시겠습니까?");
     $('#radio-ccvm-instance-backup').prop('checked', true);
     $('#radio-ccvm-regular-backup').prop('checked', false);
+    $('#div-modal-db-backup-cloud-vm-regular-backup-activation').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-repeat').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-date').hide();
@@ -328,16 +329,21 @@ $('#card-action-cloud-vm-db-dump').on('click', function(){
 });
 // 클라우드센터 VM DB 백업 실행 클릭 시
 $('#button-execution-modal-cloud-vm-db-dump').on('click', function () {
-    $('#div-modal-wizard-cluster-config-finish-db-dump-file-download-empty-state').show();
-    $('#dbdump-prepare-status').html("<svg class='pf-c-spinner pf-m-xl' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100'><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>" +
-    "<h1 data-ouia-component-type='PF4/Title' data-ouia-safe='true' data-ouia-component-id='OUIA-Generated-Title-1' class='pf-c-title pf-m-lg'>백업파일 준비 중...</h1><div class='pf-c-empty-state__body'></div>")
-    ccvmDbBackup();
-    $('#div-db-backup').hide();
-    $('#button-execution-modal-cloud-vm-db-dump').hide();
-    $('#button-cancel-modal-cloud-vm-db-dump').hide();
-    $('#button-close-modal-cloud-vm-db-dump').hide();
-    $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide();
-    $('#div-modal-wizard-cluster-config-finish-db-dump-file-download-empty-state').hide();
+    let deativationDbBackup = $('input:checkbox[id="switch-ccvm-backup-check"]').is(":checked")
+    if (deativationDbBackup == 'false') {
+        deactiveDBBackupCronjob()
+    }else {
+        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download-empty-state').show();
+        $('#dbdump-prepare-status').html("<svg class='pf-c-spinner pf-m-xl' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100'><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>" +
+        "<h1 data-ouia-component-type='PF4/Title' data-ouia-safe='true' data-ouia-component-id='OUIA-Generated-Title-1' class='pf-c-title pf-m-lg'>백업파일 준비 중...</h1><div class='pf-c-empty-state__body'></div>")
+        ccvmDbBackup();
+        $('#div-db-backup').hide();
+        $('#button-execution-modal-cloud-vm-db-dump').hide();
+        $('#button-cancel-modal-cloud-vm-db-dump').hide();
+        $('#button-close-modal-cloud-vm-db-dump').hide();
+        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide();
+        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download-empty-state').hide();
+    }
 })
 
 // 클라우드센터 VM DB 백업파일 다운로드 링크 클릭 시
@@ -1140,12 +1146,12 @@ function ribbonWorker() {
 
 /**
  * Meathod Name : ccvmDbBackup
- * Date Created : 2021.10.21
+ * Date Created : 2023.3.21
  * Writer  : 류홍욱
  * Description : DB Dump 파일을 로컬 저장소에 저장하고 다운로드 링크를 생성하는 함수
  * Parameter : file_path
  * Return  : 없음
- * History  : 2021.10.26 수정
+ * History  : 2023.3.21 수정
  */
  async function ccvmDbBackup() {
     // ccvm에서 mysqldump 파일을 생성하는 파이썬 파일 실행
@@ -1288,7 +1294,77 @@ async function checkDBBackupCronjob(){
             $('#switch-ccvm-backup-check').prop('checked', true);
             $('#span-ccvm-backup-check').text("최초 실행 일정 : "+dump_check);
             $("select[name=select-db-backup-cloud-vm]").prop('disabled', false)
-            $("[name=ccvm-regular-backup-time]").prop('disabled', false)
+            if (retVal.val == 'None'){
+                $("[name=ccvm-regular-backup-time]").prop('disabled', true)
+                $('#switch-ccvm-backup-check').prop('checked', false);
+                $("select[name=select-db-backup-cloud-vm]").prop('disabled', true)
+                $('#span-ccvm-backup-check').text("최초 실행 일정 : " + retVal.val);
+            }else {
+                $("[name=ccvm-regular-backup-time]").prop('disabled', false)
+            }
+            createLoggerInfo("Creation of mysqldump of ccvm is completed");
+            console.log("Creation of mysqldump of ccvm is completed");
+            result="200";
+        }else {
+            $('#div-db-backup').show();
+            $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
+            $('#dbdump-prepare-status').html("")
+            $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
+            $('#button-execution-modal-cloud-vm-db-dump').show();
+            $('#button-cancel-modal-cloud-vm-db-dump').show();
+            $('#button-close-modal-cloud-vm-db-dump').show();
+            $('#switch-ccvm-backup-check').prop('checked', false);
+            $('#span-ccvm-backup-check').text("현재 예약된 작업 없음");
+            $("select[name=select-db-backup-cloud-vm]").prop('disabled', true)
+            $("[name=ccvm-regular-backup-time]").prop('disabled', true)
+            createLoggerInfo("Creation of mysqldump of ccvm is failed");
+            console.log("Creation of mysqldump of ccvm is failed");
+            result="500";
+        }
+    }).catch(function(data){
+        $('#div-db-backup').show();
+        $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
+        $('#dbdump-prepare-status').html("")
+        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
+        $('#button-execution-modal-cloud-vm-db-dump').show();
+        $('#button-cancel-modal-cloud-vm-db-dump').show();
+        $('#button-close-modal-cloud-vm-db-dump').show();
+        createLoggerInfo("Creation of mysqldump of ccvm is failed");
+        console.log("Creation of mysqldump of ccvm is failed");
+        result="500";
+    });
+}
+
+/**
+ * Meathod Name : deactiveDBBackupCronjob
+ * Date Created : 2023.03.29
+ * Writer  : 류홍욱
+ * Description : DB 백업 예약작업(Cronjob, at) 비활성하는 함수
+ * Parameter : 없음
+ * Return  : 없음
+ * History  : 2023.03.17 최초 작성
+ */
+
+async function deactiveDBBackupCronjob(){
+    let span_ccvm_backup_check = ""
+    let radio_ccvm_backup = $('input[name=radio-ccvm-backup]:checked').val();
+    if (radio_ccvm_backup == "regularBackup") {
+        span_ccvm_backup_check = "r";
+    }else if (radio_ccvm_backup == "deleteOldBackup") {
+        span_ccvm_backup_check = "d";
+    }
+
+    await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', 'deactiveBackup', '--checkOption', span_ccvm_backup_check])
+    .then(function(data){
+        console.log(data);
+        let retVal = JSON.parse(data);
+        if (retVal.code == 200) {
+            dump_check = retVal.val;
+            console.log(dump_check);
+            $('#switch-ccvm-backup-check').prop('checked', false);
+            $('#span-ccvm-backup-check').text("현재 예약된 작업 없음");
+            // $("select[name=select-db-backup-cloud-vm]").prop('disabled', false)
+            // $("[name=ccvm-regular-backup-time]").prop('disabled', false)
             createLoggerInfo("Creation of mysqldump of ccvm is completed");
             console.log("Creation of mysqldump of ccvm is completed");
             result="200";
@@ -1325,6 +1401,7 @@ async function checkDBBackupCronjob(){
 // ccvm db backup 방식에 따라 html 구성 변경
 $('#radio-ccvm-instance-backup').on('click', function () {
     $('#div-db-backup-cloud-vm-manage').hide();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-activation').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-repeat').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option').hide();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-date').hide();
@@ -1333,6 +1410,7 @@ $('#radio-ccvm-instance-backup').on('click', function () {
 });
 $('#radio-ccvm-regular-backup').on('click', function () {
     $('#div-db-backup-cloud-vm-manage').hide();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-activation').show();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-repeat').show();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option').show();
     $('#div-modal-db-backup-cloud-vm-regular-backup-time-label').show();
@@ -1344,7 +1422,6 @@ $('#radio-ccvm-regular-backup').on('click', function () {
 
     // 정기 백업 선택 시 초기 화면
     $('#input-ccvm-regular-backup-timepicker-no').show();
-    $('#select-db-backup-cloud-vm-drop-repeat').val('no');
     $('#input-ccvm-regular-backup-timepicker-hourly').hide();
     $('#input-ccvm-regular-backup-timepicker-daily').hide();
     $('#input-ccvm-regular-backup-timepicker-weekly').hide();
@@ -1360,12 +1437,14 @@ $('#radio-ccvm-regular-backup').on('click', function () {
     $('#select-db-backup-cloud-vm-days').val('1');
     $('#form-input-db-backup-cloud-vm-number').val('');
     $('#span-ccvm-backup-kind').text('정기 백업 활성화');
+    $('#span-ccvm-backup-check').text("최초 실행 일정 : ");
 
     checkDBBackupCronjob()
     
 });
 $('#radio-ccvm-manage-backup').on('click', function () {
     $('#div-db-backup-cloud-vm-manage').show();
+    $('#div-modal-db-backup-cloud-vm-regular-backup-activation').show();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-repeat').show();
     $('#div-modal-db-backup-cloud-vm-regular-backup-option').show();
     $('#div-modal-db-backup-cloud-vm-regular-backup-time-label').show();
@@ -1375,7 +1454,6 @@ $('#radio-ccvm-manage-backup').on('click', function () {
     $('#div-modal-db-backup-cloud-vm-regular-backup-option-monthly').hide();
     $('#div-modal-wizard-cluster-config-finish-db-dump-file-download').hide()
     $('#input-ccvm-regular-backup-timepicker-no').show();
-    $('#select-db-backup-cloud-vm-drop-repeat').val('no');
     $('#input-ccvm-regular-backup-timepicker-hourly').hide();
     $('#input-ccvm-regular-backup-timepicker-daily').hide();
     $('#input-ccvm-regular-backup-timepicker-weekly').hide();
@@ -1392,6 +1470,7 @@ $('#radio-ccvm-manage-backup').on('click', function () {
     $('#form-input-db-backup-cloud-vm-number').val('0');
     // $('#form-input-db-backup-cloud-vm-number-plus').attr('disabled', true);
     $('#span-ccvm-backup-kind').text('백업 삭제 활성화');
+    $('#span-ccvm-backup-check').text("최초 실행 일정 : ");
     
 
     checkDBBackupCronjob()

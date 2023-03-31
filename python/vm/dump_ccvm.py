@@ -38,7 +38,7 @@ def parseArgs():
                                      epilog='copyrightⓒ 2023 All rights reserved by ABLECLOUD™')
 
     parser.add_argument('action', choices=[
-                        'instantBackup', 'regularBackup', 'deleteOldBackup', 'checkBackup'], help='choose one of the actions')
+                        'instantBackup', 'regularBackup', 'deleteOldBackup', 'checkBackup', 'deactiveBackup'], help='choose one of the actions')
     parser.add_argument('--path', metavar='name', type=str,
                         nargs='*', help='backup path')
     parser.add_argument('--repeat', metavar='name', type=str,
@@ -54,94 +54,124 @@ def parseArgs():
     return parser.parse_args()
 
 
+# 함수명 : deactiveBackup
+# 주요 기능 : ccvm의 "cloud" databased의 backup 크론잡을 비활성화하는 함수
+def deactiveBackup(checkOption):
+    try:
+        checkOption = str(checkOption[0])
+        if checkOption == 'r':
+            subprocess.check_output("grep -lrZ 'instantBackup' /var/spool/at/ | xargs -0 rm -f", universal_newlines=True, shell=True, env=env)
+            subprocess.check_output("sed -i '/RegularBackup/d' /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
+            subprocess.check_output("crontab -u root -l | grep -v 'instantBackup' | crontab -u root -", universal_newlines=True, shell=True, env=env)
+        elif checkOption == 'd':
+            subprocess.check_output("grep -lrEZ 'ccvm_dump.*delete' /var/spool/at/ | xargs -0 rm -f", universal_newlines=True, shell=True, env=env)
+            subprocess.check_output("sed -i '/DeleteOldBackup/d' /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
+            subprocess.check_output("crontab -u root -l | grep -Ev 'delete.*sql|sql.*delete' | crontab -u root -", universal_newlines=True, shell=True, env=env)
+
+    except Exception as e:
+        print(e)
+        resultDate = ""
+        return resultDate
+
 # 함수명 : checkBackup
 # 주요 기능 : ccvm의 "cloud" databased의 backup 크론잡을 체크하는 함수
 def checkBackup(checkOption):
     try:
         checkOption = str(checkOption[0])
         if checkOption == 'r':
+            noRepeatOption = subprocess.check_output("at -l | awk '{if ($7==\""+checkOption+"\") print ($2,$3,$4,$5,$6)}'", universal_newlines=True, shell=True, env=env)
             repeatOptionOne = (subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $2}'", universal_newlines=True, shell=True, env=env)).rstrip()
             repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
         elif checkOption == 'd':
+            noRepeatOption = subprocess.check_output("at -l | awk '{if ($7==\""+checkOption+"\") print ($2,$3,$4,$5,$6)}'", universal_newlines=True, shell=True, env=env)
             repeatOptionOne = (subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $2}'", universal_newlines=True, shell=True, env=env)).rstrip()
             repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
+            deleteOption = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $6}'", universal_newlines=True, shell=True, env=env)
 
-        # resultDate = ""
-        if repeatOptionOne == 'hourly':
-            repeatOptionOne = '한 시간 마다'
-            format = '%Y-%m-%d %H:%M'
-        elif repeatOptionOne == 'daily':
-            repeatOptionOne = '매일'
-            format = '%Y-%m-%d %H:%M'
-        elif repeatOptionOne == 'weekly':
-            repeatOptionOne = '매주'
-            format = '%Y-%m-%d %H:%M'
-        elif repeatOptionOne == 'monthly':
-            repeatOptionOne = '매월'
-            format = '%Y-%m-%d %H:%M'
+        # print(noRepeatOption)
+        # print(repeatOptionOne)
+        # print(repeatOptionTwo)
 
-        if repeatOptionOne == '매주':
-            repeatOptionTwo = repeatOptionTwo.rstrip()
-            if repeatOptionTwo == '0':
-                repeatOptionTwo = '월요일'
-            elif repeatOptionTwo == '1':
-                repeatOptionTwo = '화요일'
-            elif repeatOptionTwo == '2':
-                repeatOptionTwo = '수요일'
-            elif repeatOptionTwo == '3':
-                repeatOptionTwo = '목요일'
-            elif repeatOptionTwo == '4':
-                repeatOptionTwo = '금요일'
-            elif repeatOptionTwo == '5':
-                repeatOptionTwo = '토요일'
-            elif repeatOptionTwo == '6':
-                repeatOptionTwo = '일요일'
-            repeatOptionTwo = " "+repeatOptionTwo
-        elif repeatOptionOne == '매월':
+        if noRepeatOption or repeatOptionOne and repeatOptionTwo != '':
+            # resultDate = ""
+            format = '%Y-%m-%d %H:%M'
+            if repeatOptionOne == 'hourly':
+                repeatOptionOne = '한 시간 마다'
+                repeatOptionTwo = ''
+                deleteOption = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
+            elif repeatOptionOne == 'daily':
+                repeatOptionOne = '매일'
+                repeatOptionTwo = ''
+                deleteOption = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
+            elif repeatOptionOne == 'weekly':
+                repeatOptionOne = '매주'
+            elif repeatOptionOne == 'monthly':
+                repeatOptionOne = '매월'
+
+            if repeatOptionOne == '매주':
+                repeatOptionTwo = repeatOptionTwo.rstrip()
+                if repeatOptionTwo == '0':
+                    repeatOptionTwo = '월요일'
+                elif repeatOptionTwo == '1':
+                    repeatOptionTwo = '화요일'
+                elif repeatOptionTwo == '2':
+                    repeatOptionTwo = '수요일'
+                elif repeatOptionTwo == '3':
+                    repeatOptionTwo = '목요일'
+                elif repeatOptionTwo == '4':
+                    repeatOptionTwo = '금요일'
+                elif repeatOptionTwo == '5':
+                    repeatOptionTwo = '토요일'
+                elif repeatOptionTwo == '6':
+                    repeatOptionTwo = '일요일'
+                repeatOptionTwo = " "+repeatOptionTwo
+            elif repeatOptionOne == '매월':
+                if checkOption == 'r':
+                    repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
+                elif checkOption == 'd':
+                    repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
+                repeatOptionTwo = repeatOptionTwo.rstrip()
+                repeatOptionTwo_arr = repeatOptionTwo.split('-')
+                repeatOptionTwo = repeatOptionTwo_arr[0]+"개월 "+repeatOptionTwo_arr[1]+"일 마다"
+                repeatOptionTwo += " "
+
+            # 백업일 경우, 한 번만 실행하는 경우와 반복하는 경우 체크
             if checkOption == 'r':
-                repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
+                result = subprocess.check_output("at -l | awk '{if ($7==\""+checkOption+"\") print ($2,$3,$4,$5,$6)}'", universal_newlines=True, shell=True, env=env)
+                # 한 번만 실행
+                if result != '':
+                    str_datetime = result.rstrip()
+                    format = '%a %b %d %H:%M:%S %Y'
+                    resultDate = datetime.datetime.strptime(str_datetime, format)
+                    resultDate = resultDate.strftime('%Y-%m-%d %H:%M:%S')
+                    resultDate += " (반복 없음)"
+                # 반복
+                else:
+                    result = subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $3, $4}'", universal_newlines=True, shell=True, env=env)
+                    str_datetime = result.rstrip()
+                    resultDate = datetime.datetime.strptime(str_datetime, format)
+                    resultDate = resultDate.strftime('%Y-%m-%d %H:%M')
+                    resultDate += " ("+repeatOptionOne+repeatOptionTwo.rstrip()+")"
+
+            # 백업 삭제일 경우, 한 번만 실행하는 경우와 반복하는 경우 체크
             elif checkOption == 'd':
-                repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
-            repeatOptionTwo = repeatOptionTwo.rstrip()
-            repeatOptionTwo_arr = repeatOptionTwo.split('-')
-            repeatOptionTwo = repeatOptionTwo_arr[0]+"개월 "+repeatOptionTwo_arr[1]+"일 마다"
-            repeatOptionTwo += " "
-
-        # 백업일 경우, 한 번만 실행하는 경우와 반복하는 경우 체크
-        if checkOption == 'r':
-            result = subprocess.check_output("at -l | awk '{if ($7==\""+checkOption+"\") print ($2,$3,$4,$5,$6)}'", universal_newlines=True, shell=True, env=env)
-            # 한 번만 실행
-            if result != '':
-                str_datetime = result.rstrip()
-                format = '%a %b %d %H:%M:%S %Y'
-                resultDate = datetime.datetime.strptime(str_datetime, format)
-                resultDate = resultDate.strftime('%Y-%m-%d %H:%M:%S')
-                resultDate += " (반복 없음)"
-            # 반복
-            else:
-                result = subprocess.check_output("crontab -u root -l | grep 'RegularBackup' | awk '{print $3, $4}'", universal_newlines=True, shell=True, env=env)
-                str_datetime = result.rstrip()
-                resultDate = datetime.datetime.strptime(str_datetime, format)
-                resultDate = resultDate.strftime('%Y-%m-%d %H:%M')
-                resultDate += " ("+repeatOptionOne+repeatOptionTwo.rstrip()+")"
-
-        # 백업 삭제일 경우, 한 번만 실행하는 경우와 반복하는 경우 체크
-        elif checkOption == 'd':
-            result = subprocess.check_output("at -l | awk '{if ($7==\""+checkOption+"\") print ($2,$3,$4,$5,$6)}'", universal_newlines=True, shell=True, env=env)
-            # 한 번만 실행
-            if result != '':
-                str_datetime = result.rstrip()
-                format = '%a %b %d %H:%M:%S %Y'
-                resultDate = datetime.datetime.strptime(str_datetime,format)
-                resultDate = resultDate.strftime('%Y-%m-%d %H:%M:%S')
-                resultDate += " (반복 없음)"
-            # 반복
-            else:
-                result = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $3, $4}'", universal_newlines=True, shell=True, env=env)
-                str_datetime = result.rstrip()
-                resultDate = datetime.datetime.strptime(str_datetime,format)
-                resultDate = resultDate.strftime('%Y-%m-%d %H:%M')
-                resultDate += " ("+repeatOptionOne+repeatOptionTwo.rstrip()+")"
+                result = subprocess.check_output("at -l | awk '{if ($7==\""+checkOption+"\") print ($2,$3,$4,$5,$6)}'", universal_newlines=True, shell=True, env=env)
+                # 한 번만 실행
+                if result != '':
+                    str_datetime = result.rstrip()
+                    format = '%a %b %d %H:%M:%S %Y'
+                    resultDate = datetime.datetime.strptime(str_datetime,format)
+                    resultDate = resultDate.strftime('%Y-%m-%d %H:%M:%S')
+                    resultDate += " (반복 없음)"
+                # 반복
+                else:
+                    result = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $3, $4}'", universal_newlines=True, shell=True, env=env)
+                    str_datetime = result.rstrip()
+                    resultDate = datetime.datetime.strptime(str_datetime,format)
+                    resultDate = resultDate.strftime('%Y-%m-%d %H:%M')
+                    resultDate += " ("+repeatOptionOne+repeatOptionTwo.rstrip()+", "+deleteOption+"일 지난 파일 삭제)"
+        else:
+            resultDate = "None"
 
         return resultDate
         
@@ -332,7 +362,7 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
             # print("date_obj(입력받은) is greater than now_with_hourly_obj(현재).")
             new_date_string = date_obj
 
-        result = subprocess.check_output("echo -e '#DeleteOldBackup hourly '"+new_date_string+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
+        result = subprocess.check_output("echo -e '#DeleteOldBackup hourly '"+new_date_string+" "+delete+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" */1 * * * find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'daily':
         timeone_arr = timeone.split(':')
@@ -352,7 +382,7 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
             # print("date_obj(입력받은) is greater than now_with_weekday_obj(현재).")
             new_date_string = date_obj
 
-        result = subprocess.check_output("echo -e '#DeleteOldBackup daily '"+new_date_string+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
+        result = subprocess.check_output("echo -e '#DeleteOldBackup daily '"+new_date_string+" "+delete+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * * find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'weekly':
         timeone_arr = timeone.split(':')
@@ -383,8 +413,9 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d')
             new_date_obj = date_obj
             new_date_string = new_date_obj.strftime("%Y-%m-%d")
-        result = subprocess.check_output("echo -e '#DeleteOldBackup weekly '"+new_date_string+" "+timeone+" "+timetwo+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
+        result = subprocess.check_output("echo -e '#DeleteOldBackup weekly '"+new_date_string+" "+timeone+" "+timetwo+" "+delete+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * "+timetwo+" find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
+
     elif(repeat) == 'monthly':
         timeone_arr = timeone.split(':')
         timetwo_arr = timetwo.split('-')
@@ -412,7 +443,7 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
             date_obj = date_obj.strftime("%Y-%m-%d")
             new_date_string = date_obj
 
-        result = subprocess.check_output("echo -e '#DeleteOldBackup monthly '"+new_date_string+" "+timeone+" "+timetwo+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
+        result = subprocess.check_output("echo -e '#DeleteOldBackup monthly '"+new_date_string+" "+timeone+" "+timetwo+" "+delete+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" "+str(timetwo_arr[1])+" */"+str(timetwo_arr[0])+" * find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
 
 def main():
@@ -468,6 +499,22 @@ def main():
             print(json.dumps(json.loads(ret), indent=4))
             print(e)
         return ret
-    
+
+    if (args.action) == 'deactiveBackup':
+        try:
+            dump_check = deactiveBackup(args.checkOption)
+            if (dump_check) == "":
+                ret = createReturn(code=500, val="Backup Check ERROR")
+                print(json.dumps(json.loads(ret), indent=4))
+            else:
+                ret = createReturn(code=200, val=dump_check)
+                print(json.dumps(json.loads(ret), indent=4))
+
+        except Exception as e:
+            ret = createReturn(code=500, val="Creation of mysqldump of ccvm is failed")
+            print(json.dumps(json.loads(ret), indent=4))
+            print(e)
+        return ret
+        
 if __name__ == "__main__":
     main()
