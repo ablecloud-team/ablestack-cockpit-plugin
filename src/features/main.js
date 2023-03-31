@@ -1204,6 +1204,7 @@ function ribbonWorker() {
             console.log("Creation of mysqldump of ccvm is failed");
             result="500";
         }
+        checkDBBackupCronjob()
     }).catch(function(data){
         $('#div-db-backup').show();
         $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 실패하었습니다.");
@@ -1266,7 +1267,7 @@ function ribbonWorker() {
  * History  : 2023.03.17 최초 작성
  */
 
-function checkDBBackupCronjob(){
+async function checkDBBackupCronjob(){
     let span_ccvm_backup_check = ""
     let regular_option_ccvm_backup_info = ""
     let radio_ccvm_backup = $('input[name=radio-ccvm-backup]:checked').val();
@@ -1277,7 +1278,7 @@ function checkDBBackupCronjob(){
         span_ccvm_backup_check = "d";
     }
 
-    cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', 'checkBackup', '--checkOption', span_ccvm_backup_check])
+    await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', 'checkBackup', '--checkOption', span_ccvm_backup_check])
     .then(function(data){
         console.log(data);
         let retVal = JSON.parse(data);
@@ -1285,7 +1286,7 @@ function checkDBBackupCronjob(){
             dump_check = retVal.val;
             console.log(dump_check);
             $('#switch-ccvm-backup-check').prop('checked', true);
-            $('#span-ccvm-backup-check').text("최초 백업 일정 : "+dump_check);
+            $('#span-ccvm-backup-check').text("최초 실행 일정 : "+dump_check);
             $("select[name=select-db-backup-cloud-vm]").prop('disabled', false)
             $("[name=ccvm-regular-backup-time]").prop('disabled', false)
             createLoggerInfo("Creation of mysqldump of ccvm is completed");
@@ -1358,6 +1359,7 @@ $('#radio-ccvm-regular-backup').on('click', function () {
     $('#select-db-backup-cloud-vm-months').val('1');
     $('#select-db-backup-cloud-vm-days').val('1');
     $('#form-input-db-backup-cloud-vm-number').val('');
+    $('#span-ccvm-backup-kind').text('정기 백업 활성화');
 
     checkDBBackupCronjob()
     
@@ -1389,6 +1391,8 @@ $('#radio-ccvm-manage-backup').on('click', function () {
     $('#select-db-backup-cloud-vm-days').val('1');
     $('#form-input-db-backup-cloud-vm-number').val('0');
     // $('#form-input-db-backup-cloud-vm-number-plus').attr('disabled', true);
+    $('#span-ccvm-backup-kind').text('백업 삭제 활성화');
+    
 
     checkDBBackupCronjob()
 });
