@@ -110,19 +110,19 @@ def checkBackup(checkOption):
             if repeatOptionOne == '매주':
                 repeatOptionTwo = repeatOptionTwo.rstrip()
                 if repeatOptionTwo == '0':
-                    repeatOptionTwo = '월요일'
-                elif repeatOptionTwo == '1':
-                    repeatOptionTwo = '화요일'
-                elif repeatOptionTwo == '2':
-                    repeatOptionTwo = '수요일'
-                elif repeatOptionTwo == '3':
-                    repeatOptionTwo = '목요일'
-                elif repeatOptionTwo == '4':
-                    repeatOptionTwo = '금요일'
-                elif repeatOptionTwo == '5':
-                    repeatOptionTwo = '토요일'
-                elif repeatOptionTwo == '6':
                     repeatOptionTwo = '일요일'
+                elif repeatOptionTwo == '1':
+                    repeatOptionTwo = '월요일'
+                elif repeatOptionTwo == '2':
+                    repeatOptionTwo = '화요일'
+                elif repeatOptionTwo == '3':
+                    repeatOptionTwo = '수요일'
+                elif repeatOptionTwo == '4':
+                    repeatOptionTwo = '목요일'
+                elif repeatOptionTwo == '5':
+                    repeatOptionTwo = '금요일'
+                elif repeatOptionTwo == '6':
+                    repeatOptionTwo = '토요일'
                 repeatOptionTwo = " "+repeatOptionTwo
             elif repeatOptionOne == '매월':
                 if checkOption == 'r':
@@ -254,31 +254,36 @@ def regularBackup(path, repeat, timeone, timetwo):
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'weekly':
         timeone_arr = timeone.split(':')
-
-        # 백업 예정 날짜가 현재보다 과거일 경우 7일 경과된 날짜를 첫 백업 일정으로 지정
-        # date_obj: cockpit에서 입력받은 값
         weekday = today.weekday()
-        date_string = now_daily+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])+" "+timetwo
+
+        # 입력받은 요일 계산
+        days_until_day = (int(timetwo) - weekday) % 7
+        the_day = datetime.datetime.now() + datetime.timedelta(days=days_until_day)
+        the_day_obj = the_day.date().strftime("%Y-%m-%d")
+        date_string = the_day_obj+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])
+
+        # date_obj: cockpit에서 입력받은 값
         str_datetime = date_string.rstrip()
-        date_obj = datetime.datetime.strptime(str_datetime, "%Y-%m-%d %H:%M %w")
-        date_obj = date_obj.strftime("%Y-%m-%d %H:%M %w")
+        date_obj = datetime.datetime.strptime(str_datetime, "%Y-%m-%d %H:%M")
+        date_obj = date_obj.replace(day=date_obj.day-1)
+        date_obj = date_obj.strftime("%Y-%m-%d %H:%M")
 
         # now_with_weekday_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
         now = datetime.datetime.now()
-        date_str = now.strftime("%Y-%m-%d %H:%M")
-        now_with_weekday_obj = f"{date_str} {weekday}"
-        
+        now_with_weekday_obj = now.strftime("%Y-%m-%d %H:%M")
+
         # new_date_string : 최종적으로 크론잡에 입력되는 날짜
         new_date_string = str_datetime
 
-        if (now_with_weekday_obj >= date_obj) and (weekday >= int(timetwo)) :
-            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M %w')
+        if now_with_weekday_obj >= date_obj:
+            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
             date_obj = date_obj.strftime('%Y-%m-%d')
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d')
             new_date_obj = date_obj + datetime.timedelta(days=7)
             new_date_string = new_date_obj.strftime("%Y-%m-%d")
         else:
-            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M %w')
+            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
+            # date_obj = date_obj.replace(day=date_obj.year-1)
             date_obj = date_obj.strftime('%Y-%m-%d')
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d')
             new_date_obj = date_obj
@@ -394,32 +399,44 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
     elif(repeat) == 'weekly':
         timeone_arr = timeone.split(':')
                 # 백업 예정 날짜가 현재보다 과거일 경우 7일 경과된 날짜를 첫 백업 일정으로 지정
-        # date_obj: cockpit에서 입력받은 값
         weekday = today.weekday()
-        date_string = now_daily+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])+" "+str(weekday)
+        # 입력받은 요일 계산
+        days_until_day = (int(timetwo) - weekday) % 7
+        the_day = datetime.datetime.now() + datetime.timedelta(days=days_until_day)
+        the_day_obj = the_day.date().strftime("%Y-%m-%d")
+        date_string = the_day_obj+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])
+
+        # date_obj: cockpit에서 입력받은 값
         str_datetime = date_string.rstrip()
-        date_obj = datetime.datetime.strptime(str_datetime, "%Y-%m-%d %H:%M %w")
-        date_obj = date_obj.strftime("%Y-%m-%d %H:%M %w")
+        date_obj = datetime.datetime.strptime(str_datetime, "%Y-%m-%d %H:%M")
+        date_obj = date_obj.replace(day=date_obj.day-1)
+        date_obj = date_obj.strftime("%Y-%m-%d %H:%M")
 
         # now_with_weekday_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
         now = datetime.datetime.now()
-        now_with_weekday_obj = now.strftime("%Y-%m-%d %H:%M %w")
+        now_with_weekday_obj = now.strftime("%Y-%m-%d %H:%M")
 
         # new_date_string : 최종적으로 크론잡에 입력되는 날짜
         new_date_string = str_datetime
         
-        if (now_with_weekday_obj >= date_obj) and (weekday >= int(timetwo)) :
-            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M %w')
+        # print(now_with_weekday_obj)
+        # print(date_obj)
+        # print(weekday)
+        # print(timetwo)
+        if now_with_weekday_obj >= date_obj:
+            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
             date_obj = date_obj.strftime('%Y-%m-%d')
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d')
             new_date_obj = date_obj + datetime.timedelta(days=7)
             new_date_string = new_date_obj.strftime("%Y-%m-%d")
         else:
-            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M %w')
+            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
+            # date_obj = date_obj.replace(day=date_obj.year-1)
             date_obj = date_obj.strftime('%Y-%m-%d')
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d')
             new_date_obj = date_obj
             new_date_string = new_date_obj.strftime("%Y-%m-%d")
+
         result = subprocess.check_output("echo -e '#DeleteOldBackup weekly '"+new_date_string+" "+timeone+" "+timetwo+" "+delete+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * "+timetwo+" find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
 
@@ -437,7 +454,6 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
         # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
 
         if now_no_sec_obj >= date_obj:
-            # print("now_with_monthly_obj(현재) is greater than date_obj(입력받은).") 과거를 입력
             date_obj = datetime.datetime.strptime(now_daily, "%Y-%m-%d")
             date_obj = date_obj.replace(day=int(timetwo_arr[1]))
             if int(timetwo_arr[0]) == 1:
@@ -453,7 +469,6 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
             date_obj = date_obj.strftime("%Y-%m-%d")
             new_date_string = date_obj
         else:
-            # print("date_obj(입력받은) is greater than now_with_monthly_obj(현재).") 미래를 입력
             date_obj = datetime.datetime.strptime(now_daily, "%Y-%m-%d")
             date_obj = date_obj.replace(day=int(timetwo_arr[1]))
             if int(timetwo_arr[0]) == 1 or int(timetwo_arr[0]) == 3:
