@@ -330,7 +330,8 @@ $('#card-action-cloud-vm-db-dump').on('click', function(){
 // 클라우드센터 VM DB 백업 실행 클릭 시
 $('#button-execution-modal-cloud-vm-db-dump').on('click', function () {
     let deativationDbBackup = $('input:checkbox[id="switch-ccvm-backup-check"]').is(":checked")
-    if (deativationDbBackup == 'false') {
+    console.log(deativationDbBackup);
+    if (deativationDbBackup == false) {
         deactiveDBBackupCronjob()
     }else {
         $('#div-modal-wizard-cluster-config-finish-db-dump-file-download-empty-state').show();
@@ -1471,7 +1472,6 @@ $('#radio-ccvm-manage-backup').on('click', function () {
     // $('#form-input-db-backup-cloud-vm-number-plus').attr('disabled', true);
     $('#span-ccvm-backup-kind').text('백업 삭제 활성화');
     $('#span-ccvm-backup-check').text("최초 실행 일정 : ");
-    
 
     checkDBBackupCronjob()
 });

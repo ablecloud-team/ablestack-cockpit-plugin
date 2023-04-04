@@ -88,14 +88,13 @@ def checkBackup(checkOption):
             repeatOptionTwo = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
             deleteOption = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $6}'", universal_newlines=True, shell=True, env=env)
 
-        # print(noRepeatOption)
-        # print(repeatOptionOne)
-        # print(repeatOptionTwo)
-
         if noRepeatOption or repeatOptionOne and repeatOptionTwo != '':
             # resultDate = ""
             format = '%Y-%m-%d %H:%M'
-            if repeatOptionOne == 'hourly':
+            if noRepeatOption != '':
+                jobId = subprocess.check_output("at -l | awk '{if ($7==\""+checkOption+"\") print ($1)}'", universal_newlines=True, shell=True, env=env)
+                deleteOption = subprocess.check_output("at -c "+jobId.rstrip()+" | grep 'ccvm_dump_*' | awk '{print $6}' | cut -c 2- ", universal_newlines=True, shell=True, env=env)
+            elif repeatOptionOne == 'hourly':
                 repeatOptionOne = '한 시간 마다'
                 repeatOptionTwo = ''
                 deleteOption = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $5}'", universal_newlines=True, shell=True, env=env)
@@ -162,14 +161,14 @@ def checkBackup(checkOption):
                     format = '%a %b %d %H:%M:%S %Y'
                     resultDate = datetime.datetime.strptime(str_datetime,format)
                     resultDate = resultDate.strftime('%Y-%m-%d %H:%M:%S')
-                    resultDate += " (반복 없음)"
+                    resultDate += " (반복 없음, "+deleteOption.rstrip()+"일 지난 파일 삭제)"
                 # 반복
                 else:
                     result = subprocess.check_output("crontab -u root -l | grep 'DeleteOldBackup' | awk '{print $3, $4}'", universal_newlines=True, shell=True, env=env)
                     str_datetime = result.rstrip()
                     resultDate = datetime.datetime.strptime(str_datetime,format)
                     resultDate = resultDate.strftime('%Y-%m-%d %H:%M')
-                    resultDate += " ("+repeatOptionOne+repeatOptionTwo.rstrip()+", "+deleteOption+"일 지난 파일 삭제)"
+                    resultDate += " ("+repeatOptionOne+repeatOptionTwo.rstrip()+", "+deleteOption.rstrip()+"일 지난 파일 삭제)"
         else:
             resultDate = "None"
 
@@ -259,23 +258,25 @@ def regularBackup(path, repeat, timeone, timetwo):
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
     elif(repeat) == 'weekly':
         timeone_arr = timeone.split(':')
+        # timetwo_arr = timetwo.split(':')
 
         # 백업 예정 날짜가 현재보다 과거일 경우 7일 경과된 날짜를 첫 백업 일정으로 지정
         # date_obj: cockpit에서 입력받은 값
         weekday = today.weekday()
-        date_string = now_daily+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])+" "+str(weekday)
+        date_string = now_daily+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])+" "+timetwo
         str_datetime = date_string.rstrip()
         date_obj = datetime.datetime.strptime(str_datetime, "%Y-%m-%d %H:%M %w")
         date_obj = date_obj.strftime("%Y-%m-%d %H:%M %w")
 
         # now_with_weekday_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
         now = datetime.datetime.now()
-        now_with_weekday_obj = now.strftime("%Y-%m-%d %H:%M %w")
-
+        date_str = now.strftime("%Y-%m-%d %H:%M")
+        now_with_weekday_obj = f"{date_str} {weekday}"
+        
         # new_date_string : 최종적으로 크론잡에 입력되는 날짜
         new_date_string = str_datetime
-        
-        if now_with_weekday_obj >= date_obj:
+
+        if (now_with_weekday_obj >= date_obj) and (weekday >= int(timetwo)) :
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M %w')
             date_obj = date_obj.strftime('%Y-%m-%d')
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d')
@@ -305,16 +306,33 @@ def regularBackup(path, repeat, timeone, timetwo):
         # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
 
         if now_no_sec_obj >= date_obj:
-            # print("now_with_monthly_obj(현재) is greater than date_obj(입력받은).")
+            # print("now_with_monthly_obj(현재) is greater than date_obj(입력받은).") 과거를 입력
             date_obj = datetime.datetime.strptime(now_daily, "%Y-%m-%d")
             date_obj = date_obj.replace(day=int(timetwo_arr[1]))
-            date_obj = date_obj + relativedelta(months=int(timetwo_arr[0]))
+            if int(timetwo_arr[0]) == 1:
+                date_obj = date_obj.replace(month=date_obj.month + 1)
+            elif int(timetwo_arr[0]) == 2:
+                date_obj = date_obj + relativedelta(months=int(1))
+            elif int(timetwo_arr[0]) == 3:
+                date_obj = date_obj + relativedelta(months=int(timetwo_arr[0]))
+            elif int(timetwo_arr[0]) == 12:
+                date_obj = date_obj
+            else:
+                date_obj = date_obj.replace(month=int(timetwo_arr[0]) + 1)
             date_obj = date_obj.strftime("%Y-%m-%d")
             new_date_string = date_obj
         else:
-            # print("date_obj(입력받은) is greater than now_with_monthly_obj(현재).")
+            # print("date_obj(입력받은) is greater than now_with_monthly_obj(현재).") 미래를 입력
             date_obj = datetime.datetime.strptime(now_daily, "%Y-%m-%d")
             date_obj = date_obj.replace(day=int(timetwo_arr[1]))
+            if int(timetwo_arr[0]) == 1 or int(timetwo_arr[0]) == 3:
+                date_obj = date_obj.replace(month=date_obj.month)
+            elif int(timetwo_arr[0]) == 2:
+                date_obj = date_obj + relativedelta(months=int(1))
+            elif int(timetwo_arr[0]) == 12:
+                date_obj = date_obj
+            else:
+                date_obj = date_obj.replace(month=int(timetwo_arr[0]) + 1)
             date_obj = date_obj.strftime("%Y-%m-%d")
             new_date_string = date_obj
 
@@ -401,7 +419,7 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
         # new_date_string : 최종적으로 크론잡에 입력되는 날짜
         new_date_string = str_datetime
         
-        if now_with_weekday_obj >= date_obj:
+        if (now_with_weekday_obj >= date_obj) and (weekday >= int(timetwo)) :
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M %w')
             date_obj = date_obj.strftime('%Y-%m-%d')
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d')
@@ -430,16 +448,33 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
         # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
 
         if now_no_sec_obj >= date_obj:
-            # print("now_with_monthly_obj(현재) is greater than date_obj(입력받은).")
+            # print("now_with_monthly_obj(현재) is greater than date_obj(입력받은).") 과거를 입력
             date_obj = datetime.datetime.strptime(now_daily, "%Y-%m-%d")
             date_obj = date_obj.replace(day=int(timetwo_arr[1]))
-            date_obj = date_obj + relativedelta(months=int(timetwo_arr[0]))
+            if int(timetwo_arr[0]) == 1:
+                date_obj = date_obj.replace(month=date_obj.month + 1)
+            elif int(timetwo_arr[0]) == 2:
+                date_obj = date_obj + relativedelta(months=int(1))
+            elif int(timetwo_arr[0]) == 3:
+                date_obj = date_obj + relativedelta(months=int(timetwo_arr[0]))
+            elif int(timetwo_arr[0]) == 12:
+                date_obj = date_obj
+            else:
+                date_obj = date_obj.replace(month=int(timetwo_arr[0]) + 1)
             date_obj = date_obj.strftime("%Y-%m-%d")
             new_date_string = date_obj
         else:
-            # print("date_obj(입력받은) is greater than now_with_monthly_obj(현재).")
+            # print("date_obj(입력받은) is greater than now_with_monthly_obj(현재).") 미래를 입력
             date_obj = datetime.datetime.strptime(now_daily, "%Y-%m-%d")
             date_obj = date_obj.replace(day=int(timetwo_arr[1]))
+            if int(timetwo_arr[0]) == 1 or int(timetwo_arr[0]) == 3:
+                date_obj = date_obj.replace(month=date_obj.month)
+            elif int(timetwo_arr[0]) == 2:
+                date_obj = date_obj + relativedelta(months=int(1))
+            elif int(timetwo_arr[0]) == 12:
+                date_obj = date_obj
+            else:
+                date_obj = date_obj.replace(month=int(timetwo_arr[0]) + 1)
             date_obj = date_obj.strftime("%Y-%m-%d")
             new_date_string = date_obj
 
