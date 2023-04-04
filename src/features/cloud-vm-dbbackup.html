@@ -1,0 +1,226 @@
+<!--
+ * File Name : cloud-vm-dbbackup.html 
+ * Date Created : 2023.04.04
+ * Writer  : 류홍욱
+ * Description : 전체 시스템 자동화를 위한 modal html
+-->
+<div id="div-modal-db-backup-cloud-vm" class="pf-c-backdrop">
+  <div class="pf-l-bullseye">
+      <div class="pf-c-modal-box pf-m-md" role="dialog" aria-modal="true" aria-label="Cloud VM Database Backup" style="width: 900px;">
+          <button id="button-close-modal-cloud-vm-db-dump" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+          <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+          <header class="pf-c-modal-box__header">
+          <h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">클라우드센터 데이터베이스 백업</span></h1>
+          </header>
+          <div class="pf-c-modal-box__body">
+              <div id="div-db-backup">클라우드센터 가상머신의 데이터베이스를 백업하시겠습니까?</div>
+          </div>
+          <div id="pf-modal-part-3" class="pf-c-modal-box__body">
+              <form novalidate="" class="pf-c-form pf-m-horizontal">
+                  <div class="pf-c-form__group">
+                      <div class="pf-c-form__group-label">
+                          <label class="pf-c-form__label" for="servicename"><span class="pf-c-form__label-text">위치</span></label>
+                      </div>
+                      <div class="pf-c-form__group-control">
+                          <input id="dump-path" class="pf-c-form-control" type="text" aria-invalid="false" value="/home/db_backup">
+                      </div>
+                  </div>
+                  <div class="pf-c-form__group">
+                      <div class="pf-c-form__group-label pf-m-no-padding-top">
+                          <label class="pf-c-form__label"><span class="pf-c-form__label-text">백업 작업 선택</span></label>
+                      </div>
+                      <div class="pf-c-form__group-control">
+                          <div class="pf-l-flex">
+                              <div class="pf-c-radio">
+                                  <input id="radio-ccvm-instance-backup" name="radio-ccvm-backup" class="pf-c-radio__input" type="radio" aria-invalid="false" value="instantBackup" checked="">
+                                  <label class="pf-c-radio__label" for="radio-ccvm-instance-backup">즉시 백업</label>
+                              </div>
+                              <div class="pf-c-radio">
+                                  <input id="radio-ccvm-regular-backup" name="radio-ccvm-backup" class="pf-c-radio__input" type="radio" aria-invalid="false" value="regularBackup">
+                                  <label class="pf-c-radio__label" for="radio-ccvm-regular-backup">정기 백업</label>
+                              </div>
+                              <div class="pf-c-radio">
+                                  <input id="radio-ccvm-manage-backup" name="radio-ccvm-backup" class="pf-c-radio__input" type="radio" aria-invalid="false" value="deleteOldBackup">
+                                  <label class="pf-c-radio__label" for="radio-ccvm-manage-backup">백업파일 삭제관리</label>
+                              </div>
+                          </div>
+                          <div class="pf-c-form__group" id="div-modal-db-backup-cloud-vm-regular-backup-activation" style="display:none">
+                              <div class="pf-c-form__group-label">
+                                  <label class="pf-c-form__label"><span id="span-ccvm-backup-kind" class="pf-c-form__label-text">정기 백업 활성화</span></label>
+                              </div>
+                              <div class="pf-c-form__group-control">
+                                  <article>
+                                      <div class="pf-l-flex pf-m-align-items-center">
+                                          <label class="pf-c-switch pf-c-form-control" for="networking-firewall-switch" style="width: fit-content;border: none;">
+                                              <input id="switch-ccvm-backup-check" class="pf-c-switch__input" type="checkbox" aria-label="활성화" checked>
+                                              <span id="toggle-ccvm-backup-check" class="pf-c-switch__toggle">
+                                                  <div class="pf-c-switch__toggle-icon" aria-hidden="true">
+                                                      <svg fill="currentColor" height="1em" width="1em" viewbox="0 0 512 512" aria-hidden="true" role="img">
+                                                          <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path>
+                                                      </svg>
+                                                  </div>
+                                              </span>
+                                          </label>
+                                          <span id="span-ccvm-backup-check" class="side-note font-xs" style="font-size: smaller;" ></span>
+                                      </div>
+                                  </article>
+                              </div>
+                          </div>
+                          <div class="pf-c-form__group" id="div-modal-db-backup-cloud-vm-regular-backup-option-repeat" style="display:none">
+                              <div class="pf-c-form__group-label">
+                                  <label class="pf-c-form__label"><span class="pf-c-form__label-text">반복</span></label>
+                              </div>
+                              <div class="pf-c-form__group-control">
+                                  <select id="select-db-backup-cloud-vm-drop-repeat" aria-label="반복" class="pf-c-form-control" name="select-db-backup-cloud-vm" style="width: 40%;" disabled>
+                                      <option class="" value="no">반복 실행하지 않습니다</option>
+                                      <option class="" value="hourly">한 시간 마다</option>
+                                      <option class="" value="daily">매일</option>
+                                      <option class="" value="weekly">매주</option>
+                                      <option class="" value="monthly">월 별</option>
+                                      <!-- <option class="" value="yearly">매년</option> -->
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="pf-c-form__group" id="div-modal-db-backup-cloud-vm-regular-backup-option" style="display:none">
+                              <div class="pf-c-form__group-label"  id="div-modal-db-backup-cloud-vm-regular-backup-time-label">
+                                  <label class="pf-c-form__label">
+                                      <span class="pf-c-form__label-text">다음에서 실행</span>
+                                  </label>
+                              </div>
+                              <div class="pf-c-form__group-label" id="div-modal-db-backup-cloud-vm-regular-backup-date-label">
+                                  <label class="pf-c-form__label">
+                                      <span class="pf-c-form__label-text">다음 실행</span>
+                                  </label>
+                              </div>
+                              <div class="pf-c-form__group-control" id="div-modal-db-backup-cloud-vm-regular-backup-option-week">
+                                  <select aria-label="매주 반복" class="pf-c-form-control week-days" id="select-db-backup-cloud-vm-week-days" name="select-db-backup-cloud-vm" style="width: 40%;" disabled>
+                                      <option class="" value="0">일요일</option>
+                                      <option class="" value="1">월요일</option>
+                                      <option class="" value="2">화요일</option>
+                                      <option class="" value="3">수요일</option>
+                                      <option class="" value="4">목요일</option>
+                                      <option class="" value="5">금요일</option>
+                                      <option class="" value="6">토요일</option>
+                                  </select>
+                                  <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-weekly" class="pf-c-form-control" name="ccvm-regular-backup-time" style="width: 40%;">
+                              </div>
+                              <div class="pf-c-form__group-control" id="div-modal-db-backup-cloud-vm-regular-backup-option-monthly">
+                                  <select aria-label="매월 반복" class="pf-c-form-control month-days" id="select-db-backup-cloud-vm-months" name="select-db-backup-cloud-vm" style="width: 30%;" disabled>
+                                      <option class="" value="1">1개월</option>
+                                      <option class="" value="2">2개월</option>
+                                      <option class="" value="3">3개월</option>
+                                      <option class="" value="4">4개월</option>
+                                      <option class="" value="5">5개월</option>
+                                      <option class="" value="6">6개월</option>
+                                      <option class="" value="7">7개월</option>
+                                      <option class="" value="8">8개월</option>
+                                      <option class="" value="9">9개월</option>
+                                      <option class="" value="10">10개월</option>
+                                      <option class="" value="11">11개월</option>
+                                      <option class="" value="12">12개월</option>
+                                  </select>
+                                  <select aria-label="매월 반복" class="pf-c-form-control month-days" id="select-db-backup-cloud-vm-days" name="select-db-backup-cloud-vm" style="width: 30%;" disabled>
+                                      <option class="" value="1">1일</option>
+                                      <option class="" value="2">2일</option>
+                                      <option class="" value="3">3일</option>
+                                      <option class="" value="4">4일</option>
+                                      <option class="" value="5">5일</option>
+                                      <option class="" value="6">6일</option>
+                                      <option class="" value="7">7일</option>
+                                      <option class="" value="8">8일</option>
+                                      <option class="" value="9">9일</option>
+                                      <option class="" value="10">10일</option>
+                                      <option class="" value="11">11일</option>
+                                      <option class="" value="12">12일</option>
+                                      <option class="" value="13">13일</option>
+                                      <option class="" value="14">14일</option>
+                                      <option class="" value="15">15일</option>
+                                      <option class="" value="16">16일</option>
+                                      <option class="" value="17">17일</option>
+                                      <option class="" value="18">18일</option>
+                                      <option class="" value="19">19일</option>
+                                      <option class="" value="20">20일</option>
+                                      <option class="" value="21">21일</option>
+                                      <option class="" value="22">22일</option>
+                                      <option class="" value="23">23일</option>
+                                      <option class="" value="24">24일</option>
+                                      <option class="" value="25">25일</option>
+                                      <option class="" value="26">26일</option>
+                                      <option class="" value="27">27일</option>
+                                      <option class="" value="28">28일</option>
+                                      <option class="" value="29">29일</option>
+                                      <option class="" value="30">30일</option>
+                                      <option class="" value="31">31일</option>
+                                  </select>
+                                  <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-monthly" class="pf-c-form-control" name="ccvm-regular-backup-time" style="width: 30%;">
+                              </div>
+                              <div class="pf-c-form__group-control" id="div-modal-db-backup-cloud-vm-regular-backup-option-time">
+                                  <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-no" class="pf-c-form-control" name="ccvm-regular-backup-time" style="width: 40%;" disabled>
+                                  <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-hourly" class="pf-c-form-control" name="ccvm-regular-backup-time" style="width: 40%;" disabled>
+                                  <input type="text" autocomplete="off" id="input-ccvm-regular-backup-timepicker-daily" class="pf-c-form-control" name="ccvm-regular-backup-time" style="width: 40%;" disabled>
+                              </div>
+                          </div>
+                          <div class="pf-c-form__group" id="div-modal-db-backup-cloud-vm-regular-backup-option-repeat" style="display:none">
+                              <div class="pf-c-form__group-label">
+                                  <label class="pf-c-form__label"><span class="pf-c-form__label-text">반복</span></label>
+                              </div>
+                              <div class="pf-c-form__group-control">
+                                  <select id="select-db-backup-cloud-vm-drop-repeat" aria-label="반복" class="pf-c-form-control" name="select-db-backup-cloud-vm" style="width: 40%;" disabled>
+                                      <option class="" value="no">반복 실행하지 않습니다</option>
+                                      <option class="" value="hourly">한 시간 마다</option>
+                                      <option class="" value="daily">매일</option>
+                                      <option class="" value="weekly">매주</option>
+                                      <option class="" value="monthly">월 별</option>
+                                      <option class="" value="yearly">매년</option>
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="pf-c-form__group" id="div-db-backup-cloud-vm-manage" style="display:none">
+                              <div class="pf-c-form__group-label">
+                                  <label class="pf-c-form__label"><span class="pf-c-form__label-text">다음보다 오래된 파일 삭제</span></label>
+                              </div>
+                              <div class="pf-c-form__group-control">
+                                  <div class="pf-c-form__group-control pf-m-inline">
+                                      <div class="pf-c-number-input">
+                                          <div class="pf-c-input-group">
+                                          <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-minus" name="ccvm-regular-backup-time" type="button" aria-label="Minus">
+                                              <span class="pf-c-number-input__icon">
+                                              <i class="fas fa-minus" aria-hidden="true"></i>
+                                              </span>
+                                          </button>
+                                          <input class="pf-c-form-control" type="number" maxlength="2" value="1" id="form-input-db-backup-cloud-vm-number" name="ccvm-regular-backup-time" style="padding-right:10px;" aria-label="Number input"/>
+                                          <button class="pf-c-button pf-m-control" id="form-input-db-backup-cloud-vm-number-plus" name="ccvm-regular-backup-time" type="button" aria-label="Plus">
+                                              <span class="pf-c-number-input__icon">
+                                              <i class="fas fa-plus" aria-hidden="true"></i>
+                                              </span>
+                                          </button>
+                                          </div>
+                                      </div>
+                                      <span style="margin-top:10px">일</span>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  
+              </form>
+          <div class="pf-c-empty-state" id="div-modal-wizard-cluster-config-finish-db-dump-file-download-empty-state" style="display: none;">
+              <div class="pf-c-empty-state__content" id="dbdump-prepare-status"></div>
+          </div>
+          <div class="pf-c-content" id="div-modal-wizard-cluster-config-finish-db-dump-file-download" style="margin-top:30px;margin-left:30px;display:none">
+              <span>
+                  DB dump 파일 다운로드 :
+                  <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-db-dump-file-download" href="#">파일을 다운로드 하려면 클릭하십시오.</a>
+              </span>
+          </div>
+          <footer class="pf-c-modal-box__footer">
+              <button id="button-execution-modal-cloud-vm-db-dump" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+              <button id="button-cancel-modal-cloud-vm-db-dump" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
+          </footer>
+      </div>
+  </div>
+</div>
+<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+<script src="./src/features/cloud-vm-dbbackup.js"></script>
+<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 

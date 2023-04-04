@@ -1,7 +1,7 @@
 '''
-Copyright (c) 2021 ABLECLOUD Co. Ltd
+Copyright (c) 2023 ABLECLOUD Co. Ltd
 설명 : 클라우드센터 가상머신의 데이터베이스를 백업하는 프로그램
-최초 작성일 : 2021. 10. 21
+최초 작성일 : 2023. 03. 21
 '''
 
 #!/usr/bin/env python3
@@ -419,10 +419,6 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
         # new_date_string : 최종적으로 크론잡에 입력되는 날짜
         new_date_string = str_datetime
         
-        # print(now_with_weekday_obj)
-        # print(date_obj)
-        # print(weekday)
-        # print(timetwo)
         if now_with_weekday_obj >= date_obj:
             date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
             date_obj = date_obj.strftime('%Y-%m-%d')
@@ -443,7 +439,7 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
     elif(repeat) == 'monthly':
         timeone_arr = timeone.split(':')
         timetwo_arr = timetwo.split('-')
-                # 백업 예정 날짜가 현재보다 과거일 경우 지정된 개월 수 이후, 지정된 날을 첫 백업 일정으로 지정
+        # 백업 예정 날짜가 현재보다 과거일 경우 지정된 개월 수 이후, 지정된 날을 첫 백업 일정으로 지정
         # date_obj: cockpit에서 입력받은 값
         date_obj = datetime.datetime.strptime(now_daily, "%Y-%m-%d")
         date_obj = date_obj.replace(day=int(timetwo_arr[1]))
