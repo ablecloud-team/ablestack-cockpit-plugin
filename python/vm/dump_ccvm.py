@@ -201,7 +201,8 @@ def regularBackup(path, repeat, timeone, timetwo):
     timeone = str(timeone[0])
     timetwo = str(timetwo[0])
     now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-    now_no_sec_obj = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+    now_no_sec = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+    now_no_sec_obj = datetime.datetime.strptime(now_no_sec, "%Y-%m-%d %H:%M")
     today = datetime.date.today()
     now_hourly = datetime.datetime.now().strftime('%Y-%m-%d %H')
     now_daily = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -220,16 +221,16 @@ def regularBackup(path, repeat, timeone, timetwo):
         # date_obj: cockpit에서 입력받은 값
         date_obj = now_hourly+":"+str(timeone_arr[1])
         date_obj = date_obj.rstrip()
+        date_obj = datetime.datetime.strptime(date_obj, "%Y-%m-%d %H:%M")
 
         # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
 
         # 백업 예정 날짜가 현재보다 과거일 경우 1일 경과된 날짜를 첫 백업 일정으로 지정
         if now_no_sec_obj >= date_obj:
-            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
             new_date_obj = date_obj + datetime.timedelta(hours=1)
             new_date_string = new_date_obj.strftime("%Y-%m-%d %H:%M")
         else:
-            new_date_string = date_obj
+            new_date_string = date_obj.strftime("%Y-%m-%d %H:%M")
 
         result = subprocess.check_output("echo -e '#RegularBackup hourly '"+new_date_string+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" */1 * * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
@@ -239,16 +240,16 @@ def regularBackup(path, repeat, timeone, timetwo):
         # date_obj: cockpit에서 입력받은 값
         date_obj = now_daily+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])
         date_obj = date_obj.rstrip()
-  
+        date_obj = datetime.datetime.strptime(date_obj, "%Y-%m-%d %H:%M")
+
         # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
         
         # 백업 예정 날짜가 현재보다 과거일 경우 1일 경과된 날짜를 첫 백업 일정으로 지정
         if now_no_sec_obj >= date_obj:
-            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
             new_date_obj = date_obj + datetime.timedelta(days=1)
             new_date_string = new_date_obj.strftime("%Y-%m-%d %H:%M")
         else:
-            new_date_string = date_obj
+            new_date_string = date_obj.strftime("%Y-%m-%d %H:%M")
 
         result = subprocess.check_output("echo -e '#RegularBackup daily '"+new_date_string+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * * /usr/bin/python3 /usr/share/cockpit/ablestack/python/vm/dump_ccvm.py instantBackup --path "+path+"'"+") | crontab -", universal_newlines=True, shell=True, env=env)
@@ -347,7 +348,8 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
     delete = str(delete[0])
 
     # now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-    now_no_sec_obj = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+    now_no_sec = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+    now_no_sec_obj = datetime.datetime.strptime(now_no_sec, "%Y-%m-%d %H:%M")
     today = datetime.date.today()
     now_hourly = datetime.datetime.now().strftime('%Y-%m-%d %H')
     now_daily = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -365,16 +367,16 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
         # date_obj: cockpit에서 입력받은 값
         date_obj = now_hourly+":"+str(timeone_arr[1])
         date_obj = date_obj.rstrip()
+        date_obj = datetime.datetime.strptime(date_obj, "%Y-%m-%d %H:%M")
 
         # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
 
         # 백업 예정 날짜가 현재보다 과거일 경우 1일 경과된 날짜를 첫 백업 일정으로 지정
         if now_no_sec_obj >= date_obj:
-            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
             new_date_obj = date_obj + datetime.timedelta(hours=1)
             new_date_string = new_date_obj.strftime("%Y-%m-%d %H:%M")
         else:
-            new_date_string = date_obj
+            new_date_string = date_obj.strftime("%Y-%m-%d %H:%M")
 
         result = subprocess.check_output("echo -e '#DeleteOldBackup hourly '"+new_date_string+" "+delete+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" */1 * * * find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
@@ -383,16 +385,16 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
                 # date_obj: cockpit에서 입력받은 값
         date_obj = now_daily+" "+str(timeone_arr[0])+":"+str(timeone_arr[1])
         date_obj = date_obj.rstrip()
+        date_obj = datetime.datetime.strptime(date_obj, "%Y-%m-%d %H:%M")
   
         # now_no_sec_obj : 현재 날짜, 요일을 나타내는 변수를 생성하기 위한 코드 
         
         # 백업 예정 날짜가 현재보다 과거일 경우 1일 경과된 날짜를 첫 백업 일정으로 지정
         if now_no_sec_obj >= date_obj:
-            date_obj = datetime.datetime.strptime(date_obj, '%Y-%m-%d %H:%M')
             new_date_obj = date_obj + datetime.timedelta(days=1)
             new_date_string = new_date_obj.strftime("%Y-%m-%d %H:%M")
         else:
-            new_date_string = date_obj
+            new_date_string = date_obj.strftime("%Y-%m-%d %H:%M")
 
         result = subprocess.check_output("echo -e '#DeleteOldBackup daily '"+new_date_string+" "+delete+" >> /var/spool/cron/root", universal_newlines=True, shell=True, env=env)
         result = subprocess.check_output("cat <(crontab -l) <(echo "+"'"+str(timeone_arr[1])+" "+str(timeone_arr[0])+" * * * find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+ delete+"'"+" -delete) | crontab -", universal_newlines=True, shell=True, env=env)
