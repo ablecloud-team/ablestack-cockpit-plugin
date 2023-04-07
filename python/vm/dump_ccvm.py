@@ -62,21 +62,13 @@ def deactiveBackup(checkOption):
         checkOption = str(checkOption[0])
         if checkOption == 'r':
             subprocess.check_output("ssh root@ccvm2 \"grep -lrEZ 'mysqldump.*ccvm_dump' /var/spool/at/ | xargs -0 rm -f\"", universal_newlines=True, shell=True, env=env)
-            subprocess.check_output("ssh root@ccvm2 \"crontab -u root -l | grep -v 'ccvm_dump_' | crontab -u root -\"", universal_newlines=True, shell=True, env=env)
-            try:
-                result = subprocess.run("ssh root@ccvm2 sed -i '/RegularBackup/d' /var/spool/cron/root", universal_newlines=True, shell=True, env=env, capture_output=True, text=True)
-                result.check_returncode()
-            except subprocess.CalledProcessError as e:
-                print(e)
+            subprocess.check_output("ssh root@ccvm2 crontab -u root -l | grep -lrEZ 'mysqldump.*ccvm_dump_' | crontab -u root -", universal_newlines=True, shell=True, env=env)
+            subprocess.run("ssh root@ccvm2 sed -i '/RegularBackup/d' /var/spool/cron/root 2> /dev/null", universal_newlines=True, shell=True, env=env)
 
         elif checkOption == 'd':
             subprocess.check_output("ssh root@ccvm2 \"grep -lrEZ 'ccvm_dump.*delete' /var/spool/at/ | xargs -0 rm -f\"", universal_newlines=True, shell=True, env=env)
-            subprocess.check_output("ssh root@ccvm2 \"crontab -u root -l | grep -Ev 'delete.*sql|sql.*delete' | crontab -u root -\"", universal_newlines=True, shell=True, env=env)
-            try:
-                result = subprocess.run("ssh root@ccvm2 sed -i '/DeleteOldBackup/d' /var/spool/cron/root", universal_newlines=True, shell=True, env=env, capture_output=True, text=True)
-                result.check_returncode()
-            except subprocess.CalledProcessError as e:
-                print(e)
+            subprocess.check_output("ssh root@ccvm2 crontab -u root -l | grep -lrEZ 'ccvm_dump.*delete' | crontab -u root -", universal_newlines=True, shell=True, env=env)
+            subprocess.run("ssh root@ccvm2 sed -i '/RegularBackup/d' /var/spool/cron/root 2> /dev/null", universal_newlines=True, shell=True, env=env)
 
     except Exception as e:
         print(e)
@@ -222,12 +214,8 @@ def regularBackup(path, repeat, timeone, timetwo):
     # 백업 폴더 생성
     # 크론잡 초기화 ("ccvm_dump_"이 포함되어있는 크론잡 삭제, "RegularBackup" 포함된 주석 삭제)
     subprocess.check_output("ssh root@ccvm2 \"grep -lrEZ 'mysqldump.*ccvm_dump' /var/spool/at/ | xargs -0 rm -f\"", universal_newlines=True, shell=True, env=env)
-    subprocess.check_output("ssh root@ccvm2 \"crontab -u root -l | grep -v 'ccvm_dump_' | crontab -u root -\"", universal_newlines=True, shell=True, env=env)
-    try:
-        result = subprocess.run("ssh root@ccvm2 sed -i '/RegularBackup/d' /var/spool/cron/root", universal_newlines=True, shell=True, env=env, capture_output=True, text=True)
-        result.check_returncode()
-    except subprocess.CalledProcessError as e:
-        print(e)
+    subprocess.check_output("ssh root@ccvm2 crontab -u root -l | grep -lrEZ 'mysqldump.*ccvm_dump_' | crontab -u root -", universal_newlines=True, shell=True, env=env)
+    subprocess.run("ssh root@ccvm2 sed -i '/RegularBackup/d' /var/spool/cron/root 2> /dev/null", universal_newlines=True, shell=True, env=env)
 
     # 반복 옵션에 따른 명령어 실행
     if (repeat) == 'no':
@@ -373,12 +361,8 @@ def deleteOldBackup(path, repeat, timeone, timetwo, delete):
 
     # 크론잡 초기화 ("delete"와 "sql"이 포함되어있는 크론잡 삭제)
     subprocess.check_output("ssh root@ccvm2 \"grep -lrEZ 'ccvm_dump.*delete' /var/spool/at/ | xargs -0 rm -f\"", universal_newlines=True, shell=True, env=env)
-    subprocess.check_output("ssh root@ccvm2 \"crontab -u root -l | grep -Ev 'delete.*sql|sql.*delete' | crontab -u root -\"", universal_newlines=True, shell=True, env=env)
-    try:
-        result = subprocess.run("ssh root@ccvm2 sed -i '/DeleteOldBackup/d' /var/spool/cron/root", universal_newlines=True, shell=True, env=env, capture_output=True, text=True)
-        result.check_returncode()
-    except subprocess.CalledProcessError as e:
-        print(e)
+    subprocess.check_output("ssh root@ccvm2 crontab -u root -l | grep -lrEZ 'ccvm_dump.*delete' | crontab -u root -", universal_newlines=True, shell=True, env=env)
+    subprocess.run("ssh root@ccvm2 sed -i '/RegularBackup/d' /var/spool/cron/root 2> /dev/null", universal_newlines=True, shell=True, env=env)
 
     if (repeat) == 'no':
         subprocess.check_output("ssh root@ccvm2 \"echo find "+path+" -name "'"ccvm_dump_*.sql"'" -ctime -"+delete+" delete | at "+timeone+" -q d\"", universal_newlines=True, shell=True, env=env)
