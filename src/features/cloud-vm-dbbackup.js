@@ -326,10 +326,6 @@ async function ccvmDbBackup() {
 
     let regular_input_ccvm_backup_path = $('#dump-path').val();
 
-    setTimeout(function(){
-        console.log("Executed after 1 second");
-    }, 3000);
-
     await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', radio_ccvm_backup, '--path', regular_input_ccvm_backup_path, '--repeat', 
     regular_option_ccvm_backup, '--timeone', regular_input_ccvm_backup_time_one, '--timetwo', regular_input_ccvm_backup_time_two, '--delete', form_input_db_backup_cloud_vm_number])
     .then(function(data){
