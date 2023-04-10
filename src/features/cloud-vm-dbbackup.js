@@ -3,11 +3,10 @@
 // 클라우드센터 VM DB 백업 실행 클릭 시
 $('#button-execution-modal-cloud-vm-db-dump').on('click', function () {
     let deativationDbBackup = $('input:checkbox[id="switch-ccvm-backup-check"]').is(":checked")
-    console.log(deativationDbBackup);
-    if (deativationDbBackup == false) {
+    let radio_ccvm_backup = $('input[name=radio-ccvm-backup]:checked').val();
+    if (deativationDbBackup == false && radio_ccvm_backup != 'instantBackup') {
         deactiveDBBackupCronjob()
     }else {
-        $('#div-modal-wizard-cluster-config-finish-db-dump-file-download-empty-state').show();
         $('#dbdump-prepare-status').html("<svg class='pf-c-spinner pf-m-xl' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100'><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>" +
         "<h1 data-ouia-component-type='PF4/Title' data-ouia-safe='true' data-ouia-component-id='OUIA-Generated-Title-1' class='pf-c-title pf-m-lg'>백업파일 준비 중...</h1><div class='pf-c-empty-state__body'></div>")
         ccvmDbBackup();
@@ -163,6 +162,9 @@ $('#form-input-db-backup-cloud-vm-number-minus').on('click', function () {
     if(num > 0){
         $('#form-input-db-backup-cloud-vm-number').val(num * 1 - 1)
     }
+});
+$('input[type="number"]').on('input', function() {
+    $(this).val($(this).val().replace(/[^0-9]/g, '').slice(0, 4));
 });
 
 $('#select-db-backup-cloud-vm-drop-repeat').change(function() {
@@ -323,6 +325,11 @@ async function ccvmDbBackup() {
     }
 
     let regular_input_ccvm_backup_path = $('#dump-path').val();
+
+    setTimeout(function(){
+        console.log("Executed after 1 second");
+    }, 3000);
+
     await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', radio_ccvm_backup, '--path', regular_input_ccvm_backup_path, '--repeat', 
     regular_option_ccvm_backup, '--timeone', regular_input_ccvm_backup_time_one, '--timetwo', regular_input_ccvm_backup_time_two, '--delete', form_input_db_backup_cloud_vm_number])
     .then(function(data){
@@ -370,6 +377,7 @@ async function ccvmDbBackup() {
                 href: 'data:Application/octet-stream;application/x-xz;attachment;/,' + encodeURIComponent(tag),
                 download: dump_sql_file_name
             });
+            $('#div-modal-wizard-cluster-config-finish-db-dump-file-download-empty-state').hide();
             $('#div-db-backup').show();
             $('#div-db-backup').text("클라우드센터 가상머신의 데이터베이스 백업이 완료되었습니다.");
             $('#dbdump-prepare-status').html("")
@@ -410,14 +418,17 @@ async function ccvmDbBackup() {
 
 async function checkDBBackupCronjob(){
     let span_ccvm_backup_check = ""
-    let regular_option_ccvm_backup_info = ""
     let radio_ccvm_backup = $('input[name=radio-ccvm-backup]:checked').val();
-    let regular_option_ccvm_backup = "";
     if (radio_ccvm_backup == "regularBackup") {
         span_ccvm_backup_check = "r";
     }else if (radio_ccvm_backup == "deleteOldBackup") {
         span_ccvm_backup_check = "d";
     }
+
+    // 상태 체크 로딩 circle
+    $('#ccvm-dump-status').show()
+    $('#span-ccvm-backup-check').hide()
+    $('#switch-ccvm-backup-check').prop('disabled', false);
 
     await cockpit.spawn(['/usr/bin/python3', pluginpath+'/python/vm/dump_ccvm.py', 'checkBackup', '--checkOption', span_ccvm_backup_check])
     .then(function(data){
@@ -425,7 +436,9 @@ async function checkDBBackupCronjob(){
         let retVal = JSON.parse(data);
         if (retVal.code == 200) {
             dump_check = retVal.val;
-            console.log(dump_check);
+            // 상태 체크 로딩 circle hide
+            $('#ccvm-dump-status').hide()
+            $('#span-ccvm-backup-check').show()
             $('#switch-ccvm-backup-check').prop('checked', true);
             $('#span-ccvm-backup-check').text("최초 실행 일정 : "+dump_check);
             $("select[name=select-db-backup-cloud-vm]").prop('disabled', false)

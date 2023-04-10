@@ -79,6 +79,10 @@ def deactiveBackup(checkOption):
 # 주요 기능 : ccvm의 "cloud" databased의 backup 및 삭제 예약작업을 체크하는 함수
 def checkBackup(checkOption):
     try:
+        noRepeatOption = ''
+        repeatOptionOne = ''
+        repeatOptionTwo = ''
+        deleteOption = ''
         checkOption = str(checkOption[0])
         if checkOption == 'r':
             noRepeatOption = subprocess.check_output("ssh root@ccvm2 at -l | awk '{if ($7==\""+checkOption+"\") print ($2,$3,$4,$5,$6)}'", universal_newlines=True, shell=True, env=env).rstrip()
