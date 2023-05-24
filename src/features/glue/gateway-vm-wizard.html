@@ -1,0 +1,868 @@
+<!-- 
+* File Name : gateway-vm-wizard.html  
+* Date Created : 2023.05.08
+* Writer  : 배태주
+* Description : ABLESTACK 게이트웨이 VM을 배포하기 위한 절차를 진행하는 마법사 Modal 대화상자
+-->
+
+<div class="pf-l-bullseye" >
+    <div class="pf-c-modal-box pf-m-lg" role="dialog" aria-modal="true" aria-label="Basic wizard">
+        <div class="pf-c-wizard">
+            <div class="pf-c-wizard__header">
+                <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" id="button-close-modal-wizard-gateway-vm">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+                <h1 class="pf-c-title pf-m-3xl pf-c-wizard__title">ABLESTACK 게이트웨이 VM 배포 마법사</h1>
+                <p class="pf-c-wizard__description">ABLESTACK 클러스터에 Glue 공유스토리지 게이트웨이를 실행하는 가상머신 어플라이언스를 배포합니다. </p>
+            </div>    
+            <div class="pf-c-wizard__outer-wrap">
+                <div class="pf-c-wizard__inner-wrap">
+                    <nav class="pf-c-wizard__nav" aria-label="Steps">
+                        <ol class="pf-c-wizard__nav-list">
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link pf-m-current" id="nav-button-gateway-vm-overview">개요</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-gateway-vm-cluster">장애조치 클러스터 설정</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-gateway-vm-appliance">게이트웨이 VM 설정</button>
+                                <ol class="pf-c-wizard__nav-list">
+                                    <li class="pf-c-wizard__nav-item">
+                                        <button class="pf-c-wizard__nav-link" id="nav-button-gateway-vm-compute">컴퓨트</button>
+                                    </li>
+                                    <li class="pf-c-wizard__nav-item">
+                                        <button class="pf-c-wizard__nav-link" id="nav-button-gateway-vm-network">네트워크</button>
+                                    </li>
+                                </ol>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-gateway-vm-additional">추가 네트워크 정보</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-gateway-vm-ssh-key">SSH Key 정보</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-gateway-vm-review">설정확인</button>
+                            </li>
+                            <li class="pf-c-wizard__nav-item">
+                                <button class="pf-c-wizard__nav-link" id="nav-button-gateway-vm-finish">완료</button>
+                            </li>
+                        </ol>
+                    </nav>
+                    <main class="pf-c-wizard__main">
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-gateway-vm-overview">
+                            <div class="pf-c-content">
+                                <p>
+                                    ABLESTACK 게이트웨이 VM을 배포하기 위해 필요한 정보를 다음과 같이 마법사를 통해 입력받습니다.    
+                                </p>
+                                <ul>
+                                    <li>게이트웨이 VM의 HA구성을 위한 클러스터 설정 정보</li>
+                                    <li>게이트웨이 VM의 CPU, Memory, Disk, Network에 대한 정보</li>
+                                    <li>가상머신의 호스트명 등의 네트워크 정보</li>
+                                    <li>호스트 및 가상머신 간의 상호 SSH 연결을 위한 SSH Key 정보</li>
+                                </ul>
+                                <p>
+                                    필요한 정보를 먼저 준비하십시오. 정보가 준비되었다면 "다음" 버튼을 눌러 게이트웨이 VM 배포를 시작합니다. 
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-gateway-vm-failover-cluster">
+                            <div class="pf-c-content">
+                                <p>
+                                    장애조치 클러스터는 게이트웨이 VM이 실행 중인 호스트에 장애가 발생하는 경우 게이트웨이 VM을 안전하게 다른 호스트에서 실행하도록 하기 위해 구성합니다.
+                                    장애조치 클러스터를 구성하기 위해 필요한 정보를 아래에 입력하십시오. 
+                                </p>
+                                <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                    <section class="pf-c-form__section">
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-select-storage-vm-cpu">
+                                                    <span class="pf-c-form__label-text">하이퍼바이저</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control">
+                                                <select class="pf-c-form-control" id="form-select-storage-vm-cpu" name="form-select-storage-vm-cpu" style="width:40%">
+                                                    <option value="" selected>선택하십시오</option>
+                                                    <option value="8">Cell PCS</option>
+                                                    <!-- <option value="16">Hyper-v MSCS</option> -->
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-gateway-vm-failover-cluster-member-number">
+                                                    <span class="pf-c-form__label-text">클러스터 멤버수</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:15%" type="text" id="form-input-gateway-vm-failover-cluster-member-number" name="form-input-gateway-vm-failover-cluster-member-number" value="3">
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__field-group">
+                                            <div class="pf-c-form__field-group-header"  style="padding-bottom:8px;">
+                                                <div class="pf-c-form__field-group-header-main">
+                                                    <div class="pf-c-form__field-group-header-title">
+                                                        <div class="pf-c-form__field-group-header-title-text">PCS 호스트 #1 정보</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="pf-c-form__field-group-body" style="padding-top:0px;">
+                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-input-gateway-vm-failover-cluster-host1-name">
+                                                            <span class="pf-c-form__label-text">PN IP</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-gateway-vm-failover-cluster-host1-name" name="form-input-gateway-vm-failover-cluster-host1-name" required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__field-group">
+                                            <div class="pf-c-form__field-group-header"  style="padding-bottom:8px;">
+                                                <div class="pf-c-form__field-group-header-main">
+                                                    <div class="pf-c-form__field-group-header-title">
+                                                        <div class="pf-c-form__field-group-header-title-text">PCS 호스트 #2 정보</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="pf-c-form__field-group-body" style="padding-top:0px;">
+                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-input-gateway-vm-failover-cluster-host2-name">
+                                                            <span class="pf-c-form__label-text">PN IP</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-gateway-vm-failover-cluster-host2-name" name="form-input-gateway-vm-failover-cluster-host2-name" required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__field-group">
+                                            <div class="pf-c-form__field-group-header"  style="padding-bottom:8px;">
+                                                <div class="pf-c-form__field-group-header-main">
+                                                    <div class="pf-c-form__field-group-header-title">
+                                                        <div class="pf-c-form__field-group-header-title-text">PCS 호스트 #3 정보</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="pf-c-form__field-group-body" style="padding-top:0px;">
+                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-input-gateway-vm-failover-cluster-host3-name">
+                                                            <span class="pf-c-form__label-text">PN IP</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <input class="pf-c-form-control" style="width:70%" type="text" id="form-input-gateway-vm-failover-cluster-host3-name" name="form-input-gateway-vm-failover-cluster-host3-name" required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </section>
+                                </form>
+                                <br/>
+                                <div class="pf-c-alert pf-m-info pf-m-inline" aria-label="VM Compute Info" style="margin-left:15px;margin-top:32px">
+                                    <div class="pf-c-alert__icon">
+                                        <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="pf-c-alert__title pf-m-truncate">
+                                        <strong><span class="pf-screen-reader">Info alert:</span>HA클러스터 구성 시 참고사항</strong>
+                                    </p>
+                                    <div class="pf-c-alert__description">
+                                        <p>하이퍼바이저 별 HA 클러스터에 맞는 환경이 구성되어 있어야합니다.</p>
+                                        <p>
+                                            CELL 하이퍼 바이저 : PCS Cluster
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-gateway-vm-compute">
+                            <div class="pf-c-content">
+                                <p>
+                                    게이트웨이 VM의 CPU 및 Memory, ROOT Disk 등의 정보를 설정합니다. 
+                                    아래의 항목에 적합한 값을 선택하여 입력하십시오.
+                                </p>
+                                <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                    <section class="pf-c-form__section">
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-modal-select-gateway-vm-compute-cpu-core">
+                                                    <span class="pf-c-form__label-text">CPU Core</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <select class="pf-c-form-control" id="form-modal-select-gateway-vm-compute-cpu-core" name="form-modal-select-gateway-vm-compute-cpu-core" style="width:40%;">
+                                                    <option value="" selected>선택하십시오</option>
+                                                    <option value="4">4 vCore</option>
+                                                    <option value="8">8 vCore</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-modal-select-gateway-vm-compute-memory">
+                                                    <span class="pf-c-form__label-text">Memory</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control">
+                                                <select class="pf-c-form-control" id="form-modal-select-gateway-vm-compute-memory" name="form-modal-select-gateway-vm-compute-memory" style="width:40%;">
+                                                    <option value="" selected>선택하십시오</option>
+                                                    <option value="8">8 GiB</option>
+                                                    <option value="16">16 GiB</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-select-gateway-vm-root-disk">
+                                                    <span class="pf-c-form__label-text">ROOT Disk</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" id="form-select-gateway-vm-root-disk" name="form-select-gateway-vm-root-disk" style="width:40%">
+                                                    <span class="pf-c-form__label-text">70 GiB (THIN Provisioning)</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </form>
+                                <br/>
+                                <div class="pf-c-alert pf-m-info pf-m-inline" aria-label="VM Compute Info" style="margin-left:15px;margin-top:32px">
+                                    <div class="pf-c-alert__icon">
+                                        <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="pf-c-alert__title pf-m-truncate">
+                                        <strong><span class="pf-screen-reader">Info alert:</span>컴퓨트 자원 구성 시 참고사항</strong>
+                                    </p>
+                                    <div class="pf-c-alert__description">
+                                        <p>게이트웨이 VM의 Compute 자원은 Glue 공유스토리지 게이트웨이 가상머신이 관리해야 할 서비스 수에 따라 탄력적으로 선택합니다. </p>
+                                        <p>
+                                            게이트웨이 가상머신이 컨트롤 할 스토리지 서비스 수가 2개 미만이면 4 vCore를, 그 이상이면 8 vCore를 선택하십시오.
+                                            가상머신이 컨트롤 할 스토리지 서비스 수가 2개 미만이면 8GiB를, 그 이상이면 16GiB를 선택하십시오.
+                                        </p>
+                                        <p>ROOT Disk의 크기는 70GiB를 디스크가 Thin Provisioning 방식으로 제공됩니다. </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-gateway-vm-network">
+                            <div class="pf-c-content">
+                                <p>
+                                    게이트웨이 VM이 사용할 관리 네트워크용 NIC 정보를 설정합니다. 
+                                    아래의 항목에 적합한 값을 선택하여 입력하십시오.
+                                </p>
+                                <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                    <section class="pf-c-form__section">
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label">
+                                                    <span class="pf-c-form__label-text">네트워크 구성</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-stack" style="margin-top:8px">
+                                                <div class="pf-c-check">
+                                                    <input class="pf-c-check__input" type="checkbox" id="form-checkbox-mngt-network" name="form-checkbox-mngt-network" checked disabled/>
+                                                    <label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-mngt-network">관리네트워크</label>
+                                                </div>
+                                                <div class="pf-c-check">
+                                                    <input class="pf-c-check__input" type="checkbox" id="form-checkbox-svc-network" name="form-checkbox-svc-network" checked disabled/>
+                                                    <label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-svc-network">스토리지네트워크</label>
+                                                </div>    
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__field-group">
+                                            <div class="pf-c-form__field-group-header"  style="padding-bottom:8px;">
+                                                <div class="pf-c-form__field-group-header-main">
+                                                    <div class="pf-c-form__field-group-header-title">
+                                                        <div class="pf-c-form__field-group-header-title-text">가상머신에 할당할 Parent Bridge</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="pf-c-form__field-group-body">
+                                                <div class="pf-c-form__group">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-select-gateway-vm-mngt-parent">
+                                                            <span class="pf-c-form__label-text">관리네트워크</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <select class="pf-c-form-control" id="form-select-gateway-vm-mngt-parent" name="form-select-gateway-vm-mngt-parent" style="width:40%;">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="pf-c-form__group" style="padding:0px;">
+                                                    <div class="pf-c-form__group-label">
+                                                        <label class="pf-c-form__label" for="form-select-gateway-vm-svc-parent">
+                                                            <span class="pf-c-form__label-text">스토리지네트워크</span>
+                                                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="pf-c-form__group-control">
+                                                        <select class="pf-c-form-control" id="form-select-gateway-vm-svc-parent" name="form-select-gateway-vm-svc-parent" style="width:40%;">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </form>
+                                <div class="pf-c-alert pf-m-info pf-m-inline" aria-label="VM Compute Info" style="margin-left:15px;margin-top:32px">
+                                    <div class="pf-c-alert__icon">
+                                        <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="pf-c-alert__title pf-m-truncate">
+                                        <strong><span class="pf-screen-reader">Info alert:</span>네트워크 구성 시 참고사항</strong>
+                                    </p>
+                                    <div class="pf-c-alert__description">
+                                        <p>게이트웨이 기싱머신 스토리지 서비스에 접근하고자 하는 네트워크 위치에 따라 가상머신에 할당할 네트워크와 네트워크의 상위 브릿지를 선택합니다. </p>
+                                        <p>
+                                            관리네트워크는 호스트를 관리하기 위해 필수적인 네트워크이며, 기본 선택되어 있고, 선택 여부를 변경할 수 없습니다. 
+                                            서비스네트워크는 사용자가 접근하고자 하는 네트워크 위치이며, 관리네트워크와 서비스네트워크가 다른 경우 선택합니다. 
+                                        </p>
+                                        <p>가상머신에 네트워크를 할당하기 전에 반드시 상위 브릿지를 먼저 생성해야 합니다. </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-gateway-vm-additional">
+                            <div class="pf-c-content">
+                                <p>
+                                    게이트웨이 VM에 호스트명 등의 부가적인 네트워크 정보를 설정합니다. 아래의 항목에 값을 입력하십시오.
+                                </p>
+                                <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                    <section class="pf-c-form__section">
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label">
+                                                    <span class="pf-c-form__label-text">클러스터 구성 파일 준비</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                                                <div class="pf-c-radio" style="display: none;">
+                                                    <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-new-gwvm" name="radio-hosts-file-gwvm" value="new" disabled/>
+                                                    <label class="pf-c-radio__label" for="form-radio-hosts-new-gwvm">신규 생성</label>
+                                                </div>
+                                                <div class="pf-c-radio">
+                                                    <input class="pf-c-radio__input" type="radio" id="form-radio-hosts-file-gwvm" name="radio-hosts-file-gwvm" value="existing" checked/>
+                                                    <label class="pf-c-radio__label" for="form-radio-hosts-file-gwvm">해당 호스트 파일 사용</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-current-host-name-gwvm">
+                                                    <span class="pf-c-form__label-text">현재 호스트명</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control">
+                                                <input class="pf-c-form-control" style="width:60%" type="text" id="form-input-current-host-name-gwvm" name="form-input-current-host-name-gwvm" required="required" disabled/> 
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-gateway-vm-mngt-nic-ip">
+                                                    <span class="pf-c-form__label-text">관리 NIC IP</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-gateway-vm-mngt-nic-ip" name="form-input-gateway-vm-mngt-nic-ip" placeholder="xxx.xxx.xxx.xxx/xx 형식으로 입력"/>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-gateway-vm-mngt-gw">
+                                                    <span class="pf-c-form__label-text">관리 NIC Gateway</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-gateway-vm-mngt-gw" name="form-input-gateway-vm-mngt-gw" placeholder="xxx.xxx.xxx.xxx 형식으로 입력"/>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-gateway-vm-dns">
+                                                    <span class="pf-c-form__label-text">관리 NIC DNS</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-gateway-vm-dns" name="form-input-gateway-vm-dns" placeholder="xxx.xxx.xxx.xxx 형식으로 입력" />
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-gateway-vm-svc-nic-ip">
+                                                    <span class="pf-c-form__label-text">스토리지 NIC IP</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-gateway-vm-svc-nic-ip" name="form-input-gateway-vm-svc-nic-ip" placeholder="xxx.xxx.xxx.xxx/xx 형식으로 입력"/>
+                                            </div>
+                                        </div>
+                                        <!-- <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-gateway-vm-svc-gw">
+                                                    <span class="pf-c-form__label-text">스토리지 NIC Gateway</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-gateway-vm-svc-gw" name="form-input-gateway-vm-svc-gw" placeholder="xxx.xxx.xxx.xxx 형식으로 입력" disabled/>
+                                            </div>
+                                        </div> -->
+                                        <!-- <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-gateway-vm-svc-dns">
+                                                    <span class="pf-c-form__label-text">스토리지 NIC DNS</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-gateway-vm-svc-dns" name="form-input-gateway-vm-svc-dns" placeholder="xxx.xxx.xxx.xxx 형식으로 입력" disabled/>
+                                            </div>
+                                        </div> -->
+                                    </section>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-gateway-vm-ssh-key">
+                            <div class="pf-c-content">
+                                <p>
+                                    게이트웨이 VM과 호스트, 그리고 ABLESTACK을 구성하고 있는 가상머신들과의 SSH 연결을 위해 SSH Key를 설정합니다. 기본적으로 현재 호스트의 SSH Key 파일을 자동으로 등록하며, 필요시 다운로드 한 SSH Key 파일로 등록 가능합니다.
+                                </p>
+                                <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+                                    <section class="pf-c-form__section">
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-gateway-vm-ssh-private-key-file">
+                                                    <span class="pf-c-form__label-text">SSH 개인 Key 파일</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-gateway-vm-ssh-private-key-file" name="form-input-gateway-vm-ssh-private-key-file" hidden/>
+                                                <textarea class="pf-c-form-control" style="width:70%" type="text" id="form-textarea-gateway-vm-ssh-private-key-file" disabled></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-form__group">
+                                            <div class="pf-c-form__group-label">
+                                                <label class="pf-c-form__label" for="form-input-gateway-vm-ssh-public-key-file">
+                                                    <span class="pf-c-form__label-text">SSH 공개 Key 파일</span>
+                                                    <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                                                </label>
+                                            </div>
+                                            <div class="pf-c-form__group-control pf-m-inline">
+                                                <input class="pf-c-form-control" style="width:70%" type="file" id="form-input-gateway-vm-ssh-public-key-file" name="form-input-gateway-vm-ssh-public-key-file" hidden/>
+                                                <textarea class="pf-c-form-control" style="width:70%" type="text" id="form-textarea-gateway-vm-ssh-public-key-file" disabled></textarea>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </form>
+                                <br/>
+                                <div class="pf-c-alert pf-m-info pf-m-inline" aria-label="VM Compute Info" style="margin-left:15px;margin-top:32px">
+                                    <div class="pf-c-alert__icon">
+                                        <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="pf-c-alert__title pf-m-truncate">
+                                        <strong><span class="pf-screen-reader">Info alert:</span>SSH Key 등록 참고사항</strong>
+                                    </p>
+                                    <div class="pf-c-alert__description">
+                                        <p>
+                                            SSH Key는 호스트 및 게이트웨이, 클라우드센터, 스토리지센터 가상머신 등의 ABLESTACK 구성요소 간의 암호화된 인증을 위해 사용됩니다. 
+                                        </p>
+                                        <p>
+                                            호스트 간, 가상머신 간의 모든 명령은 SSH를 이용해 전달되며 이 때 SSH Key를 이용해 인증을 처리합니다. 따라서 모든 호스트, 가상머신은 동일한 SSH Key를 사용해야 합니다.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-gateway-vm-review">
+                            <div class="pf-c-content">
+                                <p>
+                                    게이트웨이 VM의 배포를 위해 입력한 설정 정보는 다음과 같습니다. 
+                                    입력한 정보를 수정하고자 하는 경우, 해당 탭으로 이동하여 정보를 수정하십시오. 
+                                    <br/>
+                                    <br/>
+                                    모든 정보를 확인한 후 "배포"를 시작합니다. 
+                                </p>
+                            </div>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:10px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-gateway-vm-failover-cluster">
+                                        <span class="pf-c-accordion__toggle-text">장애조치 클러스터 설정</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-gateway-vm-failover-cluster">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">클러스터 멤버 수 </span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">3</div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">PCS 호스트 #1</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        PN IP : <span id="span-gateway-vm-failover-cluster-host1-name"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">PCS 호스트 #2</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        PN IP : <span id="span-gateway-vm-failover-cluster-host2-name"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">PCS 호스트 #3</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        PN IP : <span id="span-gateway-vm-failover-cluster-host3-name"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:10px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-gateway-vm-compute-network">
+                                        <span class="pf-c-accordion__toggle-text">게이트웨이 VM 설정</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-gateway-vm-compute-network">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">CPU Core</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-gateway-vm-cpu-core"></span>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">Memory</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-gateway-vm-memory"></span>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">ROOT Disk Size</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-gateway-vm-root-disk-size">70 GiB</span>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">네트워크 구성</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-gateway-vm-network-config"></span>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">관리용 Bridge</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-gateway-vm-mgmt-nic-bridge"></span>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">스토리지용 Bridge</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-gateway-vm-svc-nic-bridge"></span>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:10px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-gateway-vm-additional">
+                                        <span class="pf-c-accordion__toggle-text">추가 네트워크 정보</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-gateway-vm-additional">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">클러스터 구성 준비</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-hosts-file-gwvm"></span>
+                                                    </div>
+                                                </dd>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <textarea class="pf-c-form-control" id="div-textarea-cluster-config-confirm-hosts-file-gwvm" style="width:670px;height:150px;font-size:10px;vertical-align:text-bottom;" type="text" readonly>Host 프로파일 내용</textarea>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">호스트명(CCVM)</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-gateway-vm-additional-hostname"></span>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">관리 NIC 정보</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        IP Addr : <span id="span-gateway-vm-additional-mgmt-ipaddr"></span><br/>
+                                                        Gateway : <span id="span-gateway-vm-additional-mgmt-gateway"></span><br/>
+                                                        DNS : <span id="span-gateway-vm-additional-dns"></span>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">스토리지 NIC 정보</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        IP Addr : <span id="span-gateway-vm-additional-svc-ipaddr"></span><br/>
+                                                        <!-- Gateway : <span id="span-gateway-vm-additional-svc-gateway"></span><br/>
+                                                        DNS : <span id="span-gateway-vm-additional-svc-dns"></span> -->
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pf-c-accordion" style="margin-top:32px;margin-left:10px">
+                                <h3>
+                                    <button class="pf-c-accordion__toggle" aria-expanded="false" id="button-accordion-gateway-vm-ssh-key">
+                                        <span class="pf-c-accordion__toggle-text">SSH Key 정보</span>
+                                        <span class="pf-c-accordion__toggle-icon">
+                                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </h3>
+                                <div class="pf-c-accordion__expanded-content" id="div-accordion-gateway-vm-ssh-key">
+                                    <div class="pf-c-accordion__expanded-content-body">
+                                        <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;margin-left: 10px">
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">SSH 개인 Key 파일</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-gateway-vm-ssh-private-key-file"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            <div class="pf-c-description-list__group">
+                                                <dt class="pf-c-description-list__term">
+                                                    <span class="pf-c-description-list__text">SSH 공개 Key 파일</span>
+                                                </dt>
+                                                <dd class="pf-c-description-list__description">
+                                                    <div class="pf-c-description-list__text">
+                                                        <span id="span-gateway-vm-ssh-public-key-file"></span><br/>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-gateway-vm-deploy">
+                            <p id='gwvm-progress-step-text'>
+                                게이트웨이 가상머신을 배포 중입니다. 전체 5단계 중 1단계 진행 중입니다.  
+                            </p>
+
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-gwvm-progress-step1">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성 HOST 네트워크 연결 테스트</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-gwvm-progress-step2">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성 설정 초기화 작업</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-gwvm-progress-step3">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">cloudinit iso 파일 생성</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-gwvm-progress-step4">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">게이트웨이 가상머신 구성</span>
+                            </div>
+                            <div class="pf-c-content" style="margin-top:30px;margin-left:15px">
+                                <span class="pf-c-label pf-m-blue" id="span-gwvm-progress-step5">
+                                    <span class="pf-c-label__content">
+                                        <span class="pf-c-label__icon">
+                                            <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                                        </span><p>준비중</p>
+                                    </span>
+                                </span>
+                                <span class="pf-c-label__content" style="margin-left:4px">클러스터 구성 및 게이트웨이 가상머신 배포</span>
+                            </div>
+                        </div>
+                        <div class="pf-c-wizard__main-body" id="div-modal-wizard-gateway-vm-finish">
+                            <div class="pf-c-content">
+                                <p>
+                                    게이트웨이 VM의 배포를 완료했습니다. 가상머신이 배포되면 다음의 작업을 수행해야 합니다. 
+                                </p>
+                                <ul>
+                                    <li>게이트웨이 VM의 웹관리콘솔에 접속</li>
+                                    <li>ABLESTACK에 대한 클라우드 Zone 구성</li>
+                                    <li>가상머신 생성을 위한 각종 정책 준비</li>
+                                </ul>
+                                <p>
+                                    위의 모든 작업은 게이트웨이 VM의 웹 관리콘솔을 이용해 진행합니다. 
+                                </p>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+                <footer class="pf-c-wizard__footer" style="box-shadow:var(--pf-global--BoxShadow--sm-top)">
+                    <button class="pf-c-button pf-m-primary" type="submit" id="button-next-step-modal-wizard-gateway-vm">다음</button>
+                    <button class="pf-c-button pf-m-secondary" type="button" id="button-before-step-modal-wizard-gateway-vm">이전</button>
+                    <div class="pf-c-wizard__footer-cancel">
+                        <button class="pf-c-button pf-m-link" type="button" id="button-cancel-config-modal-wizard-gateway-vm">취소</button>
+                    </div>
+                </footer>
+            </div>
+
+            <!-- 게이트웨이 가상머신 배포 마법사 진행: Modal 영역 시작 -->
+            <div id="div-modal-gateway-wizard-confirm" class="pf-c-backdrop" style="display:none" >
+                <div class="pf-l-bullseye">
+                    <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="gateway wizard confirm">
+                        <button id="button-close-modal-gateway-wizard-confirm" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                        <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">게이트웨이 가상머신 배포 진행</span></h1></header>
+                        <div class="pf-c-modal-box__body">
+                            <div>게이트웨이 가상머신 배포를 진행하시겠습니까?</div>
+                        </div>
+                        <footer class="pf-c-modal-box__footer">
+                            <button id="button-execution-modal-gateway-wizard-confirm" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                            <button id="button-cancel-modal-gateway-wizard-confirm" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">아니요</button>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            <!-- 게이트웨이 가상머신 배포 마법사 진행: Modal 영역 끝 -->
+            
+            <!-- 게이트웨이 가상머신 배포 마법사 취소: Modal 영역 시작 -->
+            <div id="div-modal-cancel-gateway-wizard-cancel" class="pf-c-backdrop" style="display:none" >
+                <div class="pf-l-bullseye">
+                    <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="gateway wizard cancel">
+                        <button id="button-close-modal-gateway-wizard-cancel" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                        <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">게이트웨이 가상머신 배포 취소</span></h1></header>
+                        <div class="pf-c-modal-box__body">
+                            <div>게이트웨이 가상머신 배포를 취소하시겠습니까? 입력된 데이터는 초기화 됩니다.</div>
+                        </div>
+                        <footer class="pf-c-modal-box__footer">
+                            <button id="button-execution-modal-gateway-wizard-cancel" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                            <button id="button-cancel-modal-gateway-wizard-cancel" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">아니요</button>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            <!-- 게이트웨이 가상머신 배포 마법사 취소: Modal 영역 끝 -->
+
+        </div>
+    </div>
+</div>
+
+<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+<script src="./src/common/wizard-common.js"></script>
+<script src="./src/common/validation.js"></script>
+<script src="./src/features/glue/gateway-vm-wizard.js"></script>
+<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 

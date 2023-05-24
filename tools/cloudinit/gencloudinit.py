@@ -60,6 +60,7 @@ def argumentParser():
     ccvm_parser = subparsers.add_parser('ccvm', help='Cloud Center Virtual Machine을 위한 cloudinit')
     ccvm_dup_parser = subparsers.add_parser('ccvm_dup', help='Cloud Center Virtual Machine을 위한 cloudinit')
     scvm_parser = subparsers.add_parser('scvm', help='Storage Center Virtual Machine을 위한 cloudinit')
+    gwvm_parser = subparsers.add_parser('gwvm', help='GateWay Virtual Machine을 위한 cloudinit')
     # 선택지 추가(동작 선택)
     tmp_parser.add_argument('--iso-path', metavar='ISO file', help="저장할 ISO파일 이름")
     tmp_parser.add_argument('--hostname', metavar='hostname', help="VM의 이름")
@@ -472,6 +473,45 @@ def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_p
         f.write('#cloud-config\n')
         f.write(yaml.dump(yam2).replace("\n\n", "\n"))
     return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=yam)))
+    
+"""
+gwvm용 네트워크설정(네트워크 추가 없음)하는 부분
+
+:param 없음
+:return yaml 파일
+"""
+def gwvmGen( sn_nic: str, sn_ip: str, sn_prefix: int):
+    with open(f'{tmpdir}/network-config.mgmt', 'rt') as f:
+        yam = yaml.load(f)
+
+    if sn_nic is not None or sn_ip is not None or sn_prefix is not None :
+        yam['network']['config'].append({'mtu': 9000, 'name': sn_nic,
+                                        'subnets': [{'address': f'{sn_ip}/{sn_prefix}',
+                                                    'type': 'static'}],
+                                        'type': 'physical'})
+
+    with open(f'{tmpdir}/network-config', 'wt') as f:
+        f.write(yaml.dump(yam))
+
+    with open(f'{tmpdir}/user-data', 'rt') as f:
+        yam2 = yaml.load(f)
+        with open(f'{pluginpath}/shell/host/gwvm_bootstrap.sh', 'rt') as bootstrapfile:
+            bootstrap = bootstrapfile.read()
+        yam2['write_files'].append(
+            {
+                'encoding': 'base64',
+                'content': base64.encodebytes(bootstrap.encode()),
+                'owner': 'root:root',
+                'path': '/root/bootstrap.sh',
+                'permissions': '0777'
+            }
+        )
+
+    with open(f'{tmpdir}/user-data', 'wt') as f:
+        f.write('#cloud-config\n')
+        f.write(yaml.dump(yam2).replace("\n\n", "\n"))
+
+    return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=yam)))
 
 
 """
@@ -528,6 +568,8 @@ def main(args):
         ret = ccvmDupGen(sn_nic=args.sn_nic, sn_ip=args.sn_ip, sn_prefix=args.sn_prefix, sn_gw=args.sn_gw)
     elif args.type == 'scvm':
         ret = scvmGen(pn_nic=args.pn_nic, pn_ip=args.pn_ip, pn_prefix=args.pn_prefix, cn_nic=args.cn_nic, cn_ip=args.cn_ip, cn_prefix=args.cn_prefix, master=args.master)
+    elif args.type == 'gwvm':
+        ret = gwvmGen(sn_nic=args.sn_nic, sn_ip=args.sn_ip, sn_prefix=args.sn_prefix)
     ret = genCloudInit(filename=args.iso_path)
     return ret
 

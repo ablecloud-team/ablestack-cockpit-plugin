@@ -24,36 +24,51 @@ $(".tab-available").keydown(function (e) {
  * History  : 2021.03.16 최초 작성
  * History  : 2021.03.18 wizard ui 공통 함수로 분리
  */
- function setNicBridge(select_box_id){
+ function setNicBridge(select_box_id, excute_host){
     var cmd = ["python3",pluginpath + "/python/nic/network_action.py","list"];
-
-    cockpit.spawn(cmd).then(function(data){
+    
+    if(excute_host == undefined || excute_host == null || excute_host == ""){
+        cockpit.spawn(cmd).then(function(data){
         
-        // 초기화
-        $('#'+select_box_id).empty();
+            setNicSelectBox(select_box_id, data)
+    
+        }).catch(function(){
+            createLoggerInfo("setNicBridge error");
+            alert("setNicBridge error");
+        });
+    }else{
+        cockpit.spawn(cmd,{ host: excute_host}).then(function(data){
+        
+            setNicSelectBox(select_box_id, data)
+    
+        }).catch(function(){
+            createLoggerInfo("setNicBridge error");
+            alert("setNicBridge error");
+        });
+    }
+}
 
-        var el ='';
-        var result = JSON.parse(data);
-        var bridge_list = result.val.bridges;
-        var bridge_others_list = result.val.others;
+function setNicSelectBox(select_box_id, data){
+    // 초기화
+    $('#'+select_box_id).empty();
 
-        el += '<option value="" selected>선택하십시오</option>';
-        for(var i = 0 ; i < bridge_list.length ; i ++ ){
-            el += '<option value="'+bridge_list[i].DEVICE+'">'+bridge_list[i].DEVICE+' ('+bridge_list[i].STATE+')</option>';
-        }
+    var el ='';
+    var result = JSON.parse(data);
+    var bridge_list = result.val.bridges;
+    var bridge_others_list = result.val.others;
 
-        for(var i = 0 ; i < bridge_others_list.length ; i ++ ){
-            el += '<option value="'+bridge_others_list[i].DEVICE+'">'+bridge_others_list[i].DEVICE+' ('+bridge_others_list[i].STATE+')</option>';
-        }
+    el += '<option value="" selected>선택하십시오</option>';
+    for(var i = 0 ; i < bridge_list.length ; i ++ ){
+        el += '<option value="'+bridge_list[i].DEVICE+'">'+bridge_list[i].DEVICE+' ('+bridge_list[i].STATE+')</option>';
+    }
 
-        $('#'+select_box_id).append(el);
+    for(var i = 0 ; i < bridge_others_list.length ; i ++ ){
+        el += '<option value="'+bridge_others_list[i].DEVICE+'">'+bridge_others_list[i].DEVICE+' ('+bridge_others_list[i].STATE+')</option>';
+    }
 
-        createLoggerInfo("setNicBridge success");
+    $('#'+select_box_id).append(el);
 
-    }).catch(function(){
-        createLoggerInfo("setNicBridge error");
-        alert("setNicBridge error");
-    });
+    createLoggerInfo("setNicBridge success");
 }
 
 /**
