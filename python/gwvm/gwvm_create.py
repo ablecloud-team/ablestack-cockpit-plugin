@@ -36,7 +36,7 @@ def createArgumentParser():
     '''
     # 참조: https://docs.python.org/ko/3/library/argparse.html
     # 프로그램 설명
-    parser = argparse.ArgumentParser(description='클러스터 설정 파일 cluster.json의 hosts정보를 편집하는 프로그램',
+    parser = argparse.ArgumentParser(description='gwvm을 생성 하는 프로그램',
                                         epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™',
                                         usage='%(prog)s arguments')
 
