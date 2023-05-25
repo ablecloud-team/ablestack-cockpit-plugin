@@ -14,6 +14,7 @@ import json
 import sh
 import socket
 import requests
+import cryptocode
 
 from ablestack import *
 from sh import ssh
@@ -75,13 +76,15 @@ def glueUrl():
 # token 생성
 def createToken():
     try:
+        encode_pw = 'GS9I0aqoMo/Kom0=*fmZKrV21Ry1j/P3JfgMxmw==*xcRtTz8BG0Jesd/Tsn3WJw==*XuOU3SeZ9MrzywVylTytdA=='
+        decode_pw = cryptocode.decrypt(encode_pw, 'ablestack')
         headers = {
             'Accept': 'application/vnd.ceph.api.v1.0+json',
             'Content-Type': 'application/json',
         }
         json_data = {
             'username': 'ablecloud',
-            'password': 'Ablecloud1!',
+            'password': decode_pw,
         }
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         url = glueUrl()

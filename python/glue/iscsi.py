@@ -14,6 +14,7 @@ import json
 import sh
 import requests
 import socket
+import cryptocode
 
 from ablestack import *
 from sh import ssh
@@ -72,13 +73,15 @@ def glueUrl():
 # token 생성
 def createToken():
     try:
+        encode_pw = 'GS9I0aqoMo/Kom0=*fmZKrV21Ry1j/P3JfgMxmw==*xcRtTz8BG0Jesd/Tsn3WJw==*XuOU3SeZ9MrzywVylTytdA=='
+        decode_pw = cryptocode.decrypt(encode_pw, 'ablestack')
         headers = {
             'Accept': 'application/vnd.ceph.api.v1.0+json',
             'Content-Type': 'application/json',
         }
         json_data = {
             'username': 'ablecloud',
-            'password': 'Ablecloud1!',
+            'password': decode_pw,
         }
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         url = glueUrl()
@@ -264,7 +267,7 @@ def detailTarget(args):
     except Exception as e:
         return createReturn(code=500, val='iscsi.py detailTarget error :'+e)
     
-# iSCSI Target  생성
+# iSCSI Target 생성
 def createTarget(args):
     try:
         token = createToken()
@@ -273,77 +276,80 @@ def createTarget(args):
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/json'
         }
-        # 이미지 생성
-        json_data = {
-            'name': args.name,
-            'pool_name': 'rbd',
-            'size': convert_to_bytes(args.size),
-            'namespace': '',
-            'schedule_interval': '',
-            'obj_size': 4194304,
-            'features': [
-                'deep-flatten', 'layering', 'exclusive-lock', 'object-map', 'fast-diff'
-            ],
-            'stripe_unit': 4194304,
-            'stripe_count': 1,
-            'data_pool': '',
-            'configuration': {}
-        }
+        # 이미지 조회
+        imageInfo = listImage(args)
         url = glueUrl()
-        response = requests.post(url+'/api/block/image', headers=headers, json=json_data, verify=False)
-        if response.status_code == 201 or 202:
-            while True:
-                imageInfo = listImage(args)
-                if imageInfo is not None:
-                    break
-            # target 생성
+        # 이미지 없는 경우 생성
+        if imageInfo is None:
             json_data = {
-                'portals': [
-                    { 
-                        'host' : 'gwvm',
-                        'ip' : socket.gethostbyname('gwvm-mngt')
-                    }
+                'name': args.name,
+                'pool_name': 'rbd',
+                'size': convert_to_bytes(args.size),
+                'namespace': '',
+                'schedule_interval': '',
+                'obj_size': 4194304,
+                'features': [
+                    'deep-flatten', 'layering', 'exclusive-lock', 'object-map', 'fast-diff'
                 ],
-                'disks' :[
-                    {
-                        'pool': 'rbd',
-                        'image': args.name,
-                        'backstore': 'user:rbd',
-                        'controls': {},
-                        'lun': 0
-                    }
-                ],
-                'target_iqn': args.iqn,
-                'target_controls': {},
-                'acl_enabled': False,
-                'clients': [],
-                'groups': [],
-                'auth': {
-                    'user': '',
-                    'password': '',
-                    'mutual_user': '',
-                    'mutual_password': ''
-                }
+                'stripe_unit': 4194304,
+                'stripe_count': 1,
+                'data_pool': '',
+                'configuration': {}
             }
-            response = requests.post(url+'/api/iscsi/target', headers=headers, json=json_data, verify=False)
-            if response.status_code == 201:
-                return createReturn(code=200, val='iscsi service '+args.action+' control success')
-            elif response.status_code == 202:
-                cnt == 0    
-                task = json.loads(taskList()).get('val')
-                task_json = json.loads(task).get('executing_tasks')
-                if len(task_json) > 0:
-                    while True:
-                        for job in task_json:
-                            if 'iscsi/target/create' in job['name']:
-                                cnt = cnt+1
-                        if cnt == 0:
-                            break
-                return createReturn(code=200, val='iscsi service '+args.action+' control success')
+            response = requests.post(url+'/api/block/image', headers=headers, json=json_data, verify=False)
+            if response.status_code == 201 or 202:
+                while True:
+                    imageInfo = listImage(args)
+                    if imageInfo is not None:
+                        break
             else:
-                return createReturn(code=500, val=json.dumps(response.json(), indent=2))    
+                return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+        # target 생성
+        json_data = {
+            'portals': [
+                { 
+                    'host' : 'scvm3',
+                    'ip' : socket.gethostbyname('scvm3-mngt')
+                }
+            ],
+            'disks' :[
+                {
+                    'pool': 'rbd',
+                    'image': args.name,
+                    'backstore': 'user:rbd',
+                    'controls': {},
+                    'lun': 0
+                }
+            ],
+            'target_iqn': args.iqn,
+            'target_controls': {},
+            'acl_enabled': False,
+            'clients': [],
+            'groups': [],
+            'auth': {
+                'user': '',
+                'password': '',
+                'mutual_user': '',
+                'mutual_password': ''
+            }
+        }
+        response = requests.post(url+'/api/iscsi/target', headers=headers, json=json_data, verify=False)
+        if response.status_code == 201:
+            return createReturn(code=200, val='iscsi service '+args.action+' control success')
+        elif response.status_code == 202:
+            cnt == 0    
+            task = json.loads(taskList()).get('val')
+            task_json = json.loads(task).get('executing_tasks')
+            if len(task_json) > 0:
+                while True:
+                    for job in task_json:
+                        if 'iscsi/target/create' in job['name']:
+                            cnt = cnt+1
+                    if cnt == 0:
+                        break
+            return createReturn(code=200, val='iscsi service '+args.action+' control success')
         else:
-            return createReturn(code=500, val=json.dumps(response.json(), indent=2))  
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))      
     except Exception as e:
         return createReturn(code=500, val='iscsi.py createTarget error :'+e)
 
