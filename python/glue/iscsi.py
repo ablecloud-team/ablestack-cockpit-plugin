@@ -454,7 +454,7 @@ def editTarget(args):
             if len(task_json) > 0:
                 while True:
                     for job in task_json:
-                        if 'iscsi/target/edit' in job['name']:
+                        if 'rbd/edit' in job['name']:
                             cnt = cnt+1
                     if cnt == 0:
                         break
