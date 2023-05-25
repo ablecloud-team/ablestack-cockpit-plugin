@@ -308,8 +308,8 @@ def createTarget(args):
         json_data = {
             'portals': [
                 { 
-                    'host' : 'scvm3',
-                    'ip' : socket.gethostbyname('scvm3-mngt')
+                    'host' : 'gwvm',
+                    'ip' : socket.gethostbyname('gwvm-mngt')
                 }
             ],
             'disks' :[
