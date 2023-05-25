@@ -37,7 +37,7 @@ def createArgumentParser():
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
 
     # 선택지 추가(동작 선택)
-    tmp_parser.add_argument('action', choices=['config', 'destroy', 'status', 'create', 'delete', 'edit', 'list', 'detail', 'task'], help='nfs 클러스터 and nfs export action')
+    tmp_parser.add_argument('action', choices=['config', 'destroy', 'status', 'create', 'delete', 'edit', 'list', 'detail'], help='nfs 클러스터 and nfs export action')
     tmp_parser.add_argument('--id', metavar='export id', type=int, help='nfs export ID')
     tmp_parser.add_argument('--access-type', metavar='access type', type=str, default='RW', help='nfs 옵션 RW, RO, NONE')
     tmp_parser.add_argument('--squash',metavar='squash', type=str, default='no_root_squash', help='nfs 옵션 no_root_squash, root_id_squash, root_squash, all_squash')
@@ -107,7 +107,7 @@ def convert_to_bytes(size):
     return int(num * prefix[letter]) 
 
 # task 조회
-def taskList(args):
+def taskList():
     try:
         token = createToken()
         headers = {
@@ -115,12 +115,9 @@ def taskList(args):
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/json'
         }
-        params = {
-            #'name': args.name,
-        }
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         url = glueUrl()
-        response = requests.get(url+'/api/task', headers=headers, params=params, verify=False)
+        response = requests.get(url+'/api/task', headers=headers, verify=False)
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
         else:
@@ -150,7 +147,19 @@ def configNfsCluster(args):
         }
         url = glueUrl()
         response = requests.post(url+'/api/service', headers=headers, json=json_data, verify=False)
-        if response.status_code == 201 or 202:
+        if response.status_code == 201:
+            return createReturn(code=200, val='nfs service '+args.action+' control success')
+        elif response.status_code == 202:
+            cnt == 0    
+            task = json.loads(taskList()).get('val')
+            task_json = json.loads(task).get('executing_tasks')
+            if len(task_json) > 0:
+                while True:
+                    for job in task_json:
+                        if 'service/create' in job['name']:
+                            cnt = cnt+1
+                    if cnt == 0:
+                        break
             return createReturn(code=200, val='nfs service '+args.action+' control success')
         else:
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
@@ -182,7 +191,19 @@ def destroyNfsCluster(args):
                 }
                 url = glueUrl()
                 response = requests.delete(url+'/api/service/service_name', headers=headers, params=params, verify=False)
-                if response.status_code == 202 or 204:
+                if response.status_code == 204:
+                    return createReturn(code=200, val='nfs service '+args.action+' control success')
+                elif response.status_code == 202:
+                    cnt == 0    
+                    task = json.loads(taskList()).get('val')
+                    task_json = json.loads(task).get('executing_tasks')
+                    if len(task_json) > 0:
+                        while True:
+                            for job in task_json:
+                                if 'service/delete' in job['name']:
+                                    cnt = cnt+1
+                            if cnt == 0:
+                                break
                     return createReturn(code=200, val='nfs service '+args.action+' control success')
                 else:
                     return createReturn(code=500, val=json.dumps(response.json(), indent=2))
@@ -206,8 +227,6 @@ def statusNfsCluster(args):
         url = glueUrl()
         response = requests.get(url+'/api/service', headers=headers, params=params, verify=False)
         if response.status_code == 200:
-            task = json.loads(taskList(args)).get('val')
-            task_json = json.loads(task).get('executing_tasks')
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
         else:
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
@@ -241,7 +260,22 @@ def createNfsExport(args):
         }
         url = glueUrl()
         response = requests.post(url+'/api/nfs-ganesha/export', headers=headers, json=json_data, verify=False)
-        if response.status_code == 201 or 202:
+        if response.status_code == 201:
+            if args.quota is not None:
+                #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
+                fs = sh.python3(pluginpath + '/python/ceph/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
+            return createReturn(code=200, val='nfs service '+args.action+' control success')
+        elif response.status_code == 202:
+            cnt == 0    
+            task = json.loads(taskList()).get('val')
+            task_json = json.loads(task).get('executing_tasks')
+            if len(task_json) > 0:
+                while True:
+                    for job in task_json:
+                        if 'nfs/create' in job['name']:
+                            cnt = cnt+1
+                    if cnt == 0:
+                        break
             if args.quota is not None:
                 #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
                 fs = sh.python3(pluginpath + '/python/ceph/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
@@ -271,7 +305,19 @@ def deleteNfsExport(args):
         }
         url = glueUrl()
         response = requests.delete(url+'/api/nfs-ganesha/export/cluster_id/export_id', headers=headers, params=params, verify=False)
-        if response.status_code == 202 or 204:
+        if response.status_code == 204:
+            return createReturn(code=200, val='nfs service '+args.action+' control success')
+        elif response.status_code == 202:
+            cnt == 0    
+            task = json.loads(taskList()).get('val')
+            task_json = json.loads(task).get('executing_tasks')
+            if len(task_json) > 0:
+                while True:
+                    for job in task_json:
+                        if 'nfs/delete' in job['name']:
+                            cnt = cnt+1
+                    if cnt == 0:
+                        break
             return createReturn(code=200, val='nfs service '+args.action+' control success')
         else:
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
@@ -314,7 +360,22 @@ def editNfsExport(args):
         }
         url = glueUrl()
         response = requests.put(url+'/api/nfs-ganesha/export/cluster_id/export_id', headers=headers, params=params, json=json_data, verify=False)
-        if response.status_code == 200 or 202:
+        if response.status_code == 200:
+            if args.quota is not None:
+                #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
+                fs = sh.python3(pluginpath + '/python/ceph/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
+            return createReturn(code=200, val='nfs service '+args.action+' control success')
+        elif response.status_code == 202:
+            cnt == 0    
+            task = json.loads(taskList()).get('val')
+            task_json = json.loads(task).get('executing_tasks')
+            if len(task_json) > 0:
+                while True:
+                    for job in task_json:
+                        if 'nfs/edit' in job['name']:
+                            cnt = cnt+1
+                    if cnt == 0:
+                        break
             if args.quota is not None:
                 #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
                 fs = sh.python3(pluginpath + '/python/ceph/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
@@ -400,5 +461,3 @@ if __name__ == '__main__':
         print(listNfsExport(args))
     elif (args.action) == 'detail':
         print(detailNfsExport(args))
-    elif (args.action) == 'task':
-        print(taskList(args))

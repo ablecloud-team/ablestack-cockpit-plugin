@@ -106,6 +106,25 @@ def convert_to_bytes(size):
         prefix[size] = 1 << (i+1)*10
     return int(num * prefix[letter]) 
 
+# task 조회
+def taskList():
+    try:
+        token = createToken()
+        headers = {
+            'Accept': 'application/vnd.ceph.api.v1.0+json',
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        url = glueUrl()
+        response = requests.get(url+'/api/task', headers=headers, verify=False)
+        if response.status_code == 200:
+            return createReturn(code=200, val=json.dumps(response.json(), indent=2))
+        else:
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+    except Exception as e:
+        return createReturn(code=500, val='iscsi.py taskList error :'+e)
+
 # iSCSI 게이트웨이 생성     
 def configIscsi(args):
     try:
@@ -133,10 +152,20 @@ def configIscsi(args):
         }
         url = glueUrl()
         response = requests.post(url+'/api/service', headers=headers, json=json_data, verify=False)
-        if response.status_code == 201 or 202:
+        if response.status_code == 201:
             return createReturn(code=200, val='iscsi service '+args.action+' control success')
-        else:
-            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+        elif response.status_code == 202:
+            cnt == 0    
+            task = json.loads(taskList()).get('val')
+            task_json = json.loads(task).get('executing_tasks')
+            if len(task_json) > 0:
+                while True:
+                    for job in task_json:
+                        if 'service/create' in job['name']:
+                            cnt = cnt+1
+                    if cnt == 0:
+                        break
+            return createReturn(code=200, val='iscsi service '+args.action+' control success')
     except Exception as e:
         return createReturn(code=500, val='iscsi.py configIscsi error :'+e)
 
@@ -154,7 +183,19 @@ def destroyIscsi(args):
         }
         url = glueUrl()
         response = requests.delete(url+'/api/service/service_name', headers=headers, params=params, verify=False)
-        if response.status_code == 202 or 204:
+        if response.status_code == 204:
+            return createReturn(code=200, val='iscsi service '+args.action+' control success')
+        elif response.status_code == 202:
+            cnt == 0    
+            task = json.loads(taskList()).get('val')
+            task_json = json.loads(task).get('executing_tasks')
+            if len(task_json) > 0:
+                while True:
+                    for job in task_json:
+                        if 'service/delete' in job['name']:
+                            cnt = cnt+1
+                    if cnt == 0:
+                        break
             return createReturn(code=200, val='iscsi service '+args.action+' control success')
         else:
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
@@ -285,7 +326,19 @@ def createTarget(args):
                 }
             }
             response = requests.post(url+'/api/iscsi/target', headers=headers, json=json_data, verify=False)
-            if response.status_code == 201 or 202:
+            if response.status_code == 201:
+                return createReturn(code=200, val='iscsi service '+args.action+' control success')
+            elif response.status_code == 202:
+                cnt == 0    
+                task = json.loads(taskList()).get('val')
+                task_json = json.loads(task).get('executing_tasks')
+                if len(task_json) > 0:
+                    while True:
+                        for job in task_json:
+                            if 'iscsi/target/create' in job['name']:
+                                cnt = cnt+1
+                        if cnt == 0:
+                            break
                 return createReturn(code=200, val='iscsi service '+args.action+' control success')
             else:
                 return createReturn(code=500, val=json.dumps(response.json(), indent=2))    
@@ -308,18 +361,62 @@ def deleteTarget(args):
         }
         url = glueUrl()
         response = requests.delete(url+'/api/iscsi/target/target_iqn', headers=headers, params=params, verify=False)
-        if response.status_code == 202 or 204:
+        if response.status_code == 204:
             if args.name is not None:
                 params = {
                     'image_spec': 'rbd/'+args.name
                 }
                 response = requests.delete(url+'/api/block/image/image_spec', headers=headers, params=params, verify=False)
-                if response.status_code == 202 or 204:
+                if response.status_code == 204:
+                    return createReturn(code=200, val='iscsi service '+args.action+' control success')
+                elif response.status_code == 202:
+                    cnt == 0    
+                    task = json.loads(taskList()).get('val')
+                    task_json = json.loads(task).get('executing_tasks')
+                    if len(task_json) > 0:
+                        while True:
+                            for job in task_json:
+                                if 'rbd/delete' in job['name']:
+                                    cnt = cnt+1
+                            if cnt == 0:
+                                break
                     return createReturn(code=200, val='iscsi service '+args.action+' control success')
                 else:
-                    createReturn(code=500, val=json.dumps(response.json(), indent=2))
+                    return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+        elif response.status_code == 202:
+            cnt == 0    
+            task = json.loads(taskList()).get('val')
+            task_json = json.loads(task).get('executing_tasks')
+            if len(task_json) > 0:
+                while True:
+                    for job in task_json:
+                        if 'iscsi/target/delete' in job['name']:
+                            cnt = cnt+1
+                    if cnt == 0:
+                        break
+            if args.name is not None:
+                params = {
+                    'image_spec': 'rbd/'+args.name
+                }
+                response = requests.delete(url+'/api/block/image/image_spec', headers=headers, params=params, verify=False)
+                if response.status_code == 204:
+                    return createReturn(code=200, val='iscsi service '+args.action+' control success')
+                elif response.status_code == 202:
+                    cnt == 0    
+                    task = json.loads(taskList()).get('val')
+                    task_json = json.loads(task).get('executing_tasks')
+                    if len(task_json) > 0:
+                        while True:
+                            for job in task_json:
+                                if 'rbd/delete' in job['name']:
+                                    cnt = cnt+1
+                            if cnt == 0:
+                                break
+                    return createReturn(code=200, val='iscsi service '+args.action+' control success')
+                else:
+                    return createReturn(code=500, val=json.dumps(response.json(), indent=2))
         else:
-            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))    
     except Exception as e:
         return createReturn(code=500, val='iscsi.py deleteTarget error :'+e)
 
@@ -348,10 +445,22 @@ def editTarget(args):
         }
         url = glueUrl()
         response = requests.put(url+'/api/block/image/image_spec', headers=headers, params=params, json=json_data, verify=False)
-        if response.status_code == 200 or 202:
+        if response.status_code == 200:
+            return createReturn(code=200, val='iscsi service '+args.action+' control success')
+        elif response.status_code == 202:
+            cnt == 0    
+            task = json.loads(taskList()).get('val')
+            task_json = json.loads(task).get('executing_tasks')
+            if len(task_json) > 0:
+                while True:
+                    for job in task_json:
+                        if 'iscsi/target/edit' in job['name']:
+                            cnt = cnt+1
+                    if cnt == 0:
+                        break
             return createReturn(code=200, val='iscsi service '+args.action+' control success')
         else:
-            return createReturn(code=500, val=json.dumps(response.json(), indent=2))    
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))        
     except Exception as e:
         return createReturn(code=500, val='iscsi.py editTarget error :'+e)
 
