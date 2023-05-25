@@ -369,7 +369,6 @@ def detailNfsExport(args):
     except Exception as e:
         return createReturn(code=500, val='nfs.py detailNfsExport error :'+e)
 
-
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # parser 생성
@@ -403,5 +402,3 @@ if __name__ == '__main__':
         print(detailNfsExport(args))
     elif (args.action) == 'task':
         print(taskList(args))
-
-

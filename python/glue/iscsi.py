@@ -183,7 +183,6 @@ def statusIscsi(args):
     except Exception as e:
         return createReturn(code=500, val='iscsi.py statusNfsCluster error :'+e)
 
-
 # iSCSI Target 목록 조회
 def listTarget(args):
     try:        
@@ -388,7 +387,6 @@ def listImage(args):
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
     except Exception as e:
         return createReturn(code=500, val='iscsi.py listImage error :'+e)
-
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
