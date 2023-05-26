@@ -1,19 +1,46 @@
 {
     "clusterConfig": {
         "ccvm": {
-            "ip": ""
+            "ip": "10.10.2.10"
         },
         "mngtNic": {
-            "cidr": "",
-            "gw": "",
-            "dns": ""
+            "cidr": "16",
+            "gw": "10.10.0.1",
+            "dns": "8.8.8.8"
         },
         "pcsCluster": {
-            "hostname1": "",
-            "hostname2": "",
-            "hostname3": ""
+            "hostname1": "100.100.2.1",
+            "hostname2": "100.100.2.2",
+            "hostname3": "100.100.2.3"
         },
         "hosts": [
+            {
+                "index": "1",
+                "hostname": "ablecube21",
+                "ablecube": "10.10.2.1",
+                "scvmMngt": "10.10.2.11",
+                "ablecubePn": "100.100.2.1",
+                "scvm": "100.100.2.11",
+                "scvmCn": "100.200.2.11"
+            },
+            {
+                "index": "2",
+                "hostname": "ablecube22",
+                "ablecube": "10.10.2.2",
+                "scvmMngt": "10.10.2.12",
+                "ablecubePn": "100.100.2.2",
+                "scvm": "100.100.2.12",
+                "scvmCn": "100.200.2.12"
+            },
+            {
+                "index": "3",
+                "hostname": "ablecube23",
+                "ablecube": "10.10.2.3",
+                "scvmMngt": "10.10.2.13",
+                "ablecubePn": "100.100.2.3",
+                "scvm": "100.100.2.13",
+                "scvmCn": "100.200.2.13"
+            }
         ]
     }
 }

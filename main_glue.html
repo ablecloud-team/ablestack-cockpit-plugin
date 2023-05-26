@@ -1,0 +1,546 @@
+<div class="pf-c-page" id="main-page-glue-ablestack">
+    <main class="pf-c-page__main" tabindex="-1" id="main-content-card-glue-view">
+        <!-- ui 영역 시작 -->
+        <!-- ABLESTACK  Glue 상태 요약 및 바로가기 ALERT Ribbon 영역 시작 -->
+        <section class="pf-c-page__main-section pf-m-no-padding">
+            <div class="pf-c-alert pf-m-warning" aria-label="Warning alert" id="glue-ribbon">
+                <div class="pf-c-alert__icon">
+                    <i class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                </div>
+                <p class="pf-c-alert__title">
+                    <strong>
+                    <span class="pf-screen-reader" id="main-ribbon">Warning alert:</span>ABLESTACK Glue 스토리지 서비스 상태</strong>
+                </p>
+                <div class="pf-c-alert__description" id="main-glue-ribbon-description">
+                    <p>ABLESTACK Glue 서비스 상태를 확인 중입니다.</p>
+                </div>
+                <div class="pf-c-alert__action-group">
+                    <!-- <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-open-modal-wizard-gateway-vm">게이트웨이 가상머신 배포</button> -->
+                    <button class="pf-c-button pf-m-link pf-m-inline" type="button" id="button-gateway-vm-setup">스토리지 서비스 구성</button>
+                    
+                </div>
+            </div>
+        </section>
+        <!-- ABLESTACK Glue 상태 요약 및 바로가기 ALERT Ribbon 영역 끝 -->
+        <!-- 상태를 보여주기 위한 레이아웃 시작 -->
+        <section class="pf-c-page__main-section">
+            <div class="pf-l-grid pf-m-gutter">
+                <div class="pf-l-grid__item pf-m-12-col">
+                    <div class="pf-l-grid pf-m-gutter">
+                        <!-- 파일 시스템 카드 영역 시작-->
+                        <div class="pf-l-grid__item pf-m-12-col">
+                            <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-storage-cluster-status">
+                                <div class="pf-c-card__header">
+                                    <div class="pf-c-card__header-main">
+                                        <i class="pf-icon pf-icon-registry" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="pf-c-card__title" id="card-storage-cluster-status-title">파일 시스템</div>
+                                    <div class="pf-c-card__actions">
+                                        <div class="pf-c-dropdown">
+                                            <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-status" aria-expanded="false" type="button" aria-label="Actions">
+                                                <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+                                            </button>
+                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status">
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >GlueFS 구성</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >GlueFS 삭제</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >NFS 구성</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >NFS 삭제</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >SMB 구성</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >SMB 삭제</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >파일 시스템 제어</button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pf-c-divider" role="separator"></div>
+                                <div class="pf-c-card__body">
+                                    <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
+                                        <table class="pf-c-table pf-m-compact pf-m-grid-lg" role="grid" aria-label="This is a compact table example" id="compact-demo-table">
+                                            <thead>
+                                                <tr role="row">
+                                                    <th role="columnheader" scope="col">서비스</th>
+                                                    <th role="columnheader" scope="col">상태</th>
+                                                    <th role="columnheader" scope="col">FS 경로</th>
+                                                    <th role="columnheader" scope="col">마운트 경로</th>
+                                                    <th role="columnheader" scope="col">접근 IP</th>
+                                                    <th role="columnheader" scope="col">사용량</th>
+                                                    <th class="pf-c-table__icon" role="columnheader" scope="col">편집</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody role="rowgroup">
+                                                <tr role="row">
+                                                    <td role="cell" data-label="서비스">GlueFS</td>
+                                                    <td role="cell" data-label="상태">
+                                                        <span class="pf-c-label pf-m-green">
+                                                            <span class="pf-c-label__content">
+                                                                <span class="pf-c-label__icon" >
+                                                                    <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
+                                                                </span><div>Health Ok</div>
+                                                            </span>
+                                                        </span>
+                                                    </td>
+                                                    <td role="cell" data-label="FS 경로">/fs/gluefs</td>
+                                                    <td role="cell" data-label="마운트 경로">/gluefs</td>
+                                                    <td role="cell" data-label="접근 IP">-</td>
+                                                    <td role="cell" data-label="사용량">1Tb</td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
+                                                </tr>
+                                                <tr role="row">
+                                                    <td role="cell" data-label="서비스">NFS</td>
+                                                    <td role="cell" data-label="상태">
+                                                        <span class="pf-c-label pf-m-red">
+                                                            <span class="pf-c-label__content">
+                                                                <span class="pf-c-label__icon" >
+                                                                    <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
+                                                                </span><div>Health Err</div>
+                                                            </span>
+                                                        </span>
+                                                    </td>
+                                                    <td role="cell" data-label="FS 경로">/fs/nfs</td>
+                                                    <td role="cell" data-label="마운트 경로">/nfs</td>
+                                                    <td role="cell" data-label="접근 IP">10.10.2.18</td>
+                                                    <td role="cell" data-label="사용량">10Gb</td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
+                                                </tr>
+                                                <tr role="row">
+                                                    <td role="cell" data-label="서비스">SMB</td>
+                                                    <td role="cell" data-label="상태">
+                                                        <span class="pf-c-label pf-m-orange">
+                                                            <span class="pf-c-label__content">
+                                                                <span class="pf-c-label__icon" >
+                                                                    <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
+                                                                </span><div>Health Warn</div>
+                                                            </span>
+                                                        </span>
+                                                    </td>
+                                                    <td role="cell" data-label="FS 경로">/fs/smb</td>
+                                                    <td role="cell" data-label="마운트 경로">/smb</td>
+                                                    <td role="cell" data-label="접근 IP">10.10.2.18</td>
+                                                    <td role="cell" data-label="사용량">50Gb</td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </dl>
+                                </div>
+                                <!-- <div class="pf-c-divider" role="separator"></div>
+                                <div class="pf-c-card__footer" style="color: var(--pf-global--danger-color--100);" id="scc-status-check">스토리지센터 클러스터가 구성되지 않았습니다.</div> -->
+                            </div>
+                        </div>
+                        <!-- 파일 시스템 카드 영역 끝-->
+                    </div>
+                </div>
+                <div class="pf-l-grid__item pf-m-12-col">
+                    <div class="pf-l-grid pf-m-gutter">
+                        <!-- 파일 시스템 카드 영역 시작-->
+                        <div class="pf-l-grid__item pf-m-12-col">
+                            <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-storage-cluster-status">
+                                <div class="pf-c-card__header">
+                                    <div class="pf-c-card__header-main">
+                                        <i class="pf-icon pf-icon-registry" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="pf-c-card__title" id="card-storage-cluster-status-title">iSCSI</div>
+                                    <div class="pf-c-card__actions">
+                                        <div class="pf-c-dropdown">
+                                            <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-status" aria-expanded="false" type="button" aria-label="Actions">
+                                                <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+                                            </button>
+                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status">
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >iSCSI 구성</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >iSCSI 삭제</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >서비스 제어</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >타겟 생성</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >ACL 설정 연결</button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pf-c-divider" role="separator"></div>
+                                <div class="pf-c-card__body">
+                                    <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
+                                        <table class="pf-c-table pf-m-compact pf-m-grid-lg" role="grid" aria-label="This is a compact table example" id="compact-demo-table">
+                                            <thead>
+                                                <tr role="row">
+                                                    <th role="columnheader" scope="col" class="pf-m-width-20">대상</th>
+                                                    <th role="columnheader" scope="col">포털</th>
+                                                    <th role="columnheader" scope="col">이미지</th>
+                                                    <th role="columnheader" scope="col">크기</th>
+                                                    <th class="pf-c-table__icon" role="columnheader" scope="col">삭제</th>
+                                                    <th class="pf-c-table__icon" role="columnheader" scope="col">편집</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody role="rowgroup">
+                                                <tr role="row">
+                                                    <td role="cell" data-label="대상">iqn.2023.05-com.ceph:01312</td>
+                                                    <td role="cell" data-label="포털">10.10.2.14</td>
+                                                    <td role="cell" data-label="이미지">rbd/iscsi-test1</td>
+                                                    <td role="cell" data-label="크기">10GiB</td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="삭제"><i class="fas fa-trash"></i></td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
+                                                </tr>
+                                                <tr role="row">
+                                                    <td role="cell" data-label="대상">iqn.2023.05-com.ceph:01211</td>
+                                                    <td role="cell" data-label="포털">10.10.2.14</td>
+                                                    <td role="cell" data-label="이미지">rbd/iscsi-test1</td>
+                                                    <td role="cell" data-label="크기">50GiB</td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="삭제"><i class="fas fa-trash"></i></td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 파일 시스템 카드 영역 끝-->
+                    </div>
+                </div>
+                <div class="pf-l-grid__item pf-m-12-col">
+                    <div class="pf-l-grid pf-m-gutter">
+                        <!-- 파일 시스템 카드 영역 시작-->
+                        <div class="pf-l-grid__item pf-m-12-col">
+                            <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-storage-cluster-status">
+                                <div class="pf-c-card__header">
+                                    <div class="pf-c-card__header-main">
+                                        <i class="pf-icon pf-icon-registry" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="pf-c-card__title" id="card-storage-cluster-status-title">게이트웨이 가상머신</div>
+                                    <div class="pf-c-card__actions">
+                                        <div class="pf-c-dropdown">
+                                            <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-status" aria-expanded="false" type="button" aria-label="Actions">
+                                                <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+                                            </button>
+                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status" hidden>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >게이트웨이 VM 구성</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >게이트웨이 VM 삭제</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >게이트웨이 VM 시작</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >게이트웨이 VM 정지</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >게이트웨이 VM 클린업</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >마이그레이션</button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pf-c-divider" role="separator"></div>
+                                <div class="pf-c-card__body">
+                                    <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
+                                        <table class="pf-c-table pf-m-compact pf-m-grid-lg" role="grid" aria-label="This is a compact table example" id="compact-demo-table">
+                                            <thead>
+                                                <tr role="row">
+                                                    <th role="columnheader" scope="col" class="pf-m-width-10">가상머신 상태</th>
+                                                    <th role="columnheader" scope="col" class="pf-m-width-10">CPU/Mem</th>
+                                                    <th role="columnheader" scope="col" class="pf-m-width-10">관리 IP/PREFIX</th>
+                                                    <th role="columnheader" scope="col" class="pf-m-width-10">GW</th>
+                                                    <th role="columnheader" scope="col" class="pf-m-width-10">VM실행노드</th>
+                                                    <th role="columnheader" scope="col" class="pf-m-width-10">Root Disk 크기</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody role="rowgroup">
+                                                <tr role="row">
+                                                    <td role="cell" data-label="가상머신 상태">
+                                                        <span class="pf-c-label pf-m-red" id="gwvm-back-color">
+                                                            <span class="pf-c-label__content" id="span-cloud-vm-status-content">
+                                                                <span class="pf-c-label__icon">
+                                                                    <i id="gwvm-cluster-icon" class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
+                                                                </span><div id="gwvm-status">Health Err</div>
+                                                            </span>
+                                                        </span>
+                                                    </td>
+                                                    <td role="cell" data-label="CPU/Mem" id="td_gwvm_cpu_mem">N/A</td>
+                                                    <td role="cell" data-label="관리 IP/PREFIX" id="td_gwvm_ip_prefix">N/A</td>
+                                                    <td role="cell" data-label="GW" id="td_gwvm_gw">N/A</td>
+                                                    <td role="cell" data-label="VM실행노드" id="td_gwvm_started_host">N/A</td>
+                                                    <td role="cell" data-label="Root Disk 크기" id="td_gwvm_root_disk">N/A</td>
+                                                    <!-- <td role="cell" data-label="VM실행노드" id="td_gwvm_ip">10.10.2.14</td>
+                                                    <td role="cell" data-label="CPU/Mem" id="td_gwvm_ip">4 Core / 8 GiB</td>
+                                                    <td role="cell" data-label="관리 IP/PREFIX" id="td_gwvm_ip">10.10.2.18/16</td>
+                                                    <td role="cell" data-label="GW" id="td_gwvm_ip">10.10.0.1</td>
+                                                    <td role="cell" data-label="Root Disk 크기" id="td_gwvm_ip">61GiB(사용가능 6.7GiB/사용률 89%)</td> -->
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 파일 시스템 카드 영역 끝-->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+<!-- ui 영역 끝  -->
+
+<!-- 모달 영역 시작  -->
+<!-- 게이트웨이 가상머신 배포 마법사: Modal 영역 시작 -->
+<div id="div-modal-gateway-vm-setup" class="pf-c-backdrop" style="display:none;">
+    <div class="pf-l-bullseye">
+        <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Mold Service Control" style="width: 1000px;">
+            <button id="button-close-modal-gateway-vm-create" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">스토리지 서비스 구성</span></h1></header>
+            <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:10px">
+                <section class="pf-c-form__section">
+                    <!-- <div class="pf-c-modal-box__body">
+                        <div>스토리지 서비스 선택</div>
+                        <div id="div-modal-gateway-control" style="color: var(--pf-global--danger-color--100);"></div>
+                        <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                            <div class="pf-c-radio">
+                                <input class="pf-c-radio__input" type="checkbox" id="input-checkbox-nfs" name="input-checkbox-nfs" value="existing"/>
+                                <label class="pf-c-radio__label" for="input-checkbox-nfs">NFS</label>
+                            </div>
+                        </div>
+                        <div class="pf-c-form__group-label" id="dev-nfs-info" style="margin-left: 10px;display:none;">
+                            <label class="pf-c-form__label" for="form-input-gateway-vm-mngt-nic-ip" style="margin-left: 10px;width: 110px;">
+                                <span class="pf-c-form__label-text">엑세스 유형</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <select class="pf-c-form-control" id="form-select-gateway-control" name="form-select-gateway-control" style="width: 170px;">
+                                <option value="" selected>RW</option>
+                                <option value="" >RO</option>
+                                <option value="" >NONE</option>
+                            </select>
+                            <label class="pf-c-form__label" for="form-input-gateway-vm-mngt-nic-ip" style="margin-left: 10px;width: 110px;">
+                                <span class="pf-c-form__label-text">squash</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <select class="pf-c-form-control" id="form-select-gateway-control" name="form-select-gateway-control" style="width: 170px;">
+                                <option value="" selected>no_root_squash</option>
+                                <option value="" >root_id_squash</option>
+                                <option value="" >root_squash</option>
+                                <option value="" >all_squash</option>
+                            </select>
+                            <label class="pf-c-form__label" for="form-input-gateway-vm-mngt-nic-ip" style="margin-left: 10px;width: 110px;">
+                                <span class="pf-c-form__label-text">최대 용량</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <input class="pf-c-form-control" style="width: 170px;" type="text" id="form-input-gateway-vm-mngt-nic-ip" name="form-input-gateway-vm-mngt-nic-ip" placeholder=""/>
+                        </div>
+                        <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                            <div class="pf-c-radio">
+                                <input class="pf-c-radio__input" type="checkbox" id="input-checkbox-smb" value="existing"/>
+                                <label class="pf-c-radio__label" for="input-checkbox-smb">SMB</label>
+                            </div>
+                        </div>
+                        <div class="pf-c-form__group-label" id="dev-smb-info" style="margin-left: 10px;display:none;">
+                            <label class="pf-c-form__label" for="form-input-gateway-vm-mngt-nic-ip" style="margin-left: 10px;width: 110px;">
+                                <span class="pf-c-form__label-text">사용자 이름</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <input class="pf-c-form-control" style="width: 170px;" type="text" id="form-input-gateway-vm-mngt-nic-ip" name="form-input-gateway-vm-mngt-nic-ip" placeholder=""/>
+                            <label class="pf-c-form__label" for="form-input-gateway-vm-mngt-nic-ip" style="margin-left: 10px;width: 110px;">
+                                <span class="pf-c-form__label-text">사용자 비밀번호</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <input class="pf-c-form-control" style="width: 170px;" type="text" id="form-input-gateway-vm-mngt-nic-ip" name="form-input-gateway-vm-mngt-nic-ip" placeholder=""/>
+                            <label class="pf-c-form__label" for="form-input-gateway-vm-mngt-nic-ip" style="margin-left: 10px;width: 110px;">
+                                <span class="pf-c-form__label-text">최대 용량</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <input class="pf-c-form-control" style="width: 170px;" type="text" id="form-input-gateway-vm-mngt-nic-ip" name="form-input-gateway-vm-mngt-nic-ip" placeholder=""/>
+                        </div>
+                        <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                            <div class="pf-c-radio">
+                                <input class="pf-c-radio__input" type="checkbox" id="input-checkbox-gluefs" value="existing"/>
+                                <label class="pf-c-radio__label" for="input-checkbox-gluefs">GlueFS</label>
+                            </div>
+                        </div>
+                        <div class="pf-c-form__group-label" id="dev-gluefs-info" style="margin-left: 10px;display:none;">
+                            <label class="pf-c-form__label" for="form-input-gateway-vm-mngt-nic-ip" style="margin-left: 10px;width: 110px;">
+                                <span class="pf-c-form__label-text">마운트 경로</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <input class="pf-c-form-control" style="width: 170px;" type="text" id="form-input-gateway-vm-mngt-nic-ip" name="form-input-gateway-vm-mngt-nic-ip" placeholder=""/>
+                            <label class="pf-c-form__label" for="form-input-gateway-vm-mngt-nic-ip" style="margin-left: 10px;width: 110px;">
+                                <span class="pf-c-form__label-text">최대 용량</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <input class="pf-c-form-control" style="width: 170px;" type="text" id="form-input-gateway-vm-mngt-nic-ip" name="form-input-gateway-vm-mngt-nic-ip" placeholder=""/>
+                        </div>
+                        <div class="pf-c-form__group-control pf-m-inline" style="margin-top:10px">
+                            <div class="pf-c-radio">
+                                <input class="pf-c-radio__input" type="checkbox" id="input-checkbox-iscsi" value="existing"/>
+                                <label class="pf-c-radio__label" for="input-checkbox-iscsi">iSCSI</label>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="pf-c-modal-box__body">
+                        <div>하이퍼바이저 및 HA 방식 선택</div>
+                        <div class="pf-c-form__group-label" style="margin-left: 20px;">
+                            <label class="pf-c-form__label" for="form-select-gateway-hypervisor" style="width: 120px;">
+                                <span class="pf-c-form__label-text">하이퍼바이저</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <div class="pf-c-dropdown">
+                                <select class="pf-c-form-control" id="form-select-gateway-hypervisor" name="form-select-gateway-hypervisor" style="width: 180px;">
+                                    <option value="cell" selected>Cell - PCS</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pf-c-modal-box__body">
+                        <div>네트워크 구성</div>
+                        <div class="pf-c-form__group-label" style="margin-left: 20px;">
+                            <label class="pf-c-form__label" for="form-select-gateway-vm-mngt-nic-parent" style="width: 120px;">
+                                <span class="pf-c-form__label-text">관리 NIC</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <select class="pf-c-form-control" id="form-select-gateway-vm-mngt-nic-parent" name="form-select-gateway-vm-mngt-nic-parent" style="width: 180px;">
+                                <option value="" selected>선택해주세요.</option>
+                            </select>
+                            
+                            <label class="pf-c-form__label" for="form-input-gateway-vm-mngt-nic-ip" style="margin-left: 10px;width: 120px;">
+                                <span class="pf-c-form__label-text">관리 NIC IP</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <input class="pf-c-form-control" style="width: 200px;" type="text" id="form-input-gateway-vm-mngt-nic-ip" name="form-input-gateway-vm-mngt-nic-ip" placeholder="xxx.xxx.xxx.xxx 형식"/>
+                        </div>
+                        <div class="pf-c-form__group-label" style="margin-left: 20px;">
+                            <label class="pf-c-form__label" for="form-select-gateway-vm-storage-nic-parent" style="width: 120px;">
+                                <span class="pf-c-form__label-text">스토리지 NIC</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <select class="pf-c-form-control" id="form-select-gateway-vm-storage-nic-parent" name="form-select-gateway-vm-storage-nic-parent" style="width: 180px;">
+                                <option value="" selected>선택해주세요.</option>
+                            </select>
+                            <label class="pf-c-form__label" for="form-input-gateway-vm-storage-nic-ip" style="margin-left: 10px;width: 120px;">
+                                <span class="pf-c-form__label-text">스토리지 NIC IP</span>
+                                <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                            <input class="pf-c-form-control" style="width: 200px;" type="text" id="form-input-gateway-vm-storage-nic-ip" name="form-input-gateway-vm-storage-nic-ip" placeholder="xxx.xxx.xxx.xxx 형식"/>
+                        </div>
+                    </div>
+                </section>
+            </form>
+            <footer class="pf-c-modal-box__footer">
+                <button id="button-execution-modal-gateway-vm-create" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                <button id="button-cancel-modal-gateway-vm-create" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
+            </footer>
+        </div>
+    </div>
+</div>
+<!-- 게이트웨이 가상머신 배포 마법사: Modal 영역 끝 -->
+
+<!-- 게이트웨이 가상머신 배포 마법사 진행: Modal 영역 시작 -->
+<div id="div-modal-gateway-wizard-confirm" class="pf-c-backdrop" style="display:none" >
+    <div class="pf-l-bullseye">
+        <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="storage wizard confirm">
+            <button id="button-close-modal-gateway-wizard-confirm" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">스토리지 서비스 구성 진행</span></h1></header>
+            <div class="pf-c-modal-box__body">
+                <div>스토리지 서비스 구성을 진행하시겠습니까?</div>
+            </div>
+            <footer class="pf-c-modal-box__footer">
+                <button id="button-execution-modal-gateway-wizard-confirm" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                <button id="button-cancel-modal-gateway-wizard-confirm" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">아니요</button>
+            </footer>
+        </div>
+    </div>
+</div>
+<!-- 게이트웨이 가상머신 배포 마법사 진행: Modal 영역 끝 -->
+
+<!-- 실행중 : Modal 영역 시작 -->
+<div id="div-modal-spinner" class="pf-c-backdrop" style="display:none">
+    <div class="pf-l-bullseye">
+        <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Cloud VM migration">
+            <div class="pf-c-modal-box__header">
+                <h1 class="pf-c-modal-box__title">
+                    <span class="pf-c-modal-box__title-text">
+                        <div id="div-modal-spinner-header-txt"></div>
+                    </span>
+                </h1>
+            </div>
+            <div class="pf-c-modal-box__body">
+                <div id="div-modal-spinner-body-txt"></div>
+            </div>
+            <div>
+                <div class="ws-core-c-spinner ws-preview">
+                    <div align="center">
+                        <span class="pf-c-spinner" role="progressbar" aria-valuetext="Loading...">
+                            <span class="pf-c-spinner__clipper"></span> 
+                            <span class="pf-c-spinner__lead-ball"></span>
+                            <span class="pf-c-spinner__tail-ball"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 실행중 : Modal 영역 끝 -->
+<!-- 상태 alert : Modal 영역 시작 -->
+<div id="div-modal-status-alert" class="pf-c-backdrop" style="display:none;">
+    <div class="pf-l-bullseye">
+        <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-labelledby="modal-sm-title" aria-describedby="modal-sm-description">
+        <button class="pf-c-button pf-m-plain" type="button" aria-label="Close dialog" id="modal-status-alert-button-close1">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <header class="pf-c-modal-box__header">
+            <h1 class="pf-c-modal-box__title" id="modal-status-alert-title"></h1>
+        </header>
+        <div class="pf-c-modal-box__body" id="modal-status-alert-body"></div>
+        <footer class="pf-c-modal-box__footer">
+            <button class="pf-c-button pf-m-primary" type="button" id="modal-status-alert-button-close2">확인</button>
+        </footer>
+        </div>
+    </div>
+</div>
+<!-- 상태 alert : Modal 영역 끝 -->
+
+<!-- 스토리지센터VM 배포 마법사 : ./src/features/storage-vm-wizard.html을 내용으로 load -->
+<div class="pf-c-backdrop" id="div-modal-wizard-gateway-vm"></div>
+
+<!-- 클러스터 구성 준비 마법사 : ./src/features/cluster-config-prepare.html을 내용으로 load -->
+<!-- <div class="pf-c-backdrop" id="div-modal-wizard-cluster-config-prepare"></div> -->
+
+
+<!-- 모달 영역 끝  -->
+
+<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+<!-- <script src="./src/features/cloud-center-virtual-machine.js"></script>
+<script src="./src/features/main.js"></script>
+<script src="./src/features/card-cloud-cluster-status.js"></script> -->
+<script src="./src/features/glue/main_glue.js"></script>
+<script src="./src/common/logger.js"></script>
+<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 -->
