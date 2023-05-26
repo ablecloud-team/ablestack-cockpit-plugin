@@ -111,6 +111,7 @@ def create(args):
         # hosts 파일 세팅
         hosts = check_output(["cat /etc/hosts"], universal_newlines=True, shell=True, env=env)
 
+        os.system("mkdir " + pluginpath+"/tools/vmconfig/gwvm/")
         os.system("cp -f /etc/hosts " + pluginpath+"/tools/vmconfig/gwvm/hosts")
         os.system("cp -f /root/.ssh/id_rsa " + pluginpath+"/tools/vmconfig/gwvm/id_rsa")
         os.system("cp -f /root/.ssh/id_rsa.pub " + pluginpath+"/tools/vmconfig/gwvm/id_rsa.pub")
