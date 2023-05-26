@@ -376,45 +376,6 @@ def ccvmGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str):
     return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=yam)))
 
 """
-ccvm_dup용 네트워크설정(스토리지 네트워크 추가 없음)하는 부분
-
-:param 없음
-:return yaml 파일
-"""
-def ccvmDupGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str):
-    with open(f'{tmpdir}/network-config.mgmt', 'rt') as f:
-        yam = yaml.load(f)
-
-    if sn_nic is not None or sn_ip is not None or sn_prefix is not None or sn_gw is not None :
-        yam['network']['config'].append({'name': sn_nic,
-                                         'subnets': [{'address': f'{sn_ip}/{sn_prefix}',
-                                                      'gateway': sn_gw,
-                                                      'type': 'static'}],
-                                         'type': 'physical'})
-    with open(f'{tmpdir}/network-config', 'wt') as f:
-        f.write(yaml.dump(yam))
-
-    with open(f'{tmpdir}/user-data', 'rt') as f:
-        yam2 = yaml.load(f)
-        with open(f'{pluginpath}/shell/host/ccvm_dup_bootstrap.sh', 'rt') as bootstrapfile:
-            bootstrap = bootstrapfile.read()
-        yam2['write_files'].append(
-            {
-                'encoding': 'base64',
-                'content': base64.encodebytes(bootstrap.encode()),
-                'owner': 'root:root',
-                'path': '/root/bootstrap.sh',
-                'permissions': '0777'
-            }
-        )
-
-    with open(f'{tmpdir}/user-data', 'wt') as f:
-        f.write('#cloud-config\n')
-        f.write(yaml.dump(yam2).replace("\n\n", "\n"))
-
-    return json.dumps(indent=4, obj=json.loads(createReturn(code=200, val=yam)))
-
-"""
 scvm용 네트워크설정(스토리지 네트워크 추가)하는 부분
 
 :param :pn_nic :str  PN의 NIC 이름

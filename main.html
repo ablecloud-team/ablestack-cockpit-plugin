@@ -32,40 +32,107 @@
             <div class="pf-l-grid pf-m-gutter">
                 <div class="pf-l-grid__item pf-m-12-col">
                     <div class="pf-l-grid pf-m-gutter">
-                        <div class="pf-l-grid__item pf-m-6-col">
-                            <!-- 스토리지 센터 클러스터 상태 카드 영역 시작-->
-                            <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-storage-cluster-status">
-                                <div class="pf-c-card__header">
-                                    <div class="pf-c-card__header-main">
-                                        <i class="pf-icon pf-icon-registry" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
-                                    </div>
-                                    <div class="pf-c-card__title" id="card-storage-cluster-status-title">스토리지센터 클러스터 상태</div>
-                                    <div class="pf-c-card__actions">
-                                        <div class="pf-c-dropdown">
-                                            <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-status" aria-expanded="false" type="button" aria-label="Actions">
-                                                <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
-                                            </button>
-                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status">
-                                                <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >유지보수 모드 설정</button>
-                                                </li>
-                                                <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-unset-maintenance-mode" >유지보수 모드 해제</button>
-                                                </li>
-                                                <li class="pf-c-divider" role="separator"></li>
-                                                <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 있을때 표시-->
-                                                <li id="scvm-after-bootstrap-run"></li>
-                                                <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 없을때 표시-->
-                                                <li id="scvm-before-bootstrap-run"></li>
-                                                <li id="scvm-after-update-glue-config"></li>
-                                                <li class="pf-c-divider" role="separator"></li>
-                                                <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-auto-shutdown-step-two" >전체 시스템 자동 종료</button>
-                                                </li>
-                                                <li>
-                                                    <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-remove-cube-host" >Cube 호스트 제거</button>
-                                                </li>
-                                            </ul>
+                        <div class="pf-l-grid__item pf-m-12-col">
+                            <div class="pf-l-grid pf-m-gutter">
+                                <div class="pf-l-grid__item pf-m-6-col">
+                                    <!-- 스토리지 센터 클러스터 상태 카드 영역 시작-->
+                                    <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-storage-cluster-status">
+                                        <div class="pf-c-card__header">
+                                            <div class="pf-c-card__header-main">
+                                                <i class="pf-icon pf-icon-registry" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
+                                            </div>
+                                            <div class="pf-c-card__title" id="card-storage-cluster-status-title">스토리지센터 클러스터 상태</div>
+                                            <div class="pf-c-card__actions">
+                                                <div class="pf-c-dropdown">
+                                                    <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-status" aria-expanded="false" type="button" aria-label="Actions">
+                                                        <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+                                                    </button>
+                                                    <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status">
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >유지보수 모드 설정</button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-unset-maintenance-mode" >유지보수 모드 해제</button>
+                                                        </li>
+                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 있을때 표시-->
+                                                        <li id="scvm-after-bootstrap-run"></li>
+                                                        <!--scvm의 /root/bootstrap.sh 파일 실행 기록이 없을때 표시-->
+                                                        <li id="scvm-before-bootstrap-run"></li>
+                                                        <li id="scvm-after-update-glue-config"></li>
+                                                        <li class="pf-c-divider" role="separator"></li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-auto-shutdown-step-two" >전체 시스템 자동 종료</button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="pf-c-dropdown__menu-item" type="button" id="menu-item-remove-cube-host" >Cube 호스트 제거</button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pf-c-divider" role="separator"></div>
+                                        <div class="pf-c-card__body">
+                                            <section class="pf-c-page__main-breadcrumb">
+                                                <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">클러스터 상태</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text "style="overflow: auto;">
+                                                                <span class="pf-c-label pf-m-red" id="scc-css">
+                                                                    <span class="pf-c-label__content">
+                                                                        <span class="pf-c-label__icon">
+                                                                            <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true" id="scc-icon"></i>
+                                                                        </span><div id="scc-status">Health Err</div>                                                                
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">디스크</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text" id="scc-osd">N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">게이트웨이</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text" id="scc-gw">N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">관리데몬</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text" id="scc-mgr">N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">스토리지 풀</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text" id="scc-pools">N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                    <div class="pf-c-description-list__group">
+                                                        <dt class="pf-c-description-list__term">
+                                                            <span class="pf-c-description-list__text">스토리지 용량</span>
+                                                        </dt>
+                                                        <dd class="pf-c-description-list__description">
+                                                            <div class="pf-c-description-list__text" id="scc-usage">N/A</div>
+                                                        </dd>
+                                                    </div>
+                                                </dl>
+                                            </section>
                                         </div>
                                     </div>
                                 </div>
@@ -1011,50 +1078,40 @@
                 <button id="button-cancel-modal-remove-cube-host" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
             </footer>
         </div>
-    </div>
-</div>
-<!-- Cube 호스트 제거 및 설정정보 초기화 : Modal 영역 끝 -->
 
-<!-- mold 서비스 제어 : Modal 영역 시작 -->
-<div id="div-modal-ccvm-dup-deploy" class="pf-c-backdrop" style="display:none">
-    <div class="pf-l-bullseye">
-        <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Ccvm Duplicate Deploy">
-            <button id="button-close-ccvm-dup-deploy" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
-                <i class="fas fa-times" aria-hidden="true"></i>
-            </button>
-            <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">클라우드센터 가상머신 이중화 구성</span></h1></header>
-            <div class="pf-c-modal-box__body">
-                <div>이중화 구성할 클라우드센터 가상머신의 관리 IP를 입력해주세요.</div>
-                <form novalidate class="pf-c-form pf-m-horizontal" >
-                    
-                            <div class="pf-c-form__group-label" style="margin-left:15px;margin-top:15px">
-                                <label class="pf-c-form__label" for="form-input-ccvm-dup-mngt-ip" style="margin-right:15px">
-                                    <span class="pf-c-form__label-text">관리 IP</span>
-                                </label>
-                                <input class="pf-c-form-control" style="width:50%" type="text" id="form-input-ccvm-dup-mngt-ip" name="form-input-ccvm-dup-mngt-ip" placeholder="xxx.xxx.xxx.xxx 형식으로 입력"/>
-                            </div>
-                    
-                    
-                </form>
+        <!-- 전체 호스트 Glue 설정 업데이트 : Modal 영역 끝 -->
+
+        <!-- Cube 호스트 제거 및 설정정보 초기화 : Modal 영역 시작 -->
+        <div id="div-modal-remove-cube-host" class="pf-c-backdrop" style="display:none">
+            <div class="pf-l-bullseye">
+                <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Remove Cube Host Config">
+                    <button id="button-close-modal-remove-cube-host" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                    <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">Cube 호스트 제거</span></h1></header>
+                    <div class="pf-c-modal-box__body">
+                        <div>Cube 호스트 제거를 진행하시겠습니까?<br/>주의!! 실행하실 경우 cube 호스트 설정정보가 초기화 됩니다.</div>
+                    </div>
+                    <footer class="pf-c-modal-box__footer">
+                        <button id="button-execution-modal-remove-cube-host" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                        <button id="button-cancel-modal-remove-cube-host" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
+                    </footer>
+                </div>
             </div>
-            <footer class="pf-c-modal-box__footer">
-                <button id="button-execution-modal-ccvm-dup-deploy" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
-                <button id="button-cancel-modal-ccvm-dup-deploy" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
-            </footer>
         </div>
-    </div>
-</div>
-<!-- mold 서비스 제어 : Modal 영역 끝 -->
+        <!-- Cube 호스트 제거 및 설정정보 초기화 : Modal 영역 끝 -->
+        <!-- 모달 영역 끝  -->
 
-<!-- 모달 영역 끝  -->
-
-<!-- 클라우드센터VM 용량 변경에 관한 modal : ./src/features/cloud-vm-change.html을 내용으로 load -->
-<div class="pf-c-backdrop" id="div-change-modal-cloud-vm"></div>
-<!-- 클라우드센터VM 용량 변경에 관한 modal : ./src/features/cloud-vm-change-alert.html을 내용으로 load -->
-<div class="pf-c-backdrop" id="div-change-alert-cloud-vm"></div>
-<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
-<script src="./src/features/cloud-center-virtual-machine.js"></script>
-<script src="./src/features/main.js"></script>
-<script src="./src/features/card-cloud-cluster-status.js"></script>
-<script src="./src/common/logger.js"></script>
-<!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
+        <!-- 클라우드센터VM 용량 변경에 관한 modal : ./src/features/cloud-vm-change.html을 내용으로 load -->
+        <div class="pf-c-backdrop" id="div-change-modal-cloud-vm"></div>
+        <!-- 클라우드센터VM 용량 변경에 관한 modal : ./src/features/cloud-vm-change-alert.html을 내용으로 load -->
+        <div class="pf-c-backdrop" id="div-change-alert-cloud-vm"></div>
+        <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 시작 -->
+        <script src="./src/features/cloud-center-virtual-machine.js"></script>
+        <script src="./src/features/main.js"></script>
+        <script src="./src/features/card-cloud-cluster-status.js"></script>
+        <script src="./src/common/logger.js"></script>
+        <!-- 해당 페이지에 필요한 javascript 파일 추가 영역 끝 --> 
+        
+    </body>
+</html>
