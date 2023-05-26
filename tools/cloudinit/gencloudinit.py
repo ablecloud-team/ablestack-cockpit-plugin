@@ -58,7 +58,6 @@ def argumentParser():
                                          epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
     subparsers = tmp_parser.add_subparsers(help='select vm type action', dest='type')
     ccvm_parser = subparsers.add_parser('ccvm', help='Cloud Center Virtual Machine을 위한 cloudinit')
-    ccvm_dup_parser = subparsers.add_parser('ccvm_dup', help='Cloud Center Virtual Machine을 위한 cloudinit')
     scvm_parser = subparsers.add_parser('scvm', help='Storage Center Virtual Machine을 위한 cloudinit')
     gwvm_parser = subparsers.add_parser('gwvm', help='GateWay Virtual Machine을 위한 cloudinit')
     # 선택지 추가(동작 선택)
@@ -525,8 +524,6 @@ def main(args):
     """
     if args.type == 'ccvm':
         ret = ccvmGen(sn_nic=args.sn_nic, sn_ip=args.sn_ip, sn_prefix=args.sn_prefix, sn_gw=args.sn_gw)
-    elif args.type == 'ccvm_dup':
-        ret = ccvmDupGen(sn_nic=args.sn_nic, sn_ip=args.sn_ip, sn_prefix=args.sn_prefix, sn_gw=args.sn_gw)
     elif args.type == 'scvm':
         ret = scvmGen(pn_nic=args.pn_nic, pn_ip=args.pn_ip, pn_prefix=args.pn_prefix, cn_nic=args.cn_nic, cn_ip=args.cn_ip, cn_prefix=args.cn_prefix, master=args.master)
     elif args.type == 'gwvm':

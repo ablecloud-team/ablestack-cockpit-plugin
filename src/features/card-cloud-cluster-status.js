@@ -600,7 +600,6 @@ function CardCloudClusterStatus(){
                         sessionStorage.setItem("ccvm_bootstrap_status","true");
                         console.log('ccvm true in')
                         html_text = '<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-linkto-storage-center-ccvm" onclick="cccc_link_go()">클라우드센터 연결</a>'
-                        html_text += '<a class="pf-c-dropdown__menu-item" href="#" id="menu-item-ccvm-dup-deploy" onclick="ccvm_dup_deploy_modal()">클라우드센터 가상머신 이중화</a>'
                         $('#ccvm-after-bootstrap-run').html(html_text);
                         $('#ccvm-before-bootstrap-run').html('');
                     }
