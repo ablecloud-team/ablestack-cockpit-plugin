@@ -76,15 +76,15 @@ def glueUrl():
 # token 생성
 def createToken():
     try:
-        encode_pw = 'GS9I0aqoMo/Kom0=*fmZKrV21Ry1j/P3JfgMxmw==*xcRtTz8BG0Jesd/Tsn3WJw==*XuOU3SeZ9MrzywVylTytdA=='
-        decode_pw = cryptocode.decrypt(encode_pw, 'ablestack')
+        key = 'Agf3+7aN/pQg0Hw=*NI6nvNtR8v6Oq48oFRifVA==*s3Oqft8USRW87+hxxQ6ZSQ==*8ey7/oGt1bvN5qFJPDHP5A=='
+        pw = cryptocode.decrypt(key, 'ablecloud')
         headers = {
             'Accept': 'application/vnd.ceph.api.v1.0+json',
             'Content-Type': 'application/json',
         }
         json_data = {
             'username': 'ablecloud',
-            'password': decode_pw,
+            'password': pw,
         }
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         url = glueUrl()
