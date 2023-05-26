@@ -129,16 +129,22 @@ def create(args):
         
         
         if json_data["clusterConfig"]["pcsCluster"]["hostname1"] is not None:
-            pcs_cluster_list.append(json_data["clusterConfig"]["pcsCluster"]["hostname1"])
-            create_gwvm_cloudinit_cmd.append(json_data["clusterConfig"]["pcsCluster"]["hostname1"])
+            # pcs_cluster_list.append(json_data["clusterConfig"]["pcsCluster"]["hostname1"])
+            # create_gwvm_cloudinit_cmd.append(json_data["clusterConfig"]["pcsCluster"]["hostname1"])
+            pcs_cluster_list.append("10.10.2.1")
+            create_gwvm_cloudinit_cmd.append("10.10.2.1")
 
         if json_data["clusterConfig"]["pcsCluster"]["hostname2"] is not None:
-            pcs_cluster_list.append(json_data["clusterConfig"]["pcsCluster"]["hostname2"])
-            create_gwvm_cloudinit_cmd.append(json_data["clusterConfig"]["pcsCluster"]["hostname2"])
+            # pcs_cluster_list.append(json_data["clusterConfig"]["pcsCluster"]["hostname2"])
+            # create_gwvm_cloudinit_cmd.append(json_data["clusterConfig"]["pcsCluster"]["hostname2"])
+            pcs_cluster_list.append("10.10.2.2")
+            create_gwvm_cloudinit_cmd.append("10.10.2.2")
 
         if json_data["clusterConfig"]["pcsCluster"]["hostname3"] is not None:
-            pcs_cluster_list.append(json_data["clusterConfig"]["pcsCluster"]["hostname3"])
-            create_gwvm_cloudinit_cmd.append(json_data["clusterConfig"]["pcsCluster"]["hostname3"])
+            # pcs_cluster_list.append(json_data["clusterConfig"]["pcsCluster"]["hostname3"])
+            # create_gwvm_cloudinit_cmd.append(json_data["clusterConfig"]["pcsCluster"]["hostname3"])
+            pcs_cluster_list.append("10.10.2.3")
+            create_gwvm_cloudinit_cmd.append("10.10.2.3")
         
         create_gwvm_cloudinit_cmd.append('--mgmt-nic')
         create_gwvm_cloudinit_cmd.append('enp0s20')
@@ -170,7 +176,7 @@ def create(args):
         # gwvm pcs 클러스터 배포
         # result = json.loads(python3(pluginpath + 'python/pcs/pcsExehost.py' ).stdout.decode())
         # pcs_exe_ip = result.val
-        pcs_exe_ip = '10.10.2.2'
+        pcs_exe_ip = '10.10.2.1'
         ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', pcs_exe_ip, "python3 " + pluginpath + "/python/gwvm/create_gwvm_setup_pcs_cluster.py").stdout.strip().decode()
 
         # gwvm 부팅 완료 대기
@@ -178,10 +184,10 @@ def create(args):
         gwvm_boot_check=0
         cnt_num = 0
         while True:
-            time.sleep(1)
+            time.sleep(10)
             cnt_num += 1
             gwvm_boot_check = os.system("ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 root@"+mngt_ip+" 'echo ok > /dev/null 2>&1'")
-            if gwvm_boot_check == 0 or cnt_num > 30000:
+            if gwvm_boot_check == 0 or cnt_num > 3000:
                 break
 
         # gwvm_boot_check 결과가 0이 부팅 완료, 0이 아니면 부팅 미완료

@@ -4,8 +4,8 @@
 #
 #ccvm 초기화(bootstrap)하는 스크립트
 #
-#최초작성자 : 윤여천 책임(ycyun@ablecloud.io)
-#최초작성일 : 2021-04-12
+#최초작성자 : 배태주
+#최초작성일 : 2023-05-19
 #########################################
 set -x
 LOGFILE="/var/log/gwvm_install.log"
@@ -46,6 +46,9 @@ firewall-cmd --list-all 2>&1 | tee -a $LOGFILE
 #   ssh -o StrictHostKeyChecking=no $host /usr/bin/systemctl enable --now pacemaker
 #   ssh -o StrictHostKeyChecking=no $host /usr/bin/systemctl enable --now corosync
 # done
+
+#ceph 키 복사
+scp -q -o StrictHostKeyChecking=no root@scvm-mngt:/etc/ceph/* /etc/ceph/
 
 # Delete bootstrap script file
 rm -rf /root/bootstrap.sh

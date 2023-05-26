@@ -42,14 +42,26 @@
                                             </button>
                                             <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status">
                                                 <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >유지보수 모드 설정</button>
-                                                </li>
-                                                <!-- <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-unset-maintenance-mode" >유지보수 모드 해제</button>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >GlueFS 구성</button>
                                                 </li>
                                                 <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-unset-maintenance-mode" >GlueFS 구성</button>
-                                                </li> -->
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >GlueFS 삭제</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >NFS 구성</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >NFS 삭제</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >SMB 구성</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >SMB 삭제</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >파일 시스템 제어</button>
+                                                </li>
                                             </ul>
                                         </div>
                                     </div>
@@ -62,8 +74,8 @@
                                                 <tr role="row">
                                                     <th role="columnheader" scope="col">서비스</th>
                                                     <th role="columnheader" scope="col">상태</th>
+                                                    <th role="columnheader" scope="col">FS 경로</th>
                                                     <th role="columnheader" scope="col">마운트 경로</th>
-                                                    <th role="columnheader" scope="col">경로</th>
                                                     <th role="columnheader" scope="col">접근 IP</th>
                                                     <th role="columnheader" scope="col">사용량</th>
                                                     <th class="pf-c-table__icon" role="columnheader" scope="col">편집</th>
@@ -81,8 +93,8 @@
                                                             </span>
                                                         </span>
                                                     </td>
-                                                    <td role="cell" data-label="마운트 경로">/fs/gluefs</td>
-                                                    <td role="cell" data-label="서비스 경로">/gluefs</td>
+                                                    <td role="cell" data-label="FS 경로">/fs/gluefs</td>
+                                                    <td role="cell" data-label="마운트 경로">/gluefs</td>
                                                     <td role="cell" data-label="접근 IP">-</td>
                                                     <td role="cell" data-label="사용량">1Tb</td>
                                                     <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
@@ -98,8 +110,8 @@
                                                             </span>
                                                         </span>
                                                     </td>
-                                                    <td role="cell" data-label="마운트 경로">/fs/nfs</td>
-                                                    <td role="cell" data-label="서비스 경로">/nfs</td>
+                                                    <td role="cell" data-label="FS 경로">/fs/nfs</td>
+                                                    <td role="cell" data-label="마운트 경로">/nfs</td>
                                                     <td role="cell" data-label="접근 IP">10.10.2.18</td>
                                                     <td role="cell" data-label="사용량">10Gb</td>
                                                     <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
@@ -111,12 +123,12 @@
                                                             <span class="pf-c-label__content">
                                                                 <span class="pf-c-label__icon" >
                                                                     <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
-                                                                </span><div>Health Err</div>
+                                                                </span><div>Health Warn</div>
                                                             </span>
                                                         </span>
                                                     </td>
-                                                    <td role="cell" data-label="마운트 경로">/fs/smb</td>
-                                                    <td role="cell" data-label="서비스 경로">/smb</td>
+                                                    <td role="cell" data-label="FS 경로">/fs/smb</td>
+                                                    <td role="cell" data-label="마운트 경로">/smb</td>
                                                     <td role="cell" data-label="접근 IP">10.10.2.18</td>
                                                     <td role="cell" data-label="사용량">50Gb</td>
                                                     <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
@@ -149,7 +161,19 @@
                                             </button>
                                             <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status">
                                                 <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >유지보수 모드 설정</button>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >iSCSI 구성</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >iSCSI 삭제</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >서비스 제어</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >타겟 생성</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >ACL 설정 연결</button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -211,9 +235,24 @@
                                             <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-status" aria-expanded="false" type="button" aria-label="Actions">
                                                 <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
                                             </button>
-                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status">
+                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status" hidden>
                                                 <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >유지보수 모드 설정</button>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >게이트웨이 VM 구성</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >게이트웨이 VM 삭제</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >게이트웨이 VM 시작</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >게이트웨이 VM 정지</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >게이트웨이 VM 클린업</button>
+                                                </li>
+                                                <li>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >마이그레이션</button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -226,29 +265,34 @@
                                             <thead>
                                                 <tr role="row">
                                                     <th role="columnheader" scope="col" class="pf-m-width-10">가상머신 상태</th>
-                                                    <th role="columnheader" scope="col" class="pf-m-width-10">실행 노드</th>
                                                     <th role="columnheader" scope="col" class="pf-m-width-10">CPU/Mem</th>
                                                     <th role="columnheader" scope="col" class="pf-m-width-10">관리 IP/PREFIX</th>
                                                     <th role="columnheader" scope="col" class="pf-m-width-10">GW</th>
+                                                    <th role="columnheader" scope="col" class="pf-m-width-10">VM실행노드</th>
                                                     <th role="columnheader" scope="col" class="pf-m-width-10">Root Disk 크기</th>
                                                 </tr>
                                             </thead>
                                             <tbody role="rowgroup">
                                                 <tr role="row">
                                                     <td role="cell" data-label="가상머신 상태">
-                                                        <span class="pf-c-label pf-m-red" id="span-cloud-vm-status">
+                                                        <span class="pf-c-label pf-m-red" id="gwvm-back-color">
                                                             <span class="pf-c-label__content" id="span-cloud-vm-status-content">
                                                                 <span class="pf-c-label__icon">
-                                                                    <i id="ccvm_status_icon" class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
-                                                                </span>Stopped
+                                                                    <i id="gwvm-cluster-icon" class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
+                                                                </span><div id="gwvm-status">Health Err</div>
                                                             </span>
                                                         </span>
                                                     </td>
-                                                    <td role="cell" data-label="실행 노드">10.10.2.14</td>
-                                                    <td role="cell" data-label="CPU/Mem">4 Core / 8 GiB</td>
-                                                    <td role="cell" data-label="관리 IP/PREFIX">10.10.2.18/16</td>
-                                                    <td role="cell" data-label="GW">10.10.0.1</td>
-                                                    <td role="cell" data-label="Root Disk 크기">61GiB(사용가능 6.7GiB/사용률 89%)</td>
+                                                    <td role="cell" data-label="CPU/Mem" id="td_gwvm_cpu_mem">N/A</td>
+                                                    <td role="cell" data-label="관리 IP/PREFIX" id="td_gwvm_ip_prefix">N/A</td>
+                                                    <td role="cell" data-label="GW" id="td_gwvm_gw">N/A</td>
+                                                    <td role="cell" data-label="VM실행노드" id="td_gwvm_started_host">N/A</td>
+                                                    <td role="cell" data-label="Root Disk 크기" id="td_gwvm_root_disk">N/A</td>
+                                                    <!-- <td role="cell" data-label="VM실행노드" id="td_gwvm_ip">10.10.2.14</td>
+                                                    <td role="cell" data-label="CPU/Mem" id="td_gwvm_ip">4 Core / 8 GiB</td>
+                                                    <td role="cell" data-label="관리 IP/PREFIX" id="td_gwvm_ip">10.10.2.18/16</td>
+                                                    <td role="cell" data-label="GW" id="td_gwvm_ip">10.10.0.1</td>
+                                                    <td role="cell" data-label="Root Disk 크기" id="td_gwvm_ip">61GiB(사용가능 6.7GiB/사용률 89%)</td> -->
                                                 </tr>
                                             </tbody>
                                         </table>

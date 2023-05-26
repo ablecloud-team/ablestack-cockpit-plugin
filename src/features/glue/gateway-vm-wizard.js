@@ -12,10 +12,10 @@ var console_log = true;
 $(document).ready(function(){
 
     //관리네트워크 리스트 초기 세팅
-    setNicBridge('form-select-gateway-vm-mngt-nic-parent',"ablecube");
+    setNicBridge('form-select-gateway-vm-mngt-nic-parent',"10.10.2.1");
 
     //스토리지네트워크 리스트 초기 세팅
-    setNicBridge('form-select-gateway-vm-storage-nic-parent',"ablecube");
+    setNicBridge('form-select-gateway-vm-storage-nic-parent',"10.10.2.1");
 
 });
 /* Document Ready 이벤트 처리 끝 */
@@ -104,10 +104,10 @@ $('#button-execution-modal-gateway-wizard-confirm').on('click', function () {
             var retVal = JSON.parse(data);
             console.log(retVal);
             if(retVal.code == "200"){
+                
                 $("#modal-status-alert-title").html("스토리지 게이트웨이 서비스 가상머신 구성 완료");
                 $("#modal-status-alert-body").html("스토리지 게이트웨이 서비스 가상머신 구성을 완료하였습니다.");
                 $('#div-modal-status-alert').show();
-                location.reload();
                 createLoggerInfo("스토리지 서비스 구성 완료");
             } else {
                 $('#div-modal-status-alert').show();
