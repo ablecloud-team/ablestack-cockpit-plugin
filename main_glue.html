@@ -31,9 +31,6 @@
                         <div class="pf-l-grid__item pf-m-12-col">
                             <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-storage-cluster-status">
                                 <div class="pf-c-card__header">
-                                    <div class="pf-c-card__header-main">
-                                        <i class="pf-icon pf-icon-registry" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
-                                    </div>
                                     <div class="pf-c-card__title" id="card-storage-cluster-status-title">파일 시스템</div>
                                     <div class="pf-c-card__actions">
                                         <div class="pf-c-dropdown">
@@ -66,7 +63,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="pf-c-divider" role="separator"></div>
                                 <div class="pf-c-card__body">
                                     <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
                                         <table class="pf-c-table pf-m-compact pf-m-grid-lg" role="grid" aria-label="This is a compact table example" id="compact-demo-table">
@@ -97,7 +93,7 @@
                                                     <td role="cell" data-label="마운트 경로">/gluefs</td>
                                                     <td role="cell" data-label="접근 IP">-</td>
                                                     <td role="cell" data-label="사용량">1Tb</td>
-                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-edit"></i></td>
                                                 </tr>
                                                 <tr role="row">
                                                     <td role="cell" data-label="서비스">NFS</td>
@@ -114,7 +110,7 @@
                                                     <td role="cell" data-label="마운트 경로">/nfs</td>
                                                     <td role="cell" data-label="접근 IP">10.10.2.18</td>
                                                     <td role="cell" data-label="사용량">10Gb</td>
-                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-edit"></i></td>
                                                 </tr>
                                                 <tr role="row">
                                                     <td role="cell" data-label="서비스">SMB</td>
@@ -131,7 +127,7 @@
                                                     <td role="cell" data-label="마운트 경로">/smb</td>
                                                     <td role="cell" data-label="접근 IP">10.10.2.18</td>
                                                     <td role="cell" data-label="사용량">50Gb</td>
-                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-edit"></i></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -150,9 +146,6 @@
                         <div class="pf-l-grid__item pf-m-12-col">
                             <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-storage-cluster-status">
                                 <div class="pf-c-card__header">
-                                    <div class="pf-c-card__header-main">
-                                        <i class="pf-icon pf-icon-registry" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
-                                    </div>
                                     <div class="pf-c-card__title" id="card-storage-cluster-status-title">iSCSI</div>
                                     <div class="pf-c-card__actions">
                                         <div class="pf-c-dropdown">
@@ -189,8 +182,8 @@
                                                     <th role="columnheader" scope="col">포털</th>
                                                     <th role="columnheader" scope="col">이미지</th>
                                                     <th role="columnheader" scope="col">크기</th>
-                                                    <th class="pf-c-table__icon" role="columnheader" scope="col">삭제</th>
                                                     <th class="pf-c-table__icon" role="columnheader" scope="col">편집</th>
+                                                    <th class="pf-c-table__icon" role="columnheader" scope="col">삭제</th>
                                                 </tr>
                                             </thead>
 
@@ -200,16 +193,16 @@
                                                     <td role="cell" data-label="포털">10.10.2.14</td>
                                                     <td role="cell" data-label="이미지">rbd/iscsi-test1</td>
                                                     <td role="cell" data-label="크기">10GiB</td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-edit"></i></td>
                                                     <td class="pf-c-table__icon" role="cell" data-label="삭제"><i class="fas fa-trash"></i></td>
-                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
                                                 </tr>
                                                 <tr role="row">
                                                     <td role="cell" data-label="대상">iqn.2023.05-com.ceph:01211</td>
                                                     <td role="cell" data-label="포털">10.10.2.14</td>
                                                     <td role="cell" data-label="이미지">rbd/iscsi-test1</td>
                                                     <td role="cell" data-label="크기">50GiB</td>
+                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-edit"></i></td>
                                                     <td class="pf-c-table__icon" role="cell" data-label="삭제"><i class="fas fa-trash"></i></td>
-                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-cog"></i></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -226,9 +219,6 @@
                         <div class="pf-l-grid__item pf-m-12-col">
                             <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-storage-cluster-status">
                                 <div class="pf-c-card__header">
-                                    <div class="pf-c-card__header-main">
-                                        <i class="pf-icon pf-icon-registry" style="font-size: var(--pf-global--icon--FontSize--lg);padding-right: 15px" aria-hidden="true"></i>
-                                    </div>
                                     <div class="pf-c-card__title" id="card-storage-cluster-status-title">게이트웨이 가상머신</div>
                                     <div class="pf-c-card__actions">
                                         <div class="pf-c-dropdown">
@@ -258,7 +248,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="pf-c-divider" role="separator"></div>
                                 <div class="pf-c-card__body">
                                     <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
                                         <table class="pf-c-table pf-m-compact pf-m-grid-lg" role="grid" aria-label="This is a compact table example" id="compact-demo-table">
