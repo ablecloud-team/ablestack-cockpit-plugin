@@ -39,10 +39,11 @@ def createArgumentParser():
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
 
     # 선택지 추가(동작 선택)
-    tmp_parser.add_argument('action', choices=['config', 'destroy', 'status', 'list', 'detail', 'create', 'delete', 'edit', 'image'], help='iSCSI gateway and target action')
+    tmp_parser.add_argument('action', choices=['config', 'destroy', 'status', 'list', 'detail', 'create', 'delete', 'edit', 'image', 'daemon'], help='iSCSI gateway and target action')
     tmp_parser.add_argument('--iqn', metavar='target iqn', type=str, help='iSCSI target iqn')
     tmp_parser.add_argument('--name', metavar='image name', type=str, help='rbd 이미지 이름')
     tmp_parser.add_argument('--size',metavar='image size', type=str, help='rbd 이미지 크기')
+    tmp_parser.add_argument('--control',metavar='daemon control', type=str, help='iSCSI Daemon 서비스 제어')
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐)
     tmp_parser.add_argument('-v', '--verbose', action='count', default=0,
@@ -83,8 +84,8 @@ def createToken():
             'username': 'ablecloud',
             'password': pw,
         }
-        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.post(url+'/api/auth', headers=headers, json=json_data, verify=False)
         if response.status_code == 201:
             return response.json()['token']
@@ -118,8 +119,8 @@ def taskList():
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/json'
         }
-        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.get(url+'/api/task', headers=headers, verify=False)
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
@@ -127,6 +128,28 @@ def taskList():
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
     except Exception as e:
         return createReturn(code=500, val='iscsi.py taskList error :'+e)
+    
+# daemon 조회
+def daemonList():
+    try:
+        token = createToken()
+        headers = {
+            'Accept': 'application/vnd.ceph.api.v1.0+json',
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }
+        params = {
+            'service_name': 'iscsi.iscsi'
+        }
+        url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        response = requests.get(url+'/api/service/service_name/daemons', headers=headers, params=params, verify=False)
+        if response.status_code == 200:
+            return createReturn(code=200, val=json.dumps(response.json(), indent=2))
+        else:
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+    except Exception as e:
+        return createReturn(code=500, val='iscsi.py daemonList error :'+e)
 
 # iSCSI 게이트웨이 생성     
 def configIscsi(args):
@@ -154,11 +177,13 @@ def configIscsi(args):
             }
         }
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.post(url+'/api/service', headers=headers, json=json_data, verify=False)
         if response.status_code == 201:
             return createReturn(code=200, val='iscsi service '+args.action+' control success')
         elif response.status_code == 202:
-            cnt == 0    
+            global cnt
+            cnt = 0    
             task = json.loads(taskList()).get('val')
             task_json = json.loads(task).get('executing_tasks')
             if len(task_json) > 0:
@@ -185,11 +210,13 @@ def destroyIscsi(args):
             'service_name': 'iscsi.iscsi'
         }
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.delete(url+'/api/service/service_name', headers=headers, params=params, verify=False)
         if response.status_code == 204:
             return createReturn(code=200, val='iscsi service '+args.action+' control success')
         elif response.status_code == 202:
-            cnt == 0    
+            global cnt
+            cnt = 0    
             task = json.loads(taskList()).get('val')
             task_json = json.loads(task).get('executing_tasks')
             if len(task_json) > 0:
@@ -219,6 +246,7 @@ def statusIscsi(args):
             'service_name': 'iscsi.iscsi'
         }
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.get(url+'/api/service', headers=headers, params=params, verify=False)
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
@@ -237,6 +265,7 @@ def listTarget(args):
             'Content-Type': 'application/json'
         }
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.get(url+'/api/iscsi/target', headers=headers, verify=False)
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
@@ -259,6 +288,7 @@ def detailTarget(args):
             'target_iqn': args.iqn
         }
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.get(url+'/api/iscsi/target/target_iqn', headers=headers, params=params, verify=False)
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
@@ -279,6 +309,7 @@ def createTarget(args):
         # 이미지 조회
         imageInfo = listImage(args)
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         # 이미지 없는 경우 생성
         if imageInfo is None:
             json_data = {
@@ -337,7 +368,8 @@ def createTarget(args):
         if response.status_code == 201:
             return createReturn(code=200, val='iscsi service '+args.action+' control success')
         elif response.status_code == 202:
-            cnt == 0    
+            global cnt
+            cnt = 0   
             task = json.loads(taskList()).get('val')
             task_json = json.loads(task).get('executing_tasks')
             if len(task_json) > 0:
@@ -366,7 +398,10 @@ def deleteTarget(args):
             'target_iqn': args.iqn
         }
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.delete(url+'/api/iscsi/target/target_iqn', headers=headers, params=params, verify=False)
+        global cnt
+        cnt = 0
         if response.status_code == 204:
             if args.name is not None:
                 params = {
@@ -375,8 +410,7 @@ def deleteTarget(args):
                 response = requests.delete(url+'/api/block/image/image_spec', headers=headers, params=params, verify=False)
                 if response.status_code == 204:
                     return createReturn(code=200, val='iscsi service '+args.action+' control success')
-                elif response.status_code == 202:
-                    cnt == 0    
+                elif response.status_code == 202:  
                     task = json.loads(taskList()).get('val')
                     task_json = json.loads(task).get('executing_tasks')
                     if len(task_json) > 0:
@@ -389,8 +423,7 @@ def deleteTarget(args):
                     return createReturn(code=200, val='iscsi service '+args.action+' control success')
                 else:
                     return createReturn(code=500, val=json.dumps(response.json(), indent=2))
-        elif response.status_code == 202:
-            cnt == 0    
+        elif response.status_code == 202:   
             task = json.loads(taskList()).get('val')
             task_json = json.loads(task).get('executing_tasks')
             if len(task_json) > 0:
@@ -407,8 +440,7 @@ def deleteTarget(args):
                 response = requests.delete(url+'/api/block/image/image_spec', headers=headers, params=params, verify=False)
                 if response.status_code == 204:
                     return createReturn(code=200, val='iscsi service '+args.action+' control success')
-                elif response.status_code == 202:
-                    cnt == 0    
+                elif response.status_code == 202:   
                     task = json.loads(taskList()).get('val')
                     task_json = json.loads(task).get('executing_tasks')
                     if len(task_json) > 0:
@@ -450,11 +482,13 @@ def editTarget(args):
             'configuration': {}
         }
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.put(url+'/api/block/image/image_spec', headers=headers, params=params, json=json_data, verify=False)
         if response.status_code == 200:
             return createReturn(code=200, val='iscsi service '+args.action+' control success')
         elif response.status_code == 202:
-            cnt == 0    
+            global cnt
+            cnt = 0    
             task = json.loads(taskList()).get('val')
             task_json = json.loads(task).get('executing_tasks')
             if len(task_json) > 0:
@@ -487,6 +521,7 @@ def listImage(args):
             'sort': 'name'
         }
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.get(url+'/api/block/image', headers=headers, params=params, verify=False)
         if response.status_code == 200:
             # rbd 이미지 상세 조회
@@ -502,6 +537,49 @@ def listImage(args):
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
     except Exception as e:
         return createReturn(code=500, val='iscsi.py listImage error :'+e)
+
+# iscsi 서비스 제어      
+def controlDaemon(args):
+    try:        
+        token = createToken()
+        headers = {
+            'Accept': 'application/vnd.ceph.api.v0.1+json',
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }
+        daemonInfo = json.loads(daemonList()).get('val')
+        daemon = json.loads(daemonInfo)
+        for num in daemon:
+            status = num['status_desc']
+            name = num['daemon_name']
+        params = {
+            'daemon_name': name
+        }
+        json_data = {
+            'action': args.control,
+            'container_image': ''
+        }
+        url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        response = requests.put(url+'/api/daemon/daemon_name', headers=headers, params=params, json=json_data, verify=False)
+        if response.status_code == 200:
+            return createReturn(code=200, val=json.dumps(response.json(), indent=2))
+        elif response.status_code == 202:
+            global cnt
+            cnt = 0    
+            while True:
+                redaemonInfo = json.loads(daemonList()).get('val')
+                redaemon = json.loads(redaemonInfo)
+                for renum in redaemon:
+                    if status != renum['status_desc']:
+                        cnt = cnt+1
+                if cnt != 0:
+                    break
+            return createReturn(code=200, val='iscsi service '+args.action+' control success')     
+        else:
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+    except Exception as e:
+        return createReturn(code=500, val='iscsi.py controlDaemon error :'+e)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -536,3 +614,5 @@ if __name__ == '__main__':
         print(editTarget(args))
     elif (args.action) == 'image':
         print(listImage(args))
+    elif (args.action) == 'daemon':
+        print(controlDaemon(args))

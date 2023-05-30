@@ -40,12 +40,13 @@ def createArgumentParser():
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
 
     # 선택지 추가(동작 선택)
-    tmp_parser.add_argument('action', choices=['config', 'destroy', 'status', 'list', 'detail', 'delete', 'edit', 'quota', 'mount'], help='glueFS action')
+    tmp_parser.add_argument('action', choices=['config', 'destroy', 'status', 'list', 'detail', 'delete', 'edit', 'quota', 'mount', 'daemon'], help='glueFS action')
     tmp_parser.add_argument('--type', metavar='fs type', type=str, help='gluefs, smb, nfs 중 파일시스템 타입')
     tmp_parser.add_argument('--path', metavar='gluefs path', type=str, help='gluefs 경로')
     tmp_parser.add_argument('--quota', metavar='gluefs quota max bytes', default='0', help='gluefs 쿼터 최대 크기 (Bytes)')
     tmp_parser.add_argument('--target', metavar='mount target', type=str, help='host, gwvm 중 마운트 대상')
     tmp_parser.add_argument('--mount-path', metavar='mount path', type=str, help='마운트 경로')
+    tmp_parser.add_argument('--control',metavar='daemon control', type=str, help='fs Daemon 서비스 제어')
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐)
     tmp_parser.add_argument('-v', '--verbose', action='count', default=0,
@@ -86,8 +87,8 @@ def createToken():
             'username': 'ablecloud',
             'password': pw,
         }
-        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.post(url+'/api/auth', headers=headers, json=json_data, verify=False)
         if response.status_code == 201:
             return response.json()['token']
@@ -107,6 +108,28 @@ def openClusterJson():
         return host_list
     except Exception as e:
         return createReturn(code=500, val='cluster.json read error :'+e)
+
+# daemon 조회
+def daemonList():
+    try:
+        token = createToken()
+        headers = {
+            'Accept': 'application/vnd.ceph.api.v1.0+json',
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }
+        params = {
+            'service_name': 'mds.fs'
+        }
+        url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        response = requests.get(url+'/api/service/service_name/daemons', headers=headers, params=params, verify=False)
+        if response.status_code == 200:
+            return createReturn(code=200, val=json.dumps(response.json(), indent=2))
+        else:
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+    except Exception as e:
+        return createReturn(code=500, val='gluefs.py daemonList error :'+e)
 
 # fs 구성 (nfs, smb, gluefs 구성하는 경우)      
 def configFs(args):
@@ -249,6 +272,7 @@ def statusFs(args):
             'service_name': 'mds.fs'
         }
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.get(url+'/api/service', headers=headers, params=params, verify=False)
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
@@ -267,6 +291,7 @@ def listFs(args):
             'Content-Type': 'application/json'
         }
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.get(url+'/api/cephfs', headers=headers, verify=False)
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
@@ -293,6 +318,7 @@ def detailFs(args):
             'fs_id': id,
         }
         url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.get(url+'/api/cephfs/fs_id', headers=headers, params=params, verify=False)
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
@@ -320,6 +346,7 @@ def quotaFs(args):
                 'depth': 1
             }
             url = glueUrl()
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
             response = requests.get(url+'/api/cephfs/fs_id/ls_dir', headers=headers, params=params, verify=False)
             if response.status_code == 200:
                 return createReturn(code=200, val=json.dumps(response.json(), indent=2))
@@ -388,6 +415,49 @@ def deleteGlueFs(args):
     except Exception as e:
         return createReturn(code=500, val='gluefs.py deleteGlueFs error :'+e)
 
+# mds 서비스 제어   
+def controlDaemon(args):
+    try:        
+        token = createToken()
+        headers = {
+            'Accept': 'application/vnd.ceph.api.v0.1+json',
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }
+        daemonInfo = json.loads(daemonList()).get('val')
+        daemon = json.loads(daemonInfo)
+        for num in daemon:
+            status = num['status_desc']
+            name = num['daemon_name']
+        params = {
+            'daemon_name': name
+        }
+        json_data = {
+            'action': args.control,
+            'container_image': ''
+        }
+        url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        response = requests.put(url+'/api/daemon/daemon_name', headers=headers, params=params, json=json_data, verify=False)
+        if response.status_code == 200:
+            return createReturn(code=200, val=json.dumps(response.json(), indent=2))
+        elif response.status_code == 202:
+            global cnt
+            cnt = 0    
+            while True:
+                redaemonInfo = json.loads(daemonList()).get('val')
+                redaemon = json.loads(redaemonInfo)
+                for renum in redaemon:
+                    if status != renum['status_desc']:
+                        cnt = cnt+1
+                if cnt != 0:
+                    break
+            return createReturn(code=200, val='iscsi service '+args.action+' control success')     
+        else:
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+    except Exception as e:
+        return createReturn(code=500, val='iscsi.py controlDaemon error :'+e)
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # parser 생성
@@ -421,4 +491,6 @@ if __name__ == '__main__':
         print(editGlueFs(args))
     elif (args.action) == 'delete':
         print(deleteGlueFs(args))
+    elif (args.action) == 'daemon':
+        print(controlDaemon(args))
     

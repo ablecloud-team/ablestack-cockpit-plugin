@@ -78,6 +78,16 @@ python3 gluefs.py delete
 -/fs/gluefs 경로의 파일시스템을 마운트한 호스트의 마운트 해제 및 디렉토리 비우는 작업 
 ```
 
+#### gluefs daemon control
+```
+python3 gluefs.py daemon --control {control cmd} 
+
+-mds 서비스 데몬 시작/재시작/정지
+
+-옵션 (필수는 *표시)
+*{control cmd} : start, stop, restart
+```
+
 #### nfs config
 ```
 python3 nfs.py config
@@ -142,6 +152,16 @@ python3 nfs.py edit --access-type {access_type} --squash {squash} --quota {quota
 *{access_type} : RW, RO, NONE 중 선택
 *{squash} : no_root_squash, root_id_squash, root_squash, all_squash 중 선택
 {quota} : bytes 단위로 입력, 디폴트 0
+```
+
+#### nfs daemon control
+```
+python3 nfs.py daemon --control {control cmd} 
+
+-nfs 서비스 데몬 시작/재시작/정지
+
+-옵션 (필수는 *표시)
+*{control cmd} : start, stop, restart
 ```
 
 #### iscsi config
@@ -224,4 +244,14 @@ python3 iscsi.py image --name {image name}
 
 -옵션 (필수는 *표시)
 {image name} : rbd image 이름
+```
+
+#### iscsi daemon control
+```
+python3 iscsi.py daemon --control {control cmd} 
+
+-iscsi 서비스 데몬 시작/재시작/정지
+
+-옵션 (필수는 *표시)
+*{control cmd} : start, stop, restart
 ```
