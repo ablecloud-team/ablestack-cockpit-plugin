@@ -480,7 +480,6 @@ def controlDaemon(args):
         daemonInfo = json.loads(daemonList()).get('val')
         daemon = json.loads(daemonInfo)
         for num in daemon:
-            status = num['status_desc']
             name = num['daemon_name']
         params = {
             'daemon_name': name
@@ -495,17 +494,7 @@ def controlDaemon(args):
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
         elif response.status_code == 202:
-            global cnt
-            cnt = 0    
-            while True:
-                redaemonInfo = json.loads(daemonList()).get('val')
-                redaemon = json.loads(redaemonInfo)
-                for renum in redaemon:
-                    if status != renum['status_desc']:
-                        cnt = cnt+1
-                if cnt != 0:
-                    break
-            return createReturn(code=200, val='nfs service '+args.action+' control success')     
+            return createReturn(code=200, val='scheduled to '+args.control+' nfs service')     
         else:
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
     except Exception as e:

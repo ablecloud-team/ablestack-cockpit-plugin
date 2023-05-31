@@ -427,9 +427,10 @@ def controlDaemon(args):
         daemonInfo = json.loads(daemonList()).get('val')
         daemon = json.loads(daemonInfo)
         global success
+        global schedule
         success = 0
+        schedule = 0
         for num in daemon:
-            status = num['status_desc']
             name = num['daemon_name']
             params = {
                 'daemon_name': name
@@ -444,24 +445,13 @@ def controlDaemon(args):
             if response.status_code == 200:
                 success = success+1
             elif response.status_code == 202:
-                global cnt
-                cnt = 0    
-                while True:
-                    redaemonInfo = json.loads(daemonList()).get('val')
-                    redaemon = json.loads(redaemonInfo)
-                    for renum in redaemon:
-                        if name == renum['daemon_name']:
-                            if status != renum['status_desc']:
-                                cnt = cnt+1
-                    if cnt != 0:
-                        break
-                success = success+1   
+                schedule = schedule+1
             else:
                 return createReturn(code=500, val=json.dumps(response.json(), indent=2))
         if success == 2:
             return createReturn(code=200, val='gluefs service '+args.action+' control success')
         else:
-            return createReturn(code=500, val='gluefs.py controlDaemon error : mds service 2 daemon control fail')
+            return createReturn(code=200, val='scheduled to '+args.control+' gluefs service')    
     except Exception as e:
         return createReturn(code=500, val='gluefs.py controlDaemon error :'+e)
 
