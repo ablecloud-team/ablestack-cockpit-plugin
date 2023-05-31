@@ -448,7 +448,7 @@ def controlDaemon(args):
                 schedule = schedule+1
             else:
                 return createReturn(code=500, val=json.dumps(response.json(), indent=2))
-        if success == 2:
+        if success == 2 and schedule == 0:
             return createReturn(code=200, val='gluefs service '+args.action+' control success')
         else:
             return createReturn(code=200, val='scheduled to '+args.control+' gluefs service')    
