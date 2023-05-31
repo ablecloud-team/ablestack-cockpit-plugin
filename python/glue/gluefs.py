@@ -426,37 +426,44 @@ def controlDaemon(args):
         }
         daemonInfo = json.loads(daemonList()).get('val')
         daemon = json.loads(daemonInfo)
+        global success
+        success = 0
         for num in daemon:
             status = num['status_desc']
             name = num['daemon_name']
-        params = {
-            'daemon_name': name
-        }
-        json_data = {
-            'action': args.control,
-            'container_image': ''
-        }
-        url = glueUrl()
-        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-        response = requests.put(url+'/api/daemon/daemon_name', headers=headers, params=params, json=json_data, verify=False)
-        if response.status_code == 200:
-            return createReturn(code=200, val=json.dumps(response.json(), indent=2))
-        elif response.status_code == 202:
-            global cnt
-            cnt = 0    
-            while True:
-                redaemonInfo = json.loads(daemonList()).get('val')
-                redaemon = json.loads(redaemonInfo)
-                for renum in redaemon:
-                    if status != renum['status_desc']:
-                        cnt = cnt+1
-                if cnt != 0:
-                    break
-            return createReturn(code=200, val='iscsi service '+args.action+' control success')     
+            params = {
+                'daemon_name': name
+            }
+            json_data = {
+                'action': args.control,
+                'container_image': ''
+            }
+            url = glueUrl()
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+            response = requests.put(url+'/api/daemon/daemon_name', headers=headers, params=params, json=json_data, verify=False)
+            if response.status_code == 200:
+                success = success+1
+            elif response.status_code == 202:
+                global cnt
+                cnt = 0    
+                while True:
+                    redaemonInfo = json.loads(daemonList()).get('val')
+                    redaemon = json.loads(redaemonInfo)
+                    for renum in redaemon:
+                        if name == renum['daemon_name']:
+                            if status != renum['status_desc']:
+                                cnt = cnt+1
+                    if cnt != 0:
+                        break
+                success = success+1   
+            else:
+                return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+        if success == 2:
+            return createReturn(code=200, val='gluefs service '+args.action+' control success')
         else:
-            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+            return createReturn(code=500, val='gluefs.py controlDaemon error : mds service 2 daemon control fail')
     except Exception as e:
-        return createReturn(code=500, val='iscsi.py controlDaemon error :'+e)
+        return createReturn(code=500, val='gluefs.py controlDaemon error :'+e)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
