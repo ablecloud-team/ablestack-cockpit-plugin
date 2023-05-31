@@ -581,7 +581,7 @@ if __name__ == '__main__':
     verbose = (5 - args.verbose) * 10
 
     # 로깅을 위한 logger 생성, 모든 인자에 default 인자가 있음.
-    logger = createLogger(loggername='nfs', verbosity=verbose, log_file='nfs.log',
+    logger = createLogger(loggername='iscsi', verbosity=verbose, log_file='iscsi.log',
                           file_log_level=logging.ERROR)
 
     # 실제 로직 부분 호출 및 결과 출력
