@@ -69,7 +69,7 @@ def selectPcsExeHost(args):
         for f_key in json_data["clusterConfig"]["pcsCluster"]:
             pcs_host = json_data["clusterConfig"]["pcsCluster"][f_key]
             if pcs_host != "":
-                ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_host, "echo ok").stdout.strip().decode()
+                ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_host, "echo ok").strip()
                 if ret == 'ok':
                     return createReturn(code=200, val=pcs_host)
 

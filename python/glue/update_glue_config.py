@@ -78,17 +78,17 @@ def updateAllHostGlueConfig(args):
                 host_list.append(f_val1["ablecube"])
                 host_list.append(f_val1["scvmMngt"])
 
-            ping_result = json.loads(python3(pluginpath+'/python/vm/host_ping_test.py', '-hns', host_list).stdout.decode())
+            ping_result = json.loads(python3(pluginpath+'/python/vm/host_ping_test.py', '-hns', host_list))
 
             if ping_result["code"] == 200:
                 # 명령 수행이 가능한 상태인지 체크하는 부분
                 return_val = "Command execution test failed. Check the ablecube cube hosts and scvms status. Please check the config.json file or ip"
                 for f_val2 in json_data["clusterConfig"]["hosts"]:
-                    ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', f_val2["ablecube"], "echo ok").stdout.strip().decode()
+                    ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', f_val2["ablecube"], "echo ok").strip()
                     if ret != "ok":
                         return createReturn(code=500, val=return_val + " : " + f_val2["ablecube"])
 
-                    ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', f_val2["scvmMngt"], "echo ok").stdout.strip().decode()
+                    ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', f_val2["scvmMngt"], "echo ok").strip()
                     if ret != "ok":
                         return createReturn(code=500, val=return_val + " : " + f_val2["scvmMngt"])
                 

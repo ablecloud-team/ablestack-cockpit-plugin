@@ -123,7 +123,7 @@ class Pacemaker:
         self.target_host = target_host
         current_host = None
 
-        xml = pcs('status', 'xml').stdout.decode()
+        xml = pcs('status', 'xml')
         soup = BeautifulSoup(xml, 'lxml')
         soup_nodes = soup.find('nodes').select('node')
         soup_resource = soup.select_one(f'#{self.resource_name}')
@@ -214,7 +214,7 @@ class Pacemaker:
         current_host = None
         
         try:
-            xml = pcs('status', 'xml').stdout.decode()
+            xml = pcs('status', 'xml')
             soup = BeautifulSoup(xml, 'lxml')
             soup_nodes = soup.find('nodes').select('node')
             soup_resource = soup.select_one(f'#{self.resource_name}')

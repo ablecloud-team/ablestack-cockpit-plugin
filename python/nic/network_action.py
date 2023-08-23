@@ -55,7 +55,7 @@ def listNetworkInterface(H=False):
     #    print(out.split())
 
     output = nmcli_cmd('-c', 'no', '-f', 'DEVICE,TYPE,STATE,CON-PATH', 'device', _env=env)
-    logger.debug(output.stdout.decode())
+    logger.debug(output)
     outputs = output.splitlines()
     fields = outputs[0].split()
     bridges=[]
@@ -70,7 +70,7 @@ def listNetworkInterface(H=False):
         if 'bridge' in item['TYPE']:
             bridges.append(item)
         elif 'ether' in item['TYPE']:
-            fin = ethtool(i=item['DEVICE']).stdout.decode().splitlines()
+            fin = ethtool(i=item['DEVICE']).splitlines()
             for line in fin:
                 if "bus-info" in line:
                     item['PCI']=line.split(' ')[1]

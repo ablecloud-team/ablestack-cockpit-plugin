@@ -229,7 +229,7 @@ user-data파일을 사용하여 publickey와 privatekey, authorized_key, /etc/ho
 """
 def genUserFromFile(pubkeyfile: str, privkeyfile: str, hostsfile: str):
     # with open('user-data.tmpl', 'rt') as f:
-    #     yam = yaml.load(f)
+    #     yam = yaml.safe_load(f)
     #     tmp_meta = f.read()
     # pprint.pprint(yam)
     with open(pubkeyfile, 'rt') as f:
@@ -342,7 +342,7 @@ ccvm용 네트워크설정(스토리지 네트워크 추가 없음)하는 부분
 """
 def ccvmGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str):
     with open(f'{tmpdir}/network-config.mgmt', 'rt') as f:
-        yam = yaml.load(f)
+        yam = yaml.safe_load(f)
 
     if sn_nic is not None or sn_ip is not None or sn_prefix is not None or sn_gw is not None :
         yam['network']['config'].append({'name': sn_nic,
@@ -354,7 +354,7 @@ def ccvmGen( sn_nic: str, sn_ip: str, sn_prefix: int, sn_gw: str):
         f.write(yaml.dump(yam))
 
     with open(f'{tmpdir}/user-data', 'rt') as f:
-        yam2 = yaml.load(f)
+        yam2 = yaml.safe_load(f)
         with open(f'{pluginpath}/shell/host/ccvm_bootstrap.sh', 'rt') as bootstrapfile:
             bootstrap = bootstrapfile.read()
         yam2['write_files'].append(
@@ -384,7 +384,7 @@ scvm용 네트워크설정(스토리지 네트워크 추가)하는 부분
 """
 def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_prefix=24, master=False):
     with open(f'{tmpdir}/network-config.mgmt', 'rt') as f:
-        yam = yaml.load(f)
+        yam = yaml.safe_load(f)
     yam['network']['config'].append({'mtu': 9000, 'name': pn_nic,
                                      'subnets': [{'address': f'{pn_ip}/{pn_prefix}',
                                                   'type': 'static'}],
@@ -396,7 +396,7 @@ def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_p
     with open(f'{tmpdir}/network-config', 'wt') as f:
         f.write(yaml.dump(yam))
     with open(f'{tmpdir}/user-data', 'rt') as f:
-        yam2 = yaml.load(f)
+        yam2 = yaml.safe_load(f)
     yam2['bootcmd'] = [
         ['/usr/bin/systemctl', 'enable', '--now', 'cockpit.socket'],
         ['/usr/bin/systemctl', 'enable', '--now', 'cockpit.service']

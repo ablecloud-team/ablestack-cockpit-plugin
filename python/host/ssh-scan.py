@@ -21,7 +21,7 @@ env = os.environ.copy()
 knownhostsfile = f"{env['HOME']}/.ssh/known_hosts"
 
 
-output = bash(scanscript).stdout.decode().splitlines()
+output = bash(scanscript).splitlines()
 
 knownhostlists = []
 try:
