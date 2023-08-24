@@ -70,9 +70,10 @@ def resetCloudCenter(args):
 
     # 작업폴더 생성
     os.system("mkdir -p "+pluginpath+"/tools/vmconfig/ccvm")
-    '''
+
     # cloudinit iso 삭제
-    os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso")
+    os.system("rm -f /var/lib/libvirt/images/ccvm-cloudinit.iso")
+    '''
     
     # vm xml 템플릿 삭제
     os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
