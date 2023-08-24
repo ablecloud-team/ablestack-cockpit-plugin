@@ -124,7 +124,7 @@ def createCcvmCloudinit(args):
             
             # /ccvm/ccvm-cloudinit.iso 복사 실패
             for i in [1,2,3]:
-                ret_num = os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso")
+                ret_num = os.system("scp -q "+"/var/lib/libvirt/images/ccvm-cloudinit.iso root@"+host_name+":"+"/var/lib/libvirt/images/ccvm-cloudinit.iso")
                 if ret_num == 0:
                     break
                     
