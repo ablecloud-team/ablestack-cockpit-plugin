@@ -1,9 +1,0 @@
-{
-    "bootstrap": {
-        "scvm": "false",
-        "ccvm": "false"
-    },
-    "monitoring": {
-        "wall": "false"
-    }
-}

@@ -1,1 +1,0 @@
-ABLESTACK Cockpit Plugin의 UI에서 사용하는 각종 이미지를 관리하는 디렉토리
