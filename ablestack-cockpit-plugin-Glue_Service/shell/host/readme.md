@@ -1,0 +1,1 @@
+ABLESTACK Cockpit Plugin에서 서버 측의 명령을 실행하기 위해 작성된 쉡 스크립트를 관리하는 디렉토리

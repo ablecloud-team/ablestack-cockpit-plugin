@@ -1,0 +1,19 @@
+{
+    "clusterConfig": {
+        "ccvm": {
+            "ip": ""
+        },
+        "mngtNic": {
+            "cidr": "",
+            "gw": "",
+            "dns": ""
+        },
+        "pcsCluster": {
+            "hostname1": "",
+            "hostname2": "",
+            "hostname3": ""
+        },
+        "hosts": [
+        ]
+    }
+}
