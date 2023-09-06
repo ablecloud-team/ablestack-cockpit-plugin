@@ -289,7 +289,7 @@ $('html').on('click', function(e){
 });
 
 // 상태 보기 드롭다운 메뉴를 활성화한 상태에서 다른 영역을 클릭 했을 경우 메뉴 닫기 (pareant html 클릭할 때 작동)
-$(top.document, 'html').on('click', function(e){ 
+$(top.document, 'html').on('click', function(e){
     if(!$(e.target).hasClass('pf-c-dropdown__toggle')){
         $('.pf-c-dropdown__menu, .pf-m-align-right').hide();
     }
@@ -321,7 +321,7 @@ $('#button-execution-modal-cloud-vm-db-dump').on('click', function () {
 
 // 클라우드센터 VM DB 백업파일 다운로드 링크 클릭 시
 $('#span-modal-wizard-cluster-config-finish-db-dump-file-download').on('click', function () {
-    
+
 })
 
 /**
@@ -389,7 +389,7 @@ function scvm_bootstrap_run(){
     cockpit.spawn(["python3", pluginpath+"/python/url/create_address.py", "storageCenter"])
     .then(function(data){
         createLoggerInfo("scc_link_go start");
-        var retVal = JSON.parse(data);        
+        var retVal = JSON.parse(data);
         if(retVal.code == 200){
             // 스토리지센터 연결
             window.open(retVal.val);
@@ -401,7 +401,7 @@ function scvm_bootstrap_run(){
     })
     .catch(function(data){
         createLoggerInfo(":::scc_link_go() Error :::");
-        console.log(":::scc_link_go() Error :::" + data);        
+        console.log(":::scc_link_go() Error :::" + data);
     });
 }
 
@@ -577,25 +577,25 @@ $('#button-cancel-modal-remove-cube-host').on('click', function(){
 function checkStorageClusterStatus(){
     //createLoggerInfo("checkStorageClusterStatus() start");
     return new Promise((resolve) => {
-        //초기 상태 체크 중 표시        
+        //초기 상태 체크 중 표시
         $('#scc-status').html("상태 체크 중 &bull;&bull;&bull;&nbsp;&nbsp;&nbsp;<svg class='pf-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
         $("#scc-css").attr('class','pf-c-label pf-m-orange');
         $("#scc-icon").attr('class','fas fa-fw fa-exclamation-triangle');
 
-        //bootstrap.sh을 실행했는지 여부 확인        
+        //bootstrap.sh을 실행했는지 여부 확인
         cockpit.spawn(["python3", pluginpath+"/python/ablestack_json/ablestackJson.py", "status"])
-        .then(function(data){            
-            var retVal = JSON.parse(data);            
+        .then(function(data){
+            var retVal = JSON.parse(data);
             if(retVal.val.bootstrap.scvm == "false"){ //bootstrap.sh 실행 전
-                sessionStorage.setItem("scvm_bootstrap_status","false");      
+                sessionStorage.setItem("scvm_bootstrap_status","false");
                 $("#scvm-after-bootstrap-run").html("");
                 $("#scvm-before-bootstrap-run").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-bootstrap-run' onclick='scvm_bootstrap_run()'>Bootstrap 실행</a>");
             }else{  //bootstrap.sh 실행 후
-                sessionStorage.setItem("scvm_bootstrap_status","true"); 
+                sessionStorage.setItem("scvm_bootstrap_status","true");
                 $("#scvm-after-bootstrap-run").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-linkto-storage-center' onclick='scc_link_go()'>스토리지센터 연결</a>");
                 $("#scvm-after-update-glue-config").html("<a class='pf-c-dropdown__menu-item' href='#' id='menu-item-update-glue-config' onclick='all_host_glue_config_update_modal()'>전체 호스트 Glue 설정 업데이트</a>");
                 $("#scvm-before-bootstrap-run").html("");
-            }      
+            }
         })
         .catch(function(data){
             createLoggerInfo("Check whether bootstrap.sh is executed Error");
@@ -674,9 +674,9 @@ function checkStorageClusterStatus(){
                 if(retVal.val.osd !="N/A" && retVal.val.osd_up !="N/A" ){
                     $('#scc-osd').text("전체 " + retVal.val.osd + "개의 디스크 중 " + retVal.val.osd_up + "개 작동 중");
                 }
-                if(retVal.val.mon_gw1 !="N/A" && retVal.val.mon_gw2 !="N/A" ){     
-                    if(retVal.val.json_raw.health.checks.hasOwnProperty('MON_DOWN')){//health 상태값 중 MON_DOWN 값이 있을때 
-                        activeGwCnt = parseInt(retVal.val.mon_gw1) - parseInt(retVal.val.json_raw.health.checks.MON_DOWN.summary.count);//다운된 mon count 확인해 실행중인(activeGwCnt) mon count 값세팅        
+                if(retVal.val.mon_gw1 !="N/A" && retVal.val.mon_gw2 !="N/A" ){
+                    if(retVal.val.json_raw.health.checks.hasOwnProperty('MON_DOWN')){//health 상태값 중 MON_DOWN 값이 있을때
+                        activeGwCnt = parseInt(retVal.val.mon_gw1) - parseInt(retVal.val.json_raw.health.checks.MON_DOWN.summary.count);//다운된 mon count 확인해 실행중인(activeGwCnt) mon count 값세팅
                     }else{
                         activeGwCnt = retVal.val.mon_gw1;
                     }
@@ -874,13 +874,13 @@ function checkDeployStatus(){
     $('#button-link-monitoring-center').hide();
     $('#button-config-file-download').hide();
     /*
-       가상머신 배포 및 클러스터 구성 상태를 세션 스토리지에서 조회 
+       가상머신 배포 및 클러스터 구성 상태를 세션 스토리지에서 조회
        - 클러스터 구성준비 상태 = false, true
-       - 스토리지센터 가상머신 상태 = HEALTH_ERR(배포x), RUNNING, SHUT OFF 등 
+       - 스토리지센터 가상머신 상태 = HEALTH_ERR(배포x), RUNNING, SHUT OFF 등
        - 스토리지센터 가상머신 부트스트랩 실행 상태 = false, true
-       - 스토리지센터 클러스터 상태 = HEALTH_ERR(구성x), HEALTH_OK, HEALTH_WARN 등 
+       - 스토리지센터 클러스터 상태 = HEALTH_ERR(구성x), HEALTH_OK, HEALTH_WARN 등
        - 클라우드센터 클러스터 상태 = HEALTH_ERR1(구성x), HEALTH_ERR2(리소스 구성x), HEALTH_OK
-       - 클라우드센터 가상머신 상태 = HEALTH_ERR(배포x), RUNNING, SHUT OFF 등 
+       - 클라우드센터 가상머신 상태 = HEALTH_ERR(배포x), RUNNING, SHUT OFF 등
        - 클라우드센터 가상머신 부트스트랩 실행 상태 = false, true
     */
     const step1 = sessionStorage.getItem("ccfg_status");
@@ -894,7 +894,7 @@ function checkDeployStatus(){
 
     console.log("step1 :: " + step1 + ", step2 :: " + step2 + " , step3 :: " + step3 + ", step4 :: " + step4 + ", step5 :: " + step5 + ", step6 :: " + step6 + ", step7 :: " + step7 + ", step8 :: " + step8);
 
-    // 배포 상태조회 
+    // 배포 상태조회
     if(step1!="true"){
         // 클러스터 구성준비 버튼 show
         $('#button-open-modal-wizard-storage-cluster').show();
@@ -938,7 +938,7 @@ function checkDeployStatus(){
                                 // 스토리지센터 연결 버튼, 클라우드센터 연결 버튼 show, 모니터링센터 구성 버튼 show
                                 $('#button-link-storage-center-dashboard').show();
                                 $('#button-link-cloud-center').show();
-                                
+
                                 if(step8!="true"){
                                     $('#button-open-modal-wizard-monitoring-center').show();
                                     showRibbon('warning','모니터링센터에 연결할 수 있도록 모니터링센터 구성 작업을 진행하십시오.');
@@ -1035,7 +1035,7 @@ function saveHostInfo(){
  function scanHostKey(){
     //createLoggerInfo("scanHostKey() start");
     cockpit.spawn(['python3', pluginpath + '/python/host/ssh-scan.py'])
-    .then(function(data){            
+    .then(function(data){
         console.log("keyscan ok");
     })
     .catch(function(err){
@@ -1088,7 +1088,7 @@ function saveHostInfo(){
     });
     //ccvm bootstrap 프로퍼티 초기화
     cockpit.spawn(["python3", pluginpath+"/python/ablestack_json/ablestackJson.py", "update", "--depth1", "bootstrap", "--depth2", "ccvm", "--value", "false"])
-    .then(function(data){        
+    .then(function(data){
         createLoggerInfo("resetBootstrap ccvm ok");
         console.log("resetBootstrap ccvm ok");
     })
@@ -1098,7 +1098,7 @@ function saveHostInfo(){
     });
     //wall monitoring 프로퍼티 초기화
     cockpit.spawn(["python3", pluginpath+"/python/ablestack_json/ablestackJson.py", "update", "--depth1", "monitoring", "--depth2", "wall", "--value", "false"])
-    .then(function(data){        
+    .then(function(data){
         createLoggerInfo("resetBootstrap wall ok");
         console.log("resetBootstrap wall ok");
     })
@@ -1133,9 +1133,9 @@ function ribbonWorker() {
     let month = ('0' + (today.getMonth() + 1)).slice(-2);
     let day = ('0' + today.getDate()).slice(-2);
     let date_string = year+month+day;
-    let hours = ('0' + today.getHours()).slice(-2); 
+    let hours = ('0' + today.getHours()).slice(-2);
     let minutes = ('0' + today.getMinutes()).slice(-2);
-    let seconds = ('0' + today.getSeconds()).slice(-2); 
+    let seconds = ('0' + today.getSeconds()).slice(-2);
     let time_string = hours+ minutes+seconds;
 
     // ccvm에서 mysqldump 파일을 생성하는 파이썬 파일 실행
@@ -1204,8 +1204,3 @@ function ribbonWorker() {
         cockpit.file().close()
     }
 }
-
-
-
-
-

@@ -13,7 +13,7 @@ $(document).ready(function(){
             $('#index-page').load("main_glue.html");
         } else {
             $('#index-page').load("main.html");
-        }        
+        }
     })
     .catch(function (error) {
         $('#index-page').load("main.html");

@@ -102,9 +102,8 @@ $('#button-execution-modal-gateway-wizard-confirm').on('click', function () {
         cockpit.spawn(cmd).then(function(data){
             $('#div-modal-spinner').hide();
             var retVal = JSON.parse(data);
-            console.log(retVal);
             if(retVal.code == "200"){
-                
+
                 $("#modal-status-alert-title").html("스토리지 게이트웨이 서비스 가상머신 구성 완료");
                 $("#modal-status-alert-body").html("스토리지 게이트웨이 서비스 가상머신 구성을 완료하였습니다.");
                 $('#div-modal-status-alert').show();

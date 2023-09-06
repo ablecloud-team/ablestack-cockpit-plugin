@@ -1,0 +1,69 @@
+<div class="pf-c-backdrop" >
+    <div class="pf-l-bullseye">
+      <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-description">
+        <button class="pf-c-button pf-m-plain" type="button" aria-label="Close dialog" id="button-close-modal-nfs-construction">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+        <header class="pf-c-modal-box__header">
+          <h1 class="pf-c-modal-box__title" id="modal-title-nfs-construciton">NFS 구성</h1>
+        </header>
+        <div class="pf-c-modal-box__body" id="modal-description-nfs-construciton">
+          <form novalidate class="pf-c-form pf-m-horizontal" style="margin-left:15px;margin-top:32px">
+              <section class="pf-c-form__section">
+                <div class="pf-c-form__group">
+                    <div class="pf-c-form__group-label">
+                        <label class="pf-c-form__label" for="nfs-construction-access-type">
+                            <span class="pf-c-form__label-text">액세스 유형</span>
+                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                        </label>
+                    </div>
+                    <div class="pf-c-form__group-control pf-m-inline">
+                        <div class="pf-c-dropdown">
+                            <select class="pf-c-form-control" id="form-select-nfs-access-type" name="form-select-nfs-access-type" style="width:100%">
+                                <option value="" selected>선택하십시오</option>
+                                <option value="RW">RW</option>
+                                <option value="RO">RO</option>
+                                <option value="NONE">NONE</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                  <div class="pf-c-form__group">
+                      <div class="pf-c-form__group-label">
+                          <label class="pf-c-form__label" for="nfs-construction-squash">
+                              <span class="pf-c-form__label-text">squash</span>
+                              <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                          </label>
+                      </div>
+                      <div class="pf-c-form__group-control pf-m-inline">
+                        <div class="pf-c-dropdown">
+                            <select class="pf-c-form-control" id="form-select-nfs-squash" name="form-select-nfs-squash" style="width:100%">
+                                <option value="" selected>선택하십시오</option>
+                                <option value="no_root_squash">no_root_squash</option>
+                                <option value="root_id_squash">root_id_squash</option>
+                                <option value="root_squash">root_squash</option>
+                                <option value="all_squash">all_squash</option>
+                            </select>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="pf-c-form__group">
+                    <div class="pf-c-form__group-label">
+                        <label class="pf-c-form__label" for="nfs-construction-max-capacity">
+                            <span class="pf-c-form__label-text">용량</span>
+                        </label>
+                    </div>
+                    <div class="pf-c-form__group-control pf-m-inline">
+                        <input class="pf-c-form-control" style="width:50%" type="text" id="nfs-construction-max-capacity" name="nfs-construction-max-capacity" />
+                    </div>
+                </div>
+        </div>
+        <footer class="pf-c-modal-box__footer">
+          <button class="pf-c-button pf-m-primary" id="buttion-create-modal-nfs-construction" type="button">확인</button>
+          <button class="pf-c-button pf-m-link" id="button-cancel-modal-nfs-construction" type="button">취소</button>
+        </footer>
+      </div>
+    </div>
+</div>
+
+<script src="./src/features/glue/nfs-construction.js"></script>

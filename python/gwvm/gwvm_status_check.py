@@ -27,7 +27,7 @@ env = os.environ.copy()
 json_file_path = pluginpath+"/tools/properties/cluster.json"
 hosts_file_path = "/etc/hosts"
 # ablecube_host는 scvm이 실행중인 호스트의 ip 또는 호스트 네임
-ablecube_host = "ablecube"  
+ablecube_host = "ablecube"
 
 def createArgumentParser():
     '''
@@ -45,10 +45,10 @@ def createArgumentParser():
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
-    
+
     # flag 추가(샘플임, 테스트용으로 json이 아닌 plain text로 출력하는 플래그 역할)
     parser.add_argument('-H', '--Human', action='store_const', dest='flag_readerble', const=True, help='Human readable')
-    
+
     # Version 추가
     parser.add_argument('-V', '--Version', action='version', version='%(prog)s 1.0')
 
@@ -82,7 +82,7 @@ def check(args):
             gwvm_info['role'] = ret["val"]["role"]
             # 실행 노드
             gwvm_info['started'] = ret["val"]["started"]
-            
+
             if ret["val"]["role"] == "Started":
                 gwvm_info['ip'] = "Unknown"
                 gwvm_info['mac'] = "Unknown"

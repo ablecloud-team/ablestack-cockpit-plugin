@@ -81,10 +81,10 @@ $('#nav-button-cluster-config-ip-info').on('click', function () {
 
 $('#nav-button-cluster-config-time-server').on('click', function () {
     resetClusterConfigWizard();
-    
+
     $('#div-modal-wizard-cluster-config-time-server').show();
     $('#nav-button-cluster-config-time-server').addClass('pf-m-current');
-    
+
     $('#button-next-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
     $('#button-before-step-modal-wizard-cluster-config-prepare').attr('disabled', false);
 
@@ -126,7 +126,7 @@ $('#nav-button-cluster-config-review').on('click', function () {
     putSshKeyValueIntoTextarea(ssh_key_type);
     // 변경된 hosts file 내용을 설정 확인에 반영
     let host_file_type = $('input[name=radio-hosts-file]:checked').val();
-    
+
     $("#div-cluster-ccvm-mngt-ip").text($("#form-input-cluster-ccvm-mngt-ip").val());
     $("#div-cluster-mngt-nic-cidr").text($("#form-input-cluster-mngt-nic-cidr").val());
     $("#div-cluster-mngt-nic-gw").text($("#form-input-cluster-mngt-nic-gateway").val());
@@ -173,7 +173,7 @@ $('#nav-button-cluster-config-finish').on('click', function () {
     putSshKeyValueIntoTextarea(ssh_key_type);
     // 변경된 hosts file 내용을 설정 확인에 반영
     let host_file_type = $('input[name=radio-hosts-file]:checked').val();
-    
+
     putHostsValueIntoTextarea(host_file_type, option);
     // time server 내용을 설정 확인에 반영
     let ntp_timeserver_type = $('input[name=radio-timeserver]:checked').val();
@@ -226,7 +226,7 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
         $("#div-cluster-pcs-hostname1").text($("#form-input-cluster-pcs-hostname1").val());
         $("#div-cluster-pcs-hostname2").text($("#form-input-cluster-pcs-hostname2").val());
         $("#div-cluster-pcs-hostname3").text($("#form-input-cluster-pcs-hostname3").val());
-        
+
         putHostsValueIntoTextarea(host_file_type, option);
         // time server 내용을 설정 확인에 반영
         let timeserver_type = $('input[name=radio-timeserver]:checked').val();
@@ -265,7 +265,7 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
         putSshKeyValueIntoTextarea(ssh_key_type);
         // 변경된 hosts file 내용을 설정 확인에 반영
         let host_file_type = $('input[name=radio-hosts-file]:checked').val();
-        
+
         putHostsValueIntoTextarea(host_file_type, option);
         // time server 내용을 설정 확인에 반영
         let timeserver_type = $('input[name=radio-timeserver]:checked').val();
@@ -278,7 +278,7 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
         let cluster_config_prepare_vaildation = validateClusterConfigPrepare(timeserver_type);
         if (cluster_config_prepare_vaildation == true) {
             $('#div-modal-wizard-cluster-config-deploy').show();
-            
+
             $('#nav-button-cluster-config-overview').addClass('pf-m-disabled');
             $('#nav-button-cluster-config-ssh-key').addClass('pf-m-disabled');
             $('#nav-button-cluster-config-ip-info').addClass('pf-m-disabled');
@@ -298,12 +298,12 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
             let pri_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pri-file').val();
             let pub_ssh_key_text = $('#div-textarea-cluster-config-confirm-ssh-key-pub-file').val();
             let file_type = "ssh_key";
-            
+
             writeSshKeyFile(pri_ssh_key_text, pub_ssh_key_text, file_type);
-            
+
             // hosts 파일 > config 파일 쓰는 부분
             let host_file_type = $('input[name=radio-hosts-file]:checked').val();
-            
+
             let ret_json_string = tableToClusterConfigJsonString(host_file_type, option);
 
             // ccvm_mngt_ip
@@ -324,10 +324,10 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
             // writeSshKeyFile 작업이 완료될떄까지 5초 delay
             setTimeout(function(){
                 setClusterProgressStep("span-cluster-progress-step1",2);
-                setClusterProgressStep("span-cluster-progress-step2",1); 
+                setClusterProgressStep("span-cluster-progress-step2",1);
                 // 신규일때
                 // writeConfigFile(ret_json_string);
-                let cluster_host_yn = $('input[name=radio-cluster-host]:checked').val() 
+                let cluster_host_yn = $('input[name=radio-cluster-host]:checked').val()
                 if(cluster_host_yn == "new"){
                     var cluster_config_cmd = ["python3", pluginpath+"/python/cluster/cluster_config.py", "insert", "-js", ret_json_string, '-cmi', ccvm_mgmt_ip, '-pcl', host1_name, host2_name, host3_name];
                     if(mngt_nic_cidr != ""){
@@ -349,7 +349,7 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
                             setClusterProgressStep("span-cluster-progress-step3",1);
                             // 해당 호스트의 수정된 cluster.json 파일을 다운로드 링크로 만드는 함수 호출
                             createClusterJsonLink();
-    
+
                             // 마무리 작업 및 최종 화면 호출
                             showDivisionClusterConfigFinish();
                         }else{
@@ -396,7 +396,7 @@ $('#button-next-step-modal-wizard-cluster-config-prepare').on('click', function 
                                     setClusterProgressStep("span-cluster-progress-step3",2);
                                     // 해당 호스트의 수정된 cluster.json 파일을 다운로드 링크로 만드는 함수 호출
                                     createClusterJsonLink();
-            
+
                                     // 마무리 작업 및 최종 화면 호출
                                     showDivisionClusterConfigFinish();
                                 }else{
@@ -586,7 +586,7 @@ $('#form-radio-cluster-host-add').on('click', function () {
     $('#form-radio-hosts-file').click();
 });
 
-// Host 파일 준비 중 "현재 호스트 번호"를 변경하는 '+', '-' 기능 
+// Host 파일 준비 중 "현재 호스트 번호"를 변경하는 '+', '-' 기능
 // $('#form-input-cluster-config-current-host-number-plus').on('click', function () {
 //     let total_host_num_val = $('#form-input-cluster-config-host-number').val();
 //     let n = $('.bt_up').index(this);
@@ -613,11 +613,11 @@ $('#form-radio-cluster-host-add').on('click', function () {
 //     }
 // });
 
-// Host 파일 준비 중 "구성할 호스트"를 변경하는 '+', '-' 기능 
+// Host 파일 준비 중 "구성할 호스트"를 변경하는 '+', '-' 기능
 $('#form-input-cluster-config-host-number-plus').on('click', function () {
     let num = $("#form-input-cluster-config-host-number").val();
     $("#form-input-cluster-config-host-number").val(num * 1 + 1);
-    
+
     clusterConfigTableChange("form-input-cluster-config-host-number", "form-table-tbody-cluster-config-new-host-profile");
 });
 $('#form-input-cluster-config-host-number-minus').on('click', function () {
@@ -629,7 +629,7 @@ $('#form-input-cluster-config-host-number-minus').on('click', function () {
 });
 
 $('#form-input-cluster-config-host-number').on('change', function () {
-    
+
     if (this.value < 3 || this.value > 99) {
         this.value = 3;
         alert("3~99까지의 숫자만 입력할 수 있습니다.")
@@ -722,7 +722,7 @@ $('#form-input-cluster-config-host-number').on('change', function () {
 //         $('#form-input-cluster-config-current-host-number').val(99);
 //         alert("1~99까지의 숫자만 입력할 수 있습니다.");
 //     }
-//     // 기존 파일 사용 시, 현재 호스트 + 또는 - 클릭 시 Alias2 변경 
+//     // 기존 파일 사용 시, 현재 호스트 + 또는 - 클릭 시 Alias2 변경
 //     let option = "";
 //     changeAlias2(option);
 // });
@@ -837,7 +837,7 @@ $('input[name=radio-ssh-key]').on('click', function () {
 $('#form-input-cluster-config-hosts-file').on('click', function () {
     let hosts_input = document.querySelector('#form-input-cluster-config-hosts-file');
     let file_type = "cluster.json";
-    
+
     fileReaderIntoTableFunc(hosts_input, file_type, option);
     $('#form-input-cluster-config-hosts-file').val("")
 });
@@ -857,7 +857,7 @@ $('#button-accordion-ssh-key').on('click change', function () {
 // hosts 파일 준비 방식에 따라 내용 보여주기
 $('#button-accordion-hosts-file').on('click change', function () {
     let hosts_file_type = $('input[name=radio-hosts-file]:checked').val();
-    
+
     putHostsValueIntoTextarea(hosts_file_type, option);
 });
 // time server 종류에 따라 내용 보여주기
@@ -906,7 +906,7 @@ $('#span-modal-wizard-cluster-config-finish-hosts-file-download').on('click', fu
         saveAsFile(hosts_download, configtext, "cluster.json");
     } else {
         alert("cluster.json 파일이 존재하지 않습니다.");
-    }       
+    }
 });
 
 function createClusterJsonLink(){
@@ -1329,8 +1329,8 @@ async function writeSshKeyFile(text1, text2) {
 //         var retVal = JSON.parse(data);
 //         if(retVal.code == "200"){
 //             // 해당 호스트의 수정된 cluster.json 파일을 다운로드 링크로 만드는 함수 호출
-//             createClusterJsonLink();        
-//         }else{                
+//             createClusterJsonLink();
+//         }else{
 //             createLoggerInfo(":::Please check the cluster.json file.:::");
 //             console.log(":::Please check the cluster.json file.::: "+ data);
 //         }
@@ -1406,7 +1406,7 @@ function checkHostsOs() {
  **/
 
 function inputPnIntoTimeServer() {
-    
+
     //let colcnt;
     let tbody_tr;
     radio_value = $('input[name=radio-hosts-file]:checked').val();
@@ -1424,11 +1424,11 @@ function inputPnIntoTimeServer() {
         idx_num = $(this).find('td').eq(0).text();
         hostName = $(this).find('td').eq(1).text();
         pn_ip = $(this).find('td').eq(4).text();
-        
+
         if(index < 2){
             $('#form-input-cluster-config-time-server-ip-'+(index+1)).val(pn_ip);
         }
-        
+
         if(currentHostName == hostName) {//호스트 네임을 가져와서 시간 서버의 종류를 선택한다. (Master Server, Second Server, Other Server)
             if(idx_num == 1){
                 $('#form-radio-timeserver-host-num-1').prop('checked', true);
@@ -1505,7 +1505,7 @@ function inputPnIntoTimeServer() {
 async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserver_current_host_num) {
     let chrony_file_root = "/etc/chrony.conf"
     let chrony_text = "";
-    
+
     chrony_text +="# These servers were defined in the installation:"+"\n";
     chrony_text +="# Use public servers from the pool.ntp.org project."+"\n";
     chrony_text +="# Please consider joining the pool (http://www.pool.ntp.org/join.html)."+"\n";
@@ -1525,7 +1525,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
         }
     }
     chrony_text +=""+"\n";
-    
+
     chrony_text +="# Record the rate at which the system clock gains/losses time."+"\n";
     chrony_text +="driftfile /var/lib/chrony/drift"+"\n";
     chrony_text +=""+"\n";
@@ -1547,7 +1547,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
     chrony_text +="allow 0.0.0.0/0"+"\n";
     chrony_text +=""+"\n";
     chrony_text +="# Serve time even if not synchronized to a time source."+"\n";
-    
+
     if (file_type == "external") {
         chrony_text +="#local stratum 10"+"\n";
     } else if (file_type == "internal") {
@@ -1566,7 +1566,7 @@ async function modifyTimeServer(timeserver_confirm_ip_text, file_type, timeserve
     chrony_text +=""+"\n";
     chrony_text +="# Select which information is logged."+"\n";
     chrony_text +="#log measurements statistics tracking"+"\n";
-    
+
     //파일쓰기 재시작
     cockpit.file(chrony_file_root).replace(chrony_text)
     .done(function (data) { //성공

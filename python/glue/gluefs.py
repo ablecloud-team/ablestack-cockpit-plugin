@@ -40,7 +40,7 @@ def createArgumentParser():
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
 
     # 선택지 추가(동작 선택)
-    tmp_parser.add_argument('action', choices=['config', 'destroy', 'status', 'list', 'detail', 'delete', 'edit', 'quota', 'mount', 'daemon'], help='glueFS action')
+    tmp_parser.add_argument('action', choices=['config', 'destroy', 'status', 'list', 'detail', 'delete', 'edit', 'quota', 'mount', 'daemon','gluefs-quota'], help='glueFS action')
     tmp_parser.add_argument('--type', metavar='fs type', type=str, help='gluefs, smb, nfs 중 파일시스템 타입')
     tmp_parser.add_argument('--path', metavar='gluefs path', type=str, help='gluefs 경로')
     tmp_parser.add_argument('--quota', metavar='gluefs quota max bytes', default='0', help='gluefs 쿼터 최대 크기 (Bytes)')
@@ -63,7 +63,7 @@ def createArgumentParser():
     return tmp_parser
 
 # glue 대시보드 url 조회
-def glueUrl(): 
+def glueUrl():
     try:
         cmd = ssh('-o', 'StrictHostKeyChecking=no', 'ablecube', 'python3', pluginpath+ '/python/url/create_address.py', 'storageCenter').stdout.decode().splitlines()
         dashboard = json.loads(cmd[0])
@@ -96,7 +96,7 @@ def createToken():
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
     except Exception as e:
         return createReturn(code=500, val='gluefs.py createToken error :'+e)
-    
+
 # cluster.json 파일의 호스트 정보
 def openClusterJson():
     try:
@@ -108,7 +108,6 @@ def openClusterJson():
         return host_list
     except Exception as e:
         return createReturn(code=500, val='cluster.json read error :'+e)
-
 # daemon 조회
 def daemonList():
     try:
@@ -131,7 +130,7 @@ def daemonList():
     except Exception as e:
         return createReturn(code=500, val='gluefs.py daemonList error :'+e)
 
-# fs 구성 (nfs, smb, gluefs 구성하는 경우)      
+# fs 구성 (nfs, smb, gluefs 구성하는 경우)
 def configFs(args):
     try:
         ########### 구성 여부 확인  ###########
@@ -209,7 +208,7 @@ def configFs(args):
                     return createReturn(code=500, val=value)
             return createReturn(code=200, val='gluefs service '+args.action+' control success')
         ########### fs가 생성되어 있는 경우  ###########
-        if fs_cnt == 1 and mds_cnt >= 1: 
+        if fs_cnt == 1 and mds_cnt >= 1:
             if args.type == 'gluefs':
                 secret = ssh('-o', 'StrictHostKeyChecking=no', 'ablecube', 'cat', '/etc/ceph/ceph.client.admin.keyring', '|', 'awk', "'{print $3}'").stdout.decode().splitlines()
                 cmd = socket.gethostbyname('scvm1')+':6789,'+socket.gethostbyname('scvm2')+':6789,'+socket.gethostbyname('scvm3')+':6789:/gluefs\t'+args.mount_path+'\tceph\tname=admin,secret='+secret[1]+',noatime,_netdev\t0 0'
@@ -217,7 +216,7 @@ def configFs(args):
                 for host in json_data:
                     ssh('-o', 'StrictHostKeyChecking=no', host, 'mkdir', '-p', args.mount_path).stdout.decode().splitlines()
                     ssh('-o', 'StrictHostKeyChecking=no', host, 'mount', '-t', 'ceph', 'admin@.fs=/gluefs', args.mount_path).stdout.decode().splitlines()
-                    ssh('-o', 'StrictHostKeyChecking=no', host, 'sed', '-i', "'$ a "+cmd+"'", '/etc/fstab').stdout.decode().splitlines()           
+                    ssh('-o', 'StrictHostKeyChecking=no', host, 'sed', '-i', "'$ a "+cmd+"'", '/etc/fstab').stdout.decode().splitlines()
             else:
                 # gwvm 마운트 상태 조회
                 mount = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', '/usr/bin/df', '-Th', '|', 'grep', 'ceph','|', 'awk', "'{print $7}'").stdout.decode().splitlines()
@@ -259,7 +258,7 @@ def destroyFs(args):
     except Exception as e:
         return createReturn(code=500, val='gluefs.py destroyFs error :'+e)
 
-# MDS 서비스 상태 조회  
+# MDS 서비스 상태 조회
 def statusFs(args):
     try:
         token = createToken()
@@ -283,7 +282,7 @@ def statusFs(args):
 
 # fs 조회
 def listFs(args):
-    try: 
+    try:
         token = createToken()
         headers = {
             'Accept': 'application/vnd.ceph.api.v1.0+json',
@@ -299,7 +298,7 @@ def listFs(args):
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
     except Exception as e:
         return createReturn(code=500, val='gluefs.py listFs error :'+e)
-    
+
 # fs 상세 조회
 def detailFs(args):
     try:
@@ -320,6 +319,7 @@ def detailFs(args):
         url = glueUrl()
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.get(url+'/api/cephfs/fs_id', headers=headers, params=params, verify=False)
+
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
         else:
@@ -329,7 +329,7 @@ def detailFs(args):
 
 # quota 조회 및 편집
 def quotaFs(args):
-    try: 
+    try:
         token = createToken()
         headers = {
             'Accept': 'application/vnd.ceph.api.v1.0+json',
@@ -355,7 +355,7 @@ def quotaFs(args):
         # quota 편집
         else:
             if args.path != '/gluefs':
-                ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'setfattr -n ceph.quota.max_bytes -v '+args.quota+ ' /fs/'+args.path).stdout.decode().splitlines()  
+                ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'setfattr -n ceph.quota.max_bytes -v '+args.quota+ ' /fs/'+args.path).stdout.decode().splitlines()
             else:
                 path = mouontGlueFs(args)
                 if path != '':
@@ -415,9 +415,9 @@ def deleteGlueFs(args):
     except Exception as e:
         return createReturn(code=500, val='gluefs.py deleteGlueFs error :'+e)
 
-# mds 서비스 제어   
+# mds 서비스 제어
 def controlDaemon(args):
-    try:        
+    try:
         token = createToken()
         headers = {
             'Accept': 'application/vnd.ceph.api.v0.1+json',
@@ -451,10 +451,20 @@ def controlDaemon(args):
         if success == 2 and schedule == 0:
             return createReturn(code=200, val='gluefs service '+args.action+' control success')
         else:
-            return createReturn(code=200, val='scheduled to '+args.control+' gluefs service')    
+            return createReturn(code=200, val='scheduled to '+args.control+' gluefs service')
     except Exception as e:
         return createReturn(code=500, val='gluefs.py controlDaemon error :'+e)
 
+def gluequota():
+    # 서비스 제어 명령
+    try:
+        result = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/gluefs | grep -w max_bytes | awk -F '\"' '{print $2}' ").stdout.decode().splitlines()
+        ret = createReturn(code=200, val=result)
+
+    except Exception as e:
+        ret = createReturn(code=500, val="gluefs quota check fail")
+
+    return print(json.dumps(json.loads(ret), indent=4))
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # parser 생성
@@ -475,7 +485,7 @@ if __name__ == '__main__':
     elif (args.action) == 'destroy':
         print(destroyFs(args))
     elif (args.action) == 'status':
-        print(statusFs(args))  
+        print(statusFs(args))
     elif (args.action) == 'detail':
         print(detailFs(args))
     elif (args.action) == 'list':
@@ -490,4 +500,5 @@ if __name__ == '__main__':
         print(deleteGlueFs(args))
     elif (args.action) == 'daemon':
         print(controlDaemon(args))
-    
+    elif(args.action) == 'gluefs-quota':
+        gluequota()

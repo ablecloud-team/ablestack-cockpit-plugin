@@ -26,24 +26,24 @@ $(".tab-available").keydown(function (e) {
  */
  function setNicBridge(select_box_id, excute_host){
     var cmd = ["python3",pluginpath + "/python/nic/network_action.py","list"];
-    
+
     if(excute_host == undefined || excute_host == null || excute_host == ""){
         cockpit.spawn(cmd).then(function(data){
-        
+
             setNicSelectBox(select_box_id, data)
-    
+
         }).catch(function(){
             createLoggerInfo("setNicBridge error");
-            alert("setNicBridge error");
+            //alert("setNicBridge error");
         });
     }else{
         cockpit.spawn(cmd,{ host: excute_host}).then(function(data){
-        
+
             setNicSelectBox(select_box_id, data)
-    
+
         }).catch(function(){
             createLoggerInfo("setNicBridge error");
-            alert("setNicBridge error");
+            //alert("setNicBridge error");
         });
     }
 }
@@ -81,7 +81,7 @@ function setNicSelectBox(select_box_id, data){
  * History  : 2021.03.18 최초 작성
 **/
 function setHostsFileReader(input, file_name, callBackFunction) {
-    input.on("change", function(event) { 
+    input.on("change", function(event) {
         // FileList
         let file_list = input.files || event.target.files;
         // File
@@ -105,7 +105,7 @@ function setHostsFileReader(input, file_name, callBackFunction) {
                 }
             } else {
                 input.val("");
-            }            
+            }
         } else {
             alert(file_name+" 파일만 업로드할 수 있습니다.");
             input.val("");
@@ -129,7 +129,7 @@ function setHostsFileReader(input, file_name, callBackFunction) {
 
     // hosts 내용 text를 한줄 단위로 나눔
     var text_array = text.split("\n");
-    
+
     for(var i = 0; i < text_array.length; i++){
         if(text_array[i] != "" && text_array[i] != " " && text_array[i].substr(0,1) != "#" ){ // 라인 내용이 없거나 첫 단어가 주석 #가 아닌 경우
             // 문자열의 모든 tab 문자열을 공백으로 치환
@@ -143,27 +143,27 @@ function setHostsFileReader(input, file_name, callBackFunction) {
                 if(j>0){ // 첫번째 값은 항상 ip
                     var ip = split_text[0]
                     var host_name = split_text[j];
-                    
+
                     // 리스트에 생성된 객체 삽입 , 예상결과 ex : "10.10.0.1,hostname1"
                     result_array.push(ip+","+host_name);
                 }
             }
         }
     }
-    
+
     var uniq_result = Array.from(new Set(result_array));
     var result_json_array = new Array();
 
     for(var i = 0 ; i < uniq_result.length ; i++){
         var json_obj = new Object();
-    
+
         var val = uniq_result[i].split(",");
         json_obj.ip = val[0]
         json_obj.hostName = val[1];
-    
+
         result_json_array.push(json_obj);
     }
-    
+
     //json 형식의 문자열 반환
     return JSON.stringify(result_json_array);
  }
@@ -178,7 +178,7 @@ function setHostsFileReader(input, file_name, callBackFunction) {
  * History  : 2021.03.18 최초 작성
 **/
 function setSshKeyFileReader(input, file_name, callBackFunction) {
-    input.on("change", function(event) { 
+    input.on("change", function(event) {
         // FileList
         let file_list = input.files || event.target.files;
         // File
@@ -187,7 +187,7 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
             if(checkFileSize(file) != false){
                 if(input.val() != ""){
                     try {
-    
+
                         let reader = new FileReader();
                         reader.onload = function (e) {
                             var text = e.target.result
@@ -258,7 +258,7 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
         }
     }else{
         alert("진행 상태를 잘못 입력했습니다.");
-    }    
+    }
 }
 
 /**
@@ -306,7 +306,7 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
         }
     }else{
         alert("진행 상태를 잘못 입력했습니다.");
-    }    
+    }
 }
 
 /**
@@ -338,7 +338,7 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
                 } else if(span.attr('id') == "span-wall-progress-step2"){
                     $('#wall-progress-step-text').text('Wall 모니터링센터를 구성 중입니다. 전체 2단계 중 2단계 진행 중입니다.');
                 }
-    
+
                 span.addClass('pf-m-orange');
                 icon.addClass('fa-play');
                 progress_text.text('진행중');
@@ -360,7 +360,7 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
                 } else if(span.attr('id') == "span-wall-progress-step3"){
                     $('#wall-progress-step-text').text('Wall 모니터링센터를 구성 중입니다. 전체 3단계 중 3단계 진행 중입니다.');
                 }
-    
+
                 span.addClass('pf-m-orange');
                 icon.addClass('fa-play');
                 progress_text.text('진행중');
@@ -373,7 +373,7 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
                 icon.addClass('fa-exclamation-circle');
                 progress_text.text('중단됨');
             }
-        }        
+        }
     }else{
         alert("진행 상태를 잘못 입력했습니다.");
     }
@@ -422,11 +422,11 @@ function setSshKeyFileReader(input, file_name, callBackFunction) {
         }
     }else{
         alert("진행 상태를 잘못 입력했습니다.");
-    }    
+    }
 }
 
 
-/** 
+/**
  * Meathod Name : setClusterProgressFail
  * Date Created : 2022.09.08
  * Writer  : 배태주
@@ -502,7 +502,7 @@ function checkHostName(option) {
                     reader.onload = function (progressEvent) {
                         let result = progressEvent.target.result;
                         var clusterJsonConf = JSON.parse(result);
-                        settingProfile(clusterJsonConf, option)                        
+                        settingProfile(clusterJsonConf, option)
                     };
                     reader.readAsText(file);
                 } catch (err) {
@@ -573,7 +573,7 @@ function settingProfile(clusterJsonConf, option){
 
             hostCnt = hostCnt+1;
         }
-        
+
         $("#form-input-cluster-ccvm-mngt-ip").val(clusterJsonConf.clusterConfig.ccvm.ip);
         $("#form-input-cluster-mngt-nic-cidr").val(clusterJsonConf.clusterConfig.mngtNic.cidr);
         $("#form-input-cluster-mngt-nic-gateway").val(clusterJsonConf.clusterConfig.mngtNic.gw);
@@ -607,7 +607,7 @@ function settingProfile(clusterJsonConf, option){
             let host_name = $(this).find('td').eq(1).text().trim();
             if(current_host_name_scvm == host_name && host_name != null){
                 let host_index = $(this).find('td').eq(0).text().trim();
-                
+
                 // 호스트명을 세팅
                 $("#form-input-storage-vm-hostname").val("scvm"+host_index);
                 // 관리 NIC IP 및 CIDR 기본 입력
@@ -768,14 +768,14 @@ function settingProfile(clusterJsonConf, option){
     if (radio_value == "new") {
         // hosts file 준비 방법 표시 및 값 설정
         $('#span-hosts-file'+option+'').text("신규 생성");
-        
+
         let result = tableToHostsText($('#form-table-tbody-cluster-config-new-host-profile'+option+' tr'), option);
         $('#div-textarea-cluster-config-confirm-hosts-file'+option+'').val(result.trim());
 
     } else if (radio_value == "existing") {
         // hosts file 준비 방법 표시 및 값 설정
         $('#span-hosts-file'+option+'').text("기존 파일 사용");
-        
+
         let result = tableToHostsText($('#form-table-tbody-cluster-config-existing-host-profile'+option+' tr'), option);
         $('#div-textarea-cluster-config-confirm-hosts-file'+option+'').val(result.trim());
     }
@@ -784,7 +784,7 @@ function settingProfile(clusterJsonConf, option){
 /**
  * Meathod Name : tableToHostsText()
  * Date Created : 2022.08.24
- * Writer  : 배태주 
+ * Writer  : 배태주
  * Description : 입력 받은 클러스터 구성 정보를 통해 ablecube host에서 사용할 hosts 파일 텍스트 생성
  * Parameter : table_tr_obj
  * Return  : hosts text
@@ -796,7 +796,7 @@ function tableToHostsText(table_tr_obj, option){
     let hsots_text = "";
     // 현재 ablecube 호스트의 이름
     let current_host_name = $("#form-input-current-host-name"+option).val();
-    
+
     if(option == ""){
         if($("#form-input-cluster-ccvm-mngt-ip").val() != ""){
             hsots_text += $("#form-input-cluster-ccvm-mngt-ip").val() + "\t" + "ccvm-mngt" + "\t" + "ccvm" + "\n";
@@ -821,7 +821,7 @@ function tableToHostsText(table_tr_obj, option){
         // eq(4) : 호스트 PN IP (ablecube-pn)
         // eq(5) : SCVM PN IP
         // eq(6) : SCVM CN IP
-        
+
         let idx = $(this).find('td').eq(0).text().trim();
         let host_name = $(this).find('td').eq(1).text().trim();
         let host_ip = $(this).find('td').eq(2).text().trim();
@@ -829,7 +829,7 @@ function tableToHostsText(table_tr_obj, option){
         let host_pn_ip = $(this).find('td').eq(4).text().trim();
         let scvm_pn_ip = $(this).find('td').eq(5).text().trim();
         let scvm_cn_ip = $(this).find('td').eq(6).text().trim();
-        
+
         // 10.10.3.1	ablecloud1	ablecube
         // 10.10.3.11	scvm1-mngt	scvm-mngt
         // 100.100.3.1	ablecube1-pn	ablecube-pn
@@ -852,20 +852,20 @@ function tableToHostsText(table_tr_obj, option){
         }
         hsots_text += temp_text;
     });
-    return hsots_text;    
+    return hsots_text;
 }
 
 /**
  * Meathod Name : clusterConfigTableChange()
  * Date Created : 2022.08.23
- * Writer  : 배태주 
+ * Writer  : 배태주
  * Description : 클러스터 구성할 호스트 대수에 따라 클러스터 구성 프로파일 입력항목을 추가하거나 제거하는 함수
  * Parameter : number_input, table_tbody
  * Return  : 없음
  * History  : 2022.08.23 최초 작성
  **/
  function clusterConfigTableChange(number_input, table_tbody) {
-    
+
     let input_num = $("#"+number_input).val();
     let tr_cnt = $("#"+table_tbody+ " > tr").length;
 
@@ -893,7 +893,7 @@ function tableToHostsText(table_tr_obj, option){
 /**
  * Meathod Name : tableToClusterConfigJsonObj()
  * Date Created : 2022.08.24
- * Writer  : 배태주 
+ * Writer  : 배태주
  * Description : table에 입력된 json 데이터를 json string으로 변환하는 함수
  * Parameter : radio_value, option
  * Return  : json string
@@ -910,7 +910,7 @@ function tableToClusterConfigJsonString(radio_value, option){
     } else if (radio_value == "existing") {
         table_tr_obj = $('#form-table-tbody-cluster-config-existing-host-profile'+option+' tr');
     }
-    
+
     table_tr_obj.each(function(){
         // $(this).find('td').eq(0) 순서는 아래와 같습니다.
         // eq(0) : index
@@ -944,7 +944,7 @@ function tableToClusterConfigJsonString(radio_value, option){
         resultArrList.push(data) ;
 
     });
-    
+
     return JSON.stringify(resultArrList);
 }
 
@@ -954,7 +954,7 @@ function tableToClusterConfigJsonString(radio_value, option){
  * Writer  : 배태주
  * Description : table에 입력된 json 데이터 값을 검증하는 기능
  * Parameter : radio_value, option
- * Return  : 
+ * Return  :
  * History  : 2022.08.25 최초 작성
  **/
  function validateClusterConfigProfile(radio_value, option){
@@ -968,7 +968,7 @@ function tableToClusterConfigJsonString(radio_value, option){
     } else if (radio_value == "existing") {
         table_tr_obj = $('#form-table-tbody-cluster-config-existing-host-profile'+option+' tr');
     }
-    
+
     table_tr_obj.each(function(index_num){
         // $(this).find('td').eq(0) 순서는 아래와 같습니다.
         // eq(0) : index
@@ -993,12 +993,12 @@ function tableToClusterConfigJsonString(radio_value, option){
                 idx_cnt = idx_cnt+1;
             }
         });
-        
+
         let host_name_cnt = 0;
         let current_host_name_cnt = 0;
         // 현재 ablecube 호스트의 이름
         let current_host_name = $("#form-input-current-host-name"+option).val();
-        
+
         table_tr_obj.each(function(){
             if (host_name == $(this).find('td').eq(1).text().trim()){
                 host_name_cnt = host_name_cnt+1;
@@ -1046,7 +1046,7 @@ function tableToClusterConfigJsonString(radio_value, option){
             return false;
         }
 
-        // 점검항목 2 : index가 중복되면 안됨        
+        // 점검항목 2 : index가 중복되면 안됨
         else if (idx_cnt >= 2) { // 동일한 idx가 2개 이상 중복되는 경우 에러
             alert("중복된 idx가 존재합니다.");
             validate_check = true;
@@ -1059,7 +1059,7 @@ function tableToClusterConfigJsonString(radio_value, option){
             validate_check = true;
             return false;
         }
-        
+
         // 점검항목 4 : 다른 inx의 IP와 중복되면 안됨 (동일 idx내에서는 중복 허용)
         else if (host_ip_cnt >= 2) { // 다른 idx에 동일 ip가 존재하면 중복으로 처리
             alert("중복된 호스트 IP가 존재합니다.");
@@ -1109,13 +1109,13 @@ function tableToClusterConfigJsonString(radio_value, option){
             validate_check = true;
             return false;
         }
-        
+
         // 점검항목 6 : 현재 호스트명으로 된 항목이 존재하지 않으면 에러
         else if (current_host_name_cnt == 0 ){
             alert("클러스터 구성 프로파일 호스트 명과 현재 호스트 명과 동일한 항목이 없습니다.");
             validate_check = true;
             return false;
-        } 
+        }
     });
     return validate_check;
 }
@@ -1126,7 +1126,7 @@ function tableToClusterConfigJsonString(radio_value, option){
  * Writer  : 배태주
  * Description : table에 입력된 ip값에 중복된 ccvm-mngt-ip가 존재하는지 확인
  * Parameter : ip, radio_value, option
- * Return  : 
+ * Return  :
  * History  : 2022.09.14 최초 작성
  **/
  function checkDuplicateCcvmIp(ip, radio_value, option){
@@ -1140,7 +1140,7 @@ function tableToClusterConfigJsonString(radio_value, option){
     } else if (radio_value == "existing") {
         table_tr_obj = $('#form-table-tbody-cluster-config-existing-host-profile'+option+' tr');
     }
-    
+
     table_tr_obj.each(function(index_num){
         // $(this).find('td').eq(0) 순서는 아래와 같습니다.
         // eq(0) : index
@@ -1246,7 +1246,7 @@ function pcsHostPnIpCheck(host_file_type, pcs_host_pn_ip, option){
         // eq(6) : SCVM CN IP
 
         host_pn_ip = $(this).find('td').eq(4).text().trim();
-        
+
         // 점검항목 1 : 빈 값이 있으면 안됨
         if (pcs_host_pn_ip == host_pn_ip){
             check_cnt += 1;

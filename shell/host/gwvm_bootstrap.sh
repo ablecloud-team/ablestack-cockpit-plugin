@@ -50,5 +50,8 @@ firewall-cmd --list-all 2>&1 | tee -a $LOGFILE
 #ceph 키 복사
 scp -q -o StrictHostKeyChecking=no root@scvm-mngt:/etc/ceph/* /etc/ceph/
 
+# smb_construction.sh 파일 복사
+scp -q -o StrictHostKeyChecking=no root@scvm-mngt:/usr/share/cockpit/ablestack/shell/host/smb_construction.sh /usr/local/samba/sbin/
+
 # Delete bootstrap script file
 rm -rf /root/bootstrap.sh

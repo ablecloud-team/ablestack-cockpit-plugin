@@ -11,6 +11,7 @@ import argparse
 import logging
 import os
 import json
+from re import L
 import sh
 import requests
 import cryptocode
@@ -38,7 +39,7 @@ def createArgumentParser():
     # 인자 추가: https://docs.python.org/ko/3/library/argparse.html#the-add-argument-method
 
     # 선택지 추가(동작 선택)
-    tmp_parser.add_argument('action', choices=['config', 'destroy', 'status', 'create', 'delete', 'edit', 'list', 'detail', 'daemon'], help='nfs 클러스터 and nfs export action')
+    tmp_parser.add_argument('action', choices=['config', 'destroy', 'status', 'create', 'delete', 'edit', 'list', 'detail', 'daemon','nfs-quota'], help='nfs 클러스터 and nfs export action')
     tmp_parser.add_argument('--id', metavar='export id', type=int, help='nfs export ID')
     tmp_parser.add_argument('--access-type', metavar='access type', type=str, default='RW', help='nfs 옵션 RW, RO, NONE')
     tmp_parser.add_argument('--squash',metavar='squash', type=str, default='no_root_squash', help='nfs 옵션 no_root_squash, root_id_squash, root_squash, all_squash')
@@ -60,7 +61,7 @@ def createArgumentParser():
     return tmp_parser
 
 # glue 대시보드 url 조회
-def glueUrl(): 
+def glueUrl():
     try:
         cmd = ssh('-o', 'StrictHostKeyChecking=no', 'ablecube', 'python3', pluginpath+ '/python/url/create_address.py', 'storageCenter').stdout.decode().splitlines()
         dashboard = json.loads(cmd[0])
@@ -93,7 +94,7 @@ def createToken():
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
     except Exception as e:
         return createReturn(code=500, val='nfs.py createToken error :'+e)
-    
+
 # 이미지 사이즈 변환
 def convert_to_bytes(size):
     symbols = 'BKMGTPEZY'
@@ -108,7 +109,7 @@ def convert_to_bytes(size):
     prefix = {symbols[0]:1}
     for i, size in enumerate(symbols[1:]):
         prefix[size] = 1 << (i+1)*10
-    return int(num * prefix[letter]) 
+    return int(num * prefix[letter])
 
 # task 조회
 def taskList():
@@ -151,7 +152,7 @@ def daemonList():
     except Exception as e:
         return createReturn(code=500, val='nfs.py daemonList error :'+e)
 
-# nfs 클러스터 서비스 생성       
+# nfs 클러스터 서비스 생성
 def configNfsCluster(args):
     try:
         token = createToken()
@@ -223,7 +224,7 @@ def destroyNfsCluster(args):
                     return createReturn(code=200, val='nfs service '+args.action+' control success')
                 elif response.status_code == 202:
                     global cnt
-                    cnt = 0      
+                    cnt = 0
                     task = json.loads(taskList()).get('val')
                     task_json = json.loads(task).get('executing_tasks')
                     if len(task_json) > 0:
@@ -243,7 +244,7 @@ def destroyNfsCluster(args):
 
 # nfs 클러스터 서비스 상태 조회
 def statusNfsCluster(args):
-    try:        
+    try:
         token = createToken()
         headers = {
             'Accept': 'application/vnd.ceph.api.v1.0+json',
@@ -294,11 +295,11 @@ def createNfsExport(args):
         if response.status_code == 201:
             if args.quota is not None:
                 #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
-                fs = sh.python3(pluginpath + '/python/ceph/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
+                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
             return createReturn(code=200, val='nfs service '+args.action+' control success')
         elif response.status_code == 202:
             global cnt
-            cnt = 0       
+            cnt = 0
             task = json.loads(taskList()).get('val')
             task_json = json.loads(task).get('executing_tasks')
             if len(task_json) > 0:
@@ -310,10 +311,10 @@ def createNfsExport(args):
                         break
             if args.quota is not None:
                 #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
-                fs = sh.python3(pluginpath + '/python/ceph/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
+                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
             return createReturn(code=200, val='nfs service '+args.action+' control success')
         else:
-            return createReturn(code=500, val=json.dumps(response.json(), indent=2))    
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
     except Exception as e:
         return createReturn(code=500, val='nfs.py createNfsExport error :'+e)
 
@@ -342,7 +343,7 @@ def deleteNfsExport(args):
             return createReturn(code=200, val='nfs service '+args.action+' control success')
         elif response.status_code == 202:
             global cnt
-            cnt = 0       
+            cnt = 0
             task = json.loads(taskList()).get('val')
             task_json = json.loads(task).get('executing_tasks')
             if len(task_json) > 0:
@@ -398,11 +399,11 @@ def editNfsExport(args):
         if response.status_code == 200:
             if args.quota is not None:
                 #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
-                fs = sh.python3(pluginpath + '/python/ceph/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
+                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
             return createReturn(code=200, val='nfs service '+args.action+' control success')
         elif response.status_code == 202:
             global cnt
-            cnt = 0        
+            cnt = 0
             task = json.loads(taskList()).get('val')
             task_json = json.loads(task).get('executing_tasks')
             if len(task_json) > 0:
@@ -414,16 +415,16 @@ def editNfsExport(args):
                         break
             if args.quota is not None:
                 #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
-                fs = sh.python3(pluginpath + '/python/ceph/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
+                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
             return createReturn(code=200, val='nfs service '+args.action+' control success')
         else:
-            return createReturn(code=500, val=json.dumps(response.json(), indent=2))    
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
     except Exception as e:
         return createReturn(code=500, val='nfs.py editNfsExport error :'+e)
 
 # nfs export 목록 조회
 def listNfsExport(args):
-    try:        
+    try:
         token = createToken()
         headers = {
             'Accept': 'application/vnd.ceph.api.v1.0+json',
@@ -440,7 +441,7 @@ def listNfsExport(args):
     except Exception as e:
         return createReturn(code=500, val='nfs.py listNfsExport error :'+e)
 
-# nfs export 상세 조회 
+# nfs export 상세 조회
 def detailNfsExport(args):
     try:
         exportInfo = json.loads(listNfsExport(args)).get('val')
@@ -448,7 +449,7 @@ def detailNfsExport(args):
         for num in nfs:
             if '/nfs' in num['path']:
                 id = num['export_id']
-        token = createToken() 
+        token = createToken()
         headers = {
             'Accept': 'application/vnd.ceph.api.v1.0+json',
             'Authorization': 'Bearer ' + token,
@@ -464,13 +465,13 @@ def detailNfsExport(args):
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
         else:
-            return createReturn(code=500, val=json.dumps(response.json(), indent=2))  
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
     except Exception as e:
         return createReturn(code=500, val='nfs.py detailNfsExport error :'+e)
 
-# nfs 서비스 제어    
+# nfs 서비스 제어
 def controlDaemon(args):
-    try:        
+    try:
         token = createToken()
         headers = {
             'Accept': 'application/vnd.ceph.api.v0.1+json',
@@ -494,11 +495,22 @@ def controlDaemon(args):
         if response.status_code == 200:
             return createReturn(code=200, val=json.dumps(response.json(), indent=2))
         elif response.status_code == 202:
-            return createReturn(code=200, val='scheduled to '+args.control+' nfs service')     
+            return createReturn(code=200, val='scheduled to '+args.control+' nfs service')
         else:
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
     except Exception as e:
         return createReturn(code=500, val='nfs.py controlDaemon error :'+e)
+
+def nfsquota():
+    # 서비스 제어 명령
+    try:
+        result = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/nfs | grep -w max_bytes | awk -F '\"' '{print $2}' ").stdout.decode().splitlines()
+        ret = createReturn(code=200, val=result)
+
+    except Exception as e:
+        ret = createReturn(code=500, val="nfs quota check fail")
+
+    return print(json.dumps(json.loads(ret), indent=4))
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -533,3 +545,5 @@ if __name__ == '__main__':
         print(detailNfsExport(args))
     elif (args.action) == 'daemon':
         print(controlDaemon(args))
+    elif (args.action) == 'nfs-quota':
+        nfsquota()
