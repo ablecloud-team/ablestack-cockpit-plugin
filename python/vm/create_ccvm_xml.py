@@ -216,7 +216,7 @@ if __name__ == '__main__':
         ret = createCcvmXml(args)
         print(ret)
     else:
-        print(secret_ret)
+        print(json.dumps(secret_ret))
 
     # 실제 로직 부분 호출 및 결과 출력
     

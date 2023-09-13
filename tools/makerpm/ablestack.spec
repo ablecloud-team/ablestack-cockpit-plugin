@@ -3,8 +3,8 @@
 # 최초 작성일 : 2021. 04. 02
 
 Name: ablestack
-Version: %{?version}%{!?version:2.0}
-Release: %{?release}%{!?release:0.wip.el8.noarch}
+Version: %{?version}%{!?version:4.0}
+Release: %{?release}%{!?release:0.wip.el9.noarch}
 Source0: %{name}-%{version}.tar.gz
 Summary: ablestack package
 
@@ -12,8 +12,8 @@ Group: AbleCloud
 License: None
 URL: https://github.com/ablecloud-team/ablestack-cockpit-plugin.git
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
-BuildRequires: /bin/bash, /bin/mkdir, /bin/cp
-Requires: /bin/bash, /bin/mkdir, /bin/cp
+BuildRequires: /bin/bash
+Requires: /bin/bash
 
 %description
  ablestack-cockpit-plugin package
