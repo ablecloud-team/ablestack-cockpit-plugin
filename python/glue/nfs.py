@@ -11,7 +11,6 @@ import argparse
 import logging
 import os
 import json
-from re import L
 import sh
 import requests
 import cryptocode
@@ -504,7 +503,12 @@ def controlDaemon(args):
 def nfsquota():
     # 서비스 제어 명령
     try:
-        result = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/nfs | grep -w max_bytes | awk -F '\"' '{print $2}' ").stdout.decode().splitlines()
+        quota = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/nfs | grep -w max_bytes | awk -F '\"' '{print $2}' ").stdout.decode().splitlines()
+        usage = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'du', '-sh', '/fs/nfs', '|', "awk '{print $1}'").stdout.decode().splitlines()
+        result ={
+            "quota": quota,
+            "usage": usage
+        }
         ret = createReturn(code=200, val=result)
 
     except Exception as e:

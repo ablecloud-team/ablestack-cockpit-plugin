@@ -46,14 +46,18 @@ def createArgumentParser():
 
 def createSamba():
 
-    result = os.system('ssh gwvm sh ' + smb_construction + " -u " + args.user_name +  " -p " + args.user_pw)
+    rc = call(["ssh gwvm ls -al /usr/local/samba/sbin/ | grep -w 'smb_construction.sh'"],universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    if rc != 0:
+        os.system("scp /usr/share/cockpit/ablestack/shell/host/smb_construction.sh gwvm:/usr/local/samba/sbin/")
+    else:
+        result = os.system('ssh gwvm sh ' + smb_construction + " -u " + args.user_name +  " -p " + args.user_pw)
 
-    if result == 0:  # 서비스 제어가 성공일 경우
-        ret = createReturn(code=200,val='smb service construction success')
-        return print(json.dumps(json.loads(ret), indent=4))
-    else:  # 서비스 제어가 실패할 경우
-        ret = createReturn(code=500,val='smb service construction fail')
-        return print(json.dumps(json.loads(ret), indent=4))
+        if result == 0:  # 서비스 제어가 성공일 경우
+            ret = createReturn(code=200,val='smb service construction success')
+            return print(json.dumps(json.loads(ret), indent=4))
+        else:  # 서비스 제어가 실패할 경우
+            ret = createReturn(code=500,val='smb service construction fail')
+            return print(json.dumps(json.loads(ret), indent=4))
 
 # 삭제할 경로가 고정이 되면 그 경로로 삭제만 해주면 됨.
 def deleteSamba():
@@ -112,7 +116,6 @@ def sambaDetail():
     service = 'N/A'
     path = 'N/A'
     full_capacity = 'N/A'
-    type = 'N/A'
     usage = 'N/A'
     ip_address = 'N/A'
     user_count = 'N/A'
@@ -130,12 +133,12 @@ def sambaDetail():
             full_capacity = output.strip()
         else :
             full_capacity = "N/A"
-        rc = call(["ssh gwvm du -sh /fs/smb | awk '{print $1}'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        if rc == 0 :
-            output = check_output(["ssh gwvm du -sh /fs/smb | awk '{print $1}'"], universal_newlines=True, shell=True, env=env)
-            usage = output.strip()
-        else :
-            usage = "N/A"
+        # rc = call(["ssh gwvm du -sh /fs/smb | awk '{print $1}'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        # if rc == 0 :
+        #    output = check_output(["ssh gwvm du -sh /fs/smb | awk '{print $1}'"], universal_newlines=True, shell=True, env=env)
+        #    usage = output.strip()
+        #else :
+        #    usage = "N/A"
         # 몇명이나 있는지 카운트
         # rc = call(["pdbedit -L | grep -v root | wc -l"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         # if rc == 0 :
@@ -154,7 +157,6 @@ def sambaDetail():
             'service' : 'Samba Service',
             'path' : path,
             'full_capacity' : full_capacity,
-            'usage' : usage,
             'ip_address' : ip_address
         }
         ret = createReturn(code=200, val=ret_val, retname='Gateway VM Samba Service Status Detail')
@@ -165,7 +167,6 @@ def sambaDetail():
             'service' : service,
             'path' : path,
             'full_capacity' : full_capacity,
-            'usage' : usage,
             'ip_address' : ip_address
         }
         ret = createReturn(code=500, val=ret_val, retname='Gateway VM Samba Service Status Detail')
@@ -175,7 +176,12 @@ def sambaDetail():
 def smbquota():
     # 서비스 제어 명령
     try:
-        result = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/smb | grep -w max_bytes | awk -F '\"' '{print $2}' ").stdout.decode().splitlines()
+        quota = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/smb | grep -w max_bytes | awk -F '\"' '{print $2}' ").stdout.decode().splitlines()
+        usage = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'du', '-sh', '/fs/smb', '|', "awk '{print $1}'").stdout.decode().splitlines()
+        result = {
+            "quota": quota,
+            "usage": usage
+        }
         ret = createReturn(code=200, val=result)
 
     except Exception as e:

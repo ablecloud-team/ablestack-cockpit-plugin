@@ -94,6 +94,7 @@ def createToken():
             return response.json()['token']
         else:
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+
     except Exception as e:
         return createReturn(code=500, val='gluefs.py createToken error :'+e)
 
@@ -458,7 +459,12 @@ def controlDaemon(args):
 def gluequota():
     # 서비스 제어 명령
     try:
-        result = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/gluefs | grep -w max_bytes | awk -F '\"' '{print $2}' ").stdout.decode().splitlines()
+        quota = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/gluefs | grep -w max_bytes | awk -F '\"' '{print $2}' ").stdout.decode().splitlines()
+        usage = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'du', '-sh', '/fs/gluefs', '|', "awk '{print $1}'").stdout.decode().splitlines()
+        result = {
+            "quota": quota,
+            "usage": usage
+        }
         ret = createReturn(code=200, val=result)
 
     except Exception as e:

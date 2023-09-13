@@ -678,21 +678,22 @@ function ServiceQuota(type){
         cockpit.spawn(['python3', pluginpath + '/python/glue/smb.py','smb-quota']).then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
-                $('#smb-usage').text(Byte(retVal.val));
+                $('#smb-usage').text(retVal.val.usage+"B/"+Byte(retVal.val.quota));
+
             }
         });
     }else if(type == 'gluefs'){
         cockpit.spawn(['python3', pluginpath + '/python/glue/gluefs.py', 'gluefs-quota']).then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
-                $('#gluefs-usage').text(Byte(retVal.val));
+                $('#gluefs-usage').text(retVal.val.usage+"B/"+Byte(retVal.val.quota));
             }
         });
     }else if(type == 'nfs'){
         cockpit.spawn(['python3', pluginpath + '/python/glue/nfs.py', 'nfs-quota']).then(function(data){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
-                $('#nfs-usage').text(Byte(retVal.val));
+                $('#nfs-usage').text(retVal.val.usage+"B/"+Byte(retVal.val.quota));
             }
         });
     }
@@ -744,23 +745,24 @@ function Byte(size){
     var ret_byte
     var ret_byte_name
 
+
     if(size < (1024*1024))
     {
         ret_byte = parseFloat(size)/1024;
-        ret_byte_name = "KiB";
+        ret_byte_name = "KB";
     }
     else if (size < (1024*1024*1024))
     {
         ret_byte = parseFloat(size)/(1024*1024);
-        ret_byte_name = "MiB";
+        ret_byte_name = "MB";
     }
     else if (size < (1024*1024*1024*1024)){
         ret_byte = parseFloat(size)/(1024*1024*1024);
-        ret_byte_name = "GiB";
+        ret_byte_name = "GB";
     }
     else if (size < (1024*1024*1024*1024*1024)){
         ret_byte = parseFloat(size)/(1024*1024*1024*1024);
-        ret_byte_name = "TiB";
+        ret_byte_name = "TB";
     }
 
     var bytes = parseInt(ret_byte);
