@@ -305,14 +305,28 @@ $('#button-execution-modal-delete').on('click',function(){
             var retVal = JSON.parse(data);
             var retVal_code = JSON.parse(retVal.code);
 
-            $('#div-modal-spinner').hide();
-
             if(retVal_code == 200){
-                $('#modal-status-alert-title').text("GlueFS 삭제");
-                $('#modal-status-alert-body').text("GlueFS 삭제가 완료되었습니다.");
-                $('#div-modal-status-alert').show();
+                cockpit.spawn(['python3', pluginpath + '/python/glue/gluefs.py', 'destroy']).then(function(data){
+                    var retVal = JSON.parse(data);
+                    var retVal_code = JSON.parse(retVal.code);
 
-                sessionStorage.removeItem('type');
+                    $('#div-modal-spinner').hide();
+
+                    if(retVal_code == 200){
+                        $('#modal-status-alert-title').text("GlueFS 삭제");
+                        $('#modal-status-alert-body').text("GlueFS 삭제가 완료되었습니다.");
+                        $('#div-modal-status-alert').show();
+
+                        sessionStorage.removeItem('type');
+                    }
+                    else{
+                        $('#modal-status-alert-title').text("GlueFS 삭제");
+                        $('#modal-status-alert-body').text("GlueFS 삭제가 실패했습니다.");
+                        $('#div-modal-status-alert').show();
+                    }
+                }).catch(function(){
+                    createLoggerInfo("GlueFS destroy failed");
+                });
             }
             else{
                 $('#modal-status-alert-title').text("GlueFS 삭제");
@@ -514,7 +528,6 @@ function gluefsCheckInfo(){
 
                                 $('#gluefs-path').text("/fs");
                                 $('#gluefs-mount-path').text("/gluefs");
-                                $('#gluefs-usage').text("200");
                                 $('#gluefs-status').text("Stop");
                                 $('#gluefs-color').attr('class','pf-c-label pf-m-red');
                                 $('#gluefs-icon').attr('class','fas fa-fw fa-exclamation-triangle');

@@ -27,7 +27,7 @@ env=os.environ.copy()
 json_file_path = pluginpath+"/tools/properties/cluster.json"
 hosts_file_path = "/etc/hosts"
 # ablecube_host는 scvm이 실행중인 호스트의 ip 또는 호스트 네임
-ablecube_host = "ablecube"  
+ablecube_host = "ablecube"
 
 def createArgumentParser():
     '''
@@ -51,10 +51,10 @@ def createArgumentParser():
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
-    
+
     # flag 추가(샘플임, 테스트용으로 json이 아닌 plain text로 출력하는 플래그 역할)
     parser.add_argument('-H', '--Human', action='store_const', dest='flag_readerble', const=True, help='Human readable')
-    
+
     # Version 추가
     parser.add_argument('-V', '--Version', action='version', version='%(prog)s 1.0')
 
@@ -71,7 +71,7 @@ def openClusterJson():
     return ret
 
 def create(args):
-    
+
     # 하이퍼 바이저 확인
     hypervisor = "cell"
 
@@ -104,7 +104,7 @@ def create(args):
         pn_ip = args.sn_ip
         pn_cidr = 24
         pcs_cluster_list = []
-        
+
         # ssh-key 파일 세팅
         id_rsa = check_output(["cat /root/.ssh/id_rsa"], universal_newlines=True, shell=True, env=env)
         id_rsa_pub = check_output(["cat /root/.ssh/id_rsa.pub"], universal_newlines=True, shell=True, env=env)
@@ -127,8 +127,8 @@ def create(args):
         create_gwvm_cloudinit_cmd.append('--hostname')
         create_gwvm_cloudinit_cmd.append(host_name)
         create_gwvm_cloudinit_cmd.append('-hns')
-        
-        
+
+
         if json_data["clusterConfig"]["pcsCluster"]["hostname1"] is not None:
             # pcs_cluster_list.append(json_data["clusterConfig"]["pcsCluster"]["hostname1"])
             # create_gwvm_cloudinit_cmd.append(json_data["clusterConfig"]["pcsCluster"]["hostname1"])
@@ -146,14 +146,14 @@ def create(args):
             # create_gwvm_cloudinit_cmd.append(json_data["clusterConfig"]["pcsCluster"]["hostname3"])
             pcs_cluster_list.append("10.10.2.3")
             create_gwvm_cloudinit_cmd.append("10.10.2.3")
-        
+
         create_gwvm_cloudinit_cmd.append('--mgmt-nic')
         create_gwvm_cloudinit_cmd.append('enp0s20')
         create_gwvm_cloudinit_cmd.append('--mgmt-ip')
         create_gwvm_cloudinit_cmd.append(mngt_ip)
         create_gwvm_cloudinit_cmd.append('--mgmt-prefix')
         create_gwvm_cloudinit_cmd.append(mngt_cidr)
-        
+
         if mngt_nic_gw != "":
             create_gwvm_cloudinit_cmd.append('--mgmt-gw')
             create_gwvm_cloudinit_cmd.append(mngt_nic_gw)
@@ -195,6 +195,12 @@ def create(args):
         if gwvm_boot_check != 0:
             return createReturn(code=500, val="gwvm did not boot. : "+e)
 
+        # gwvm 재부팅 시, 마운트 재설정
+        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'echo "/usr/bin/mount -t ceph admin@.fs=/ /fs" >>/etc/rc.d/rc.local').stdout.strip().decode()
+        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'echo -e "\n[Install]\nWantedBy=multi-user.target" >> /usr/lib/systemd/system/rc-local.service').stdout.strip().decode()
+        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'chmod +x /etc/rc.d/rc.local').stdout.strip().decode()
+        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'systemctl start rc-local.service').stdout.strip().decode()
+        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'systemctl enable rc-local.service').stdout.strip().decode()
         # bootstrap.sh 실행
         ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, "sh /root/bootstrap.sh").stdout.strip().decode()
 
@@ -214,7 +220,7 @@ if __name__ == '__main__':
 
     # secret.xml 생성 및 virsh 등록
     # secret_ret = json.loads(createSecretKey(args.host_names))
-    
+
     # if secret_ret["code"] == 200 :
     #     ret = createCcvmXml(args)
     #     print(ret)
