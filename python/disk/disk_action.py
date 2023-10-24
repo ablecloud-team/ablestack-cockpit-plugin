@@ -64,7 +64,7 @@ PCI 장치의 목록을 출력하는 함수
 :return: dict
 """
 def listPCIInterface(classify=None):
-    list_output = lspci_cmd('-vmm', '-k').stdout.decode().splitlines()
+    list_output = lspci_cmd('-vmm', '-k').splitlines()
     if classify is None:
         list_pci = []
         newpci = {}
@@ -106,14 +106,14 @@ def listDiskInterface(H=False, classify=None):
         line_sp = line.split()
         if len(line_sp) == 2:
             disk_path.append(line_sp)
-   
+
     # output = nmcli_cmd('-c', 'no', '-f', 'TYPE,ACTIVE,DEVICE,STATE,SLAVE', 'con', 'show')
     # output = nmcli_cmd('-c', 'no', '-f', 'ALL', 'con', 'show')
     # outputs = output.splitlines()
     # for out in outputs:
     #    print(out.split())
 
-    item = json.loads(lsblk_cmd(J=True, o="name,rota,model,size,state,group,type,tran,subsystems").stdout.decode())
+    item = json.loads(lsblk_cmd(J=True, o="name,rota,model,size,state,group,type,tran,subsystems"))
     bd = item['blockdevices']
     newbd = []
     for dev in bd:
@@ -122,7 +122,7 @@ def listDiskInterface(H=False, classify=None):
                 if dev["name"] == dp[0]:
                     dev["path"] = dp[1]
             newbd.append(dev)
-            
+
     item['blockdevices'] = newbd
     # print(output)
 

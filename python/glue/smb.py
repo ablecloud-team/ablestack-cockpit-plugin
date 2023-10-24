@@ -82,12 +82,12 @@ def deleteSamba():
 
                     if j == len(home_users)-1:
                         if home_result == 0:
-                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "sed -i '/ablecloud/,/directory/d'  /usr/local/samba/etc/smb.conf").stdout.decode().splitlines()
-                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "sed -i '$d' /usr/local/samba/etc/smb.conf").stdout.decode().splitlines()
-                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "systemctl stop smb").stdout.decode().splitlines()
-                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "systemctl disable smb").stdout.decode().splitlines()
-                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "firewall-cmd --permanent --remove-service=samba").stdout.decode().splitlines()
-                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "firewall-cmd --reload").stdout.decode().splitlines()
+                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "sed -i '/ablecloud/,/directory/d'  /usr/local/samba/etc/smb.conf").splitlines()
+                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "sed -i '$d' /usr/local/samba/etc/smb.conf").splitlines()
+                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "systemctl stop smb").splitlines()
+                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "systemctl disable smb").splitlines()
+                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "firewall-cmd --permanent --remove-service=samba").splitlines()
+                            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "firewall-cmd --reload").splitlines()
 
                             ret = createReturn(code=200,val='smb service smb_user && home_user delete success && service delete success')
                             return print(json.dumps(json.loads(ret), indent=4))
@@ -176,8 +176,8 @@ def sambaDetail():
 def smbquota():
     # 서비스 제어 명령
     try:
-        quota = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/smb | grep -w max_bytes | awk -F '\"' '{print $2}' ").stdout.decode().splitlines()
-        usage = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'du', '-sh', '/fs/smb', '|', "awk '{print $1}'").stdout.decode().splitlines()
+        quota = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/smb | grep -w max_bytes | awk -F '\"' '{print $2}' ").splitlines()
+        usage = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'du', '-sh', '/fs/smb', '|', "awk '{print $1}'").splitlines()
         result = {
             "quota": quota,
             "usage": usage

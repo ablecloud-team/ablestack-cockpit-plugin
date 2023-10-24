@@ -34,7 +34,7 @@ def parseArgs():
 
 def cloudinitStatus():
     try:
-        ret_val = ssh('-o', 'StrictHostKeyChecking=no', args.target, '/usr/bin/cloud-init', 'status').stdout.decode().splitlines()
+        ret_val = ssh('-o', 'StrictHostKeyChecking=no', args.target, '/usr/bin/cloud-init', 'status').splitlines()
         ret = createReturn(code=200, val=ret_val)
     except Exception as e:
         ret = createReturn(code=500, val='ERROR')

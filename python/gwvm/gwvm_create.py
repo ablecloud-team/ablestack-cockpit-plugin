@@ -168,17 +168,17 @@ def create(args):
         create_gwvm_cloudinit_cmd.append('--sn-prefix')
         create_gwvm_cloudinit_cmd.append(pn_cidr)
 
-        result = json.loads(python3(create_gwvm_cloudinit_cmd).stdout.decode())
+        result = json.loads(python3(create_gwvm_cloudinit_cmd))
 
         # gwvm xml 생성
-        result = json.loads(python3(pluginpath + '/python/gwvm/create_gwvm_xml.py', '-c', cpu_core, '-m', memory_gb, '-mnb', mngt_nic, '-snb', pn_nic, '-hns', pcs_cluster_list ).stdout.decode())
+        result = json.loads(python3(pluginpath + '/python/gwvm/create_gwvm_xml.py', '-c', cpu_core, '-m', memory_gb, '-mnb', mngt_nic, '-snb', pn_nic, '-hns', pcs_cluster_list ))
         # result로 에러 체크
 
         # gwvm pcs 클러스터 배포
-        # result = json.loads(python3(pluginpath + 'python/pcs/pcsExehost.py' ).stdout.decode())
+        # result = json.loads(python3(pluginpath + 'python/pcs/pcsExehost.py' ))
         # pcs_exe_ip = result.val
         pcs_exe_ip = '10.10.2.1'
-        ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', pcs_exe_ip, "python3 " + pluginpath + "/python/gwvm/create_gwvm_setup_pcs_cluster.py").stdout.strip().decode()
+        ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', pcs_exe_ip, "python3 " + pluginpath + "/python/gwvm/create_gwvm_setup_pcs_cluster.py").strip()
 
         # gwvm 부팅 완료 대기
         os.system("ssh-keygen -R "+mngt_ip+" > /dev/null 2>&1")
@@ -196,13 +196,13 @@ def create(args):
             return createReturn(code=500, val="gwvm did not boot. : "+e)
 
         # gwvm 재부팅 시, 마운트 재설정
-        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'echo "/usr/bin/mount -t ceph admin@.fs=/ /fs" >>/etc/rc.d/rc.local').stdout.strip().decode()
-        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'echo -e "\n[Install]\nWantedBy=multi-user.target" >> /usr/lib/systemd/system/rc-local.service').stdout.strip().decode()
-        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'chmod +x /etc/rc.d/rc.local').stdout.strip().decode()
-        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'systemctl start rc-local.service').stdout.strip().decode()
-        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'systemctl enable rc-local.service').stdout.strip().decode()
+        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'echo "/usr/bin/mount -t ceph admin@.fs=/ /fs" >>/etc/rc.d/rc.local').strip()
+        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'echo -e "\n[Install]\nWantedBy=multi-user.target" >> /usr/lib/systemd/system/rc-local.service').strip()
+        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'chmod +x /etc/rc.d/rc.local').strip()
+        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'systemctl start rc-local.service').strip()
+        ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, 'systemctl enable rc-local.service').strip()
         # bootstrap.sh 실행
-        ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, "sh /root/bootstrap.sh").stdout.strip().decode()
+        ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=5', mngt_ip, "sh /root/bootstrap.sh").strip()
 
         return createReturn(code=200, val="Gateway VM Create Success")
 

@@ -21,77 +21,77 @@ def parseArgs():
 
     parser = argparse.ArgumentParser(description='Card Cloud Cluster Status',
                                      epilog='copyrightⓒ 2021 All rights reserved by ABLECLOUD™')
-    
+
     parser.add_argument('action', choices=['pcsDetail','pcsStart','pcsStop','pcsCleanup','pcsMigration'])
     parser.add_argument('--target', metavar='name', type=str, help='Target hostname to migrate Cloud Center VM')
-    
+
     return parser.parse_args()
 
 # 함수명 : pcsDetail
 # 주요기능 : pcs 클러스터의 상세정보를 조회
 def pcsDetail():
     try:
-        ret = sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res").stdout.decode()
+        ret = sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res")
     except Exception as e:
         ret = createReturn(code=500, val='ERROR')
         print ('EXCEPTION : ',e)
-    
+
     return ret
 
 def pcsStart():
     try:
-        ret = sh.python3(pluginpath + "/python/pcs/main.py","enable", "--resource", "cloudcenter_res").stdout.decode()
+        ret = sh.python3(pluginpath + "/python/pcs/main.py","enable", "--resource", "cloudcenter_res")
         while True:
-            retPcsStatusJson = json.loads(sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res").stdout.decode())
+            retPcsStatusJson = json.loads(sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res"))
             if retPcsStatusJson['val']['role'] == 'Started':
                 break
     except Exception as e:
         ret = createReturn(code=500, val='ERROR')
         print ('EXCEPTION : ',e)
-    
-    return ret    
+
+    return ret
 
 # 함수명 : pcsStop
 # 주요기능 : pcs 클러스터를 정지
 def pcsStop():
     try:
-        ret = sh.python3(pluginpath + "/python/pcs/main.py","disable", "--resource", "cloudcenter_res").stdout.decode()
+        ret = sh.python3(pluginpath + "/python/pcs/main.py","disable", "--resource", "cloudcenter_res")
         while True:
-            retPcsStatusJson = json.loads(sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res").stdout.decode())
+            retPcsStatusJson = json.loads(sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res"))
             if retPcsStatusJson['val']['role'] == 'Stopped':
                 break
     except Exception as e:
         ret = createReturn(code=500, val='ERROR')
         print ('EXCEPTION : ',e)
-    
+
     return ret
 
 # 함수명 : pcsCleanup
 # 주요기능 : pcs 클러스터를 클린업
 def pcsCleanup():
     try:
-        ret = sh.python3(pluginpath + "/python/pcs/main.py","cleanup", "--resource", "cloudcenter_res").stdout.decode()
+        ret = sh.python3(pluginpath + "/python/pcs/main.py","cleanup", "--resource", "cloudcenter_res")
     except Exception as e:
         ret = createReturn(code=500, val='ERROR')
         print ('EXCEPTION : ',e)
-    
+
     return ret
 
 # 함수명 : pcsCleanup
 # 주요기능 : pcs 클러스터에서 운영중인 CloudCenter VM을 입력반은 호스트로 마이그레이션
 def pcsMigration():
     try:
-        ret = sh.python3(pluginpath + "/python/pcs/main.py","move", "--resource", "cloudcenter_res", "--target",  args.target).stdout.decode()
+        ret = sh.python3(pluginpath + "/python/pcs/main.py","move", "--resource", "cloudcenter_res", "--target",  args.target)
         while True:
-            retPcsStatusJson = json.loads(sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res").stdout.decode())
+            retPcsStatusJson = json.loads(sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res"))
             if retPcsStatusJson['val']['role'] == 'Started':
                 break
-        sh.python3(pluginpath + "/python/pcs/main.py","cleanup", "--resource", "cloudcenter_res").stdout.decode()
+        sh.python3(pluginpath + "/python/pcs/main.py","cleanup", "--resource", "cloudcenter_res")
     except Exception as e:
         ret = createReturn(code=500, val='ERROR')
         print ('EXCEPTION : ',e)
-    
-    return ret 
+
+    return ret
 
 
 

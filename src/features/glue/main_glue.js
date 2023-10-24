@@ -304,12 +304,10 @@ $('#button-execution-modal-delete').on('click',function(){
         cockpit.spawn(['python3', pluginpath + '/python/glue/gluefs.py','delete']).then(function(data){
             var retVal = JSON.parse(data);
             var retVal_code = JSON.parse(retVal.code);
-
             if(retVal_code == 200){
                 cockpit.spawn(['python3', pluginpath + '/python/glue/gluefs.py', 'destroy']).then(function(data){
                     var retVal = JSON.parse(data);
                     var retVal_code = JSON.parse(retVal.code);
-
                     $('#div-modal-spinner').hide();
 
                     if(retVal_code == 200){

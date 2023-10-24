@@ -72,11 +72,11 @@ def check(args):
 
     if hypervisor == "cell":
         # gwvm pcs 클러스터 배포
-        # result = json.loads(python3(pluginpath + 'python/pcs/pcsExehost.py' ).stdout.decode())
+        # result = json.loads(python3(pluginpath + 'python/pcs/pcsExehost.py' ))
         # pcs_exe_ip = result.val
         pcs_exe_ip = '10.10.2.1'
 
-        ret = json.loads(ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_exe_ip, "python3 " + pluginpath + "/python/pcs/main.py", "status", "--resource", "gateway_res").stdout.strip().decode())
+        ret = json.loads(ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_exe_ip, "python3 " + pluginpath + "/python/pcs/main.py", "status", "--resource", "gateway_res").strip())
         if ret["code"] == 200:
             # 가상머신 상태
             gwvm_info['role'] = ret["val"]["role"]
@@ -89,13 +89,13 @@ def check(args):
                 gwvm_info['nictype'] = "Unknown"
                 gwvm_info['nicbridge'] = "Unknown"
 
-                ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_exe_ip, "virsh dominfo --domain gwvm").stdout.strip().decode().splitlines()
+                ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_exe_ip, "virsh dominfo --domain gwvm").strip().splitlines()
                 for line in ret[:-1]:
                     items = line.split(":", maxsplit=1)
                     k = items[0].strip()
                     v = items[1].strip()
                     gwvm_info[k] = v
-                ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_exe_ip, "virsh domifaddr --domain gwvm --source agent --interface enp0s20").stdout.strip().decode().splitlines()
+                ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_exe_ip, "virsh domifaddr --domain gwvm --source agent --interface enp0s20").strip().splitlines()
                 for line in ret[:-1]:
                     if 'ipv4' in line and 'enp0s20' in line:
                         items = line.split(maxsplit=4)
@@ -104,21 +104,21 @@ def check(args):
                         gwvm_info['ip'] = ipSplit[0]
                         gwvm_info['prefix'] = ipSplit[1]
                         gwvm_info['mac'] = items[1]
-                ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_exe_ip, "virsh domiflist --domain gwvm").stdout.strip().decode().splitlines()
+                ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_exe_ip, "virsh domiflist --domain gwvm").strip().splitlines()
                 for line in ret[:-1]:
                     if gwvm_info['mac'] in line:
                         items = line.split()
                         gwvm_info['nictype'] = items[1]
                         gwvm_info['nicbridge'] = items[2]
                 try:
-                    ret = ssh('-o', 'StrictHostKeyChecking=no', gwvm_info['ip'], '/usr/sbin/route', '-n', '|', 'grep', '-P', '"^0.0.0.0|UG"').stdout.decode().splitlines()
+                    ret = ssh('-o', 'StrictHostKeyChecking=no', gwvm_info['ip'], '/usr/sbin/route', '-n', '|', 'grep', '-P', '"^0.0.0.0|UG"').splitlines()
                     for line in ret[:]:
                         items = line.split()
                         gwvm_info['gw'] = items[1]
                 except Exception as e:
                     pass
 
-                ret = ssh('-o', 'StrictHostKeyChecking=no', gwvm_info['ip'], '/usr/bin/df', '-h').stdout.decode().splitlines()
+                ret = ssh('-o', 'StrictHostKeyChecking=no', gwvm_info['ip'], '/usr/bin/df', '-h').splitlines()
                 ret.reverse()
                 for line in ret[:]:
                     if 'root' in line:

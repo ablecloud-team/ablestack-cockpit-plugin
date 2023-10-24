@@ -49,31 +49,31 @@ def createArgumentParser():
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
-    
+
     # flag 추가(샘플임, 테스트용으로 json이 아닌 plain text로 출력하는 플래그 역할)
     parser.add_argument('-H', '--Human', action='store_const', dest='flag_readerble', const=True, help='Human readable')
-    
+
     # Version 추가
     parser.add_argument('-V', '--Version', action='version', version='%(prog)s 1.0')
 
     return parser
 
 def createGwvmCloudinit(args):
-    
+
     success_bool = True
 
-    # cloudinit iso 생성 (/usr/share/cockpit/ablestack/tools/vmconfig/gwvm/gwvm-cloudinit.iso)   
-    # result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/gwvm/gwvm-cloudinit.iso','gwvm').stdout.decode())
+    # cloudinit iso 생성 (/usr/share/cockpit/ablestack/tools/vmconfig/gwvm/gwvm-cloudinit.iso)
+    # result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/gwvm/gwvm-cloudinit.iso','gwvm'))
     if args.mgmt_gw == None:
         if args.dns == None:
-            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/gwvm/gwvm-cloudinit.iso','gwvm').stdout.decode())
+            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/gwvm/gwvm-cloudinit.iso','gwvm'))
         else:
-            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--dns',args.dns,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/gwvm/gwvm-cloudinit.iso','gwvm').stdout.decode())        
+            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--dns',args.dns,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/gwvm/gwvm-cloudinit.iso','gwvm'))
     else:
         if args.dns == None:
-            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/gwvm/gwvm-cloudinit.iso','gwvm').stdout.decode())
+            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/gwvm/gwvm-cloudinit.iso','gwvm'))
         else:
-            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--dns',args.dns,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/gwvm/gwvm-cloudinit.iso','gwvm').stdout.decode())
+            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--dns',args.dns,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/gwvm/gwvm-cloudinit.iso','gwvm'))
 
     if result['code'] not in [200]:
         success_bool = False
@@ -89,13 +89,13 @@ def createGwvmCloudinit(args):
 
             if ret_num != 0:
                 return createReturn(code=500, val=host_name + " : pcs 클러스터 호스트에 /vmconfig/gwvm 폴더생성 명령 실패")
-            
+
             # /gwvm/gwvm-cloudinit.iso 복사 실패
             for i in [1,2,3]:
                 ret_num = os.system("scp -q "+pluginpath+"/tools/vmconfig/gwvm/gwvm-cloudinit.iso root@"+host_name+":"+pluginpath+"/tools/vmconfig/gwvm/gwvm-cloudinit.iso")
                 if ret_num == 0:
                     break
-                    
+
             if ret_num != 0:
                 return createReturn(code=500, val=host_name + " : pcs 클러스터 호스트에 /gwvm/gwvm-cloudinit.iso 복사 실패")
 

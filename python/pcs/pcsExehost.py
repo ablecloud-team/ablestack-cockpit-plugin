@@ -35,10 +35,10 @@ def createArgumentParser():
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
-    
+
     # flag 추가(샘플임, 테스트용으로 json이 아닌 plain text로 출력하는 플래그 역할)
     parser.add_argument('-H', '--Human', action='store_const', dest='flag_readerble', const=True, help='Human readable')
-    
+
     # Version 추가
     parser.add_argument('-V', '--Version', action='version', version='%(prog)s 1.0')
 
@@ -60,16 +60,16 @@ def selectPcsExeHost(args):
         # cluster.json 파일 읽어오기
         json_data = openClusterJson()
         hostname = socket.gethostname()
-        
+
         for f_key in json_data["clusterConfig"]["pcsCluster"]:
             pcs_host = json_data["clusterConfig"]["pcsCluster"][f_key]
             if pcs_host == hostname:
                 return createReturn(code=200, val=pcs_host)
-        
+
         for f_key in json_data["clusterConfig"]["pcsCluster"]:
             pcs_host = json_data["clusterConfig"]["pcsCluster"][f_key]
             if pcs_host != "":
-                ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_host, "echo ok").stdout.strip().decode()
+                ret = ssh('-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=1', pcs_host, "echo ok").strip()
                 if ret == 'ok':
                     return createReturn(code=200, val=pcs_host)
 

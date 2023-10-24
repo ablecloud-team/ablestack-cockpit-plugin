@@ -32,10 +32,10 @@ def createArgumentParser():
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
-    
+
     # flag 추가(샘플임, 테스트용으로 json이 아닌 plain text로 출력하는 플래그 역할)
     parser.add_argument('-H', '--Human', action='store_const', dest='flag_readerble', const=True, help='Human readable')
-    
+
     # Version 추가
     parser.add_argument('-V', '--Version', action='version', version='%(prog)s 1.0')
 
@@ -49,12 +49,12 @@ def setupPcsCluster(args):
     # ceph 이미지 등록
     # os.system("qemu-img convert -f qcow2 -O rbd /var/lib/libvirt/images/ablestack-template-back.qcow2 rbd:rbd/gwvm")
     # 클러스터 구성
-    # result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'config', '--cluster', 'gateway_cluster', '--hosts', args.host_names[0], args.host_names[1], args.host_names[2] ).stdout.decode())
+    # result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'config', '--cluster', 'gateway_cluster', '--hosts', args.host_names[0], args.host_names[1], args.host_names[2] ))
     # if result['code'] not in [200]:
     #     success_bool = False
     # print(pluginpath+'/tools/vmconfig/gwvm/gwvm.xml')
     # 리소스 생성
-    result = json.loads(python3(pluginpath+'/python/pcs/main.py', 'create', '--resource', 'gateway_res', '--xml', pluginpath+'/tools/vmconfig/gwvm/gwvm.xml' ).stdout.decode())
+    result = json.loads(python3(pluginpath+'/python/pcs/main.py', 'create', '--resource', 'gateway_res', '--xml', pluginpath+'/tools/vmconfig/gwvm/gwvm.xml' ))
     if result['code'] not in [200]:
         success_bool = False
 
@@ -92,4 +92,3 @@ if __name__ == '__main__':
     # 실제 로직 부분 호출 및 결과 출력
     ret = setupPcsCluster(args)
     print(ret)
-

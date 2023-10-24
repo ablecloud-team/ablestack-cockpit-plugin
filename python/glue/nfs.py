@@ -62,7 +62,7 @@ def createArgumentParser():
 # glue 대시보드 url 조회
 def glueUrl():
     try:
-        cmd = ssh('-o', 'StrictHostKeyChecking=no', 'ablecube', 'python3', pluginpath+ '/python/url/create_address.py', 'storageCenter').stdout.decode().splitlines()
+        cmd = ssh('-o', 'StrictHostKeyChecking=no', 'ablecube', 'python3', pluginpath+ '/python/url/create_address.py', 'storageCenter').splitlines()
         dashboard = json.loads(cmd[0])
         if dashboard["code"] != 200:
             return createReturn(code=500, val='nfs.py url error :'+dashboard["val"])
@@ -220,6 +220,7 @@ def destroyNfsCluster(args):
                 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
                 response = requests.delete(url+'/api/service/service_name', headers=headers, params=params, verify=False)
                 if response.status_code == 204:
+                    deleteNfsPool(args)
                     return createReturn(code=200, val='nfs service '+args.action+' control success')
                 elif response.status_code == 202:
                     global cnt
@@ -294,7 +295,7 @@ def createNfsExport(args):
         if response.status_code == 201:
             if args.quota is not None:
                 #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
-                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
+                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota)
             return createReturn(code=200, val='nfs service '+args.action+' control success')
         elif response.status_code == 202:
             global cnt
@@ -310,7 +311,7 @@ def createNfsExport(args):
                         break
             if args.quota is not None:
                 #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
-                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
+                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota)
             return createReturn(code=200, val='nfs service '+args.action+' control success')
         else:
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
@@ -358,6 +359,27 @@ def deleteNfsExport(args):
     except Exception as e:
         return createReturn(code=500, val='nfs.py deleteNfsExport error :'+e)
 
+def deleteNfsPool(args):
+    try:
+        token = createToken()
+        headers = {
+            'Accept': 'application/vnd.ceph.api.v1.0+json',
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }
+        params = {
+            'pool_name':'.nfs'
+        }
+        url = glueUrl()
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+        response = requests.delete(url+'/api/pool/pool_name', headers=headers, params=params, verify=False)
+        if response.status_code == 204:
+            return createReturn(code=200, val='nfs pool '+args.action+' control success')
+        else:
+            return createReturn(code=500, val=json.dumps(response.json(), indent=2))
+    except Exception as e:
+        return createReturn(code=500, val='nfs.py deleteNfsPool error :'+e)
+
 # nfs export 편집
 def editNfsExport(args):
     try:
@@ -398,7 +420,7 @@ def editNfsExport(args):
         if response.status_code == 200:
             if args.quota is not None:
                 #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
-                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
+                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota)
             return createReturn(code=200, val='nfs service '+args.action+' control success')
         elif response.status_code == 202:
             global cnt
@@ -414,7 +436,7 @@ def editNfsExport(args):
                         break
             if args.quota is not None:
                 #fs = check_output(['python3 gluefs.py quota --path /nfs --quota '+args.quota], universal_newlines=True, shell=True, env=env)
-                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota).stdout.decode()
+                fs = sh.python3(pluginpath + '/python/glue/gluefs.py','quota', '--path', '/nfs', '--quota', args.quota)
             return createReturn(code=200, val='nfs service '+args.action+' control success')
         else:
             return createReturn(code=500, val=json.dumps(response.json(), indent=2))
@@ -503,8 +525,8 @@ def controlDaemon(args):
 def nfsquota():
     # 서비스 제어 명령
     try:
-        quota = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/nfs | grep -w max_bytes | awk -F '\"' '{print $2}' ").stdout.decode().splitlines()
-        usage = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'du', '-sh', '/fs/nfs', '|', "awk '{print $1}'").stdout.decode().splitlines()
+        quota = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/nfs | grep -w max_bytes | awk -F '\"' '{print $2}' ").splitlines()
+        usage = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'du', '-sh', '/fs/nfs', '|', "awk '{print $1}'").splitlines()
         result ={
             "quota": quota,
             "usage": usage
