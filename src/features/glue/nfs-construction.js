@@ -12,11 +12,10 @@ $('#buttion-create-modal-nfs-construction').on('click',function(){
     var type = sessionStorage.getItem('type');
 
     if(type == 'nfs_edit'){
+        if(nfsValidateCheck() == true){
         $('#div-modal-nfs-construction').hide();
         $('#div-modal-spinner-header-txt').text('NFS 편집 중');
         $('#div-modal-spinner').show();
-
-        nfsValidateCheck();
 
         cockpit.spawn(['python3', pluginpath + '/python/glue/nfs.py', 'edit', '--access-type', access_type, '--squash', squash, '--quota', quota]).then(function(data){
             var retVal = JSON.parse(data);
@@ -36,12 +35,14 @@ $('#buttion-create-modal-nfs-construction').on('click',function(){
             createLoggerInfo("NFS 편집 실패");
         });
     }
+    }
     else{
+        if(nfsValidateCheck() == true){
         $('#div-modal-nfs-construction').hide();
         $('#div-modal-spinner-header-txt').text('NFS 구성 중');
         $('#div-modal-spinner').show();
 
-        nfsValidateCheck();
+
 
         cockpit.spawn(['python3', pluginpath + '/python/glue/gluefs.py', 'config', '--type', 'nfs','--mount-path','/fs/nfs','--quota', quota]).then(function(data){
             var retVal = JSON.parse(data);
@@ -93,6 +94,7 @@ $('#buttion-create-modal-nfs-construction').on('click',function(){
             createLoggerInfo("NFS 구성 실패");
         });
     }
+}
 });
 
 // 필수 값 유효성 검사

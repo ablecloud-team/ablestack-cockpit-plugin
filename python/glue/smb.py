@@ -48,7 +48,16 @@ def createSamba():
 
     rc = call(["ssh gwvm ls -al /usr/local/samba/sbin/ | grep -w 'smb_construction.sh'"],universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     if rc != 0:
-        os.system("scp /usr/share/cockpit/ablestack/shell/host/smb_construction.sh gwvm:/usr/local/samba/sbin/")
+        copy = os.system("scp /usr/share/cockpit/ablestack/shell/host/smb_construction.sh gwvm:/usr/local/samba/sbin/")
+        if copy == 0:
+            result = os.system('ssh gwvm sh ' + smb_construction + " -u " + args.user_name +  " -p " + args.user_pw)
+
+            if result == 0:  # 서비스 제어가 성공일 경우
+                ret = createReturn(code=200,val='smb service construction success')
+                return print(json.dumps(json.loads(ret), indent=4))
+            else:  # 서비스 제어가 실패할 경우
+                ret = createReturn(code=500,val='smb service construction fail')
+                return print(json.dumps(json.loads(ret), indent=4))
     else:
         result = os.system('ssh gwvm sh ' + smb_construction + " -u " + args.user_name +  " -p " + args.user_pw)
 

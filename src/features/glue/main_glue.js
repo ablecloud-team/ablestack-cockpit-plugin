@@ -720,7 +720,7 @@ function ServiceQuota(type){
  */
 function gwvmEtcHostIp(type){
      cockpit.spawn(['grep','gwvm-mngt','/etc/hosts']).then(function(data){
-        var ip = data.split(' ');
+        var ip = data.split('\t');
             if(type == 'gluefs'){
                 $('#gluefs-access-ip').text(ip[0]);
             }else if(type == 'nfs'){

@@ -36,11 +36,10 @@ $('#buttion-create-modal-smb-construction').on('click',function(){
         });
     }
     else{
+        if(smbValidateCheck() == true){
         $('#div-modal-smb-construction').hide();
         $('#div-modal-spinner-header-txt').text('SMB 구성 중');
         $('#div-modal-spinner').show();
-
-        smbValidateCheck();
 
         cockpit.spawn(['python3', pluginpath + '/python/glue/smb.py','create', '-u', user_name, '-p', user_pw]).then(function(data){
             var retVal = JSON.parse(data);
@@ -70,6 +69,7 @@ $('#buttion-create-modal-smb-construction').on('click',function(){
             }
         });
     }
+}
 });
 
 function smbValidateCheck(){

@@ -27,11 +27,11 @@ $('#buttion-create-modal-gluefs-construction').on('click',function(){
         });
     }
     else{
+        if(gluefsValidateCheck() == true){
         $('#div-modal-gluefs-construction').hide();
         $('#div-modal-spinner-header-txt').text('GlueFS 구성 중');
         $('#div-modal-spinner').show();
 
-        gluefsValidateCheck();
 
     cockpit.spawn(['python3', pluginpath + '/python/glue/gluefs.py', "config", "--type", option, "--mount-path", mount_path, "--quota", quota]).then(function(data){
         var retVal = JSON.parse(data);
@@ -54,7 +54,9 @@ $('#buttion-create-modal-gluefs-construction').on('click',function(){
         createLoggerInfo("GlueFS 구성 실패");
     });
 }
+}
 });
+
 // gluefs 구성 화면 닫기
 $('#button-close-modal-gluefs-construction, #button-cancel-modal-gluefs-construction').on('click',function(){
     $('#div-modal-gluefs-construction').hide();
