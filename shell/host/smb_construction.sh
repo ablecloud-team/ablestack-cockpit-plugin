@@ -16,11 +16,11 @@ user_pw=$4
 sed -i "s/$before_host/$host_ip/g" /usr/local/samba/etc/smb.conf
 
 echo -e "\n[ablecloud]" >> /usr/local/samba/etc/smb.conf
-echo  "path = /fs/smb" >> /usr/local/samba/etc/smb.conf
-echo  "writable = yes" >> /usr/local/samba/etc/smb.conf
-echo  "public = yes" >> /usr/local/samba/etc/smb.conf
-echo  "create mask = 0755" >> /usr/local/samba/etc/smb.conf
-echo  "directory mask = 0755" >> /usr/local/samba/etc/smb.conf
+echo -e "\tpath = /fs/smb" >> /usr/local/samba/etc/smb.conf
+echo -e "\twritable = yes" >> /usr/local/samba/etc/smb.conf
+echo -e "\tpublic = yes" >> /usr/local/samba/etc/smb.conf
+echo -e "\tcreate mask = 0755" >> /usr/local/samba/etc/smb.conf
+echo -e "\tdirectory mask = 0755" >> /usr/local/samba/etc/smb.conf
 
 # 사용자 추가를 위한 expect 스크립트
 useradd $user_id > /dev/null

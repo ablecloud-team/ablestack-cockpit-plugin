@@ -38,52 +38,50 @@ $('#buttion-create-modal-nfs-construction').on('click',function(){
     }
     else{
         if(nfsValidateCheck() == true){
-        $('#div-modal-nfs-construction').hide();
-        $('#div-modal-spinner-header-txt').text('NFS 구성 중');
-        $('#div-modal-spinner').show();
+            $('#div-modal-nfs-construction').hide();
+            $('#div-modal-spinner-header-txt').text('NFS 구성 중');
+            $('#div-modal-spinner').show();
 
-
-
-        cockpit.spawn(['python3', pluginpath + '/python/glue/gluefs.py', 'config', '--type', 'nfs','--mount-path','/fs/nfs','--quota', quota]).then(function(data){
-            var retVal = JSON.parse(data);
-            var retVal_code = JSON.parse(retVal.code);
-            if(retVal_code == 200){
-                cockpit.spawn(['python3', pluginpath + '/python/glue/nfs.py', 'config']).then(function(data){
-                    var retVal = JSON.parse(data);
-                    var retVal_code = JSON.parse(retVal.code);
-                    if(retVal_code == 200){
-                        cockpit.spawn(['python3', pluginpath + '/python/glue/nfs.py', 'create', '--access-type', access_type, '--squash', squash, '--quota', quota]).then(function(data){
-                            var retVal = JSON.parse(data);
-                            var retVal_code = JSON.parse(retVal.code);
+            cockpit.spawn(['python3', pluginpath + '/python/glue/gluefs.py', 'config', '--type', 'nfs','--mount-path','/fs/nfs','--quota', quota]).then(function(data){
+                var retVal = JSON.parse(data);
+                var retVal_code = JSON.parse(retVal.code);
+                if(retVal_code == 200){
+                    cockpit.spawn(['python3', pluginpath + '/python/glue/nfs.py', 'config']).then(function(data){
+                        var retVal = JSON.parse(data);
+                        var retVal_code = JSON.parse(retVal.code);
+                        if(retVal_code == 200){
+                            cockpit.spawn(['python3', pluginpath + '/python/glue/nfs.py', 'create', '--access-type', access_type, '--squash', squash, '--quota', quota]).then(function(data){
+                                var retVal = JSON.parse(data);
+                                var retVal_code = JSON.parse(retVal.code);
+                                $('#div-modal-spinner').hide();
+                                if(retVal_code == 200){
+                                    $('#div-modal-nfs-construction').hide();
+                                    $('#modal-status-alert-title').text("NFS 구성");
+                                    $('#modal-status-alert-body').text("NFS 구성이 성공했습니다.");
+                                    $('#div-modal-status-alert').show();
+                                    $('#menu-item-set-nfs-construction').hide();
+                                    $('#menu-item-set-nfs-delete').show();
+                                }else{
+                                    $('#div-modal-nfs-construction').hide();
+                                    $('#modal-status-alert-title').text("NFS 구성");
+                                    $('#modal-status-alert-body').text("NFS 구성이 실패했습니다.");
+                                    $('#div-modal-status-alert').show();
+                                }
+                            }).catch(function(){
+                                createLoggerInfo("NFS 구성 실패");
+                            });
+                        }
+                        else{
                             $('#div-modal-spinner').hide();
-                            if(retVal_code == 200){
-                                $('#div-modal-nfs-construction').hide();
-                                $('#modal-status-alert-title').text("NFS 구성");
-                                $('#modal-status-alert-body').text("NFS 구성이 성공했습니다.");
-                                $('#div-modal-status-alert').show();
-                                $('#menu-item-set-nfs-construction').hide();
-                                $('#menu-item-set-nfs-delete').show();
-                            }else{
-                                $('#div-modal-nfs-construction').hide();
-                                $('#modal-status-alert-title').text("NFS 구성");
-                                $('#modal-status-alert-body').text("NFS 구성이 실패했습니다.");
-                                $('#div-modal-status-alert').show();
-                            }
-                        }).catch(function(){
-                            createLoggerInfo("NFS 구성 실패");
-                        });
-                    }
-                    else{
-                        $('#div-modal-spinner').hide();
-                        $('#div-modal-nfs-construction').hide();
-                        $('#modal-status-alert-title').text("NFS 구성");
-                        $('#modal-status-alert-body').text("NFS 구성이 실패했습니다.");
-                        $('#div-modal-status-alert').show();
-                    }
-                }).catch(function(){
-                    createLoggerInfo("NFS 구성 실패");
-                });
-            }
+                            $('#div-modal-nfs-construction').hide();
+                            $('#modal-status-alert-title').text("NFS 구성");
+                            $('#modal-status-alert-body').text("NFS 구성이 실패했습니다.");
+                            $('#div-modal-status-alert').show();
+                        }
+                    }).catch(function(){
+                        createLoggerInfo("NFS 구성 실패");
+                    });
+                }
             else{
                 $('#div-modal-nfs-construction').hide();
                 $('#modal-status-alert-title').text("NFS 구성");

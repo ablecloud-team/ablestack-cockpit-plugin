@@ -35,7 +35,7 @@ $(document).ready(function(){
     nfsCheckInfo();
     setInterval(() => {
         gwvmInfoSet(),sambaCheckInfo(),gluefsCheckInfo(),nfsCheckInfo();
-    }, 30000);
+    }, 60000);
 });
 // document.ready 영역 끝
 

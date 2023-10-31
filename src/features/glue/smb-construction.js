@@ -37,37 +37,37 @@ $('#buttion-create-modal-smb-construction').on('click',function(){
     }
     else{
         if(smbValidateCheck() == true){
-        $('#div-modal-smb-construction').hide();
-        $('#div-modal-spinner-header-txt').text('SMB 구성 중');
-        $('#div-modal-spinner').show();
+            $('#div-modal-smb-construction').hide();
+            $('#div-modal-spinner-header-txt').text('SMB 구성 중');
+            $('#div-modal-spinner').show();
 
-        cockpit.spawn(['python3', pluginpath + '/python/glue/smb.py','create', '-u', user_name, '-p', user_pw]).then(function(data){
-            var retVal = JSON.parse(data);
-            if(retVal.code == 200){
-                cockpit.spawn(['python3', pluginpath + '/python/glue/gluefs.py','quota','--path','/smb','--quota', quota]).then(function(data){
-                    var retVal = JSON.parse(data);
+            cockpit.spawn(['python3', pluginpath + '/python/glue/smb.py','create', '-u', user_name, '-p', user_pw]).then(function(data){
+                var retVal = JSON.parse(data);
+                if(retVal.code == 200){
+                    cockpit.spawn(['python3', pluginpath + '/python/glue/gluefs.py','quota','--path','/smb','--quota', quota]).then(function(data){
+                        var retVal = JSON.parse(data);
 
-                    $('#div-modal-spinner').hide();
+                        $('#div-modal-spinner').hide();
 
-                    if(retVal.code == 200){
-                        $('#modal-status-alert-title').text("SMB 구성");
-                        $('#modal-status-alert-body').text("SMB 구성이 성공했습니다.");
-                        $('#div-modal-status-alert').show();
-                        $('#menu-item-set-smb-construction').hide();
-                        $('#menu-item-set-smb-delete').show();
-                    }
-                    else{
+                        if(retVal.code == 200){
+                            $('#modal-status-alert-title').text("SMB 구성");
+                            $('#modal-status-alert-body').text("SMB 구성이 성공했습니다.");
+                            $('#div-modal-status-alert').show();
+                            $('#menu-item-set-smb-construction').hide();
+                            $('#menu-item-set-smb-delete').show();
+                        }
+                        else{
+                            $('#modal-status-alert-title').text("SMB 구성");
+                            $('#modal-status-alert-body').text("SMB 구성이 실패했습니다.");
+                            $('#div-modal-status-alert').show();
+                        }
+                    }).catch(function(){
                         $('#modal-status-alert-title').text("SMB 구성");
                         $('#modal-status-alert-body').text("SMB 구성이 실패했습니다.");
                         $('#div-modal-status-alert').show();
-                    }
-                }).catch(function(){
-                    $('#modal-status-alert-title').text("SMB 구성");
-                    $('#modal-status-alert-body').text("SMB 구성이 실패했습니다.");
-                    $('#div-modal-status-alert').show();
-                });
-            }
-        });
+                    });
+                }
+            });
     }
 }
 });
