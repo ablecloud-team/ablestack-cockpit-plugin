@@ -130,18 +130,18 @@ def sambaDetail():
     user_count = 'N/A'
 
     try:
-        rc = call(["ssh gwvm cat /usr/local/samba/etc/smb.conf | grep path | awk '{print $3}' | tail -1"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        if rc == 0:
-            output = check_output(["ssh gwvm cat /usr/local/samba/etc/smb.conf | grep path | awk '{print $3}' | tail -1"], universal_newlines=True, shell=True, env=env)
-            path = output.strip()
-        else :
-            path = "/"
-        rc = call(["ssh gwvm df -h | grep  /fs | awk '{ print $2 }'"],universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        if rc == 0:
-            output = check_output(["ssh gwvm df -h | grep -w /fs | awk '{ print $2 }'"], universal_newlines=True, shell=True, env=env)
-            full_capacity = output.strip()
-        else :
-            full_capacity = "N/A"
+        # rc = call(["ssh gwvm cat /usr/local/samba/etc/smb.conf | grep path | awk '{print $3}' | tail -1"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        # if rc == 0:
+        #     output = check_output(["ssh gwvm cat /usr/local/samba/etc/smb.conf | grep path | awk '{print $3}' | tail -1"], universal_newlines=True, shell=True, env=env)
+        #     path = output.strip()
+        # else :
+        #     path = "/"
+        # rc = call(["ssh gwvm df -h | grep  /fs | awk '{ print $2 }'"],universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        # if rc == 0:
+        #     output = check_output(["ssh gwvm df -h | grep -w /fs | awk '{ print $2 }'"], universal_newlines=True, shell=True, env=env)
+        #     full_capacity = output.strip()
+        # else :
+        #     full_capacity = "N/A"
         # rc = call(["ssh gwvm du -sh /fs/smb | awk '{print $1}'"], universal_newlines=True, shell=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         # if rc == 0 :
         #    output = check_output(["ssh gwvm du -sh /fs/smb | awk '{print $1}'"], universal_newlines=True, shell=True, env=env)
@@ -164,8 +164,8 @@ def sambaDetail():
 
         ret_val = {
             'service' : 'Samba Service',
-            'path' : path,
-            'full_capacity' : full_capacity,
+            # 'path' : path,
+            # 'full_capacity' : full_capacity,
             'ip_address' : ip_address
         }
         ret = createReturn(code=200, val=ret_val, retname='Gateway VM Samba Service Status Detail')
@@ -174,8 +174,8 @@ def sambaDetail():
 
         ret_val = {
             'service' : service,
-            'path' : path,
-            'full_capacity' : full_capacity,
+            # 'path' : path,
+            # 'full_capacity' : full_capacity,
             'ip_address' : ip_address
         }
         ret = createReturn(code=500, val=ret_val, retname='Gateway VM Samba Service Status Detail')

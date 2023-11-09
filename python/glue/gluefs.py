@@ -195,6 +195,7 @@ def configFs(args):
                 ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'mkdir', '-p', '/fs/gluefs').splitlines()
                 ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'mkdir', '-p', '/fs/nfs').splitlines()
                 ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'mkdir', '-p', '/fs/smb').splitlines()
+                ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'chmod', '777', '/fs/smb').splitlines()
                 # /etc/fstab 추가
                 secret = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'cat', '/etc/ceph/ceph.client.admin.keyring', '|', 'awk', "'{print $3}'").splitlines()
                 cmd = socket.gethostbyname('scvm1')+':6789,'+socket.gethostbyname('scvm2')+':6789,'+socket.gethostbyname('scvm3')+':6789:/gluefs\t/fs\tceph\tname=admin,secret='+secret[1]+',noatime,_netdev\t0 0'
@@ -233,6 +234,7 @@ def configFs(args):
                     # 디렉토리 생성
                     ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'mkdir', '-p', '/fs/nfs').splitlines()
                     ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'mkdir', '-p', '/fs/smb').splitlines()
+                    ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'chmod', '777', '/fs/smb').splitlines()
                     # /etc/fstab 추가
                     secret = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'cat', '/etc/ceph/ceph.client.admin.keyring', '|', 'awk', "'{print $3}'").splitlines()
                     cmd = socket.gethostbyname('scvm1')+':6789,'+socket.gethostbyname('scvm2')+':6789,'+socket.gethostbyname('scvm3')+':6789:/gluefs\t/fs\tceph\tname=admin,secret='+secret[1]+',noatime,_netdev\t0 0'
@@ -469,9 +471,11 @@ def gluequota():
     try:
         quota = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'getfattr', '-n', 'ceph.quota.max_bytes', '--absolute-names', "/fs/gluefs | grep -w max_bytes | awk -F '\"' '{print $2}' ").splitlines()
         usage = ssh('-o', 'StrictHostKeyChecking=no', 'gwvm-mngt', 'du', '-sh', '/fs/gluefs', '|', "awk '{print $1}'").splitlines()
+        fs_path = ssh('-o', 'StrictHostKeyChecking=no', 'ablecube', 'df', '-Th', '|', 'grep', 'ceph', '|', "awk '{print $7}'").splitlines()
         result = {
             "quota": quota,
-            "usage": usage
+            "usage": usage,
+            "fs_path": fs_path
         }
         ret = createReturn(code=200, val=result)
 

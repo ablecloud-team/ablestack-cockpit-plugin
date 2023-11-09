@@ -504,14 +504,11 @@ function gluefsCheckInfo(){
                     var retVal_code_detail = JSON.parse(retVal.code);
                     var retVal_val_detail = JSON.parse(retVal.val);
                     console.log(retVal_val_detail);
-
                     if(retVal_code_detail == 200){
-
+                        gwvmEtcHostIp('gluefs');
+                        ServiceQuota('gluefs');
                             if(retVal_val_status[0].status.running == 2){
-                                gwvmEtcHostIp('gluefs');
-                                ServiceQuota('gluefs');
 
-                                $('#gluefs-path').text("/fs");
                                 $('#gluefs-mount-path').text("/gluefs");
                                 $('#gluefs-status').text("Health OK");
                                 $('#gluefs-color').attr('class','pf-c-label pf-m-green');
@@ -521,10 +518,7 @@ function gluefsCheckInfo(){
                                 $('#menu-item-set-gluefs-delete').show();
                             }
                             else {
-                                gwvmEtcHostIp('gluefs');
-                                ServiceQuota('gluefs');
 
-                                $('#gluefs-path').text("/fs");
                                 $('#gluefs-mount-path').text("/gluefs");
                                 $('#gluefs-status').text("Stop");
                                 $('#gluefs-color').attr('class','pf-c-label pf-m-red');
@@ -617,9 +611,9 @@ function nfsCheckInfo(){
                     console.log(retVal_val_detail);
 
                     if(retVal_code_detail == 200){
+                        gwvmEtcHostIp('nfs');
+                        ServiceQuota('nfs');
                             if(retVal_val_status[0].status.running == 1){
-                                gwvmEtcHostIp('nfs');
-                                ServiceQuota('nfs');
 
                                 $('#nfs-path').text("/fs");
                                 $('#nfs-mount-path').text(retVal_val_detail.path);
@@ -631,8 +625,6 @@ function nfsCheckInfo(){
                                 $('#menu-item-set-nfs-delete').show();
                             }
                             else{
-                                gwvmEtcHostIp('nfs');
-                                ServiceQuota('nfs');
 
                                 $('#nfs-path').text("/fs");
                                 $('#nfs-mount-path').text(retVal_val_detail.path);
@@ -698,6 +690,7 @@ function ServiceQuota(type){
             var retVal = JSON.parse(data);
             if(retVal.code == 200){
                 $('#gluefs-usage').text(retVal.val.usage+"B/"+Byte(retVal.val.quota));
+                $('#gluefs-path').text(retVal.val.fs_path);
             }
         });
     }else if(type == 'nfs'){

@@ -15,9 +15,8 @@ $('#buttion-create-modal-gluefs-construction').on('click',function(){
 
         cockpit.spawn(['python3', pluginpath + '/python/glue/gluefs.py', 'edit', '--mount-path', mount_path, '--quota', quota]).then(function(data){
             var retVal = JSON.parse(data);
-            var retVal_code = JSON.parse(retVal.code);
             $('#div-modal-spinner').hide();
-            if(retVal_code == 200){
+            if(retVal.code == 200){
             $('#modal-status-alert-title').text('GlueFS 편집');
             $('#modal-status-alert-body').text('GlueFS 편집되었습니다.');
             $('#div-modal-status-alert').show();
