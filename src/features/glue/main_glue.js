@@ -561,6 +561,7 @@ function iscsiCheckInfo(type){
                             $('#iscsi-status').text("Health OK");
                             $('#iscsi-color').attr('class','pf-c-label pf-m-green');
                             $('#iscsi-icon').attr('class','fas fa-fw fas fa-fw fa-check-circle');
+
                         }
                     })
                 }
