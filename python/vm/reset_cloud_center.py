@@ -35,27 +35,27 @@ def createArgumentParser():
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
-    
+
     # flag 추가(샘플임, 테스트용으로 json이 아닌 plain text로 출력하는 플래그 역할)
     parser.add_argument('-H', '--Human', action='store_const', dest='flag_readerble', const=True, help='Human readable')
-    
+
     # Version 추가
     parser.add_argument('-V', '--Version', action='version', version='%(prog)s 1.0')
 
     return parser
 
 def resetCloudCenter(args):
-    
+
     success_bool = True
 
     #=========== pcs cluster 초기화 ===========
     # 리소스 삭제
-    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'remove', '--resource', 'cloudcenter_res').stdout.decode())
+    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'remove', '--resource', 'cloudcenter_res'))
     if result['code'] not in [200,400]:
         success_bool = False
 
     # 클러스터 삭제
-    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'destroy').stdout.decode())
+    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'destroy'))
     if result['code'] not in [200,400]:
         success_bool = False
 
@@ -73,10 +73,10 @@ def resetCloudCenter(args):
     '''
     # cloudinit iso 삭제
     os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso")
-    
+
     # vm xml 템플릿 삭제
     os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
-    
+
     # cloudinit iso에 사용할 hosts 삭제
     os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/hosts")
 
@@ -89,7 +89,7 @@ def resetCloudCenter(args):
 
     # 확인후 폴더 밑 내용 다 삭제해도 무관하면 아래 코드 수행
     os.system("rm -rf "+pluginpath+"/tools/vmconfig/ccvm/*")
-    
+
     # 결과값 리턴
     if success_bool:
         return createReturn(code=200, val="cloud center reset success")

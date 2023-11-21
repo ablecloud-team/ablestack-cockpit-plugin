@@ -1,7 +1,7 @@
 '''
 Copyright (c) 2021 ABLECLOUD Co. Ltd
-설명 : 장애조치 클러스터를 구성할 1,2,3호스트에 클라우드센터 가상머신 xml과 secret key를 생성하는 프로그램
-최초 작성일 : 2021. 03. 31
+설명 : 장애조치 클러스터를 구성할 1,2,3 호스트에 게이트웨이 가상머신 xml을 생성하는 프로그램
+최초 작성일 : 2023. 05. 15
 '''
 
 #!/usr/bin/env python3
@@ -38,8 +38,8 @@ def createArgumentParser():
     #--management-network-bridge br0                                        | 1택, 필수
     parser.add_argument('-mnb', '--management-network-bridge', metavar='[bridge name]', type=str, help='input Value to bridge name of the management network', required=True)
 
-    #--service-network-bridge br1                                           | 1택, 조건부 필수
-    parser.add_argument('-snb', '--service-network-bridge', metavar='[bridge name]', type=str, help='input Value to bridge name of the service network')
+    #--storage-network-bridge br1                                           | 1택, 조건부 필수
+    parser.add_argument('-snb', '--storage-network-bridge', metavar='[bridge name]', type=str, help='input Value to bridge name of the storage network')
 
     # three host names
     parser.add_argument('-hns', '--host-names', metavar=('[hostname1]','[hostname2]','[hostname3]'), type=str, nargs=3, help='input Value to three host names', required=True)
@@ -84,15 +84,16 @@ def createSecretKey(host_names):
 
     return createReturn(code=200, val="pcs 클러스터 secret.xm 설정 성공")
 
-def createCcvmXml(args):
+def createGwvmXml(args):
     try:
-        # 템플릿 파일을 /usr/share/cockpit/ablestack/tools/vmconfig/ccvm 경로로 복사
+        # 템플릿 파일을 /usr/share/cockpit/ablestack/tools/vmconfig/gwvm 경로로 복사
         slot_hex_num = generateDecToHex()
         br_num = 0
 
-        os.system("yes|cp -f "+pluginpath+"/tools/xml-template/ccvm-xml-template.xml "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml")
+        os.system("mkdir "+pluginpath+"/tools/vmconfig/gwvm")
+        os.system("yes|cp -f "+pluginpath+"/tools/xml-template/gwvm-xml-template.xml "+pluginpath+"/tools/vmconfig/gwvm/gwvm-temp.xml")
 
-        template_file = pluginpath+'/tools/vmconfig/ccvm/ccvm-temp.xml'
+        template_file = pluginpath+'/tools/vmconfig/gwvm/gwvm-temp.xml'
 
         with fileinput.FileInput(template_file, inplace=True, backup='.bak' ) as fi:
 
@@ -102,17 +103,17 @@ def createCcvmXml(args):
                     line = line.replace('<!--memory-->', str(args.memory))
                 elif '<!--cpu-->' in line:
                     line = line.replace('<!--cpu-->', str(args.cpu))
-                elif '<!--ccvm_cloudinit-->' in line:
+                elif '<!--gwvm_cloudinit-->' in line:
                     cci_txt = "    <disk type='file' device='cdrom'>\n"
                     cci_txt += "      <driver name='qemu' type='raw'/>\n"
-                    cci_txt += "      <source file='"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso'/>\n"
+                    cci_txt += "      <source file='"+pluginpath+"/tools/vmconfig/gwvm/gwvm-cloudinit.iso'/>\n"
                     cci_txt += "      <target dev='sdz' bus='sata'/>\n"
                     cci_txt += "      <readonly/>\n"
                     cci_txt += "      <shareable/>\n"
                     cci_txt += "      <address type='drive' controller='0' bus='0' target='0' unit='0'/>\n"
                     cci_txt += "    </disk>"
 
-                    line = line.replace('<!--ccvm_cloudinit-->', cci_txt)
+                    line = line.replace('<!--gwvm_cloudinit-->', cci_txt)
                 elif '<!--management_network_bridge-->' in line:
                     mnb_txt = "    <interface type='bridge'>\n"
                     mnb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
@@ -125,11 +126,11 @@ def createCcvmXml(args):
 
                     br_num += 1
                     line = line.replace('<!--management_network_bridge-->', mnb_txt)
-                elif '<!--service_network_bridge-->' in line:
-                    if args.service_network_bridge is not None:
+                elif '<!--storage_network_bridge-->' in line:
+                    if args.storage_network_bridge is not None:
                         snb_txt = "    <interface type='bridge'>\n"
                         snb_txt += "      <mac address='" + generateMacAddress() + "'/>\n"
-                        snb_txt += "      <source bridge='" + args.service_network_bridge + "'/>\n"
+                        snb_txt += "      <source bridge='" + args.storage_network_bridge + "'/>\n"
                         snb_txt += "      <target dev='vnet" + str(br_num) + "'/>\n"
                         snb_txt += "      <model type='virtio'/>\n"
                         snb_txt += "      <alias name='net" + str(br_num) + "'/>\n"
@@ -137,30 +138,28 @@ def createCcvmXml(args):
                         snb_txt += "    </interface>"
 
                         br_num += 1
-                        line = line.replace('<!--service_network_bridge-->', snb_txt)
+                        line = line.replace('<!--storage_network_bridge-->', snb_txt)
                     else:
-                        # <!--service_network_bridge--> 주석제거
+                        # <!--storage_network_bridge--> 주석제거
                         line = ''
 
                 # 라인 수정
                 sys.write(line)
 
         for host_name in args.host_names:
-
             ret_num = 0
-
-            # pcs 클러스터 호스트에 ccvm.xml 복사 실패
+            # pcs 클러스터 호스트에 gwvm.xml 복사 실패
             for i in [1,2,3]:
-                ret_num = os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")
+                ret_num = os.system("scp -q "+pluginpath+"/tools/vmconfig/gwvm/gwvm-temp.xml root@"+host_name+":"+pluginpath+"/tools/vmconfig/gwvm/gwvm.xml")
                 if ret_num == 0:
                     break
 
             if ret_num != 0:
-                return createReturn(code=500, val="pcs 클러스터 호스트에 ccvm.xml 복사 실패")
+                return createReturn(code=500, val="pcs 클러스터 호스트에 gwvm.xml 복사 실패")
 
             # pcs 클러스터 할 호스트 전체의 폴더 권한 수정
             for i in [1,2,3]:
-                ret_num = os.system("ssh root@"+host_name+" 'chmod 755 -R "+pluginpath+"/tools/vmconfig/ccvm'")
+                ret_num = os.system("ssh root@"+host_name+" 'chmod 755 -R "+pluginpath+"/tools/vmconfig/gwvm'")
                 if ret_num == 0:
                     break
 
@@ -179,7 +178,7 @@ def createCcvmXml(args):
 
             # pcs 클러스터 할 호스트 설정 복제
             for i in [1,2,3]:
-                ret_num = os.system("ssh root@"+host_name+" 'cp -rf "+pluginpath+"/tools/vmconfig/ccvm /usr/share/ablestack/vmconfig/'")
+                ret_num = os.system("ssh root@"+host_name+" 'cp -rf "+pluginpath+"/tools/vmconfig/gwvm /usr/share/ablestack/vmconfig/'")
                 if ret_num == 0:
                     break
 
@@ -187,7 +186,7 @@ def createCcvmXml(args):
                 return createReturn(code=500, val="pcs 클러스터 할 호스트 설정 복제 실패")
 
         #작업파일 지우기
-        os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml "+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml.bak "+pluginpath+"/tools/vmconfig/ccvm/ccvm-temp.xml.bak")
+        os.system("rm -f "+pluginpath+"/tools/vmconfig/gwvm/gwvm-temp.xml "+pluginpath+"/tools/vmconfig/gwvm/gwvm.xml.bak "+pluginpath+"/tools/vmconfig/gwvm/gwvm-temp.xml.bak")
 
         # 결과값 리턴
         return createReturn(code=200, val="클라우드센터 가상머신 xml 생성 성공")
@@ -209,13 +208,7 @@ if __name__ == '__main__':
     # 로깅을 위한 logger 생성, 모든 인자에 default 인자가 있음.
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
-    # secret.xml 생성 및 virsh 등록
-    secret_ret = json.loads(createSecretKey(args.host_names))
-
-    if secret_ret["code"] == 200 :
-        ret = createCcvmXml(args)
-        print(ret)
-    else:
-        print(secret_ret)
+    ret = createGwvmXml(args)
+    print(ret)
 
     # 실제 로직 부분 호출 및 결과 출력

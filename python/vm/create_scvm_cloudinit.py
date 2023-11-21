@@ -47,19 +47,19 @@ def createArgumentParser():
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
-    
+
     # flag 추가(샘플임, 테스트용으로 json이 아닌 plain text로 출력하는 플래그 역할)
     parser.add_argument('-H', '--Human', action='store_const', dest='flag_readerble', const=True, help='Human readable')
-    
+
     # Version 추가
     parser.add_argument('-V', '--Version', action='version', version='%(prog)s 1.0')
 
     return parser
 
 def createScvmCloudinit(args):
-    
+
     success_bool = True
-    
+
     # cloudinit iso에 사용할 hosts 파일 생성
     cmd = "cat > "+args.file1+"<< EOF\n"
     cmd += args.text1
@@ -81,14 +81,14 @@ def createScvmCloudinit(args):
     # cloudinit iso 생성 (/usr/share/cockpit/ablestack/tools/vmconfig/scvm/scvm-cloudinit.iso)
     if args.mgmt_gw == None:
         if args.dns == None:
-            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic','enp0s20','--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--pn-nic','enp0s21','--pn-ip',args.pn_ip,'--pn-prefix',args.pn_prefix,'--cn-nic','enp0s22','--cn-ip',args.cn_ip,'--cn-prefix',args.cn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/scvm/scvm-cloudinit.iso','scvm').stdout.decode())
+            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic','enp0s20','--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--pn-nic','enp0s21','--pn-ip',args.pn_ip,'--pn-prefix',args.pn_prefix,'--cn-nic','enp0s22','--cn-ip',args.cn_ip,'--cn-prefix',args.cn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/scvm/scvm-cloudinit.iso','scvm'))
         else:
-            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic','enp0s20','--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--dns',args.dns,'--pn-nic','enp0s21','--pn-ip',args.pn_ip,'--pn-prefix',args.pn_prefix,'--cn-nic','enp0s22','--cn-ip',args.cn_ip,'--cn-prefix',args.cn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/scvm/scvm-cloudinit.iso','scvm').stdout.decode())
+            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic','enp0s20','--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--dns',args.dns,'--pn-nic','enp0s21','--pn-ip',args.pn_ip,'--pn-prefix',args.pn_prefix,'--cn-nic','enp0s22','--cn-ip',args.cn_ip,'--cn-prefix',args.cn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/scvm/scvm-cloudinit.iso','scvm'))
     else:
         if args.dns == None:
-            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic','enp0s20','--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--pn-nic','enp0s21','--pn-ip',args.pn_ip,'--pn-prefix',args.pn_prefix,'--cn-nic','enp0s22','--cn-ip',args.cn_ip,'--cn-prefix',args.cn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/scvm/scvm-cloudinit.iso','scvm').stdout.decode())
+            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic','enp0s20','--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--pn-nic','enp0s21','--pn-ip',args.pn_ip,'--pn-prefix',args.pn_prefix,'--cn-nic','enp0s22','--cn-ip',args.cn_ip,'--cn-prefix',args.cn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/scvm/scvm-cloudinit.iso','scvm'))
         else:
-            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic','enp0s20','--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--dns',args.dns,'--pn-nic','enp0s21','--pn-ip',args.pn_ip,'--pn-prefix',args.pn_prefix,'--cn-nic','enp0s22','--cn-ip',args.cn_ip,'--cn-prefix',args.cn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/scvm/scvm-cloudinit.iso','scvm').stdout.decode())
+            result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic','enp0s20','--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--dns',args.dns,'--pn-nic','enp0s21','--pn-ip',args.pn_ip,'--pn-prefix',args.pn_prefix,'--cn-nic','enp0s22','--cn-ip',args.cn_ip,'--cn-prefix',args.cn_prefix,'--iso-path',pluginpath+'/tools/vmconfig/scvm/scvm-cloudinit.iso','scvm'))
     if result['code'] not in [200]:
         success_bool = False
 

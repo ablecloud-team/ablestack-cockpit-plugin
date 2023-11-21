@@ -1,5 +1,5 @@
 /**
- * File Name : storage-vm-wizard.js  
+ * File Name : storage-vm-wizard.js
  * Date Created : 2020.02.19
  * Writer  : 박동혁
  * Description : 스토리지센터 VM 배포 마법사에서 발생하는 이벤트 처리를 위한 JavaScript
@@ -58,7 +58,7 @@ $(document).ready(function(){
 
     //ssh 공개 key 파일 선택 이벤트 세팅
     setSshKeyFileReader($('#form-input-storage-vm-ssh-public-key-file'), 'id_rsa.pub', setScvmSshPublicKeyInfo);
-    
+
     //SSH Key 정보 자동 세팅
     settingSshKey(option_scvm);
 
@@ -132,7 +132,7 @@ $('#button-next-step-modal-wizard-vm-config').on('click', function(){
         $('#nav-button-additional').removeClass('pf-m-current');
         $('#nav-button-vm-config').removeClass('pf-m-current');
         $('#nav-button-ssh-key').addClass('pf-m-current');
-        
+
         cur_step_wizard_vm_config = "6";
     }
     else if (cur_step_wizard_vm_config == "6") {
@@ -256,7 +256,7 @@ $('#button-cancel-config-modal-wizard-vm-config').on('click', function(){
     $('#div-modal-wizard-vm-config-overview').show();
     $('#button-next-step-modal-wizard-vm-config').attr('disabled', false);
     $('#button-before-step-modal-wizard-vm-config').attr('disabled', true);
-    $('#nav-button-overview').addClass('pf-m-current');   
+    $('#nav-button-overview').addClass('pf-m-current');
 
     // 모달 창을 닫는다.
     $('#div-modal-wizard-storage-vm').hide();
@@ -354,7 +354,7 @@ $('#nav-button-ssh-key').on('click', function(){
 $('#nav-button-review').on('click', function(){
     hideAllMainBody();
     resetCurrentMode();
-    
+
     // review 정보 세팅
     setReviewInfo();
 
@@ -471,7 +471,7 @@ $('#form-radio-hosts-file-scvm').on('click', function () {
 
     $("#form-input-ccvm-mngt-ip").val("");
     $("#form-input-ccvm-mngt-ip").attr('disabled', true);
-    
+
     cockpit.spawn(["cat", pluginpath + "/tools/properties/cluster.json"])
     .then(function(data){
         var clusterJsonConf = JSON.parse(data);
@@ -484,7 +484,7 @@ $('#form-radio-hosts-file-scvm').on('click', function () {
 
 });
 
-// Host 파일 준비 중 "현재 호스트 번호"를 변경하는 '+', '-' 기능 
+// Host 파일 준비 중 "현재 호스트 번호"를 변경하는 '+', '-' 기능
 // $('#form-input-cluster-config-current-host-number-plus-scvm').on('click', function () {
 //     let total_host_num_val = $('#form-input-cluster-config-host-number-scvm').val();
 //     let n = $('.bt_up').index(this);
@@ -511,7 +511,7 @@ $('#form-radio-hosts-file-scvm').on('click', function () {
 //     }
 // });
 
-// Host 파일 준비 중 "구성할 호스트"를 변경하는 '+', '-' 기능 
+// Host 파일 준비 중 "구성할 호스트"를 변경하는 '+', '-' 기능
 // $('#form-input-cluster-config-host-number-plus-scvm').on('click', function () {
 //     let n = $('.bt_up').index(this);
 //     let num = $("#form-input-cluster-config-host-number-scvm:eq(" + n + ")").val();
@@ -544,11 +544,11 @@ $('#form-radio-hosts-file-scvm').on('click', function () {
 //     }
 // });
 
-// Host 파일 준비 중 "구성할 호스트"를 변경하는 '+', '-' 기능 
+// Host 파일 준비 중 "구성할 호스트"를 변경하는 '+', '-' 기능
 $('#form-input-cluster-config-host-number-plus-scvm').on('click', function () {
     let num = $("#form-input-cluster-config-host-number-scvm").val();
     $("#form-input-cluster-config-host-number-scvm").val(num * 1 + 1);
-    
+
     clusterConfigTableChange("form-input-cluster-config-host-number-scvm", "form-table-tbody-cluster-config-new-host-profile-scvm");
 });
 $('#form-input-cluster-config-host-number-minus-scvm').on('click', function () {
@@ -560,7 +560,7 @@ $('#form-input-cluster-config-host-number-minus-scvm').on('click', function () {
 });
 
 $('#form-input-cluster-config-host-number-scvm').on('change', function () {
-    
+
     if (this.value < 3 || this.value > 99) {
         this.value = 3;
         alert("3~99까지의 숫자만 입력할 수 있습니다.")
@@ -653,7 +653,7 @@ $('#form-input-cluster-config-host-number-scvm').on('change', function () {
 //         $('#form-input-cluster-config-current-host-number-scvm').val(99);
 //         alert("1~99까지의 숫자만 입력할 수 있습니다.");
 //     }
-//     // 기존 파일 사용 시, 현재 호스트 + 또는 - 클릭 시 Alias2 변경 
+//     // 기존 파일 사용 시, 현재 호스트 + 또는 - 클릭 시 Alias2 변경
 //     let option = "-scvm";
 //     changeAlias2(option);
 // });
@@ -691,7 +691,7 @@ $('#button-execution-modal-storage-wizard-confirm').on('click', function () {
         $('#div-modal-wizard-vm-config-deploy').show();
         $('#button-next-step-modal-wizard-vm-config').attr('disabled', true);
         $('#button-before-step-modal-wizard-vm-config').attr('disabled', true);
-        
+
         $('#nav-button-finish').addClass('pf-m-current');
 
         cur_step_wizard_vm_config = "8";
@@ -734,7 +734,7 @@ $('#button-execution-modal-storage-wizard-cancel').on('click', function () {
 });
 
 /**
- * Meathod Name : hideAllMainBody  
+ * Meathod Name : hideAllMainBody
  * Date Created : 2021.02.22
  * Writer  : 박동혁
  * Description : 마법사 대화상자의 모든 Main Body Division 숨기기
@@ -757,7 +757,7 @@ function hideAllMainBody() {
 }
 
 /**
- * Meathod Name : resetCurrentMode  
+ * Meathod Name : resetCurrentMode
  * Date Created : 2021.02.22
  * Writer  : 박동혁
  * Description : 마법사 대화상자의 측면 버튼의 '현재 위치'를 모두 리셋
@@ -778,7 +778,7 @@ function resetCurrentMode() {
 }
 
 /**
- * Meathod Name : deployStorageCenterVM  
+ * Meathod Name : deployStorageCenterVM
  * Date Created : 2021.02.25
  * Writer  : 박동혁
  * Description : 가상머신을 배포하는 작업을 화면에 표시하도록 하는 함수
@@ -796,7 +796,7 @@ function deployStorageCenterVM() {
     $('#button-before-step-modal-wizard-vm-config').hide();
     $('#button-cancel-config-modal-wizard-vm-config').hide();
 
-    // 왼쪽 사이드 버튼 전부 비활성화 
+    // 왼쪽 사이드 버튼 전부 비활성화
     $('#nav-button-overview').addClass('pf-m-disabled');
     $('#nav-button-vm-config').addClass('pf-m-disabled');
     $('#nav-button-compute').addClass('pf-m-disabled');
@@ -892,7 +892,7 @@ function deployStorageCenterVM() {
                                                 setScvmProgressFail(4);
                                                 createLoggerInfo("Storage Center Virtual Machine Deployment Failed");
                                                 alert("스토리지센터 가상머신 배포 실패 : "+data);
-                                            });                                                        
+                                            });
                                     } else {
                                         setScvmProgressFail(3);
                                         createLoggerInfo(create_scvm_xml_result.val);
@@ -903,7 +903,7 @@ function deployStorageCenterVM() {
                                     setScvmProgressFail(3);
                                     createLoggerInfo("Storage center virtual machine configuration failed");
                                     alert("스토리지센터 가상머신 구성 실패 : "+data);
-                                });                            
+                                });
                         } else {
                             setScvmProgressFail(2);
                             createLoggerInfo(create_scvm_cloudinit_result.val);
@@ -945,7 +945,7 @@ function showDivisionVMConfigFinish() {
     $('#div-modal-wizard-vm-config-finish').show();
     $('#nav-button-finish').addClass('pf-m-current');
     $('#nav-button-finish').removeClass('pf-m-disabled');
-    
+
     completed = true;
 
     cur_step_wizard_vm_config = "9";
@@ -967,12 +967,12 @@ function setDiskInfo(){
     disk_setup_type = $('input[name="form-radio-storage-vm-disk-type"]:checked').val()
 
     createLoggerInfo("setDiskInfo() start");
-    
+
     cockpit.spawn(cmd).then(function(data){
-        
+
         // 초기화
         $('#disk-pci-list').empty();
-        
+
         var el ='';
         var result = JSON.parse(data);
 
@@ -990,12 +990,12 @@ function setDiskInfo(){
                 el += '<label class="pf-c-check__label" style="margin-top:5px">데이터가 존재하지 않습니다.</label>';
                 el += '</div>';
             }
-            
+
         } else {
             var lun_pci_list = result.val.blockdevices;
             if(lun_pci_list.length > 0){
                 for(var i = 0 ; i < lun_pci_list.length ; i ++ ){
-                    
+
                     var partition_text = '';
                     var check_disable = '';
                     if( lun_pci_list[i].children != undefined){
@@ -1008,7 +1008,7 @@ function setDiskInfo(){
                     // el += '<input class="pf-c-check__input" type="checkbox" id="form-checkbox-disk'+i+'" name="form-checkbox-disk" value="/dev/'+lun_pci_list[i].name+'" '+check_disable+' />';
                     el += '<input class="pf-c-check__input" type="checkbox" id="form-checkbox-disk'+i+'" name="form-checkbox-disk" value="'+lun_pci_list[i].path+'" '+check_disable+' />';
                     el += '<label class="pf-c-check__label" style="margin-top:5px" for="form-checkbox-disk'+i+'">/dev/'+lun_pci_list[i].name+' '+lun_pci_list[i].state+' '+lun_pci_list[i].size+' '+lun_pci_list[i].model+' '+partition_text+'</label>';
-                    el += '</div>';    
+                    el += '</div>';
                 }
             }else{
                 el += '<div class="pf-c-check">';
@@ -1021,7 +1021,7 @@ function setDiskInfo(){
 
     }).catch(function(){
         createLoggerInfo("setDiskInfo error");
-        alert("setDiskInfo error");
+        // alert("setDiskInfo error");
     });
 }
 
@@ -1032,7 +1032,7 @@ $('input[name="form-radio-storage-vm-disk-type"]').change(function() {
 
 //스토리지 트래픽 구성 방식의 선택에 따른 서버용 NIC, 복제용 NIC 셀렉트 박스를 세팅하는 버튼
 $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
-    
+
     // np = nic passthrough, npb = nic passthrough bonding, bn = bridge network
     storage_traffic_setup_type = $('input[name="form-radio-storage-vm-nic-type"]:checked').val()
 
@@ -1050,10 +1050,10 @@ $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
 
         $('#public-nic').append(el1);
         $('#cluster-nic').append(el2);
-       
+
         setNicPassthrough('form-select-storage-vm-public-nic1');
         setNicPassthrough('form-select-storage-vm-cluster-nic1');
-        
+
         //nic2에 리스트 생성
         setNicPassthrough('form-select-storage-vm-public-nic2');
         setNicPassthrough('form-select-storage-vm-cluster-nic2');
@@ -1076,7 +1076,7 @@ $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
     var cmd = ["python3",pluginpath + "/python/nic/network_action.py","list"];
     createLoggerInfo("setNicPassthrough() start");
     cockpit.spawn(cmd).then(function(data){
-        
+
         // 초기화
         $('#'+select_box_id).empty();
 
@@ -1093,7 +1093,7 @@ $('input[name="form-radio-storage-vm-nic-type"]').change(function() {
 
     }).catch(function(){
         createLoggerInfo("setNicPassthrough error");
-        alert("setNicPassthrough error");
+        //alert("setNicPassthrough error");
     });
 }
 
@@ -1112,14 +1112,14 @@ function setReviewInfo(){
     //cpu
     var cpu = $('select#form-select-storage-vm-cpu option:checked').val();
     var cpu_text = $('select#form-select-storage-vm-cpu option:checked').text();
-    
+
     if(cpu == '') {
         $('#span-storage-vm-cpu-core').text("미입력");
     } else {
         xml_create_cmd.push("-c",cpu);
         $('#span-storage-vm-cpu-core').text(cpu_text);
     }
-    
+
     //memory
     var memory = $('select#form-select-storage-vm-memory option:checked').val();
     var memory_txt = $('select#form-select-storage-vm-memory option:checked').text();
@@ -1130,7 +1130,7 @@ function setReviewInfo(){
         xml_create_cmd.push("-m",memory);
         $('#span-storage-vm-memory').text(memory_txt);
     }
-    
+
     //디스크 구성 ( rp = RAID Passthrough, lp = LUN Passthrough )
     var svdt = $('input[type=radio][name=form-radio-storage-vm-disk-type]:checked').val();
     if(svdt == 'rp') {
@@ -1140,7 +1140,7 @@ function setReviewInfo(){
         xml_create_cmd.push("-dt","lun_passthrough");
         xml_create_cmd.push("-lpl");
     }
-    
+
     $('#span-storage-vm-data-disk').empty();
     $('input[type=checkbox][name="form-checkbox-disk"]').each(function() {
         if(this.checked){
@@ -1164,7 +1164,7 @@ function setReviewInfo(){
     $('#span-storage-vm-management-traffic').empty();
     var mngt_nic = $('select#form-select-storage-vm-mngt-nic option:checked').val();
     var mngt_nic_txt = $('select#form-select-storage-vm-mngt-nic option:checked').text();
-    
+
     if(mngt_nic == '') {
         $('#span-storage-vm-management-traffic').text("관리용 : 미입력");
     } else {
@@ -1233,7 +1233,7 @@ function setReviewInfo(){
         }
 
         $('#span-storage-vm-storage-traffic').append(el);
-        
+
 
     } else {
         // np 또는 bn인 경우 서버용 nic와 복제용 nic를 1개씩 입력 받기 때문에 공통으로 사용해도 상관없음
@@ -1245,7 +1245,7 @@ function setReviewInfo(){
         var svcn1_txt = $('select#form-select-storage-vm-cluster-nic1 option:checked').text();
 
         var el = "";
-        
+
         if(svnt == "np"){
             xml_create_cmd.push("-snp");
         }else if(svnt == "bn"){
@@ -1273,7 +1273,7 @@ function setReviewInfo(){
         }
 
         $('#span-storage-vm-storage-traffic').append(el);
-        
+
     }
 
     // 선택된 스토리지 트래픽 네트워크가 없을 경우 "미입력" 표기
@@ -1304,14 +1304,14 @@ function setReviewInfo(){
         $('#span-storage-vm-host-name').text(host_name);
     }
 
-    //관리네트워크 3가지 
+    //관리네트워크 3가지
     var mngt_ip = $('#form-input-storage-vm-mgmt-ip').val();
     var mngt_gw = $('#form-input-storage-vm-mgmt-gw').val();
     var mngt_vlan = $('#form-input-storage-vm-mgmt-vlan').val();
     var dns = $('#form-input-storage-vm-dns').val();
 
     $('#span-storage-vm-mngt-ip-info').empty();
-    var mngt_el = "";    
+    var mngt_el = "";
 
     if(mngt_ip == '') {
         mngt_el += "IP Addr : 미입력</br>";
@@ -1334,7 +1334,7 @@ function setReviewInfo(){
     }else {
         mngt_el += "DNS : "+dns+"</br>";
     }
-    
+
     $('#span-storage-vm-mngt-ip-info').append(mngt_el);
 
     //스토지리 네트워크 4가지
@@ -1345,7 +1345,7 @@ function setReviewInfo(){
     var cluster_vlan = $("#form-input-storage-vm-cluster-vlan").val();
 
     $('#span-storage-vm-storage-traffic-ip-info').empty();
-    var traffic_ip_el = "";    
+    var traffic_ip_el = "";
 
     if(public_ip == '') {
         traffic_ip_el += "서버 IP Addr : 미입력</br>";

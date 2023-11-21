@@ -47,10 +47,10 @@ def createArgumentParser():
 
     # output 민감도 추가(v갯수에 따라 output및 log가 많아짐):
     parser.add_argument('-v', '--verbose', action='count', default=0, help='increase output verbosity')
-    
+
     # flag 추가(샘플임, 테스트용으로 json이 아닌 plain text로 출력하는 플래그 역할)
     parser.add_argument('-H', '--Human', action='store_const', dest='flag_readerble', const=True, help='Human readable')
-    
+
     # Version 추가
     parser.add_argument('-V', '--Version', action='version', version='%(prog)s 1.0')
 
@@ -71,10 +71,10 @@ def listCcvmSnap(args):
         return createReturn(code=500, val={})
 
 def rollbackCcvmSnap(args):
-    try:        
+    try:
         # ccvm 스냅 롤백
         result = os.system("rbd snap rollback --no-progress "+pool_name+"/"+ccvm_image_name+"@"+args.snap_name)
-        
+
         if result == 0:
             return createReturn(code=200, val="CCVM Snapshot Rollback Success")
         else:
@@ -90,7 +90,7 @@ def backupCcvmSnap(args):
     # 실행중인 ccvm 백업할 경우 추가작업 : ccvm이 실행중인 호스트를 확인하여 virsh 명령으로 suspend 후 스냅샷 생성하고 완료후 다시 resume 하는 로직 필요
     try:
         now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-        pcs_status = json.loads(sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res").stdout.decode())
+        pcs_status = json.loads(sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res"))
         pcs_started_host_name = pcs_status['val']['started']
         pcs_status = pcs_status['val']['role']
         ccvm_name = 'ccvm'
@@ -98,14 +98,14 @@ def backupCcvmSnap(args):
         pool_name = 'rbd'
 
         if pcs_started_host_name == 'None' or pcs_status == 'Started' or pcs_status == 'Stopped':
-            
+
             if pcs_status == 'Started':
                 # ccvm suspend
                 os.system("ssh root@"+pcs_started_host_name+" \"virsh suspend "+ccvm_name+" > /dev/null\"")
 
                 # ccvm 스냅 생성
                 result = os.system("rbd snap create "+pool_name+"/"+ccvm_image_name+"@"+now)
-                
+
                 # ccvm resume
                 os.system("ssh root@"+pcs_started_host_name+" \"virsh resume "+ccvm_name+" > /dev/null\"")
             else:
