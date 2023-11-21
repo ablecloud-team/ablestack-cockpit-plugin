@@ -13,7 +13,8 @@ $(document).ready(function(){
     $('#div-modal-wizard-gateway-vm').load("./src/features/glue/gateway-vm-wizard.html");
     $('#div-modal-wizard-gateway-vm').hide();
 
-    $('#dropdown-menu-storage-cluster-status').hide();
+    $('#dropdown-menu-storage-system-status').hide();
+    $('#dropdown-menu-iscsi-status').hide();
     // gluefs 구성 화면 로드
     $('#div-modal-gluefs-construction').load("./src/features/glue/gluefs-construction.html");
     $('#div-modal-gluefs-construction').hide();
@@ -27,14 +28,18 @@ $(document).ready(function(){
     $('#menu-item-set-gluefs-delete').hide();
     $('#menu-item-set-nfs-delete').hide();
     $('#menu-item-set-smb-delete').hide();
+    $('#menu-item-set-iscsi-delete').hide();
+    $('#menu-item-set-iscsi-service-control').hide();
+    $('#menu-item-set-iscsi-target-create').hide();
+    $('#menu-item-set-iscsi-acl-connect').hide();
 
-
+    iscsiCheckInfo();
     gwvmInfoSet();
     sambaCheckInfo();
     gluefsCheckInfo();
     nfsCheckInfo();
     setInterval(() => {
-        gwvmInfoSet(),sambaCheckInfo(),gluefsCheckInfo(),nfsCheckInfo();
+        gwvmInfoSet(),sambaCheckInfo(),gluefsCheckInfo(),nfsCheckInfo(),iscsiCheckInfo('delete');
     }, 60000);
 });
 // document.ready 영역 끝
@@ -44,7 +49,7 @@ $('#button-open-modal-wizard-gateway-vm').on('click', function(){
     $('#div-modal-wizard-gateway-vm').show();
 });
 // 파일 시스템 눈금 클릭 시
-$('#card-action-storage-cluster-status').on('click',function(){
+$('#card-action-storage-cluster-system-status').on('click',function(){
 
     if( $('#gluefs-status').text() != 'Health Err' || $('#nfs-status').text() != 'Health Err' || $('#smb-status').text() != 'Health Err'){
         $('#menu-item-set-filesystem-control').removeClass('pf-m-disabled');
@@ -53,14 +58,54 @@ $('#card-action-storage-cluster-status').on('click',function(){
         $('#menu-item-set-filesystem-control').removeClass('pf-m-enabled');
         $('#menu-item-set-filesystem-control').addClass('pf-m-disabeld');
     }
-    $('#dropdown-menu-storage-cluster-status').toggle();
+    $('#dropdown-menu-storage-system-status').toggle();
 });
+// iscsi 눈금 클릭 시
+$('#card-action-storage-cluster-iscsi-status').on('click', function(){
 
+        if($('#iscsi-status').text() == "Health Err"){
+            $('#menu-item-set-iscsi-delete').hide();
+            $('#menu-item-set-iscsi-service-control').hide();
+            $('#menu-item-set-iscsi-target-create').hide();
+            $('#menu-item-set-iscsi-acl-connect').hide();
+            $('#menu-item-set-iscsi-construction').show();
+        }else{
+            $('#menu-item-set-iscsi-delete').show();
+            $('#menu-item-set-iscsi-service-control').show();
+            $('#menu-item-set-iscsi-target-create').show();
+            $('#menu-item-set-iscsi-acl-connect').show();
+            $('#menu-item-set-iscsi-construction').hide();
+        }
+    $('#dropdown-menu-iscsi-status').toggle();
+});
 /** 스토리지 서비스 구성 관련 action start */
 $('#button-gateway-vm-setup').on('click', function(){
     $('#div-modal-gateway-vm-setup').show();
 });
+// iscsi 구성 화면 닫기
+$('#div-modal-iscsi-close, #button-cancel-iscsi').on('click', function(){
+    $('#div-modal-iscsi').hide();
+});
+// iscsi 구성
+$('#button-execution-iscsi').on('click', function(){
+    $('#div-modal-iscsi').hide();
+    $('#div-modal-spinner-header-txt').text('iSCSI 구성 중');
+    $('#div-modal-spinner').show();
+    setTimeout(function(){
+        cockpit.spawn(['python3', pluginpath + '/python/glue/iscsi.py', 'config']).then(function(data){
+        var retVal = JSON.parse(data);
+        if(retVal.code == 200){
+            $('#modal-status-alert-title').text("iSCSI 구성");
+            $('#modal-status-alert-body').text("iSCSI 구성 완료되었습니다.");
+            $('#div-modal-status-alert').show();
+        }else{
+            $('#modal-status-alert-title').text("iSCSI 구성");
+            $('#modal-status-alert-body').text("iSCSI 구성 실패했습니다.");
+            $('#div-modal-status-alert').show();
+        }
+    })}, 5000)
 
+});
 //gluefs 구성 화면 열기
 $('#menu-item-set-gluefs-construction').on('click',function(){
     localStorage.clear();
@@ -78,6 +123,12 @@ $('#menu-item-set-smb-construction').on('click',function(){
     localStorage.clear();
     sessionStorage.clear();
     $('#div-modal-smb-construction').show();
+});
+// iscsi 구성 화면 열기
+$('#menu-item-set-iscsi-construction').on('click', function(){
+    $('#modal-title-iscsi').text("iSCSI 구성");
+    $('#modal-body-iscsi').text("iSCSI 구성 하시겠습니까?")
+    $('#div-modal-iscsi').show();
 });
 
 // div-modal-alert-button-confirm 클릭시
@@ -246,6 +297,54 @@ $('#button-execution-modal-file-system-control').on('click',function(){
         });
     }
 });
+// iscsi 서비스 제어 버튼 클릭 시
+$('#menu-item-set-iscsi-service-control').on('click', function(){
+    $('#div-modal-iscsi-control').show();
+});
+// iscsi 서비스 제어 취소 버튼 시
+$('#button-close-iscsi-control, #button-cancel-modal-iscsi-control').on('click', function(){
+    $('#div-modal-iscsi-control').hide();
+});
+// iscsi 서비스 제어 실행 클릭 시
+$('#button-execution-modal-iscsi-control').on('click', function(){
+
+    var action = $('#form-select-iscsi-service-control-action').val();
+
+    $('#div-modal-iscsi-control').hide();
+    $('#div-modal-spinner-header-txt').text('iSCSI 서비스 제어 중');
+    $('#div-modal-spinner').show();
+
+    cockpit.spawn(['python3', pluginpath + '/python/glue/iscsi.py', 'daemon', '--control', action]).then(function(data){
+        var retVal = JSON.parse(data);
+        if(action == 'stop'){
+            if(retVal.code == 200){
+                $('#modal-status-alert-title').text("iSCSI 서비스 제어");
+                $('#modal-status-alert-body').text("iSCSI 서비스가 정지되었습니다.");
+                $('#div-modal-status-alert').show();
+
+                localStorage.setItem('iscsi','stop');
+            }
+            else{
+                $('#modal-status-alert-title').text("iSCSI 서비스 제어");
+                $('#modal-status-alert-body').text("iSCSI 서비스를 정지 시키는 데 실패했습니다.");
+                $('#div-modal-status-alert').show();
+            }
+        }
+        else{
+            if(retVal.code == 200){
+                $('#modal-status-alert-title').text("iSCSI 서비스 제어");
+                $('#modal-status-alert-body').text("iSCSI 서비스가 시작되었습니다.");
+                $('#div-modal-status-alert').show();
+            }
+            else{
+                $('#modal-status-alert-title').text("iSCSI 서비스 제어");
+                $('#modal-status-alert-body').text("iSCSI 서비스를 시작 시키는 데 실패했습니다.");
+                $('#div-modal-status-alert').show();
+            }
+        }
+
+    });
+});
 // gluefs 삭제 버튼 클릭 시
 $('#menu-item-set-gluefs-delete').on('click',function(){
 
@@ -253,6 +352,7 @@ $('#menu-item-set-gluefs-delete').on('click',function(){
 
     $('#div-modal-delete-title').text("GlueFS 삭제");
     $('#div-modal-delete-body').text("GlueFS를 삭제하시겠습니까?");
+    $('#div-modal-delete-body-p').text("(GlueFS 삭제 시 SMB,NFS 삭제를 먼저 이행 하셔야 합니다.)");
     $('#div-modal-delete-body-p').show();
     if ($('#nfs-status').text() == "Health Err" && $('#smb-status').text() == "Health Err"){
         $('#button-execution-modal-delete').addClass('pf-m-enabled');
@@ -278,7 +378,7 @@ $('#menu-item-set-nfs-delete').on('click',function(){
 });
 // smb 삭제 버튼 클릭 시
 $('#menu-item-set-smb-delete').on('click',function(){
-+
+
     sessionStorage.setItem('type','smb_delete');
 
     $('#div-modal-delete-title').text("SMB 삭제");
@@ -287,6 +387,19 @@ $('#menu-item-set-smb-delete').on('click',function(){
     $('#button-execution-modal-delete').removeClass('pf-m-disabled');
     $('#button-execution-modal-delete').removeClass('pf-m-enabled');
     $('#div-modal-all-delete').show();
+});
+// iscsi 삭제 버튼 클릭 시
+$('#menu-item-set-iscsi-delete').on('click', function(){
+    sessionStorage.setItem('type', 'iscsi_delete');
+
+    $('#div-modal-delete-title').text("iSCSI 삭제");
+    $('#div-modal-delete-body').text("iSCSI를 삭제하시겠습니까?");
+    $('#div-modal-delete-body-p').text("iSCSI 삭제 진행 시, 타겟 및 이미지도 완전 삭제됩니니다.");
+    $('#div-modal-delete-body-p').show();
+    $('#button-execution-modal-delete').removeClass('pf-m-disabled');
+    $('#button-execution-modal-delete').removeClass('pf-m-enabled');
+    $('#div-modal-all-delete').show();
+
 });
 // 삭제 실행 버튼 클릭 시
 $('#button-execution-modal-delete').on('click',function(){
@@ -385,7 +498,88 @@ $('#button-execution-modal-delete').on('click',function(){
             createLoggerInfo("SMB delete failed");
         })
     }
+    else if(delete_session == 'iscsi_delete'){
+        $('#div-modal-spinner-header-txt').text('iSCSI 삭제 중');
+        $('#div-modal-spinner').show();
+        cockpit.spawn(['python3', pluginpath + '/python/glue/iscsi.py', 'destroy']).then(function(data){
+            var retVal = JSON.parse(data);
+
+            $('#div-modal-spinner').hide();
+
+            if(retVal.code == 200){
+                $('#div-modal-all-delete').hide();
+                $('#modal-status-alert-title').text("iSCSI 삭제");
+                $('#modal-status-alert-body').text("iSCSI 삭제가 완료되었습니다.");
+                $('#div-modal-status-alert').show();
+
+                sessionStorage.removeItem('type');
+            }
+            else{
+                $('#modal-status-alert-title').text("SMB 삭제");
+                $('#modal-status-alert-body').text("SMB 삭제가 실패했습니다.");
+                $('#div-modal-status-alert').show();
+            }
+        }).catch(function(){
+            createLoggerInfo("iSCSI delete failed");
+        })
+    }
 });
+
+function iscsiCheckInfo(type){
+    $('#iscsi-status').html("상태 체크 중 &bull;&bull;&bull;&nbsp;&nbsp;&nbsp;<svg class='pf-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
+    $("#iscsi-color").attr('class','pf-c-label pf-m-orange');
+    $("#iscsi-icon").attr('class','fas fa-fw fa-exclamation-triangle');
+
+    var session = localStorage.getItem('iscsi');
+
+    cockpit.spawn(['python3', pluginpath + '/python/glue/iscsi.py', 'status']).then(function(data){
+        var retVal = JSON.parse(data);
+        var retVal_val = JSON.parse(retVal.val);
+        if(retVal_val[0].status.running == "1"){
+            cockpit.spawn(['python3', pluginpath + '/python/glue/iscsi.py', 'list']).then(function(data){
+                var retVal = JSON.parse(data);
+                var retVal_val = JSON.parse(retVal.val);
+                if(retVal.code == 200){
+
+                    cockpit.spawn(['python3', pluginpath + '/python/glue/iscsi.py', 'image']).then(function(data){
+                        var image = JSON.parse(data);
+                        var image_val = JSON.parse(image.val);
+                        console.log(image_val);
+                        if(image.code == 200){
+                            if(type == 'delete'){
+                                $('#iscsi-tbody tr').remove();
+                                $('#iscsi-tbody').html('<tbody role="rowgroup" id="iscsi-tbody"></tbody>');
+                            }
+                            for(var i = 0; i < retVal_val.length; i++){
+                                $('#iscsi-tbody').append('<tr role="row"><td role="cell" data-label="대상">'+ retVal_val[i].target_iqn+'</td>'
+                                                          + '<td role="cell" data-label="포털">'+ retVal_val[i].portals[0].ip+ '</td>'
+                                                          + '<td role="cell" data-label="이미지">'+ image_val[0].value[0].name+ '</td>'
+                                                          + '<td role="cell" data-label="크기">'+ Byte(image_val[0].value[0].size)+ '</td>'
+                                                          + '<td class="pf-c-table__icon" role="cell" data-label="편집"><button class="pf-c-dropdown__toggle pf-m-plain" id="iscsi-edit" aria-expanded="false" type="button" aria-label="Actions"><i class="fas fa-edit"></i></td>'
+                                                          + '<td class="pf-c-table__icon" role="cell" data-label="삭제"><button class="pf-c-dropdown__toggle pf-m-plain" id="iscsi-delete" aria-expanded="false" type="button" aria-label="Actions"><i class="fas fa-trash"></i></td></tr>');
+                            }
+                            $('#iscsi-status').text("Health OK");
+                            $('#iscsi-color').attr('class','pf-c-label pf-m-green');
+                            $('#iscsi-icon').attr('class','fas fa-fw fas fa-fw fa-check-circle');
+                        }
+                    })
+                }
+            })
+        }
+        else{
+            if(session == "stop"){
+                $('#iscsi-status').text("Stop");
+                $('#iscsi-color').attr('class','pf-c-label pf-m-red');
+                $('#iscsi-icon').attr('class','fas fa-fw fa-exclamation-triangle');
+            }
+            else{
+                $('#iscsi-status').text("Health Err");
+                $('#iscsi-color').attr('class','pf-c-label pf-m-red');
+                $('#iscsi-icon').attr('class','fas fa-fw fa-exclamation-triangle');
+            }
+        }
+    });
+}
 /**
  * Meathod Name : sambaCheckInfo
  * Date Created : 2023.06.02

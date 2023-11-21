@@ -180,6 +180,7 @@ def configIscsi(args):
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         response = requests.post(url+'/api/service', headers=headers, json=json_data, verify=False)
         if response.status_code == 201:
+            ssh('-o', 'StrictHostKeyChecking=no', 'gwvm', "ceph orch apply -i /root/iscsi.yaml").splitlines()
             return createReturn(code=200, val='iscsi service '+args.action+' control success')
         elif response.status_code == 202:
             global cnt
@@ -238,7 +239,7 @@ def statusIscsi(args):
     try:
         token = createToken()
         headers = {
-            'Accept': 'application/vnd.ceph.api.v1.0+json',
+            'Accept': 'application/vnd.ceph.api.v2.0+json',
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/json'
         }

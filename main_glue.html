@@ -34,10 +34,10 @@
                                     <div class="pf-c-card__title" id="card-storage-cluster-status-title">파일 시스템</div>
                                     <div class="pf-c-card__actions">
                                         <div class="pf-c-dropdown">
-                                            <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-status" aria-expanded="false" type="button" aria-label="Actions">
+                                            <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-system-status" aria-expanded="false" type="button" aria-label="Actions">
                                                 <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
                                             </button>
-                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status">
+                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-system-status" id="dropdown-menu-storage-system-status">
                                                 <li>
                                                     <button class="pf-c-dropdown__menu-item pf-m-enabled" type="button" id="menu-item-set-gluefs-construction" >GlueFS 구성</button>
                                                 </li>
@@ -168,26 +168,33 @@
                             <div class="pf-c-card pf-m-hoverable pf-m-compact" id="card-storage-cluster-status">
                                 <div class="pf-c-card__header">
                                     <div class="pf-c-card__title" id="card-storage-cluster-status-title">iSCSI</div>
+                                        <span class="pf-c-label pf-m-red" id="iscsi-color" style="margin-left:20px;">
+                                            <span class="pf-c-label__content">
+                                                <span class="pf-c-label__icon" >
+                                                    <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true" id="iscsi-icon"></i>
+                                                </span><div id="iscsi-status">Health Err</div>
+                                            </span>
+                                        </span>
                                     <div class="pf-c-card__actions">
                                         <div class="pf-c-dropdown">
-                                            <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-status" aria-expanded="false" type="button" aria-label="Actions">
+                                            <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-iscsi-status" aria-expanded="false" type="button" aria-label="Actions">
                                                 <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
                                             </button>
-                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status">
+                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-iscsi-status" id="dropdown-menu-iscsi-status">
                                                 <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >iSCSI 구성</button>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-enabled" type="button" id="menu-item-set-iscsi-construction" >iSCSI 구성</button>
                                                 </li>
                                                 <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >iSCSI 삭제</button>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-enabled" type="button" id="menu-item-set-iscsi-delete" >iSCSI 삭제</button>
                                                 </li>
                                                 <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >서비스 제어</button>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-enabled" type="button" id="menu-item-set-iscsi-service-control" >서비스 제어</button>
                                                 </li>
                                                 <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >타겟 생성</button>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-enabled" type="button" id="menu-item-set-iscsi-target-create" >타겟 생성</button>
                                                 </li>
                                                 <li>
-                                                    <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >ACL 설정 연결</button>
+                                                    <button class="pf-c-dropdown__menu-item pf-m-enabled" type="button" id="menu-item-set-iscsi-acl-connect" >ACL 설정 연결</button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -195,7 +202,7 @@
                                 </div>
                                 <div class="pf-c-card__body">
                                     <dl class="pf-c-description-list pf-m-horizontal" style="--pf-c-description-list--RowGap: 10px;">
-                                        <table class="pf-c-table pf-m-compact pf-m-grid-lg" role="grid" aria-label="This is a compact table example" id="compact-demo-table">
+                                        <table class="pf-c-table pf-m-compact pf-m-grid-lg" role="grid" aria-label="This is a compact table example" id="iscsi-table">
                                             <thead>
                                                 <tr role="row">
                                                     <th role="columnheader" scope="col" class="pf-m-width-20">대상</th>
@@ -206,24 +213,7 @@
                                                     <th class="pf-c-table__icon" role="columnheader" scope="col">삭제</th>
                                                 </tr>
                                             </thead>
-
-                                            <tbody role="rowgroup">
-                                                <tr role="row">
-                                                    <td role="cell" data-label="대상">iqn.2023.05-com.ceph:01312</td>
-                                                    <td role="cell" data-label="포털">10.10.2.14</td>
-                                                    <td role="cell" data-label="이미지">rbd/iscsi-test1</td>
-                                                    <td role="cell" data-label="크기">10GiB</td>
-                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-edit"></i></td>
-                                                    <td class="pf-c-table__icon" role="cell" data-label="삭제"><i class="fas fa-trash"></i></td>
-                                                </tr>
-                                                <tr role="row">
-                                                    <td role="cell" data-label="대상">iqn.2023.05-com.ceph:01211</td>
-                                                    <td role="cell" data-label="포털">10.10.2.14</td>
-                                                    <td role="cell" data-label="이미지">rbd/iscsi-test1</td>
-                                                    <td role="cell" data-label="크기">50GiB</td>
-                                                    <td class="pf-c-table__icon" role="cell" data-label="편집"><i class="fas fa-edit"></i></td>
-                                                    <td class="pf-c-table__icon" role="cell" data-label="삭제"><i class="fas fa-trash"></i></td>
-                                                </tr>
+                                            <tbody role="rowgroup" id="iscsi-tbody">
                                             </tbody>
                                         </table>
                                     </dl>
@@ -245,7 +235,7 @@
                                             <button class="pf-c-dropdown__toggle pf-m-plain" id="card-action-storage-cluster-status" aria-expanded="false" type="button" aria-label="Actions">
                                                 <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
                                             </button>
-                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-status" id="dropdown-menu-storage-cluster-status" hidden>
+                                            <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="card-action-storage-cluster-vm-status" id="dropdown-menu-storage-cluster-status" hidden>
                                                 <li>
                                                     <button class="pf-c-dropdown__menu-item pf-m-disabled" type="button" id="menu-item-set-maintenance-mode" >게이트웨이 VM 구성</button>
                                                 </li>
@@ -518,7 +508,7 @@
     </div>
 </div>
 <!-- 실행중 : Modal 영역 끝 -->
-<!-- 파일 시스템 : Modal 영여 시작-->
+<!-- 파일 시스템 : Modal 영역 시작-->
 <div id="div-modal-file-system-control" class="pf-c-backdrop" style="display:none">
     <div class="pf-l-bullseye">
         <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="File System Control">
@@ -561,8 +551,38 @@
     </div>
 </div>
 <!-- 파일 시스템 : Modal 영역 끝-->
+<!-- 파일 시스템 : Modal 영여 시작-->
+<div id="div-modal-iscsi-control" class="pf-c-backdrop" style="display:none">
+    <div class="pf-l-bullseye">
+        <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="iscsi Control">
+            <button id="button-close-iscsi-control" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">iSCSI 서비스 제어</span></h1></header>
+            <div class="pf-c-modal-box__body">
+                <div>iSCSI 서비스 제어 명령을 선택해 주세요.</div>
+                <div id="div-modal-service-control" style="color: var(--pf-global--danger-color--100);margin-bottom:10px;"></div>
+                <div>
+                    <div class="pf-c-dropdown">
+                        <select class="pf-c-form-control" id="form-select-iscsi-service-control-action" name="form-select-iscsi-service-control-action" style="width:100%">
+                            <option value="" selected>선택하십시오</option>
+                            <option value="start">시작</option>
+                            <option value="restart">재시작</option>
+                            <option value="stop">정지</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <footer class="pf-c-modal-box__footer">
+                <button id="button-execution-modal-iscsi-control" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                <button id="button-cancel-modal-iscsi-control" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
+            </footer>
+        </div>
+    </div>
+</div>
+<!-- 파일 시스템 : Modal 영역 끝-->
 
-<!-- smb/nfs/gluefs 삭제 : Modal 영역 시작-->
+<!-- smb/nfs/gluefs/iscsi 삭제 : Modal 영역 시작-->
 <div id="div-modal-all-delete" class="pf-c-backdrop" style="display:none">
     <div class="pf-l-bullseye">
         <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="SMB/NFS/GlueFS Delete">
@@ -601,6 +621,26 @@
     </div>
 </div>
 <!-- 상태 alert : Modal 영역 끝 -->
+
+<!-- 기본 Modal : Modal 영역 시작 -->
+<div id="div-modal-iscsi" class="pf-c-backdrop" style="display:none">
+    <div class="pf-l-bullseye">
+        <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="iscsi construction">
+            <button id="div-modal-iscsi-close" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text" id="modal-title-iscsi"></span></h1></header>
+            <div class="pf-c-modal-box__body">
+                <div id="modal-body-iscsi"></div>
+            </div>
+            <footer class="pf-c-modal-box__footer">
+                <button id="button-execution-iscsi" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
+                <button id="button-cancel-iscsi" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
+            </footer>
+        </div>
+    </div>
+</div>
+<!-- 기본 Modal : Modal 영역 끝 -->
 
 <!-- 스토리지센터VM 배포 마법사 : ./src/features/storage-vm-wizard.html을 내용으로 load -->
 <div class="pf-c-backdrop" id="div-modal-wizard-gateway-vm"></div>

@@ -91,10 +91,6 @@ $(document).ready(function(){
 // document.ready 영역 끝
 
 // 이벤트 처리 함수
-$('#card-action-storage-cluster-status').on('click', function(){
-    $('#dropdown-menu-storage-cluster-status').toggle();
-});
-
 $('#card-action-cloud-cluster-status').on('click', function(){
     $('#dropdown-menu-cloud-cluster-status').toggle();
 });
