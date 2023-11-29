@@ -90,7 +90,7 @@ def backupCcvmSnap(args):
     # 실행중인 ccvm 백업할 경우 추가작업 : ccvm이 실행중인 호스트를 확인하여 virsh 명령으로 suspend 후 스냅샷 생성하고 완료후 다시 resume 하는 로직 필요
     try:
         now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
-        pcs_status = json.loads(sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res").stdout.decode())
+        pcs_status = json.loads(sh.python3(pluginpath + "/python/pcs/main.py","status", "--resource", "cloudcenter_res"))
         pcs_started_host_name = pcs_status['val']['started']
         pcs_status = pcs_status['val']['role']
         ccvm_name = 'ccvm'

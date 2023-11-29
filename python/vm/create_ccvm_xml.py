@@ -105,7 +105,7 @@ def createCcvmXml(args):
                 elif '<!--ccvm_cloudinit-->' in line:
                     cci_txt = "    <disk type='file' device='cdrom'>\n"
                     cci_txt += "      <driver name='qemu' type='raw'/>\n"
-                    cci_txt += "      <source file='"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso'/>\n"
+                    cci_txt += "      <source file='"+"/var/lib/libvirt/images/ccvm-cloudinit.iso'/>\n"
                     cci_txt += "      <target dev='sdz' bus='sata'/>\n"
                     cci_txt += "      <readonly/>\n"
                     cci_txt += "      <shareable/>\n"
@@ -216,7 +216,7 @@ if __name__ == '__main__':
         ret = createCcvmXml(args)
         print(ret)
     else:
-        print(secret_ret)
+        print(json.dumps(secret_ret))
 
     # 실제 로직 부분 호출 및 결과 출력
     

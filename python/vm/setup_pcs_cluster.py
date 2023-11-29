@@ -82,12 +82,12 @@ def setupPcsCluster(args):
     os.system("rbd resize -s 500G ccvm")
 
     # 클러스터 구성
-    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'config', '--cluster', 'cloudcenter_cluster', '--hosts', args.host_names[0], args.host_names[1], args.host_names[2] ).stdout.decode())
+    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'config', '--cluster', 'cloudcenter_cluster', '--hosts', args.host_names[0], args.host_names[1], args.host_names[2] ))
     if result['code'] not in [200]:
         success_bool = False
 
     # 리소스 생성
-    result = json.loads(python3(pluginpath+'/python/pcs/main.py', 'create', '--resource', 'cloudcenter_res', '--xml', pluginpath+'/tools/vmconfig/ccvm/ccvm.xml' ).stdout.decode())
+    result = json.loads(python3(pluginpath+'/python/pcs/main.py', 'create', '--resource', 'cloudcenter_res', '--xml', pluginpath+'/tools/vmconfig/ccvm/ccvm.xml' ))
     if result['code'] not in [200]:
         success_bool = False
 

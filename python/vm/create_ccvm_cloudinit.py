@@ -88,25 +88,25 @@ def createCcvmCloudinit(args):
     if args.sn_nic == None: #서비스 네트워크가 없을 경우
         if args.mgmt_gw == None:
             if args.dns == None:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--iso-path','/var/lib/libvirt/images/ccvm-cloudinit.iso','ccvm'))
             else:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--dns',args.dns,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--dns',args.dns,'--iso-path','/var/lib/libvirt/images/ccvm-cloudinit.iso','ccvm'))
         else:
             if args.dns == None:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw', args.mgmt_gw,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw', args.mgmt_gw,'--iso-path','/var/lib/libvirt/images/ccvm-cloudinit.iso','ccvm'))
             else:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw', args.mgmt_gw,'--dns', args.dns,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())  
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw', args.mgmt_gw,'--dns', args.dns,'--iso-path','/var/lib/libvirt/images/ccvm-cloudinit.iso','ccvm'))  
     else: # 서비스 네트워크가 있을 경우
         if args.mgmt_gw == None:
             if args.dns == None:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--sn-gw',args.sn_gw,'--sn-dns',args.sn_dns,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--sn-gw',args.sn_gw,'--sn-dns',args.sn_dns,'--iso-path','/var/lib/libvirt/images/ccvm-cloudinit.iso','ccvm'))
             else:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--dns',args.dns,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--sn-gw',args.sn_gw,'--sn-dns',args.sn_dns,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())        
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--dns',args.dns,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--sn-gw',args.sn_gw,'--sn-dns',args.sn_dns,'--iso-path','/var/lib/libvirt/images/ccvm-cloudinit.iso','ccvm'))        
         else:
             if args.dns == None:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--sn-gw',args.sn_gw,'--sn-dns',args.sn_dns,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--sn-gw',args.sn_gw,'--sn-dns',args.sn_dns,'--iso-path','/var/lib/libvirt/images/ccvm-cloudinit.iso','ccvm'))
             else:
-                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--dns',args.dns,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--sn-gw',args.sn_gw,'--sn-dns',args.sn_dns,'--iso-path',pluginpath+'/tools/vmconfig/ccvm/ccvm-cloudinit.iso','ccvm').stdout.decode())
+                result = json.loads(python3(pluginpath + '/tools/cloudinit/gencloudinit.py','--hostname',args.hostname,'--hosts',args.file1,'--privkey',args.file2,'--pubkey',args.file3,'--mgmt-nic',args.mgmt_nic,'--mgmt-ip',args.mgmt_ip,'--mgmt-prefix',args.mgmt_prefix,'--mgmt-gw',args.mgmt_gw,'--dns',args.dns,'--sn-nic',args.sn_nic,'--sn-ip',args.sn_ip,'--sn-prefix',args.sn_prefix,'--sn-gw',args.sn_gw,'--sn-dns',args.sn_dns,'--iso-path','/var/lib/libvirt/images/ccvm-cloudinit.iso','ccvm'))
     if result['code'] not in [200]:
         success_bool = False
     else:
@@ -124,7 +124,7 @@ def createCcvmCloudinit(args):
             
             # /ccvm/ccvm-cloudinit.iso 복사 실패
             for i in [1,2,3]:
-                ret_num = os.system("scp -q "+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso root@"+host_name+":"+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso")
+                ret_num = os.system("scp -q "+"/var/lib/libvirt/images/ccvm-cloudinit.iso root@"+host_name+":"+"/var/lib/libvirt/images/ccvm-cloudinit.iso")
                 if ret_num == 0:
                     break
                     

@@ -50,12 +50,12 @@ def resetCloudCenter(args):
 
     #=========== pcs cluster 초기화 ===========
     # 리소스 삭제
-    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'remove', '--resource', 'cloudcenter_res').stdout.decode())
+    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'remove', '--resource', 'cloudcenter_res'))
     if result['code'] not in [200,400]:
         success_bool = False
 
     # 클러스터 삭제
-    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'destroy').stdout.decode())
+    result = json.loads(python3(pluginpath + '/python/pcs/main.py', 'destroy'))
     if result['code'] not in [200,400]:
         success_bool = False
 
@@ -70,9 +70,10 @@ def resetCloudCenter(args):
 
     # 작업폴더 생성
     os.system("mkdir -p "+pluginpath+"/tools/vmconfig/ccvm")
-    '''
+
     # cloudinit iso 삭제
-    os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm-cloudinit.iso")
+    os.system("rm -f /var/lib/libvirt/images/ccvm-cloudinit.iso")
+    '''
     
     # vm xml 템플릿 삭제
     os.system("rm -f "+pluginpath+"/tools/vmconfig/ccvm/ccvm.xml")

@@ -106,7 +106,7 @@ def createScvmXml(args):
         br_num = 0
         
         # 생성할 가상머신 xml 템플릿
-        os.system("yes|cp -f "+pluginpath+"/tools/xml-template/scvm-xml-template.xml "+pluginpath+"/tools/vmconfig/scvm/scvm-temp.xml")
+        os.system("/usr/bin/cp -f "+pluginpath+"/tools/xml-template/scvm-xml-template.xml "+pluginpath+"/tools/vmconfig/scvm/scvm-temp.xml")
             
         template_file = pluginpath+'/tools/vmconfig/scvm/scvm-temp.xml'
 
@@ -121,7 +121,7 @@ def createScvmXml(args):
                 elif '<!--scvm_cloudinit-->' in line:
                     sci_txt = "    <disk type='file' device='cdrom'>\n"
                     sci_txt += "      <driver name='qemu' type='raw'/>\n"
-                    sci_txt += "      <source file='"+pluginpath+"/tools/vmconfig/scvm/scvm-cloudinit.iso'/>\n"
+                    sci_txt += "      <source file='/var/lib/libvirt/images/scvm-cloudinit.iso'/>\n"
                     sci_txt += "      <target dev='sdz' bus='sata'/>\n"
                     sci_txt += "      <readonly/>\n"
                     sci_txt += "      <shareable/>\n"

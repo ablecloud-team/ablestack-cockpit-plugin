@@ -73,7 +73,7 @@ def remove(args):
         for f_val in json_data["clusterConfig"]["hosts"]:
             if current_hostname != f_val["hostname"]:
                 cmd = "python3 "+pluginpath + "/python/cluster/cluster_config.py remove -rh "+current_hostname+" -co withScvm"
-                ret = json.loads(ssh('-o', 'StrictHostKeyChecking=no', f_val["ablecube"], cmd).stdout.decode())
+                ret = json.loads(ssh('-o', 'StrictHostKeyChecking=no', f_val["ablecube"], cmd))
                 if ret["code"] != 200:
                     return createReturn(code=500, val="python3 cluster_config.py remove error : Please check if CUBEs and SCVMs are running.")
 

@@ -10,6 +10,7 @@ Copyright (c) 2021 ABLECLOUD Co. Ltd.
 import argparse
 import json
 import logging
+import pprint
 
 from ablestack import *
 import os
@@ -64,7 +65,7 @@ PCI 장치의 목록을 출력하는 함수
 :return: dict
 """
 def listPCIInterface(classify=None):
-    list_output = lspci_cmd('-vmm', '-k').stdout.decode().splitlines()
+    list_output = lspci_cmd('-vmm', '-k').splitlines()
     if classify is None:
         list_pci = []
         newpci = {}
@@ -113,7 +114,7 @@ def listDiskInterface(H=False, classify=None):
     # for out in outputs:
     #    print(out.split())
 
-    item = json.loads(lsblk_cmd(J=True, o="name,rota,model,size,state,group,type,tran,subsystems").stdout.decode())
+    item = json.loads(lsblk_cmd(J=True, o="name,rota,model,size,state,group,type,tran,subsystems"))
     bd = item['blockdevices']
     newbd = []
     for dev in bd:
