@@ -59,10 +59,6 @@ systemctl enable --now nfs-server.service
 mkdir /nfs/primary
 mkdir /nfs/secondary
 
-# Crushmap 설정 추가 (ceph autoscale)
-scvm=$(grep scvm-mngt /etc/hosts | awk {'print $1'})
-ssh -o StrictHostKeyChecking=no $scvm /usr/local/sbin/setCrushmap.sh
-
 ################# Setting Database
 mysqladmin -uroot password $DATABASE_PASSWD
 setenforce 0
@@ -99,18 +95,14 @@ for host in $hosts
 do
   scp -o StrictHostKeyChecking=no /root/uefi.properties $host:/etc/cloudstack/agent/
 done
-
 rm -rf /root/uefi.properties
-
 
 #tpm 설정 파일 생성
 echo -e "host.tpm.enable=true" > /root/tpm.properties
-
 for host in $hosts
 do
   scp -o StrictHostKeyChecking=no /root/tpm.properties $host:/etc/cloudstack/agent/
 done
-
 rm -rf /root/tpm.properties
 
 #systemvm template 등록
@@ -125,7 +117,10 @@ do
   ssh -o StrictHostKeyChecking=no $host /usr/bin/systemctl enable --now corosync
 done
 
-# Delete container image file
-rm -rf /usr/share/ablestack/*.tar
+# Crushmap 설정 추가 (ceph osd pool autoscale)
+sleep 3m
+scvm=$(grep scvm-mngt /etc/hosts | awk {'print $1'})
+ssh -o StrictHostKeyChecking=no $scvm /usr/local/sbin/setCrushmap.sh
+
 # Delete bootstrap script file
 rm -rf /root/bootstrap.sh
