@@ -7,6 +7,9 @@
   </metadata>
   <memory unit='GiB'><!--memory--></memory>
   <currentMemory unit='GiB'><!--memory--></currentMemory>
+  <memoryBacking>
+  <hugepages/>
+</memoryBacking>
   <vcpu placement='static'><!--cpu--></vcpu>
   <os>
     <type arch='x86_64' machine='q35'>hvm</type>

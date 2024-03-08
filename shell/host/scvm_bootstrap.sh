@@ -10,7 +10,7 @@
 set -x
 #scvm의 PN-ip를 갖는 host목록 생성
 conffile=/root/ceph.conf
-imagename="localhost:5000/ceph/daemon:latest"
+imagename="localhost:5000/glue/daemon:latest"
 hosts=$(grep scvm /etc/hosts| grep -v mngt | grep -v cn | awk {'print $1'})
 scvms=$(grep scvm /etc/hosts| grep -v mngt | grep -v cn | grep scvm | awk {'print $1'})
 allhosts=$(grep -v mngt /etc/hosts | grep -v cn | grep -v localhost | awk {'print $1'})
@@ -60,6 +60,10 @@ cephadm --image "$image" bootstrap \
         ceph config set mgr mgr/cephadm/container_image_grafana localhost:5000/ceph/ceph-grafana:ablestack && \
         ceph config set mgr mgr/cephadm/container_image_node_exporter localhost:5000/prom/node-exporter:ablestack && \
         ceph config set mgr mgr/cephadm/container_image_prometheus localhost:5000/prom/prometheus:ablestack
+        ceph config set mgr mgr/cephadm/container_image_loki localhost:5000/grafana/loki:ablestack
+        ceph config set mgr mgr/cephadm/container_image_promtail localhost:5000/grafana/promtail:ablestack
+        ceph config set mgr mgr/cephadm/container_image_nvmeof-cli localhost:5000/ceph/nvmeof-cli:1.0.0
+        ceph config set mgr mgr/cephadm/container_image_nvmeof localhost:5000/ceph/nvmeof:1.0.0
 
 #crontab<<EOF
 #* * * * * /usr/local/bin/ipcorrector
