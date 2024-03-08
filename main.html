@@ -13,8 +13,12 @@
         <meta charset="utf-8">
         <link href="../base1/cockpit.css" type="text/css" rel="stylesheet">
         <link href="./css/patternfly.css" type="text/css" rel="stylesheet">
+        <link href="./css/jquery-ui.min.css" type="text/css" rel="stylesheet">
+        <link href="./css/jquery.timepicker.min.css" type="text/css" rel="stylesheet">
         <script src="../base1/cockpit.js"></script>
         <script src="./src/common/jquery-3.5.1.js"></script>
+        <script src="./src/common/jquery-ui.min.js"></script>
+        <script src="./src/common/jquery.timepicker.min.js"></script>
         <!-- 공통 필요 스타일 및 자바스크립트 영역 끝 -->
  
     </head>
@@ -462,7 +466,7 @@
                                                             <button class="pf-c-dropdown__menu-item pf-m-disabled" id="button-cloud-vm-snap-rollback" type="button">클라우드센터VM 스냅샷 복구</button>
                                                         </li>
                                                         <li>
-                                                            <button class="pf-c-dropdown__menu-item pf-m-disabled" id="card-action-cloud-vm-db-dump" type="button" >클라우드센터VM DB 백업</button>
+                                                            <button class="pf-c-dropdown__menu-item" id="card-action-cloud-vm-db-dump" type="button" >클라우드센터VM DB 백업</button>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -702,35 +706,8 @@
         <!-- 클라우드센터VM 마이그레이션 : Modal 영역 끝 -->
 
         <!-- 클라우드센터VM DB 백업 : Modal 영역 시작 -->
-        <div id="div-modal-db-backup-cloud-vm" class="pf-c-backdrop" style="display:none">
-            <div class="pf-l-bullseye">
-                <div class="pf-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-label="Cloud VM Database Backup">
-                    <button id="button-close-modal-cloud-vm-db-dump" aria-disabled="false" aria-label="Close" class="pf-c-button pf-m-plain" type="button">
-                        <i class="fas fa-times" aria-hidden="true"></i>
-                    </button>
-                    <header class="pf-c-modal-box__header"><h1 class="pf-c-modal-box__title"><span class="pf-c-modal-box__title-text">클라우드센터 데이터베이스 백업</span></h1></header>
-                    <div class="pf-c-modal-box__body">
-                        <div id="div-db-backup">클라우드센터 가상머신의 데이터베이스를 백업하시겠습니까?</div>
-                    </div>
-
-                    <div class="pf-c-empty-state">
-                        <div class="pf-c-empty-state__content" id="dbdump-prepare-status">
-                        </div>
-                    </div>
-
-                    <div class="pf-c-content" id="div-modal-wizard-cluster-config-finish-db-dump-file-download" style="margin-top:30px;margin-left:30px;display:none">
-                        <span>
-                            DB dump 파일 다운로드 :
-                            <a class="pf-c-button pf-m-link" id="span-modal-wizard-cluster-config-finish-db-dump-file-download" href="#">파일을 다운로드 하려면 클릭하십시오.</a>
-                        </span>
-                    </div>
-                    <footer class="pf-c-modal-box__footer">
-                        <button id="button-execution-modal-cloud-vm-db-dump" aria-disabled="false" class="pf-c-button pf-m-primary" type="button" data-ouia-safe="true">실행</button>
-                        <button id="button-cancel-modal-cloud-vm-db-dump" aria-disabled="false" class="pf-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
-                    </footer>
-                </div>
-            </div>
-        </div>
+        <!-- 전체 시스템 종료 : ./src/features/cloud-vm-dbbackup.html을 내용으로 load -->
+        <div id="div-modal-db-backup-cloud-vm-first"></div>
         <!-- 클라우드센터VM DB 백업 : Modal 영역 끝 -->
 
         <!-- 실행중 : Modal 영역 시작 -->
