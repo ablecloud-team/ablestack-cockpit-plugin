@@ -49,15 +49,19 @@ firewall-cmd --list-all 2>&1 | tee -a $LOGFILE
 sgdisk -e /dev/vda
 parted --script /dev/vda resizepart 3 100%
 pvresize /dev/vda3
-lvcreate cs_ablestack-cerato -n nfs --extents 100%FREE
-mkfs.xfs /dev/cs_ablestack-cerato/nfs
+lvcreate rl -n nfs --extents 100%FREE
+mkfs.xfs /dev/rl/nfs
 mkdir /nfs
-echo  '/dev/mapper/cs_ablestack--cerato-nfs /nfs                    xfs    defaults        0 0' >> /etc/fstab
+echo  '/dev/mapper/rl-nfs /nfs                    xfs    defaults        0 0' >> /etc/fstab
 echo '/nfs *(rw,no_root_squash,async)' >> /etc/exports
 systemctl enable --now nfs-server.service
 
 mkdir /nfs/primary
 mkdir /nfs/secondary
+
+# Crushmap 설정 추가 (ceph autoscale)
+scvm=$(grep scvm-mngt /etc/hosts | awk {'print $1'})
+ssh -o StrictHostKeyChecking=no $scvm /usr/local/sbin/setCrushmap.sh
 
 ################# Setting Database
 mysqladmin -uroot password $DATABASE_PASSWD
@@ -95,14 +99,18 @@ for host in $hosts
 do
   scp -o StrictHostKeyChecking=no /root/uefi.properties $host:/etc/cloudstack/agent/
 done
+
 rm -rf /root/uefi.properties
+
 
 #tpm 설정 파일 생성
 echo -e "host.tpm.enable=true" > /root/tpm.properties
+
 for host in $hosts
 do
   scp -o StrictHostKeyChecking=no /root/tpm.properties $host:/etc/cloudstack/agent/
 done
+
 rm -rf /root/tpm.properties
 
 #systemvm template 등록
@@ -117,10 +125,7 @@ do
   ssh -o StrictHostKeyChecking=no $host /usr/bin/systemctl enable --now corosync
 done
 
-# Crushmap 설정 추가 (ceph osd pool autoscale)
-sleep 3m
-scvm=$(grep scvm-mngt /etc/hosts | awk {'print $1'})
-ssh -o StrictHostKeyChecking=no $scvm /usr/local/sbin/setCrushmap.sh
-
+# Delete container image file
+rm -rf /usr/share/ablestack/*.tar
 # Delete bootstrap script file
 rm -rf /root/bootstrap.sh
