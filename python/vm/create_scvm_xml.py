@@ -332,6 +332,43 @@ def createScvmXml(args):
         #print(e)
         return createReturn(code=500, val={})
 
+def createHugePageConfig(args):
+    try:
+
+        # limits
+        template_file = pluginpath + '/tools/vmconfig/scvm/limits-template.xml'
+        os.system("yes|cp -f " + pluginpath + "/tools/xml-template/limits-template.xml " + template_file)
+
+        with fileinput.FileInput(template_file, inplace=True, backup='.bak') as fi:
+            for line in fi:
+                if '{memory}' in line:
+                    line = line.replace('{memory}', str(args.memory * 1024 * 1024))
+
+        os.system("mv " + template_file + " /etc/security/limits")
+        os.system("rm -f " + template_file + ".bak")
+
+        # sysctl
+        template_file = pluginpath + '/tools/vmconfig/scvm/sysctl-template.xml'
+        os.system("yes|cp -f " + pluginpath + "/tools/xml-template/sysctl-template.xml " + template_file)
+
+        with fileinput.FileInput(template_file, inplace=True, backup='.bak') as fi:
+            for line in fi:
+                if '{memory}' in line:
+                    line = line.replace('{memory}', str(args.memory * 1024))
+
+        os.system("mv " + template_file + " /etc/sysctl.conf")
+        os.system("rm -f " + template_file + ".bak")
+        os.system("/usr/sbin/sysctl -p")
+        os.system("/usr/sbin/sysctl -a")
+
+        # 결과값 리턴
+        return createReturn(code=200, val={})
+
+    except Exception as e:
+        # 결과값 리턴
+        # print(e)
+        return createReturn(code=500, val={})
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # parser 생성
@@ -345,5 +382,6 @@ if __name__ == '__main__':
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
 
     # 실제 로직 부분 호출 및 결과 출력
+    ret = createHugePageConfig(args)
     ret = createScvmXml(args)
     print(ret)
