@@ -140,7 +140,7 @@ def listDiskInterface(H=False, classify=None):
         # }
     ]
     for pci in list_pci:
-        if 'raid' in pci['Device'].lower():
+        if 'raid' in pci['Class'].lower() or "Non-Volatile memory controller" in pci['Class'].lower():
             item['raidcontrollers'].append(pci)
 
     if H:

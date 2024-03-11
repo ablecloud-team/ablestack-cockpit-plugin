@@ -317,6 +317,17 @@ def remove(args):
         # 결과값 리턴
         return createReturn(code=500, val="Please check the \"cluster.json\" file. : "+e)
 
+def createHugePageFS():
+    if not os.path.exists("/hugepages"):
+        os.mkdir("/hugepages")
+    with open("/etc/fstab", "at") as ffstab:
+        tfstab = ffstab.read()
+        if "/hugepages" not in tfstab:
+            ffstab.write("\nhugetlbfs\t/hugepages\thugetlbfs\tdefaults\t0 0\n")
+            ffstab.flush()
+    os.system("mount -a")
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # parser 생성
@@ -328,6 +339,8 @@ if __name__ == '__main__':
 
     # 로깅을 위한 logger 생성, 모든 인자에 default 인자가 있음.
     logger = createLogger(verbosity=logging.CRITICAL, file_log_level=logging.ERROR, log_file='test.log')
+
+    createHugePageFS()
 
     # 실제 로직 부분 호출 및 결과 출력
     if args.action == 'insert':
