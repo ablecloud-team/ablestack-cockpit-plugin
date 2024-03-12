@@ -363,8 +363,9 @@ def createHugePageConfig(args):
             fi.write(file)
             
         os.system("mv " + template_file + " /etc/sysctl.conf")
-        sh.Command("/usr/sbin/sysctl", "-p")
-        sh.Command("/usr/sbin/sysctl", "-a")
+        sysctl = sh.Command("/usr/sbin/sysctl")
+        sysctl("-p")
+        sysctl("-a")
 
         # 결과값 리턴
         return createReturn(code=200, val={})
