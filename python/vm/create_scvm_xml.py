@@ -13,6 +13,7 @@ import sys
 import fileinput
 import random
 import os
+import sh
 
 from ablestack import *
 
@@ -339,27 +340,31 @@ def createHugePageConfig(args):
         template_file = pluginpath + '/tools/vmconfig/scvm/limits-template.conf'
         os.system("yes|cp -f " + pluginpath + "/tools/xml-template/limits-template.conf " + template_file)
 
-        with fileinput.FileInput(template_file, inplace=True, backup='.bak') as fi:
-            for line in fi:
-                if '{memory}' in line:
-                    line = line.replace('{memory}', str(args.memory * 1024 * 1024))
+        with open(template_file, mode="rt") as fi:
+            file=fi.read()
+            
+        file = file.replace('{memory}', str(args.memory * 1024 * 1024))
 
+        with open(template_file, mode="wt") as fi:
+            fi.write(file)
+        
         os.system("mv " + template_file + " /etc/security/limits.conf")
-        os.system("rm -f " + template_file + ".bak")
-
+        
         # sysctl
         template_file = pluginpath + '/tools/vmconfig/scvm/sysctl-template.conf'
         os.system("yes|cp -f " + pluginpath + "/tools/xml-template/sysctl-template.conf " + template_file)
 
-        with fileinput.FileInput(template_file, inplace=True, backup='.bak') as fi:
-            for line in fi:
-                if '{memory}' in line:
-                    line = line.replace('{memory}', str(args.memory * 1024))
+        with open(template_file, mode="rt") as fi:
+            file=fi.read()
+            
+        file = file.replace('{memory}', str(args.memory * 1024))
 
+        with open(template_file, mode="wt") as fi:
+            fi.write(file)
+            
         os.system("mv " + template_file + " /etc/sysctl.conf")
-        os.system("rm -f " + template_file + ".bak")
-        os.system("/usr/sbin/sysctl -p")
-        os.system("/usr/sbin/sysctl -a")
+        sh.Command("/usr/sbin/sysctl", "-p")
+        sh.Command("/usr/sbin/sysctl", "-a")
 
         # 결과값 리턴
         return createReturn(code=200, val={})
