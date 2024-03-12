@@ -18,6 +18,7 @@ from ablestack import *
 from sh import python3
 from sh import ssh
 from python_hosts import Hosts, HostsEntry
+from pyfstab import Fstab, Entry
 
 json_file_path = pluginpath+"/tools/properties/cluster.json"
 hosts_file_path = "/etc/hosts"
@@ -320,11 +321,24 @@ def remove(args):
 def createHugePageFS():
     if not os.path.exists("/hugepages"):
         os.mkdir("/hugepages")
-    with open("/etc/fstab", "at") as ffstab:
-        tfstab = ffstab.read()
-        if "/hugepages" not in tfstab:
-            ffstab.write("\nhugetlbfs\t/hugepages\thugetlbfs\tdefaults\t0 0\n")
-            ffstab.flush()
+
+    with open("/etc/fstab", "r") as f:
+        fstab = Fstab().read_file(f)
+    fstab.entries.append(
+        Entry(
+            "hugetlbfs",
+            "/hugepages",
+            "hugetlbfs",
+            "defaults",
+            0,
+            0
+        )
+    )
+    formatted = str(fstab)
+
+    with open("/etc/fstab", "w") as f:
+        f.write(formatted)
+
     os.system("mount -a")
 
 
