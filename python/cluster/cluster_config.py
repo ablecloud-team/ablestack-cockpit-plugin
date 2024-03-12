@@ -321,24 +321,26 @@ def remove(args):
 def createHugePageFS():
     if not os.path.exists("/hugepages"):
         os.mkdir("/hugepages")
-
     with open("/etc/fstab", "r") as f:
         fstab = Fstab().read_file(f)
-    fstab.entries.append(
-        Entry(
-            "hugetlbfs",
-            "/hugepages",
-            "hugetlbfs",
-            "defaults",
-            0,
-            0
+    flag = False
+    for entry in fstab.entries:
+        if entry.dir == "/hugepages":
+            flag = True
+    if flag == False:
+        fstab.entries.append(
+            Entry(
+                "hugetlbfs",
+                "/hugepages",
+                "hugetlbfs",
+                "defaults",
+                0,
+                0
+            )
         )
-    )
-    formatted = str(fstab)
-
-    with open("/etc/fstab", "w") as f:
-        f.write(formatted)
-
+        formatted = str(fstab)
+        with open("/etc/fstab", "w") as f:
+            f.write(formatted)
     os.system("mount -a")
 
 
