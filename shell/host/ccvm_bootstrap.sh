@@ -10,6 +10,12 @@
 set -x
 LOGFILE="/var/log/cloud_install.log"
 
+#Glue 스토리지 설정
+ceph osd pool set .mgr crush_rule replicated_rule
+ceph osd pool set rbd crush_rule replicated_rule
+ceph osd pool set .mgr size 2
+ceph osd pool set .mgr min_size 1
+
 hosts=$(grep -v mngt /etc/hosts | grep -v scvm | grep -v pn | grep -v localhost | awk {'print $1'})
 
 systemctl enable --now mysqld
