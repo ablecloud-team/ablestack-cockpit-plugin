@@ -56,13 +56,13 @@ cloudstack-setup-databases cloud:$DATABASE_PASSWD --deploy-as=root:$DATABASE_PAS
 global_settings=(
   "enable.vm.network.filter.allow.all.traffic=true"
   "saml2.enabled=true"
-  "saml2.idp.metadata.url=http://$ccvm:7070/realms/saml/protocol/saml/descriptor"
-  "saml2.redirect.url=http://$ccvm:8080/client"
-  "saml2.sp.id=http://$ccvm:8080"
-  "saml2.sp.slo.url=http://$ccvm:8080"
-  "saml2.sp.sso.url=http://$ccvm:8080/client/api?command=samlSso"
+  "saml2.idp.metadata.url=http://$ccvm:19000/realms/saml/protocol/saml/descriptor"
+  "saml2.redirect.url=http://$ccvm:19300/client"
+  "saml2.sp.id=http://$ccvm:19300"
+  "saml2.sp.slo.url=http://$ccvm:19300"
+  "saml2.sp.sso.url=http://$ccvm:19300/client/api?command=samlSso"
   "saml2.user.attribute=username"
-  "saml2.failed.login.redirect.url=http://$ccvm:8080/client/#/user/login?ssoLogin=false"
+  "saml2.failed.login.redirect.url=http://$ccvm:19300/client/#/user/login?ssoLogin=false"
   "saml2.check.signature=false"
 )
 
@@ -82,7 +82,7 @@ cloudstack-setup-management  2>&1 | tee -a $LOGFILE
 
 #admin 계정 로그인타입 변경(SAML)
 mysql --user=root --password="$DATABASE_PASSWD" -e \
-"USE cloud; UPDATE user SET source='SAML2', external_entity='http://$ccvm:7070/realms/saml' WHERE username='admin';"
+"USE cloud; UPDATE user SET source='SAML2', external_entity='http://$ccvm:19000/realms/saml' WHERE username='admin';"
 
 systemctl enable --now mold.service
 

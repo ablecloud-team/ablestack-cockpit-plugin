@@ -15,8 +15,12 @@ set -x
 INSTALL_DIR="/usr/share/ablestack/keycloak"
 DATA_DIR="$INSTALL_DIR/data"
 
-ADMIN_USER="admin"                  # Keycloak 관리자 계정
-ADMIN_PASS="admin"                  # Keycloak 관리자 비밀번호
+ADMIN_USER="admin"                # Keycloak 관리자 계정
+ADMIN_PW="admin"                  # Keycloak 관리자 비밀번호
+KC_PORT=19000                     # Keycloak 포트
+MOLD_PORT=19300                   # Mold 포트
+GLUE_PORT=19200                   # Glue 포트
+WALL_PORT=19400                   # Wall 포트
 
 mkdir -p "$DATA_DIR"
 chmod -R 777 "$DATA_DIR"
@@ -43,6 +47,62 @@ if ! command -v podman-compose &> /dev/null; then
 fi
 
 # ---------------------------------------------
+# Keycloak 인증서 생성
+# ---------------------------------------------
+mkdir -p ssl
+
+openssl genrsa -out ssl/rootCA.key 4096
+
+openssl req -x509 -new -nodes \
+-key ssl/rootCA.key \
+-sha256 -days 3650 \
+-out ssl/rootCA.crt \
+-subj "/C=KR/ST=Seoul/L=Seoul/O=ExampleOrg/OU=RootCA/CN=10.10.22.10"
+
+cp ssl/rootCA.crt /etc/pki/ca-trust/source/anchors/
+update-ca-trust
+
+cat > ssl/keycloak_san.cnf <<EOF
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+distinguished_name = dn
+req_extensions = req_ext
+
+[dn]
+C=KR
+ST=Seoul
+L=Seoul
+O=ExampleOrg
+OU=IT
+CN=10.10.22.10
+
+[req_ext]
+subjectAltName = @alt_names
+
+[alt_names]
+IP.1 = 10.10.22.10
+DNS.1 = keycloak.example.com
+EOF
+
+openssl req -new -nodes -newkey rsa:2048 \
+-keyout ssl/keycloak.key \
+-out ssl/keycloak.csr \
+-config ssl/keycloak_san.cnf
+
+openssl x509 -req -days 3650 \
+-in ssl/keycloak.csr \
+-CA ssl/rootCA.crt \
+-CAkey ssl/rootCA.key \
+-CAcreateserial \
+-out ssl/keycloak.crt \
+-extensions req_ext \
+-extfile ssl/keycloak_san.cnf
+
+chmod 644 ssl/*
+
+# ---------------------------------------------
 # docker-compose.yml (Podman용) 생성
 # ---------------------------------------------
 cat > docker-compose.yml <<EOF
@@ -52,14 +112,20 @@ services:
     image: localhost:15000/keycloak/keycloak:26.0
     container_name: keycloak
     environment:
-      - KEYCLOAK_ADMIN=${ADMIN_USER}
-      - KEYCLOAK_ADMIN_PASSWORD=${ADMIN_PASS}
-    command: start-dev
-    ports:
-      - "7070:8080"
-    volumes:
-      - ${INSTALL_DIR}/theme:/opt/keycloak/themes/ablestack:Z
+      - KC_BOOTSTRAP_ADMIN_USERNAME=${ADMIN_USER}
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=${ADMIN_PW}
+    command:
+      - start
+      - --https-port=8443
+      - --https-certificate-file=/opt/keycloak/ssl/keycloak.crt
+      - --https-certificate-key-file=/opt/keycloak/ssl/keycloak.key
+      - --hostname=$(hostname -I | awk '{print $1}')
 
+    ports:
+      - "${KC_PORT}:8443"
+    volumes:
+      - ${INSTALL_DIR}/ssl:/opt/keycloak/ssl:Z
+      - ${INSTALL_DIR}/theme:/opt/keycloak/themes/ablestack:Z
 EOF
 
 # ---------------------------------------------
@@ -72,10 +138,10 @@ podman-compose up -d
 # 방화벽 포트 개방 (firewalld 사용 시)
 # ---------------------------------------------
 if systemctl is-active firewalld &> /dev/null; then
-  echo "[INFO] firewalld에서 7070 포트 설정 중..."
-  sudo firewall-cmd --permanent --add-port=7070/tcp
+  echo "[INFO] firewalld에서 ${KC_PORT} 포트 설정 중..."
+  sudo firewall-cmd --permanent --add-port=${KC_PORT}/tcp
   sudo firewall-cmd --reload
-  echo "[INFO] 7070 포트 설정 완료"
+  echo "[INFO] ${KC_PORT} 포트 설정 완료"
 else
   echo "[WARN] firewalld가 실행 중이 아닙니다. 수동으로 포트를 열어야 할 수 있습니다."
 fi
@@ -84,9 +150,10 @@ fi
 # 컨테이너 상태 확인
 # ---------------------------------------------
 echo "[INFO] 컨테이너 상태 확인..."
-podman ps | grep keycloak && echo "✅ Keycloak이 실행 중입니다: http://$(hostname -I | awk '{print $1}'):7070"
+podman ps | grep keycloak && echo "✅ Keycloak이 실행 중입니다: https://$(hostname -I | awk '{print $1}'):${KC_PORT}"
 
-until curl -s http://$(hostname -I | awk '{print $1}'):7070/realms/master; do
+# until curl -s https://$(hostname -I | awk '{print $1}'):${KC_PORT}/realms/master; do
+until podman logs keycloak 2>&1 | grep -q "Keycloak .* started in"; do
     echo "Keycloak 준비 중..."
     sleep 2
 done
@@ -94,7 +161,7 @@ echo "Keycloak 준비 완료"
 
 echo "==============================="
 echo "✅ Keycloak 설치 완료"
-echo "접속 URL: http://$(hostname -I | awk '{print $1}'):7070"
+echo "접속 URL: https://$(hostname -I | awk '{print $1}'):${KC_PORT}"
 echo "관리자 계정: admin / admin"
 echo "==============================="
 
@@ -103,7 +170,7 @@ echo "==============================="
 # ---------------------------------------------
 HOST_IP=$(grep -E "ccvm" /etc/hosts | awk '{print $1}')
 
-KC_URL="http://$HOST_IP:7070"       # Keycloak 접속 URL
+KC_URL="https://$HOST_IP:${KC_PORT}"       # Keycloak 접속 URL
 
 THEME="ablestack"                   # Keycloak 테마
 REALM_NAME="saml"                   # 생성할 Realm 이름
@@ -116,9 +183,9 @@ NEW_USER_EMAIL="admin@localhost"    # SSO 로그인 계정 이메일
 NEW_USER_PASSWORD="admin"           # SSO 로그인 계정 비밀번호
 
 # 클라이언트 설정(MOLD)
-CLIENT_ID_MOLD="http://$HOST_IP:8080"
-ROOT_URL_MOLD="http://$HOST_IP:8080/"
-REDIRECT_URLS_MOLD="http://$HOST_IP:8080/*"
+CLIENT_ID_MOLD="https://$HOST_IP:${MOLD_PORT}"
+ROOT_URL_MOLD="https://$HOST_IP:${MOLD_PORT}/"
+REDIRECT_URLS_MOLD="https://$HOST_IP:${MOLD_PORT}/*"
 
 # 클라이언트 설정(GLUE)
 SCVM_HOSTS=$(grep -E "scvm[0-9]+-mngt" /etc/hosts)  # 전체 scvm
@@ -131,9 +198,9 @@ KEYSTORE_ALIAS="saml-encryption"
 KEYSTORE_PASS="changeit"
 
 # 클라이언트 설정(WALL)
-CLIENT_ID_WALL="http://$HOST_IP:3000"
-ROOT_URL_WALL="http://$HOST_IP:3000"
-REDIRECT_URIS_WALL="[\"http://$HOST_IP:3000/login*\", \"http://$HOST_IP:3000/login/generic_oauth\"]"
+CLIENT_ID_WALL="https://$HOST_IP:${WALL_PORT}"
+ROOT_URL_WALL="https://$HOST_IP:${WALL_PORT}"
+REDIRECT_URIS_WALL="[\"https://$HOST_IP:${WALL_PORT}/login*\", \"https://$HOST_IP:${WALL_PORT}/login/generic_oauth\"]"
 # CLIENT_ROLE_WALL="grafana-admin"
 
 # WALL 설정
@@ -153,10 +220,10 @@ GRAFANA_DB="/usr/share/ablestack/ablestack-wall/grafana/data/grafana.db"        
 # Access Token 발급
 # ---------------------------------------------
 echo "[INFO] 관리자 Access Token 요청 중..."
-TOKEN=$(curl -s \
+TOKEN=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
   -d "client_id=admin-cli" \
   -d "username=${ADMIN_USER}" \
-  -d "password=${ADMIN_PASS}" \
+  -d "password=${ADMIN_PW}" \
   -d "grant_type=password" \
   "${KC_URL}/realms/master/protocol/openid-connect/token" | jq -r .access_token)
 
@@ -169,10 +236,12 @@ echo "[OK] Access Token 발급 성공"
 # ---------------------------------------------
 # 초기 비밀번호 변경
 # ---------------------------------------------
-USER_ID=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
+USER_ID=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -H "Authorization: Bearer ${TOKEN}" \
   "${KC_URL}/admin/realms/master/users?username=${ADMIN_USER}" | jq -r '.[0].id')
 
-curl -s -X PUT "${KC_URL}/admin/realms/master/users/${USER_ID}" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X PUT "${KC_URL}/admin/realms/master/users/${USER_ID}" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d '{"requiredActions":["UPDATE_PASSWORD"]}'
@@ -181,13 +250,14 @@ curl -s -X PUT "${KC_URL}/admin/realms/master/users/${USER_ID}" \
 # Realm 생성 or 확인
 # ---------------------------------------------
 echo "[INFO] '${REALM_NAME}' Realm 확인 중..."
-EXISTING_REALM=$(curl -s -H "Authorization: Bearer ${TOKEN}" "${KC_URL}/admin/realms/${REALM_NAME}" | jq -r .realm || true)
+EXISTING_REALM=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt -H "Authorization: Bearer ${TOKEN}" "${KC_URL}/admin/realms/${REALM_NAME}" | jq -r .realm || true)
 
 if [ "$EXISTING_REALM" == "$REALM_NAME" ]; then
   echo "[WARN] '${REALM_NAME}' Realm 이미 존재. 기존 Realm 업데이트"
 else
   echo "[INFO] '${REALM_NAME}' Realm 생성 중..."
-  curl -s -X POST "${KC_URL}/admin/realms" \
+  curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+    -X POST "${KC_URL}/admin/realms" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${TOKEN}" \
     -d "{\"realm\":\"${REALM_NAME}\",\"enabled\":true}" >/dev/null
@@ -197,7 +267,7 @@ fi
 # ---------------------------------------------
 # Realm 설정 변경 (Timeout)
 # ---------------------------------------------
-REALM_CONFIG=$(curl -s -H "Authorization: Bearer ${TOKEN}" "${KC_URL}/admin/realms/${REALM_NAME}")
+REALM_CONFIG=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt -H "Authorization: Bearer ${TOKEN}" "${KC_URL}/admin/realms/${REALM_NAME}")
 
 if [ -z "$REALM_CONFIG" ]; then
   echo "[ERROR] Realm 정보를 가져오지 못했습니다."
@@ -208,7 +278,8 @@ UPDATED_REALM=$(echo "$REALM_CONFIG" | jq \
   --argjson val $TIMEOUT_SECONDS \
   '.accessTokenLifespan = $val | .ssoSessionIdleTimeout = $val')
 
-curl -s -X PUT "${KC_URL}/admin/realms/${REALM_NAME}" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X PUT "${KC_URL}/admin/realms/${REALM_NAME}" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d "$UPDATED_REALM" >/dev/null
@@ -219,7 +290,8 @@ echo "✅ Realm '${REALM_NAME}' 타임아웃 설정 완료 (1시간)"
 # Realm 다국어적용(Internationalization)
 # ---------------------------------------------
 # master Realm
-curl -s -X PUT "${KC_URL}/admin/realms/master" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X PUT "${KC_URL}/admin/realms/master" \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -236,7 +308,8 @@ else
 fi
 
 # 생성한 Realm
-curl -s -X PUT "${KC_URL}/admin/realms/${REALM_NAME}" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X PUT "${KC_URL}/admin/realms/${REALM_NAME}" \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -258,13 +331,15 @@ fi
 echo "[INFO] Realm 테마 적용 중..."
 
 # master Realm
-curl -s -X PUT "${KC_URL}/admin/realms/master" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X PUT "${KC_URL}/admin/realms/master" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d "{\"loginTheme\":\"${THEME}\"}"
 
 # 생성한 Realm
-curl -s -X PUT "${KC_URL}/admin/realms/${REALM_NAME}" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X PUT "${KC_URL}/admin/realms/${REALM_NAME}" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d "{\"loginTheme\":\"${THEME}\"}"
@@ -277,14 +352,15 @@ echo "✅ Realm 테마 적용 완료"
 echo "[INFO] Client Scope '${CLIENT_SCOPE_NAME}' 생성 중..."
 
 # 1. Client Scope 존재 여부 확인
-EXISTING_SCOPE_ID=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
+EXISTING_SCOPE_ID=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt -H "Authorization: Bearer ${TOKEN}" \
   "${KC_URL}/admin/realms/${REALM_NAME}/client-scopes" | jq -r ".[] | select(.name==\"${CLIENT_SCOPE_NAME}\") | .id")
 
 if [ -n "$EXISTING_SCOPE_ID" ]; then
   echo "[WARN] Client Scope '${CLIENT_SCOPE_NAME}' 이미 존재"
 else
   # 2. Client Scope 생성
-  curl -s -X POST "${KC_URL}/admin/realms/${REALM_NAME}/client-scopes" \
+  curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+    -X POST "${KC_URL}/admin/realms/${REALM_NAME}/client-scopes" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${TOKEN}" \
     -d '{
@@ -297,13 +373,14 @@ else
 
   echo "✅ Client Scope '${CLIENT_SCOPE_NAME}' 생성 완료"
 
-  EXISTING_SCOPE_ID=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
+  EXISTING_SCOPE_ID=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt -H "Authorization: Bearer ${TOKEN}" \
     "${KC_URL}/admin/realms/${REALM_NAME}/client-scopes" | jq -r ".[] | select(.name==\"${CLIENT_SCOPE_NAME}\") | .id")
 
   # 3. Mapper 추가
   echo "[INFO] Mapper (Client scopes -> username) 추가 중..."
 
-  curl -s -X POST "${KC_URL}/admin/realms/${REALM_NAME}/client-scopes/${EXISTING_SCOPE_ID}/protocol-mappers/models" \
+  curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+    -X POST "${KC_URL}/admin/realms/${REALM_NAME}/client-scopes/${EXISTING_SCOPE_ID}/protocol-mappers/models" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${TOKEN}" \
     -d '{
@@ -325,7 +402,8 @@ fi
 # SSO 로그인 사용자생성(admin)
 # ---------------------------------------------
 echo "[INFO] SSO 로그인 사용자 admin 생성 중..."
-curl -s -X POST "${KC_URL}/admin/realms/${REALM_NAME}/users" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X POST "${KC_URL}/admin/realms/${REALM_NAME}/users" \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d "{
@@ -378,29 +456,33 @@ EOF
 )
 
 # 1. 클라이언트 생성 요청
-curl -s -X POST "${KC_URL}/admin/realms/${REALM_NAME}/clients" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X POST "${KC_URL}/admin/realms/${REALM_NAME}/clients" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d "${CLIENT_DATA_MOLD}" >/dev/null
 
 # 2. 클라이언트에 스코프 연결
 echo "[INFO] MOLD 클라이언트에 '${CLIENT_SCOPE_NAME}' 클라이언트 스코프 연결 중..."
-CLIENT_MOLD_ID=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
+CLIENT_MOLD_ID=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt -H "Authorization: Bearer ${TOKEN}" \
   "${KC_URL}/admin/realms/${REALM_NAME}/clients?clientId=${CLIENT_ID_MOLD}" | jq -r '.[0].id')
 
-curl -s -X PUT "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_MOLD_ID}/default-client-scopes/${EXISTING_SCOPE_ID}" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X PUT "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_MOLD_ID}/default-client-scopes/${EXISTING_SCOPE_ID}" \
   -H "Authorization: Bearer ${TOKEN}" \
   >/dev/null
 
 # 기존 role_list 스코프 타입 변경(default->optional)
-EXISTING_SCOPE_ROLE_ID=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
+EXISTING_SCOPE_ROLE_ID=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt -H "Authorization: Bearer ${TOKEN}" \
   "${KC_URL}/admin/realms/${REALM_NAME}/client-scopes" | jq -r ".[] | select(.name==\"role_list\") | .id")
 
-curl -s -X DELETE "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_MOLD_ID}/default-client-scopes/${EXISTING_SCOPE_ROLE_ID}" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X DELETE "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_MOLD_ID}/default-client-scopes/${EXISTING_SCOPE_ROLE_ID}" \
   -H "Authorization: Bearer ${TOKEN}" \
   >/dev/null
 
-curl -s -X PUT "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_MOLD_ID}/optional-client-scopes/${EXISTING_SCOPE_ROLE_ID}" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X PUT "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_MOLD_ID}/optional-client-scopes/${EXISTING_SCOPE_ROLE_ID}" \
   -H "Authorization: Bearer ${TOKEN}" \
   >/dev/null
 
@@ -419,17 +501,17 @@ fi
 echo "✅ 인증서 생성 완료: sp.crt, sp.key"
 
 # 2. KC 메타데이터 파일 복사(뒤에서 컨테이너에 복사)
-curl -s -o ${INSTALL_DIR}/idp_metadata.xml http://"$HOST_IP":7070/realms/saml/protocol/saml/descriptor
+curl -s -o ${INSTALL_DIR}/idp_metadata.xml https://"$HOST_IP":${KC_PORT}/realms/saml/protocol/saml/descriptor
 
 # 3. 각 scvm에 대해 클라이언트 생성
 echo "$SCVM_HOSTS" | while read -r LINE; do
   SCVM_HOST_IP=$(echo "$LINE" | awk '{print $1}')
   SCVM_HOST_NAME=$(echo "$LINE" | awk '{print $2}')
 
-  CLIENT_ID_GLUE="https://$SCVM_HOST_IP:8443/auth/saml2/metadata"
+  CLIENT_ID_GLUE="https://$SCVM_HOST_IP:${GLUE_PORT}/auth/saml2/metadata"
   CLIENT_ID_GLUE_2="glue"
-  ROOT_URL_GLUE="https://$SCVM_HOST_IP:8443"
-  REDIRECT_URLS_GLUE="https://$SCVM_HOST_IP:8443/*"
+  ROOT_URL_GLUE="https://$SCVM_HOST_IP:${GLUE_PORT}"
+  REDIRECT_URLS_GLUE="https://$SCVM_HOST_IP:${GLUE_PORT}/*"
 
   echo "[INFO] GLUE 클라이언트 '${SCVM_HOST_IP}, ${SCVM_HOST_NAME}' 생성 중..."
 
@@ -458,26 +540,30 @@ GLUE_EOF
 )
 
   # 클라이언트 생성 요청
-  curl -X POST "${KC_URL}/admin/realms/${REALM_NAME}/clients" \
+  curl --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+    -X POST "${KC_URL}/admin/realms/${REALM_NAME}/clients" \
     -H "Authorization: Bearer ${TOKEN}" \
     -H "Content-Type: application/json" \
     -d "$CLIENT_DATA_GLUE"
 
   # 4. 클라이언트에 스코프 연결
   echo "[INFO] GLUE 클라이언트에 '${CLIENT_SCOPE_NAME}' 클라이언트 스코프 연결 중..."
-  CLIENT_GLUE_ID=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
+  CLIENT_GLUE_ID=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt -H "Authorization: Bearer ${TOKEN}" \
     "${KC_URL}/admin/realms/${REALM_NAME}/clients?clientId=${CLIENT_ID_GLUE}" | jq -r '.[0].id')
 
-  curl -s -X PUT "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_GLUE_ID}/default-client-scopes/${EXISTING_SCOPE_ID}" \
+  curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+    -X PUT "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_GLUE_ID}/default-client-scopes/${EXISTING_SCOPE_ID}" \
     -H "Authorization: Bearer ${TOKEN}" \
     >/dev/null
  
   # 기존 role_list 스코프 타입 변경(default->optional)
-  curl -s -X DELETE "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_GLUE_ID}/default-client-scopes/${EXISTING_SCOPE_ROLE_ID}" \
+  curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+    -X DELETE "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_GLUE_ID}/default-client-scopes/${EXISTING_SCOPE_ROLE_ID}" \
     -H "Authorization: Bearer ${TOKEN}" \
     >/dev/null
 
-  curl -s -X PUT "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_GLUE_ID}/optional-client-scopes/${EXISTING_SCOPE_ROLE_ID}" \
+  curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+    -X PUT "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_GLUE_ID}/optional-client-scopes/${EXISTING_SCOPE_ROLE_ID}" \
     -H "Authorization: Bearer ${TOKEN}" \
     >/dev/null
 
@@ -587,7 +673,8 @@ fi
 SSH_EOF
 
   # 11. Keycloak 클라이언트 암호화 인증서 업로드
-  CLIENT_UUID_GLUE=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
+  CLIENT_UUID_GLUE=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+    -H "Authorization: Bearer ${TOKEN}" \
     "${KC_URL}/admin/realms/${REALM_NAME}/clients" | \
     jq -r --arg cid "${CLIENT_ID_GLUE}" '.[] | select(.clientId == $cid) | .id')
 
@@ -605,7 +692,8 @@ SSH_EOF
   echo "✅ PKCS12 키스토어 생성 완료"
 
   echo "[INFO] Keycloak 클라이언트 암호화 인증서 업로드 중..."
-  response=$(curl -s -w "\n%{http_code}" -X POST \
+  response=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+    -w "\n%{http_code}" -X POST \
     -H "Authorization: Bearer ${TOKEN}" \
     -F "file=@${KEYSTORE_FILE}" \
     -F "keystoreFormat=PKCS12" \
@@ -652,12 +740,13 @@ CLIENT_DATA_WALL='{
 }'
 
 # 1. 클라이언트 생성 요청
-curl -s -X POST "${KC_URL}/admin/realms/${REALM_NAME}/clients" \
+curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X POST "${KC_URL}/admin/realms/${REALM_NAME}/clients" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d "${CLIENT_DATA_WALL}" >/dev/null
 
-CLIENT_WALL_ID=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
+CLIENT_WALL_ID=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt -H "Authorization: Bearer ${TOKEN}" \
   "${KC_URL}/admin/realms/${REALM_NAME}/clients?clientId=${CLIENT_ID_WALL}" | jq -r '.[0].id')
 
 if [ -z "$CLIENT_WALL_ID" ] || [ "$CLIENT_WALL_ID" == "null" ]; then
@@ -678,7 +767,7 @@ fi
 
 
 # 2. wall config 등록(설정정보 변경 및 client secret 등록)
-CLIENT_SECRET_WALL=$(curl -s -H "Authorization: Bearer ${TOKEN}" \
+CLIENT_SECRET_WALL=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt -H "Authorization: Bearer ${TOKEN}" \
   "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_WALL_ID}/client-secret" | jq -r .value)
 
 if [ -z "$CLIENT_SECRET_WALL" ] || [ "$CLIENT_SECRET_WALL" == "null" ]; then
@@ -688,6 +777,11 @@ fi
 echo "✅ WALL 클라이언트 secret: $CLIENT_SECRET_WALL"
 
 # defaults.ini 파일 업데이트
+# grafana cert_file, cert_key 파일복사
+mkdir -p "/usr/share/ablestack/ablestack-wall/grafana/tls"
+cp -f ${INSTALL_DIR}/ssl/keycloak.crt /usr/share/ablestack/ablestack-wall/grafana/tls/wall.crt
+cp -f ${INSTALL_DIR}/ssl/keycloak.key /usr/share/ablestack/ablestack-wall/grafana/tls/wall.key
+
 # [user] 섹션에 auto_assign_org_role 권한 변경(Viewer->Admin)
 sed -i 's/^\(auto_assign_org_role *= *\)Viewer/\1Admin/' "$GRAFANA_CONFIG_PATH"
 
@@ -695,7 +789,8 @@ sed -i 's/^\(auto_assign_org_role *= *\)Viewer/\1Admin/' "$GRAFANA_CONFIG_PATH"
 awk \
   -v HOST_IP="$HOST_IP" \
   -v KC_URL="$KC_URL" \
-  -v REALM_NAME="$REALM_NAME" '
+  -v REALM_NAME="$REALM_NAME" \
+  -v WALL_PORT="$WALL_PORT" '
 BEGIN {
   in_auth=0
   printed_signout_url=0
@@ -718,7 +813,7 @@ in_auth {
   }
 
   if ($0 ~ /^signout_redirect_url[[:space:]]*=/) {
-    print "signout_redirect_url = " HOST_IP ":3000/login?disableAutoLogin=true"
+    print "signout_redirect_url = " HOST_IP ":" WALL_PORT "/login?disableAutoLogin=true"
 
     if (!printed_signout_url) {
       print "signout_url = " KC_URL "/realms/" REALM_NAME "/protocol/openid-connect/logout"
@@ -792,7 +887,8 @@ fi
 echo "[INFO] Grafana admin user_id: $GRAFANA_ADMIN_USER_ID"
 
 # Keycloak admin 사용자 ID(auth_id) 조회
-KC_USER_ID=$(curl -s -X GET "$KC_URL/admin/realms/$REALM_NAME/users?username=$ADMIN_USER" \
+KC_USER_ID=$(curl -s --cacert ${INSTALL_DIR}/ssl/keycloak.crt \
+  -X GET "$KC_URL/admin/realms/$REALM_NAME/users?username=$ADMIN_USER" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" | jq -r '.[0].id')
 
