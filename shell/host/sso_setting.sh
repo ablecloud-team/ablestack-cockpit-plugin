@@ -111,6 +111,7 @@ services:
   keycloak:
     image: localhost:15000/keycloak/keycloak:26.0
     container_name: keycloak
+    restart: always
     environment:
       - KC_BOOTSTRAP_ADMIN_USERNAME=${ADMIN_USER}
       - KC_BOOTSTRAP_ADMIN_PASSWORD=${ADMIN_PW}
@@ -573,12 +574,12 @@ GLUE_EOF
   if [ $? -ne 0 ]; then
     echo "[ERROR] 원격 서버로 파일 전송 실패"
   fi
-  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SCVM_HOST_NAME "echo 'ablestack1!' > ${INSTALL_DIR}/user.txt" # 계정생성시 사용할 임시 비밀번호 파일(sso 계정생성시 필요)
+  ssh -n -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SCVM_HOST_NAME "echo 'ablestack1!' > ${INSTALL_DIR}/user.txt" # 계정생성시 사용할 임시 비밀번호 파일(sso 계정생성시 필요)
 
   echo "✅ 원격 서버에 파일 전송 완료 ($CERT_TARGET_PATH/)"
 
   # 6. 원격 서버($SCVM_HOST_NAME)에서 MGR 컨테이너에 인증서 복사 및 saml관련 패키지 설치
-  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SCVM_HOST_NAME" \
+  ssh -n -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SCVM_HOST_NAME" \
   CERT_TARGET_PATH="$CERT_TARGET_PATH" \
   KC_URL="$KC_URL" \
   ROOT_URL_GLUE="$ROOT_URL_GLUE" \
