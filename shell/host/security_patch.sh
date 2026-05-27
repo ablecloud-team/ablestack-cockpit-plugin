@@ -86,7 +86,7 @@ update_ssh_scan_port() {
 
 #====================[ firewalld 서비스 보장 ]====================#
 ensure_firewalld() {
-  # firewall-cmd가 없으면 firewalld도 없다고 보고 스킵
+  # firewall-cmd가 없으면 firewalld도 없다고 보고 스킵합니다.
   if ! command -v firewall-cmd >/dev/null 2>&1; then
     return 0
   fi
@@ -96,22 +96,43 @@ ensure_firewalld() {
     return 0
   fi
 
+  # inactive(dead), failed 상태이면 firewalld를 시작합니다.
   if ! systemctl is-active --quiet firewalld 2>/dev/null; then
     echo "[INFO] firewalld 서비스가 비활성화되어 있어 시작합니다."
+
     if systemctl start firewalld 2>/dev/null; then
-      echo "[INFO] firewalld 시작 완료"
+      if systemctl is-active --quiet firewalld 2>/dev/null; then
+        echo "[INFO] firewalld 시작 완료"
+      else
+        echo "[WARN] firewalld start 명령은 성공했지만 active 상태가 아닙니다. 계속 진행합니다."
+        return 0
+      fi
     else
       echo "[WARN] firewalld 시작 실패 또는 서비스 없음. 계속 진행합니다."
       return 0
     fi
   fi
 
+  # 부팅 시 자동 시작 설정입니다.
   if ! systemctl is-enabled --quiet firewalld 2>/dev/null; then
     if systemctl enable firewalld >/dev/null 2>&1; then
       echo "[INFO] firewalld enable 완료"
     else
       echo "[WARN] firewalld enable 실패. 계속 진행합니다."
     fi
+  fi
+
+  # 혹시 모를 상태 반영 문제를 방지하기 위해 마지막에 재시작합니다.
+  echo "[INFO] firewalld 서비스를 재시작합니다."
+
+  if systemctl restart firewalld 2>/dev/null; then
+    if systemctl is-active --quiet firewalld 2>/dev/null; then
+      echo "[INFO] firewalld 재시작 완료"
+    else
+      echo "[WARN] firewalld restart 명령은 성공했지만 active 상태가 아닙니다. 계속 진행합니다."
+    fi
+  else
+    echo "[WARN] firewalld 재시작 실패. 계속 진행합니다."
   fi
 }
 
