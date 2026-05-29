@@ -813,7 +813,7 @@ function showDivisionVMConfigFinish() {
 function setDiskInfo(){
   var cmd = ["python3",pluginpath + "/python/disk/disk_action.py","list"];
 
-  // rp = raid passthrough, lp = lun passthrough
+  // rp = raid passthrough, lp = lun passthrough, dp = disk passthrough
   disk_setup_type = $('input[name="form-radio-storage-vm-disk-type"]:checked').val()
 
   createLoggerInfo("setDiskInfo() start");
@@ -981,7 +981,7 @@ function setReviewInfo(){
     $('#span-storage-vm-memory').text(memory_txt);
   }
 
-  //디스크 구성 ( rp = RAID Passthrough, lp = LUN Passthrough )
+  //디스크 구성 ( rp = RAID Passthrough, lp = LUN Passthrough, dp = Disk Passthrough )
   var svdt = $('input[type=radio][name=form-radio-storage-vm-disk-type]:checked').val();
   if(svdt == 'rp') {
     xml_create_cmd.push("-dt","raid_passthrough");
@@ -989,6 +989,9 @@ function setReviewInfo(){
   } else if(svdt == 'lp') {
     xml_create_cmd.push("-dt","lun_passthrough");
     xml_create_cmd.push("-lpl");
+  } else if(svdt == 'dp') {
+    xml_create_cmd.push("-dt","disk_passthrough");
+    xml_create_cmd.push("-dpl");
   }
 
   $('#span-storage-vm-data-disk').empty();
@@ -999,6 +1002,8 @@ function setReviewInfo(){
         el += "RAID Passthrough : " + $('label[for="'+this.id+'"]').text()+"</br>";
       } else if(svdt == 'lp') {
         el += "LUN Passthrough : " + $('label[for="'+this.id+'"]').text()+"</br>";
+      } else if(svdt == 'dp') {
+        el += "Disk Passthrough : " + $('label[for="'+this.id+'"]').text()+"</br>";
       }
       $('#span-storage-vm-data-disk').append(el);
       xml_create_cmd.push(this.value);
