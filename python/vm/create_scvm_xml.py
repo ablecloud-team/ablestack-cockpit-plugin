@@ -35,14 +35,17 @@ def createArgumentParser():
     parser.add_argument('-c', '--cpu', metavar='[cpu cores]', type=int, help='input Value to cpu cores', required=True)
     parser.add_argument('-m', '--memory', metavar='[memory gb]', type=int, help='input Value to memory GB', required=True)
 
-    #--disk-type { raid_passthrough or lun_passthrough }            | 1택, 선택, 필수
-    parser.add_argument('-dt', '--disk-type', metavar='[raid_passthrough or lun_passthrough]', choices=['raid_passthrough', 'lun_passthrough'], type=str, help='storage center VM disk type choice', required=True)
+    #--disk-type { raid_passthrough or lun_passthrough or disk_passthrough }            | 1택, 선택, 필수
+    parser.add_argument('-dt', '--disk-type', metavar='[raid_passthrough or lun_passthrough or disk_passthrough]', choices=['raid_passthrough', 'lun_passthrough', 'disk_passthrough'], type=str, help='storage center VM disk type choice', required=True)
 
     #--raid-passthrough-list raid1 raid2                                    | 다중선택, 조건부 필수 (disk-type가 raid_passthrough 일 경우)
     parser.add_argument('-rpl', '--raid-passthrough-list', metavar='[raid pci]', type=str, nargs='+', help='input Value to raid pic list')
 
     #--lun-passthrough-list disk1 disk2                                 | 다중선택, 조건부 필수 (disk-type가 lun_passthrough 일 경우)
     parser.add_argument('-lpl', '--lun-passthrough-list', metavar='[lum]', type=str, nargs='+', help='input Value to LUN list')
+
+    # --disk-passthrough-list disk1 disk2                                 | 다중선택, 조건부 필수 (disk-type가 disk_passthrough 일 경우)
+    parser.add_argument('-dpl', '--disk-passthrough-list', metavar='[disk]', type=str, nargs='+', help='input Value to disk list')
 
     #--management-network-bridge br0                                        | 1택, 필수
     parser.add_argument('-mnb', '--management-network-bridge', metavar='[bridge name]', type=str, help='input Value to bridge name of the management network', required=True)
@@ -163,6 +166,19 @@ def createScvmXml(args):
                             num += 1
 
                         line = line.replace('<!--lun_passthrough-->', lpl_txt)
+                    elif 'disk_passthrough' == args.disk_type:
+                        dpl_txt = ""
+                        num = 0
+                        for disk in args.disk_passthrough_list:
+                            dpl_txt += "    <disk type='block' device='disk'>\n"
+                            dpl_txt += "      <driver name='qemu' type='raw'/>\n"
+                            dpl_txt += "      <source dev='" + disk + "'/>\n"
+                            dpl_txt += "      <target dev='sd"+ alphabet[num] +"' bus='scsi'/>\n"
+                            dpl_txt += "      <alias name='scsi0-0-0-"+ str(num) +"'/>\n"
+                            dpl_txt += "      <address type='drive' controller='0' bus='0' target='0' unit='"+ str(num) +"'/>\n"
+                            dpl_txt += "    </disk>\n"
+                            num += 1
+                        line = line.replace('<!--lun_passthrough-->', dpl_txt)
                     else:
                         # <!--lun_passthrough--> 주석제거
                         line = ''
