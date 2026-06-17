@@ -4974,6 +4974,15 @@ $(document).on('click', '#button-cloud-vm-snap-rollback', function () {
 
 /** ABLESTACK Version 업데이트 제어 관련 action start */
 let systemUpdateInfo = null;
+const SYSTEM_UPDATE_COPY_PATH = "/opt/ABLESTACK_UPDATE";
+const SYSTEM_UPDATE_TYPE_LABELS = {
+  all: "전체 업데이트",
+  mold: "Mold 업데이트"
+};
+const SYSTEM_UPDATE_SCRIPT_NAMES = {
+  all: "update_all.sh",
+  mold: "update_mold.sh"
+};
 
 function isAblestackTrue(value) {
   return value === true || value === "true";
@@ -5028,6 +5037,22 @@ function setSystemUpdateButtonEnabled(enabled, title) {
   $button.attr('title', enabled ? "ABLESTACK Version 업데이트" : title);
 }
 
+function getSelectedSystemUpdateType() {
+  const updateType = $('input[name="radio-system-update-type"]:checked').val();
+  if (SYSTEM_UPDATE_TYPE_LABELS[updateType]) {
+    return updateType;
+  }
+  return "all";
+}
+
+function getSystemUpdateTypeLabel(updateType) {
+  return SYSTEM_UPDATE_TYPE_LABELS[updateType] || SYSTEM_UPDATE_TYPE_LABELS.all;
+}
+
+function getSystemUpdateScriptName(updateType) {
+  return SYSTEM_UPDATE_SCRIPT_NAMES[updateType] || SYSTEM_UPDATE_SCRIPT_NAMES.all;
+}
+
 function isSystemUpdateEnabled(config, osType) {
   const rule = getSystemUpdateRule(osType);
   if (!rule) {
@@ -5063,6 +5088,7 @@ function refreshSystemUpdateButton() {
 function resetSystemUpdateModal() {
   systemUpdateInfo = null;
   $('#input-system-update-mount-path').val('');
+  $('#radio-system-update-type-all').prop('checked', true);
   $('#system-update-mount-helper').text('').removeAttr('style');
   clearSystemUpdateLoadedInfo();
 }
@@ -5085,7 +5111,12 @@ function setSystemUpdateHelper(message, isError) {
 }
 
 function updateSystemUpdateInfo(info) {
-  systemUpdateInfo = info;
+  const updateType = info.update_type || getSelectedSystemUpdateType();
+  systemUpdateInfo = Object.assign({}, info, {
+    update_type: updateType,
+    update_label: info.update_label || getSystemUpdateTypeLabel(updateType),
+    copy_path: info.copy_path || SYSTEM_UPDATE_COPY_PATH
+  });
   $('#input-system-update-mount-path').val(info.mount_path);
   $('#system-update-current-ablestack-version').text(info.current_ablestack_version || 'N/A');
   $('#system-update-target-ablestack-version').text(info.target_ablestack_version || 'N/A');
@@ -5157,10 +5188,11 @@ function parseSystemUpdateKeyValues(data) {
   return values;
 }
 
-function loadSystemUpdateInfoFallback(mountPath) {
+function loadSystemUpdateInfoFallback(mountPath, updateType) {
   const normalizedMountPath = normalizeSystemUpdatePath(mountPath);
   const ksPath = joinSystemUpdatePath(normalizedMountPath, "ks/ablestack-ks.cfg");
-  const updateScriptPath = joinSystemUpdatePath(normalizedMountPath, "update.sh");
+  const scriptName = getSystemUpdateScriptName(updateType);
+  const updateScriptPath = joinSystemUpdatePath(normalizedMountPath, scriptName);
 
   return Promise.all([
     cockpit.spawn(["test", "-d", normalizedMountPath], { superuser: true }),
@@ -5178,23 +5210,67 @@ function loadSystemUpdateInfoFallback(mountPath) {
 
     return {
       mount_path: normalizedMountPath,
+      copy_path: SYSTEM_UPDATE_COPY_PATH,
       current_ablestack_version: currentInfo.PRETTY_NAME || "N/A",
       target_ablestack_version: targetAblestackVersion,
-      update_script: updateScriptPath
+      update_type: updateType,
+      update_label: getSystemUpdateTypeLabel(updateType),
+      update_script: updateScriptPath,
+      work_update_script: joinSystemUpdatePath(SYSTEM_UPDATE_COPY_PATH, scriptName)
     };
   });
 }
 
-function runSystemUpdateFallback(mountPath) {
+function runSystemUpdateFallback(mountPath, updateType) {
   const normalizedMountPath = normalizeSystemUpdatePath(mountPath);
+  const scriptName = getSystemUpdateScriptName(updateType);
   return cockpit.spawn(
-    ["/bin/bash", "-c", "cd \"$1\" && exec /bin/bash ./update.sh", "ablestack-update", normalizedMountPath],
+    [
+      "/bin/bash",
+      "-c",
+      [
+        "set -e",
+        "src=\"$1\"",
+        "dest=\"$2\"",
+        "script=\"$3\"",
+        "update_type=\"$4\"",
+        "case \"$script\" in update_all.sh|update_mold.sh) ;; *) echo \"지원하지 않는 업데이트 스크립트입니다.\" >&2; exit 1 ;; esac",
+        "case \"$update_type\" in all|mold) ;; *) echo \"지원하지 않는 업데이트 방식입니다.\" >&2; exit 1 ;; esac",
+        "[ -d \"$src\" ] || { echo \"입력한 ISO 마운트 경로가 존재하지 않습니다.\" >&2; exit 1; }",
+        "[ -f \"$src/$script\" ] || { echo \"$script 파일을 찾을 수 없습니다.\" >&2; exit 1; }",
+        "src_real=$(readlink -f \"$src\")",
+        "dest_real=$(readlink -m \"$dest\")",
+        "[ \"$src_real\" != \"$dest_real\" ] || { echo \"ISO 마운트 경로와 복사 대상 경로를 분리해야 합니다.\" >&2; exit 1; }",
+        "case \"$dest_real/\" in \"$src_real\"/*) echo \"ISO 마운트 경로와 복사 대상 경로를 분리해야 합니다.\" >&2; exit 1 ;; esac",
+        "case \"$src_real/\" in \"$dest_real\"/*) echo \"ISO 마운트 경로와 복사 대상 경로를 분리해야 합니다.\" >&2; exit 1 ;; esac",
+        "[ ! -L \"$dest\" ] || { echo \"$dest 경로가 심볼릭 링크입니다.\" >&2; exit 1; }",
+        "rm -rf \"$dest\"",
+        "mkdir -p \"$dest\"",
+        "cp -rRp \"$src\"/. \"$dest\"/ || cp -Rp \"$src\"/. \"$dest\"/",
+        "cd \"$dest\"",
+        "export ABLESTACK_UPDATE_MOUNT_PATH=\"$src_real\"",
+        "export ABLESTACK_UPDATE_WORK_PATH=\"$dest_real\"",
+        "export ABLESTACK_UPDATE_COPY_PATH=\"$dest_real\"",
+        "export ABLESTACK_UPDATE_TYPE=\"$update_type\"",
+        "exec /bin/bash \"./$script\""
+      ].join("\n"),
+      "ablestack-update",
+      normalizedMountPath,
+      SYSTEM_UPDATE_COPY_PATH,
+      scriptName,
+      updateType
+    ],
     { superuser: true }
   ).then(function (data) {
     return {
       code: 200,
       val: {
-        message: "ABLESTACK Version 업데이트 실행이 완료되었습니다.",
+        message: "ABLESTACK " + getSystemUpdateTypeLabel(updateType) + " 실행이 완료되었습니다.",
+        mount_path: normalizedMountPath,
+        copy_path: SYSTEM_UPDATE_COPY_PATH,
+        update_type: updateType,
+        update_label: getSystemUpdateTypeLabel(updateType),
+        update_script: joinSystemUpdatePath(SYSTEM_UPDATE_COPY_PATH, scriptName),
         stdout: String(data || ""),
         stderr: ""
       }
@@ -5204,6 +5280,7 @@ function runSystemUpdateFallback(mountPath) {
 
 function loadSystemUpdateInfo() {
   const mountPath = $.trim($('#input-system-update-mount-path').val());
+  const updateType = getSelectedSystemUpdateType();
   if (mountPath == "") {
     setSystemUpdateHelper("ISO 마운트 경로를 입력해 주세요.", true);
     $('#button-open-modal-system-update-confirm').prop('disabled', true).attr('aria-disabled', 'true');
@@ -5214,7 +5291,7 @@ function loadSystemUpdateInfo() {
   $('#button-system-update-load-info').prop('disabled', true).attr('aria-disabled', 'true');
   $('#button-open-modal-system-update-confirm').prop('disabled', true).attr('aria-disabled', 'true');
 
-  cockpit.spawn(["python3", pluginpath + "/python/host/ablestack_update.py", "info", "--mount-path", mountPath], { superuser: true })
+  cockpit.spawn(["python3", pluginpath + "/python/host/ablestack_update.py", "info", "--mount-path", mountPath, "--update-type", updateType], { superuser: true })
     .then(function (data) {
       const retVal = JSON.parse(data);
       if (retVal.code == 200) {
@@ -5227,7 +5304,7 @@ function loadSystemUpdateInfo() {
     })
     .catch(function (err) {
       if (isSystemUpdateHelperMissing(err)) {
-        return loadSystemUpdateInfoFallback(mountPath)
+        return loadSystemUpdateInfoFallback(mountPath, updateType)
           .then(function (info) {
             updateSystemUpdateInfo(info);
             setSystemUpdateHelper("업데이트 ISO 정보를 확인했습니다.", false);
@@ -5260,6 +5337,7 @@ function closeSystemUpdateConfirmModal() {
 
 function resetSystemUpdateConfirmModal() {
   $('#modal-input-system-update-warning-check').prop('checked', false);
+  $('#system-update-confirm-type').text('N/A');
   $('#button-execution-modal-system-update').prop('disabled', true).attr('aria-disabled', 'true');
 }
 
@@ -5283,6 +5361,11 @@ $(document).on('input', '#input-system-update-mount-path', function () {
   $('#system-update-mount-helper').text('').removeAttr('style');
 });
 
+$(document).on('change', 'input[name="radio-system-update-type"]', function () {
+  clearSystemUpdateLoadedInfo();
+  $('#system-update-mount-helper').text('').removeAttr('style');
+});
+
 $(document).on('keydown', '#input-system-update-mount-path', function (e) {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -5301,6 +5384,7 @@ $(document).on('click', '#button-open-modal-system-update-confirm', function () 
     return;
   }
   resetSystemUpdateConfirmModal();
+  $('#system-update-confirm-type').text(systemUpdateInfo.update_label || getSystemUpdateTypeLabel(systemUpdateInfo.update_type));
   $('#div-modal-system-update-confirm').show();
 });
 
@@ -5324,17 +5408,20 @@ $(document).on('click', '#button-execution-modal-system-update', function () {
     return;
   }
 
+  const updateType = systemUpdateInfo.update_type || getSelectedSystemUpdateType();
+  const updateLabel = systemUpdateInfo.update_label || getSystemUpdateTypeLabel(updateType);
   closeSystemUpdateConfirmModal();
   closeSystemUpdateModal();
   $('#div-modal-spinner-header-txt').text('ABLESTACK Version 업데이트');
-  $('#div-modal-spinner-body-txt').text('ABLESTACK Version 업데이트를 실행 중입니다.');
+  $('#div-modal-spinner-body-txt').text('ABLESTACK ' + updateLabel + '를 실행 중입니다.');
   $('#div-modal-spinner').show();
 
   function showSystemUpdateResult(retVal) {
     $('#div-modal-spinner').hide();
     $("#modal-status-alert-title").html("ABLESTACK Version 업데이트");
     if (retVal.code == 200) {
-      $("#modal-status-alert-body").html("ABLESTACK Version 업데이트 실행이 완료되었습니다.<br/>업데이트 후 시스템 재부팅이 필요합니다.");
+      const resultLabel = retVal.val && retVal.val.update_label ? retVal.val.update_label : updateLabel;
+      $("#modal-status-alert-body").html("ABLESTACK " + resultLabel + " 실행이 완료되었습니다.<br/>업데이트 후 시스템 재부팅이 필요합니다.");
     } else {
       $("#modal-status-alert-body").text("ABLESTACK Version 업데이트 실행 중 오류가 발생했습니다 " + retVal.val);
     }
@@ -5348,14 +5435,14 @@ $(document).on('click', '#button-execution-modal-system-update', function () {
     $('#div-modal-status-alert').show();
   }
 
-  cockpit.spawn(["python3", pluginpath + "/python/host/ablestack_update.py", "run", "--mount-path", systemUpdateInfo.mount_path], { superuser: true })
+  cockpit.spawn(["python3", pluginpath + "/python/host/ablestack_update.py", "run", "--mount-path", systemUpdateInfo.mount_path, "--update-type", updateType], { superuser: true })
     .then(function (data) {
       const retVal = JSON.parse(data);
       showSystemUpdateResult(retVal);
     })
     .catch(function (err) {
       if (isSystemUpdateHelperMissing(err)) {
-        return runSystemUpdateFallback(systemUpdateInfo.mount_path)
+        return runSystemUpdateFallback(systemUpdateInfo.mount_path, updateType)
           .then(function (retVal) {
             showSystemUpdateResult(retVal);
           })
