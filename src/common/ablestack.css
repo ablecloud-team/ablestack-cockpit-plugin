@@ -41,6 +41,31 @@
   white-space: nowrap;
 }
 
+.ablestack-update-type-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 42rem;
+}
+
+.ablestack-update-type-option {
+  align-items: flex-start;
+  border: 1px solid var(--ablestack-update-table-border);
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  padding: 12px 14px;
+}
+
+.ablestack-update-type-option .pf-v6-c-radio__label,
+.ablestack-update-type-option .pf-v6-c-radio__description {
+  grid-column: 2;
+}
+
+.ablestack-update-type-option .pf-v6-c-radio__description {
+  margin-top: 4px;
+}
+
 .ablestack-update-version-panel {
   margin-left: 10.5rem;
   max-width: calc(100% - 10.5rem);
@@ -98,7 +123,15 @@
   margin: 0;
 }
 
+.ablestack-update-confirm-type {
+  margin-top: 8px;
+}
+
 @media (max-width: 768px) {
+  .ablestack-update-type-group {
+    grid-template-columns: 1fr;
+  }
+
   .ablestack-update-version-panel {
     margin-left: 0;
     max-width: 100%;

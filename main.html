@@ -77,7 +77,7 @@
                                             <ul class="pf-v6-c-menu ablestack-menu pf-m-align-right"
                                                 aria-labelledby="card-action-gfs-cluster-status"
                                                 id="dropdown-menu-gfs-cluster-status">
-                                                <li id="gfs-maintenance-update" style="display: none;"></li>
+                                                <!-- <li id="gfs-maintenance-update" style="display: none;"></li> -->
                                                 <li class="pf-v6-c-divider" role="separator"></li>
                                                 <li id="gfs-multipath-sync">
                                                     <button id="button-gfs-multipath-sync"
@@ -371,7 +371,7 @@
                                             <ul class="pf-v6-c-menu ablestack-menu pf-m-align-right"
                                                 aria-labelledby="card-action-gfs-integration-status"
                                                 id="dropdown-menu-gfs-integration-status">
-                                                <li id="gfs-integration-maintenance-update" style="display: none;"></li>
+                                                <!-- <li id="gfs-integration-maintenance-update" style="display: none;"></li> -->
                                                 <li class="pf-v6-c-divider" role="separator"></li>
                                                 <li>
                                                     <button class="pf-v6-c-menu__item pf-m-disabled" type="button"
@@ -2379,6 +2379,30 @@
                             <div id="system-update-mount-helper" class="pf-v6-c-form__helper-text" aria-live="polite"></div>
                         </div>
                     </div>
+                    <div class="pf-v6-c-form__group">
+                        <div class="pf-v6-c-form__group-label">
+                            <label class="pf-v6-c-form__label">
+                                <span class="pf-v6-c-form__label-text">업데이트 방식</span>
+                                <span class="pf-v6-c-form__label-required" aria-hidden="true">&#42;</span>
+                            </label>
+                        </div>
+                        <div class="pf-v6-c-form__group-control">
+                            <div class="ablestack-update-type-group" role="radiogroup" aria-label="업데이트 방식">
+                                <label class="pf-v6-c-radio ablestack-update-type-option" for="radio-system-update-type-all">
+                                    <input class="pf-v6-c-radio__input" type="radio" id="radio-system-update-type-all"
+                                        name="radio-system-update-type" value="all" checked />
+                                    <span class="pf-v6-c-radio__label">전체 업데이트</span>
+                                    <span class="pf-v6-c-radio__description">커널, Mold 등 전체 업데이트</span>
+                                </label>
+                                <label class="pf-v6-c-radio ablestack-update-type-option" for="radio-system-update-type-mold">
+                                    <input class="pf-v6-c-radio__input" type="radio" id="radio-system-update-type-mold"
+                                        name="radio-system-update-type" value="mold" />
+                                    <span class="pf-v6-c-radio__label">Mold 업데이트</span>
+                                    <span class="pf-v6-c-radio__description">Mold만 업데이트</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="pf-v6-c-modal-box__body">
@@ -2426,6 +2450,7 @@
             </header>
             <div class="pf-v6-c-modal-box__body">
                 <p>ABLESTACK Version 업데이트를 실행하시겠습니까?</p>
+                <p class="ablestack-update-confirm-type">선택한 업데이트: <strong id="system-update-confirm-type">N/A</strong></p>
             </div>
             <div class="pf-v6-c-modal-box__body">
                 <div class="pf-v6-c-alert pf-m-warning" aria-label="Update confirm warning">
