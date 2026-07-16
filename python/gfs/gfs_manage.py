@@ -645,14 +645,14 @@ def check_stonith(control):
         elif control == "disable":
             hosts = run_command("pcs stonith status | awk '{print $2}'").split()
             for host in hosts:
-                run_command(f"pcs stonith disable {host}")
+                run_command(f"pcs stonith disable {host} --force")
             ret = createReturn(code=200, val="Stonith Disable Pcs Cluster Success")
             return print(json.dumps(json.loads(ret), indent=4))
 
         elif control == "security-disable":
             hosts = run_command("pcs stonith status | awk '{print $2}'").split()
             for host in hosts:
-                run_command(f"pcs stonith disable {host}")
+                run_command(f"pcs stonith disable {host} --force")
             run_command("pcs property set maintenance-mode=true")
             ret = createReturn(code=200, val="Stonith Security Pcs Cluster Success")
             return print(json.dumps(json.loads(ret), indent=4))
