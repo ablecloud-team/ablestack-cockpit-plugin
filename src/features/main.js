@@ -4980,8 +4980,8 @@ const SYSTEM_UPDATE_TYPE_LABELS = {
   mold: "Mold 업데이트"
 };
 const SYSTEM_UPDATE_SCRIPT_NAMES = {
-  all: "update_all.sh",
-  mold: "update_mold.sh"
+  all: "update-all.sh",
+  mold: "update-mold.sh"
 };
 
 function isAblestackTrue(value) {
@@ -5234,7 +5234,7 @@ function runSystemUpdateFallback(mountPath, updateType) {
         "dest=\"$2\"",
         "script=\"$3\"",
         "update_type=\"$4\"",
-        "case \"$script\" in update_all.sh|update_mold.sh) ;; *) echo \"지원하지 않는 업데이트 스크립트입니다.\" >&2; exit 1 ;; esac",
+        "case \"$script\" in update-all.sh|update-mold.sh) ;; *) echo \"지원하지 않는 업데이트 스크립트입니다.\" >&2; exit 1 ;; esac",
         "case \"$update_type\" in all|mold) ;; *) echo \"지원하지 않는 업데이트 방식입니다.\" >&2; exit 1 ;; esac",
         "[ -d \"$src\" ] || { echo \"입력한 ISO 마운트 경로가 존재하지 않습니다.\" >&2; exit 1; }",
         "[ -f \"$src/$script\" ] || { echo \"$script 파일을 찾을 수 없습니다.\" >&2; exit 1; }",

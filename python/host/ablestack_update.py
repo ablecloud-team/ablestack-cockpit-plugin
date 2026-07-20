@@ -25,11 +25,11 @@ UPDATE_WORK_DIR = Path("/opt/ABLESTACK_UPDATE")
 UPDATE_SCRIPT_MAP = {
     "all": {
         "label": "전체 업데이트",
-        "script": Path("update_all.sh"),
+        "script": Path("update-all.sh"),
     },
     "mold": {
         "label": "Mold 업데이트",
-        "script": Path("update_mold.sh"),
+        "script": Path("update-mold.sh"),
     },
 }
 
