@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-cluster.json을 읽어 ccvm / ablecube / scvm 대상에 SSH로 접속하여
-/usr/local/sbin/security_patch.sh [-P <PORT>] -C <true|false> 를 수행합니다.
+cluster.json을 읽어 ccvm / ablecube / scvm 대상에 보안 패치를 적용합니다.
+ablecube는 Cockpit 플러그인에 포함된 최신 스크립트를 사용하고,
+scvm/ccvm은 cloud-init으로 배포된 /usr/local/sbin 스크립트를 사용합니다.
 
 - 입력 파라미터는 argparse로 받되, 모든 진행 로그는 표준출력에 찍지 않습니다.
 - 마지막에만 createReturn(...)을 통해 JSON으로 결과를 반환합니다.
@@ -35,6 +36,10 @@ MAX_RETRIES = 3
 RETRY_DELAY_SEC = 2.0
 SUCCESS_PATTERN = "Permissions have been updated."
 DEFAULT_JSON = "/usr/share/cockpit/ablestack/tools/properties/cluster.json"
+ABLECUBE_SECURITY_PATCH = (
+    "/usr/share/cockpit/ablestack/shell/host/security_patch.sh"
+)
+VM_SECURITY_PATCH = "/usr/local/sbin/security_patch.sh"
 
 # ===================[ 공용 유틸(더미) ]================== #
 # 실제 환경의 createReturn을 임포트하여 사용하세요.
@@ -100,6 +105,15 @@ def gather_targets(conf: Dict, kinds: List[str]) -> List[str]:
             out.add(ip)
 
     return sorted(out, key=ip_address)
+
+def gather_ablecube_targets(conf: Dict) -> Set[str]:
+    """clusterConfig.hosts[].ablecube 대상 주소를 반환합니다."""
+    hosts = (conf.get("clusterConfig") or {}).get("hosts") or []
+    return {
+        str(host.get("ablecube") or "").strip()
+        for host in hosts
+        if str(host.get("ablecube") or "").strip()
+    }
 
 def extract_cluster_type(conf: Dict) -> str:
     """clusterConfig.type 값을 소문자로 정규화하여 반환합니다(없으면 빈 문자열)."""
@@ -218,7 +232,8 @@ def build_remote_cmd(
     is_local: bool,
     new_port: Optional[int],
     cluster_type: str,
-    port_change: bool = False
+    port_change: bool = False,
+    script_path: str = VM_SECURITY_PATCH,
 ) -> str:
     """
     security_patch.sh 호출 문자열을 생성합니다.
@@ -226,7 +241,7 @@ def build_remote_cmd(
     - new_port가 None이면 -P 없이 실행합니다.
     - port_change=True이면 마지막에 '--port-change'를 추가합니다.
     """
-    base = "/usr/local/sbin/security_patch.sh"
+    base = script_path
 
     if new_port is None:
         cmd = f"{base}"
@@ -245,7 +260,8 @@ def run_remote(
     new_port: Optional[int],
     dry_run: bool,
     cluster_type: str,
-    port_change: bool
+    port_change: bool,
+    script_path: str = VM_SECURITY_PATCH,
 ) -> Dict:
     """
     원격에서 security_patch.sh를 수행하고 결과를 사전으로 반환합니다.
@@ -261,7 +277,8 @@ def run_remote(
         is_local=is_local,
         new_port=new_port,
         cluster_type=cluster_type,
-        port_change=port_change
+        port_change=port_change,
+        script_path=script_path,
     )
 
     ssh_cmd = [
@@ -287,7 +304,7 @@ def run_remote(
             "retriesPlanned": MAX_RETRIES,
             "retryDelaySec": RETRY_DELAY_SEC,
             "successPattern": SUCCESS_PATTERN,
-
+            "scriptPath": script_path,
             "clusterType": cluster_type
         }
 
@@ -339,7 +356,7 @@ def run_remote(
         "attempts": attempts,
         "successAttempt": success_attempt,
         "successPattern": SUCCESS_PATTERN,
-
+        "scriptPath": script_path,
         "clusterType": cluster_type
     }
 
@@ -348,17 +365,18 @@ def run_local_patch(
     dry_run: bool,
     cluster_type: str,
     port_change: bool,
-    ceph_ssh_change: bool = False
+    ceph_ssh_change: bool = False,
+    script_path: str = ABLECUBE_SECURITY_PATCH,
 ) -> Dict:
     """
     로컬 호스트에서 security_patch.sh를 수행합니다.
-    - SSH 사용 없이 직접 /usr/local/sbin/security_patch.sh 를 호출합니다.
+    - SSH 사용 없이 지정된 ablecube 스크립트를 직접 호출합니다.
     - stdout에 SUCCESS_PATTERN이 나타날 때까지 최대 MAX_RETRIES회 재시도합니다.
     - dry_run=True이면 실제 실행 없이 명령어만 반환합니다.
     - ceph_ssh_change=True 이면 명령에 '--ceph-ssh-change' 를 추가합니다.
     """
 
-    cmd: List[str] = ["/usr/local/sbin/security_patch.sh"]
+    cmd: List[str] = [script_path]
     if new_port is not None:
         cmd.extend(["-P", str(new_port)])
     if port_change:
@@ -379,6 +397,7 @@ def run_local_patch(
             "retriesPlanned": MAX_RETRIES,
             "retryDelaySec": RETRY_DELAY_SEC,
             "successPattern": SUCCESS_PATTERN,
+            "scriptPath": script_path,
             "clusterType": cluster_type
         }
 
@@ -430,6 +449,7 @@ def run_local_patch(
         "attempts": attempts,
         "successAttempt": success_attempt,
         "successPattern": SUCCESS_PATTERN,
+        "scriptPath": script_path,
         "clusterType": cluster_type
     }
 
@@ -474,7 +494,8 @@ def main():
                 dry_run=args.dry_run,
                 cluster_type=cluster_type,
                 port_change=args.port_change,
-                ceph_ssh_change=True
+                ceph_ssh_change=True,
+                script_path=ABLECUBE_SECURITY_PATCH,
             )
             # 보기 좋게 ip / isLocal 정리
             result["ip"] = "127.0.0.1"
@@ -511,7 +532,8 @@ def main():
                 new_port=args.new_port,
                 dry_run=args.dry_run,
                 cluster_type=cluster_type,
-                port_change=args.port_change
+                port_change=args.port_change,
+                script_path=ABLECUBE_SECURITY_PATCH,
             )
             results.append(local_result)
             success = 1 if local_result.get("ok") else 0
@@ -526,7 +548,8 @@ def main():
                     new_port=args.new_port,
                     dry_run=args.dry_run,
                     cluster_type=cluster_type,
-                    port_change=args.port_change
+                    port_change=args.port_change,
+                    script_path=VM_SECURITY_PATCH,
                 )
                 results.append(scvm_result)
                 if scvm_result.get("ok"):
@@ -573,17 +596,24 @@ def main():
 
         # 로컬 IP 목록(자기 자신) 미리 수집
         local_ips = get_local_ipv4s()
+        ablecube_targets = gather_ablecube_targets(conf)
 
         results: List[Dict] = []
         success = 0
         for ip in targets:
+            script_path = (
+                ABLECUBE_SECURITY_PATCH
+                if ip in ablecube_targets
+                else VM_SECURITY_PATCH
+            )
             # 1) 타깃 IP가 로컬이면 ssh 없이 직접 실행
             if ip in local_ips:
                 r = run_local_patch(
                     new_port=args.new_port,
                     dry_run=args.dry_run,
                     cluster_type=cluster_type,
-                    port_change=args.port_change
+                    port_change=args.port_change,
+                    script_path=script_path,
                 )
                 r["ip"] = ip
                 r["isLocal"] = True
@@ -596,7 +626,8 @@ def main():
                     new_port=args.new_port,
                     dry_run=args.dry_run,
                     cluster_type=cluster_type,
-                    port_change=args.port_change
+                    port_change=args.port_change,
+                    script_path=script_path,
                 )
 
             results.append(r)

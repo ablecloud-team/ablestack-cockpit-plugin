@@ -544,14 +544,25 @@ function deployHciSharedFileStorage() {
                                           var create_hci_shared_file_result = JSON.parse(data);
                                           console.log(create_hci_shared_file_result);
                                           if (create_hci_shared_file_result.code == "200"){
-                                            var hci_shared_file_boostrap_cmd = ['python3', pluginpath + '/python/ablestack_json/ablestackJson.py','update', '--depth1', 'bootstrap', '--depth2', 'gfs_configure', '--value', 'true']
+                                            var hci_shared_file_boostrap_cmd = ['python3', pluginpath + '/python/ablestack_json/ablestackJson.py','update', '--depth1', 'bootstrap', '--depth2', 'gfs_configure', '--value', 'true', '--all-hosts']
                                             console.log(hci_shared_file_boostrap_cmd);
                                             cockpit.spawn(hci_shared_file_boostrap_cmd)
-                                            .then(function(){
-                                              createLoggerInfo("deployHciSharedFileStorage success");
-                                              setHciSharedFileProgressStep("span-hci-shared-file-progress-step3",2);
-                                              //최종 화면 호출
-                                              showDivisionHciSharedFileConfigFinish();
+                                            .then(function(data){
+                                              var hci_shared_file_bootstrap_result = JSON.parse(data);
+                                              if (hci_shared_file_bootstrap_result.code == "200"){
+                                                createLoggerInfo("deployHciSharedFileStorage success");
+                                                setHciSharedFileProgressStep("span-hci-shared-file-progress-step3",2);
+                                                //최종 화면 호출
+                                                showDivisionHciSharedFileConfigFinish();
+                                              }else{
+                                                seHciSharedFileProgressFail(3);
+                                                createLoggerInfo("HCI Shared File configuration succeeded, but gfs_configure synchronization failed");
+                                                alert("HCI 공유 파일 구성은 완료되었으나 일부 호스트의 구성 상태 동기화에 실패했습니다.");
+                                              }
+                                            }).catch(function(data){
+                                              seHciSharedFileProgressFail(3);
+                                              createLoggerInfo("HCI Shared File configuration succeeded, but gfs_configure synchronization command failed");
+                                              alert("HCI 공유 파일 구성은 완료되었으나 구성 상태 동기화 명령 실행에 실패했습니다 : "+data);
                                             })
                                           }else{
                                             seHciSharedFileProgressFail(3);

@@ -618,6 +618,9 @@ function resetSmtpValues() {
 function showDivisionWallConfigFinish() {
   resetWallMonitoringWizard();
 
+  sessionStorage.setItem("wall_monitoring_status", "true");
+  $('#button-cloud-cluster-ssh-port').removeClass('pf-m-disabled');
+
   $('#div-modal-wizard-wall-monitoring-finish').show();
 
   $('#nav-button-wall-monitoring-finish').addClass('pf-m-current');
