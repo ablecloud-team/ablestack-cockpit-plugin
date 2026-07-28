@@ -574,6 +574,9 @@ function secondarySizeExpansionCheck(){
 /** 설정파일 다운로드 modal 관련 action start */
 $('#button-config-file-download').on('click', function(){
   $('#div-modal-config-file-download').show();
+  if (typeof window.refreshSecurityEvidenceDownloadLink === 'function') {
+    window.refreshSecurityEvidenceDownloadLink();
+  }
 
   cockpit.file("/root/.ssh/id_rsa").read()
   .then((content, tag) => {

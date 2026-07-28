@@ -1,0 +1,1124 @@
+{
+  "catalogVersion": "1.2",
+  "source": "2026 주요정보통신기반시설 기술적 취약점 분석·평가 방법 상세가이드 - Unix 서버 중 Linux 기준",
+  "checks": [
+    {
+      "code": "U-01",
+      "title": "root 계정 원격 접속 제한",
+      "importance": "상",
+      "guideStatus": "예외처리",
+      "guideNote": "ABLESTACK은 공개키 기반 클러스터 내부 통신을 위해 PermitRootLogin prohibit-password가 필요합니다.",
+      "commands": [
+        {
+          "label": "SSH 설정 원문",
+          "command": "grep -RniE '^[[:space:]]*PermitRootLogin[[:space:]]+' /etc/ssh/sshd_config /etc/ssh/sshd_config.d 2>/dev/null || true"
+        },
+        {
+          "label": "Telnet root 터미널 설정",
+          "command": "systemctl list-unit-files --type=service 2>/dev/null | grep -Ei 'telnet' || true; if [ -e /etc/securetty ]; then grep -nE '^(pts|ttyp)' /etc/securetty || true; else echo 'NOT_FOUND /etc/securetty'; fi"
+        }
+      ],
+      "checkContent": "시스템 정책에 root 계정의 원격터미널 접속 차단 설정이 적용 여부 점검",
+      "remediation": "원격 접속 시 root 계정으로 접속할 수 없도록 파일 내용 설정"
+    },
+    {
+      "code": "U-02",
+      "title": "비밀번호 관리정책 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "길이, 문자 조합, 이전 비밀번호, root 적용, 사용 기간을 확인합니다.",
+      "commands": [
+        {
+          "label": "비밀번호 복잡도",
+          "command": "grep -RniE '^[[:space:]]*(minlen|dcredit|ucredit|lcredit|ocredit|difok)[[:space:]]*=' /etc/security/pwquality.conf /etc/security/pwquality.conf.d 2>/dev/null || true"
+        },
+        {
+          "label": "PAM 비밀번호 정책",
+          "command": "grep -nE 'pam_(pwquality|pwhistory|unix).so' /etc/pam.d/system-auth /etc/pam.d/password-auth 2>/dev/null || true"
+        },
+        {
+          "label": "비밀번호 이력 정책",
+          "command": "grep -RniE '^[[:space:]]*remember[[:space:]]*=' /etc/security/pwhistory.conf /etc/security/pwhistory.conf.d 2>/dev/null || true"
+        },
+        {
+          "label": "비밀번호 사용 기간",
+          "command": "grep -E '^[[:space:]]*(PASS_MAX_DAYS|PASS_MIN_DAYS|PASS_MIN_LEN|PASS_WARN_AGE)[[:space:]]+' /etc/login.defs 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "비밀번호 관리 정책 설정 여부 점검",
+      "remediation": "root 계정을 포함한 사용자 계정의 비밀번호를 영문, 숫자, 특수문자를 포함하여 최소 8자리 이상 및 최소 사용 기간 1일, 최대 사용 기간 90일, 최근 비밀번호 기억 4회 이상으로 설정"
+    },
+    {
+      "code": "U-03",
+      "title": "계정 잠금 임계값 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "pam_faillock deny 값이 10회 이하인지 확인합니다.",
+      "commands": [
+        {
+          "label": "faillock 정책 파일",
+          "command": "grep -RniE '^[[:space:]]*(deny|unlock_time|fail_interval|even_deny_root|root_unlock_time)[[:space:]]*=' /etc/security/faillock.conf /etc/security/faillock.conf.d 2>/dev/null || true"
+        },
+        {
+          "label": "PAM faillock 적용",
+          "command": "grep -nE 'pam_faillock.so' /etc/pam.d/system-auth /etc/pam.d/password-auth 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "사용자 계정 로그인 실패 시 계정 잠금 임계값이 설정 여부 점검",
+      "remediation": "계정 잠금 임계값을 10회 이하로 설정"
+    },
+    {
+      "code": "U-04",
+      "title": "비밀번호 파일 보호",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "/etc/passwd의 두 번째 필드가 x로 보호되는지 확인합니다.",
+      "commands": [
+        {
+          "label": "passwd 암호 필드",
+          "command": "awk -F: '{print $1 \":\" $2}' /etc/passwd"
+        }
+      ],
+      "checkContent": "시스템의 사용자 계정(root, 일반 사용자) 정보가 저장된 파일(/etc/passwd, /etc/shadow 등)에 사용자 계정 비밀번호가 암호화 저장 여부 점검",
+      "remediation": "비밀번호 암호화 저장·관리 설정"
+    },
+    {
+      "code": "U-05",
+      "title": "root 이외의 UID가 0인 계정 금지",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "UID 0인 계정은 root만 존재해야 합니다.",
+      "commands": [
+        {
+          "label": "UID 0 계정",
+          "command": "awk -F: '$3 == 0 {print $0}' /etc/passwd"
+        }
+      ],
+      "checkContent": "사용자 계정 정보가 저장된 파일(/etc/passwd, /etc/shadow 등)에 root(UID=0) 계정과 동일한 UID를 가진 계정이 존재 여부 점검",
+      "remediation": "· UID가 0으로 설정된 계정을 0 이외의 중복되지 않은 UID로 변경 또는 불필요한 계정인 경우 제거하도록 설정 · (사용 중인 계정인 경우 명령어를 통한 조치가 적용되지 않을 수 있으므로 /etc/passwd 파일을 통해 변경)"
+    },
+    {
+      "code": "U-06",
+      "title": "사용자 계정 su 기능 제한",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "su 실행 그룹과 PAM wheel 제한을 확인합니다.",
+      "commands": [
+        {
+          "label": "wheel 그룹",
+          "command": "getent group wheel || true"
+        },
+        {
+          "label": "su 파일 권한",
+          "command": "stat -Lc '%A %a %U %G %n' /usr/bin/su"
+        },
+        {
+          "label": "PAM wheel 제한",
+          "command": "grep -nE '^[[:space:]]*auth[[:space:]].*pam_wheel.so' /etc/pam.d/su 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "su 명령어 사용을 허용하는 사용자를 지정한 그룹이 설정 여부 점검",
+      "remediation": "PAM 모듈 설정 또는 su 명령어 허용 그룹 생성 후 su 명령어 일반 사용자 권한 제거하도록 설정"
+    },
+    {
+      "code": "U-07",
+      "title": "불필요한 계정 제거",
+      "importance": "하",
+      "guideStatus": "양호",
+      "guideNote": "lp, uucp, nuucp 등 불필요한 기본 계정을 확인합니다.",
+      "commands": [
+        {
+          "label": "불필요 기본 계정",
+          "command": "egrep -w 'lp|uucp|nuucp' /etc/passwd || true"
+        }
+      ],
+      "checkContent": "시스템 계정 중 불필요한 계정(퇴직, 전직, 휴직 등의 이유로 사용하지 않는 계정 및 장기적으로 사용하지 않는 계정 등)이 존재 여부 점검",
+      "remediation": "시스템에 존재하는 계정 확인 후 불필요한 계정 제거하도록 설정"
+    },
+    {
+      "code": "U-08",
+      "title": "관리자 그룹에 최소한의 계정 포함",
+      "importance": "중",
+      "guideStatus": "양호",
+      "guideNote": "root와 wheel 그룹 구성원을 확인합니다.",
+      "commands": [
+        {
+          "label": "관리자 그룹 구성원",
+          "command": "getent group root; getent group wheel"
+        }
+      ],
+      "checkContent": "시스템 관리자 그룹에 최소한(root 계정과 시스템 관리에 허용된 계정)의 계정만 존재 여부 점검",
+      "remediation": "관리자 그룹에 등록된 계정 확인 후 불필요한 계정 제거하도록 설정"
+    },
+    {
+      "code": "U-09",
+      "title": "계정이 존재하지 않는 GID 금지",
+      "importance": "하",
+      "guideStatus": "예외처리",
+      "guideNote": "계정은 없지만 서비스 운영에 필요한 그룹이 존재할 수 있습니다.",
+      "commands": [
+        {
+          "label": "기본 그룹으로 사용되지 않는 그룹",
+          "command": "awk -F: 'NR==FNR {used[$4]=1; next} !($3 in used) {print $1 \":\" $3 \":members=\" $4}' /etc/passwd /etc/group"
+        }
+      ],
+      "checkContent": "그룹 설정 파일(/etc/group)에 불필요한 그룹이 존재 여부 점검",
+      "remediation": "불필요한 그룹이 존재하는 경우 관리자와 검토하여 제거하도록 설정 ※ /etc/group 파일과 /etc/passwd 파일을 비교하여 점검하기를 권고함"
+    },
+    {
+      "code": "U-10",
+      "title": "동일한 UID 금지",
+      "importance": "중",
+      "guideStatus": "양호",
+      "guideNote": "중복 UID 계정이 없어야 합니다.",
+      "commands": [
+        {
+          "label": "중복 UID",
+          "command": "awk -F: '{print $3, $1}' /etc/passwd | sort -n | awk 'seen[$1]++ {print}'"
+        }
+      ],
+      "checkContent": "/etc/passwd 파일 내 UID가 동일한 사용자 계정 존재 여부 점검",
+      "remediation": "동일한 UID를 가진 사용자 계정의 UID를 중복되지 않도록 변경하도록 설정"
+    },
+    {
+      "code": "U-11",
+      "title": "사용자 shell 점검",
+      "importance": "하",
+      "guideStatus": "양호",
+      "guideNote": "로그인이 불필요한 계정은 nologin 또는 false 쉘이어야 합니다.",
+      "commands": [
+        {
+          "label": "시스템 계정 쉘",
+          "command": "egrep '^(daemon|bin|sys|adm|listen|nobody|nfsnobody|noaccess|diag|operator|games|gopher):' /etc/passwd || true"
+        }
+      ],
+      "checkContent": "로그인이 불필요한 계정(adm, sys, daemon 등)에 쉘 부여 여부 점검",
+      "remediation": "로그인이 필요하지 않은 계정에 대해 /bin/false(/sbin/nologin) 쉘 부여 설정"
+    },
+    {
+      "code": "U-12",
+      "title": "세션 종료 시간 설정",
+      "importance": "하",
+      "guideStatus": "양호",
+      "guideNote": "TMOUT이 600초 이하인지 확인합니다.",
+      "commands": [
+        {
+          "label": "세션 타임아웃",
+          "command": "grep -RniE '^[[:space:]]*(export[[:space:]]+)?TMOUT=' /etc/profile /etc/profile.d 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "사용자 쉘에 대한 환경설정 파일에서 Session Timeout 설정 여부 점검",
+      "remediation": "600초(10분) 동안 입력이 없는 경우 접속된 Session을 끊도록 설정"
+    },
+    {
+      "code": "U-13",
+      "title": "안전한 비밀번호 암호화 알고리즘 사용",
+      "importance": "중",
+      "guideStatus": "양호",
+      "guideNote": "SHA-2 이상의 암호화 알고리즘을 확인합니다.",
+      "commands": [
+        {
+          "label": "비밀번호 암호화 방식",
+          "command": "grep -E '^[[:space:]]*ENCRYPT_METHOD[[:space:]]+' /etc/login.defs 2>/dev/null || true"
+        },
+        {
+          "label": "PAM 암호화 알고리즘",
+          "command": "grep -nE 'pam_unix.so.*(sha256|sha512|yescrypt)' /etc/pam.d/system-auth /etc/pam.d/password-auth /etc/pam.d/common-password 2>/dev/null || true"
+        },
+        {
+          "label": "저장된 비밀번호 알고리즘 식별자",
+          "command": "awk -F: '{h=$2; sub(/^[!*]+/, \"\", h); if (h ~ /^\\$/) {split(h,a,\"$\"); print $1 \": id=\" a[2]}}' /etc/shadow"
+        }
+      ],
+      "checkContent": "안전한 비밀번호 암호화 알고리즘을 사용 여부 점검",
+      "remediation": "SHA-2 이상의 안전한 비밀번호 암호화 알고리즘 적용 설정"
+    },
+    {
+      "code": "U-14",
+      "title": "root 홈, 패스 디렉터리 권한 및 패스 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "PATH의 맨 앞이나 중간에 현재 디렉터리(.)가 없어야 합니다.",
+      "commands": [
+        {
+          "label": "root PATH",
+          "command": "bash -lc 'printf \"%s\\n\" \"$PATH\"'"
+        }
+      ],
+      "checkContent": "root 계정의 PATH 환경변수에 “.”(마침표)이 포함 여부 점검",
+      "remediation": "root 계정의 환경설정 파일(/.profile, /.bashrc 등)과 시스템 환경설정 파일(/etc/profile 등)에 설정된 PATH 환경변수에서 현재 디렉터리를 나타내는 “.”을 PATH 환경변수의 마지막으로 이동하도록 설정 ※ /etc/profile 파일, root 계정, 일반 사용자 계정의 환경설정 파일을 순차적으로 검색하여 확인"
+    },
+    {
+      "code": "U-15",
+      "title": "파일 및 디렉터리 소유자 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "소유자 또는 그룹이 없는 파일을 확인합니다.",
+      "commands": [
+        {
+          "label": "소유자 없는 파일",
+          "command": "find / -xdev \\( -nouser -o -nogroup \\) -ls 2>/dev/null"
+        }
+      ],
+      "checkContent": "소유자가 존재하지 않는 파일 및 디렉터리의 존재 여부 점검",
+      "remediation": "소유자가 존재하지 않는 파일 및 디렉터리 제거 또는 소유자 변경 설정"
+    },
+    {
+      "code": "U-16",
+      "title": "/etc/passwd 파일 소유자 및 권한 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "소유자 root, 권한 644 이하인지 확인합니다.",
+      "commands": [
+        {
+          "label": "/etc/passwd 권한",
+          "command": "stat -Lc '%A %a %U %G %n' /etc/passwd"
+        }
+      ],
+      "checkContent": "/etc/passwd 파일 권한 적절성 여부 점검",
+      "remediation": "/etc/passwd 파일 소유자 및 권한 변경 설정"
+    },
+    {
+      "code": "U-17",
+      "title": "시스템 시작 스크립트 권한 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "시작 스크립트의 소유자와 일반 사용자 쓰기 권한을 확인합니다.",
+      "commands": [
+        {
+          "label": "Step 1) Linux 시스템 시작 스크립트 파일 소유자 및 권한 확인",
+          "command": "rc_dir=$(readlink -f /etc/rc.d/ 2>/dev/null); if [ -n \"$rc_dir\" ] && [ -d \"$rc_dir\" ]; then ls -al \"$rc_dir\"/*; else echo 'NOT_FOUND /etc/rc.d/'; fi"
+        },
+        {
+          "label": "systemd 로컬 유닛",
+          "command": "find /etc/systemd/system -xdev -type f \\( ! -user root -o -perm /022 \\) -ls 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "시스템 시작 스크립트 파일 권한 적절성 여부 점검",
+      "remediation": "시스템 시작 스크립트 파일 소유자 및 권한 변경 설정"
+    },
+    {
+      "code": "U-18",
+      "title": "/etc/shadow 파일 소유자 및 권한 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "소유자 root, 권한 400 이하인지 확인합니다.",
+      "commands": [
+        {
+          "label": "/etc/shadow 권한",
+          "command": "stat -Lc '%A %a %U %G %n' /etc/shadow"
+        }
+      ],
+      "checkContent": "/etc/shadow 파일 권한 적절성 여부 점검",
+      "remediation": "/etc/shadow 파일 소유자 및 권한 변경 설정"
+    },
+    {
+      "code": "U-19",
+      "title": "/etc/hosts 파일 소유자 및 권한 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "소유자 root, 권한 600 또는 644 이하인지 확인합니다.",
+      "commands": [
+        {
+          "label": "/etc/hosts 권한",
+          "command": "stat -Lc '%A %a %U %G %n' /etc/hosts"
+        }
+      ],
+      "checkContent": "/etc/hosts 파일의 권한 적절성 여부 점검",
+      "remediation": "/etc/hosts 파일 소유자 및 권한 변경 설정"
+    },
+    {
+      "code": "U-20",
+      "title": "/etc/(x)inetd.conf 파일 소유자 및 권한 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "파일이 없거나, 존재할 경우 소유자 root 및 권한 600 이하인지 확인합니다.",
+      "commands": [
+        {
+          "label": "inetd 설정파일 권한",
+          "command": "for f in /etc/inetd.conf /etc/xinetd.conf /etc/xinetd.d/ /etc/systemd/system.conf; do if [ -e \"$f\" ]; then stat -Lc '%A %a %U %G %n' \"$f\"; else echo \"NOT_FOUND $f\"; fi; done"
+        }
+      ],
+      "checkContent": "/etc/(x)inetd.conf 파일 권한 적절성 여부 점검",
+      "remediation": "/etc/(x)inetd.conf 파일 소유자 및 권한 변경 설정"
+    },
+    {
+      "code": "U-21",
+      "title": "/etc/(r)syslog.conf 파일 소유자 및 권한 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "rsyslog 설정 파일의 소유자와 권한을 확인합니다.",
+      "commands": [
+        {
+          "label": "rsyslog 설정 권한",
+          "command": "for f in /etc/rsyslog.conf /etc/syslog.conf; do if [ -e \"$f\" ]; then stat -Lc '%A %a %U %G %n' \"$f\"; else echo \"NOT_FOUND $f\"; fi; done"
+        }
+      ],
+      "checkContent": "/etc/(r)syslog.conf 파일 권한 적절성 여부 점검",
+      "remediation": "/etc/(r)syslog.conf 파일 소유자 및 권한 변경 설정"
+    },
+    {
+      "code": "U-22",
+      "title": "/etc/services 파일 소유자 및 권한 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "소유자 root, 권한 644 이하인지 확인합니다.",
+      "commands": [
+        {
+          "label": "/etc/services 권한",
+          "command": "stat -Lc '%A %a %U %G %n' /etc/services"
+        }
+      ],
+      "checkContent": "/etc/services 파일 권한 적절성 여부 점검",
+      "remediation": "/etc/ services 파일 소유자 및 권한 변경 설정"
+    },
+    {
+      "code": "U-23",
+      "title": "SUID, SGID, Sticky bit 설정 파일 점검",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "SUID/SGID/Sticky bit 파일의 필요성을 검토합니다.",
+      "commands": [
+        {
+          "label": "root 소유 SUID·SGID 파일",
+          "command": "find / -xdev -user root -type f \\( -perm -4000 -o -perm -2000 \\) -exec ls -ld {} \\; 2>/dev/null"
+        }
+      ],
+      "checkContent": "불필요하거나 악의적인 파일에 SUID, SGID, Sticky bit 설정 여부 점검",
+      "remediation": "· 불필요한 SUID, SGID 권한 또는 해당 파일 제거하도록 설정 · 애플리케이션에서 생성한 파일이나 사용자가 임의로 생성한 파일 등 의심스럽거나 특이한 파일에 SUID 권한이 부여된 경우 제거하도록 설정"
+    },
+    {
+      "code": "U-24",
+      "title": "사용자, 시스템 환경변수 파일 소유자 및 권한 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "홈 디렉터리와 환경 파일의 소유자 및 쓰기 권한을 확인합니다.",
+      "commands": [
+        {
+          "label": "사용자 환경 파일 권한",
+          "command": "while IFS=: read -r user _ _ _ _ home _; do [ -d \"$home\" ] || continue; find \"$home\" -maxdepth 1 -type f \\( -name '.profile' -o -name '.kshrc' -o -name '.cshrc' -o -name '.bashrc' -o -name '.bash_profile' -o -name '.login' -o -name '.exrc' -o -name '.netrc' \\) -exec stat -Lc '%A %a %U %G %n' {} \\; ; done < /etc/passwd"
+        }
+      ],
+      "checkContent": "홈 디렉터리 내의 환경변수 파일에 대한 소유자 및 접근 권한이 관리자 또는 해당 계정으로 설정 여부 점검",
+      "remediation": "환경변수 파일의 일반 사용자 쓰기 권한 제거하도록 설정"
+    },
+    {
+      "code": "U-25",
+      "title": "world writable 파일 점검",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "world writable 일반 파일의 존재 여부를 전체 파일시스템에서 확인합니다.",
+      "commands": [
+        {
+          "label": "world writable 일반 파일",
+          "command": "find / -type f -perm -2 -exec ls -l {} \\;"
+        }
+      ],
+      "checkContent": "불필요한 world writable 파일 여부 점검",
+      "remediation": "world writable 파일 존재 여부를 확인하고 불필요한 경우 제거하도록 설정"
+    },
+    {
+      "code": "U-26",
+      "title": "/dev에 존재하지 않는 device 파일 점검",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "/dev 아래 일반 파일의 필요성을 검토합니다.",
+      "commands": [
+        {
+          "label": "/dev 일반 파일",
+          "command": "find /dev -xdev -type f -exec ls -ld {} \\; 2>/dev/null"
+        }
+      ],
+      "checkContent": "/dev 디렉터리 내 존재하지 않는 device 파일 여부 점검",
+      "remediation": "major, minor number를 가지지 않는 device 파일 제거하도록 설정"
+    },
+    {
+      "code": "U-27",
+      "title": "$HOME/.rhosts, hosts.equiv 사용 금지",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "r 계열 서비스를 사용하지 않으며 관련 파일이 없어야 합니다.",
+      "commands": [
+        {
+          "label": "전체 사용자 rhosts 및 hosts.equiv",
+          "command": "for f in /etc/hosts.equiv; do [ -e \"$f\" ] && { stat -Lc '%A %a %U %G %n' \"$f\"; grep -nE '(^|[[:space:]])\\+([[:space:]]|$)' \"$f\" || true; } || echo \"NOT_FOUND $f\"; done; while IFS=: read -r user _ _ _ _ home _; do f=\"$home/.rhosts\"; [ -e \"$f\" ] || continue; printf 'USER=%s ' \"$user\"; stat -Lc '%A %a %U %G %n' \"$f\"; grep -nE '(^|[[:space:]])\\+([[:space:]]|$)' \"$f\" || true; done < /etc/passwd"
+        }
+      ],
+      "checkContent": "$HOME/.rhosts 및 /etc/hosts.equiv 파일에 대해 적절한 소유자 및 접근 권한 설정 여부 점검",
+      "remediation": "/etc/hosts.equiv, $HOME/.rhosts 파일 소유자 및 권한 변경, 허용 호스트 및 계정 등록 설정"
+    },
+    {
+      "code": "U-28",
+      "title": "접속 IP 및 포트 제한",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "운영 정책에 따라 firewalld rich rule 적용 여부를 확인합니다.",
+      "commands": [
+        {
+          "label": "firewalld 접근 통제",
+          "command": "if command -v firewall-cmd >/dev/null 2>&1; then firewall-cmd --get-active-zones; firewall-cmd --list-all-zones; else echo 'firewall-cmd NOT_FOUND'; fi"
+        },
+        {
+          "label": "nftables·iptables 접근 통제",
+          "command": "if command -v nft >/dev/null 2>&1; then nft list ruleset; elif command -v iptables >/dev/null 2>&1; then iptables -S; else echo 'nft and iptables NOT_FOUND'; fi"
+        },
+        {
+          "label": "TCP Wrapper 접근 통제",
+          "command": "for f in /etc/hosts.allow /etc/hosts.deny; do echo \"--- $f\"; [ -e \"$f\" ] && sed -n '1,160p' \"$f\" || echo NOT_FOUND; done"
+        }
+      ],
+      "checkContent": "허용할 호스트에 대한 접속 IP주소 제한 및 포트 제한 설정 여부 점검",
+      "remediation": "OS에 기본으로 제공하는 방화벽 애플리케이션이나 TCP Wrapper와 같은 호스트별 서비스 제한 애플리케이션을 사용하여 접근 허용 IP 등록 설정"
+    },
+    {
+      "code": "U-29",
+      "title": "hosts.lpd 파일 소유자 및 권한 설정",
+      "importance": "하",
+      "guideStatus": "양호",
+      "guideNote": "파일이 없거나, 존재할 경우 root 소유 및 600 이하인지 확인합니다.",
+      "commands": [
+        {
+          "label": "/etc/hosts.lpd 권한",
+          "command": "if [ -e /etc/hosts.lpd ]; then stat -Lc '%A %a %U %G %n' /etc/hosts.lpd; else echo 'NOT_FOUND /etc/hosts.lpd'; fi"
+        }
+      ],
+      "checkContent": "/etc/hosts.lpd 파일의 제거 및 권한 적절성 여부 점검",
+      "remediation": "/etc/hosts.lpd 파일 제거 또는 /etc/hosts.lpd 파일 소유자 및 권한 변경 설정"
+    },
+    {
+      "code": "U-30",
+      "title": "UMASK 설정 관리",
+      "importance": "중",
+      "guideStatus": "양호",
+      "guideNote": "UMASK가 022 이상인지 확인합니다.",
+      "commands": [
+        {
+          "label": "profile UMASK",
+          "command": "grep -RniE '^*(umask|UMASK)' /etc/profile /etc/profile.d /etc/bashrc 2>/dev/null || true"
+        },
+        {
+          "label": "login.defs UMASK",
+          "command": "grep -nE '^[[:space:]]*UMASK[[:space:]]+' /etc/login.defs 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "시스템 UMASK 값이 022 이상 설정 여부 점검",
+      "remediation": "설정 파일에 UMASK 값을 022로 설정"
+    },
+    {
+      "code": "U-31",
+      "title": "홈디렉토리 소유자 및 권한 설정",
+      "importance": "중",
+      "guideStatus": "양호",
+      "guideNote": "로그인 가능 계정의 홈 소유자와 타 사용자 쓰기 권한을 확인합니다.",
+      "commands": [
+        {
+          "label": "홈 디렉터리 이상 항목",
+          "command": "while IFS=: read -r u _ uid _ _ home shell; do [ \"$uid\" -lt 1000 ] && continue; echo \"$shell\" | grep -Eq 'nologin|false' && continue; if [ ! -d \"$home\" ]; then echo \"MISSING_HOME user=$u home=$home\"; continue; fi; owner=$(stat -Lc '%U' \"$home\"); mode=$(stat -Lc '%a' \"$home\"); [ \"$owner\" != \"$u\" ] && echo \"OWNER_MISMATCH user=$u owner=$owner home=$home mode=$mode\"; [ $((8#$mode & 2)) -ne 0 ] && echo \"WORLD_WRITABLE user=$u home=$home mode=$mode\"; done < /etc/passwd"
+        }
+      ],
+      "checkContent": "홈 디렉토리의 소유자 외 타 사용자가 해당 홈 디렉토리를 수정할 수 없도록 제한 설정 여부 점검",
+      "remediation": "사용자별 홈 디렉토리 소유주를 해당 계정으로 변경하고, 타 사용자의 쓰기 권한 제거하도록 설정(/etc/passwd 파일에서 홈 디렉토리 확인, 사용자 홈 디렉토리 외 개별적으로 만들어 사용하는 사용자 디렉토리 존재 여부 확인하여 점검)"
+    },
+    {
+      "code": "U-32",
+      "title": "홈디렉토리로 지정한 디렉토리의 존재 관리",
+      "importance": "중",
+      "guideStatus": "양호",
+      "guideNote": "계정별 홈 디렉터리의 존재 여부와 로그인 셸을 함께 확인합니다.",
+      "commands": [
+        {
+          "label": "미존재 홈 디렉터리",
+          "command": "awk -F: '{print $1, $6, $7}' /etc/passwd | while read -r user home shell; do if [ ! -d \"$home\" ]; then if echo \"$shell\" | grep -Eq 'nologin|false'; then echo \"NOLOGIN_HOME_MISSING user=$user home=$home shell=$shell\"; else echo \"LOGIN_HOME_MISSING user=$user home=$home shell=$shell\"; fi; fi; done"
+        }
+      ],
+      "checkContent": "사용자 계정과 홈 디렉토리의 일치 여부 점검",
+      "remediation": "홈 디렉토리가 존재하지 않는 계정에 홈 디렉토리 설정 또는 계정 제거하도록 설정"
+    },
+    {
+      "code": "U-33",
+      "title": "숨겨진 파일 및 디렉토리 검색 및 제거",
+      "importance": "하",
+      "guideStatus": "예외처리",
+      "guideNote": "숨김 항목의 경로와 운영 목적을 검토합니다.",
+      "commands": [
+        {
+          "label": "숨김 파일 및 디렉터리",
+          "command": "find / -xdev -name '.*' -print 2>/dev/null"
+        }
+      ],
+      "checkContent": "숨겨진 파일 및 디렉토리 내 의심스러운 파일 존재 여부 점검",
+      "remediation": "ls -al 명령어로 숨겨진 파일 존재 파악 후 불법적이거나 의심스러운 파일을 제거하도록 설정"
+    },
+    {
+      "code": "U-34",
+      "title": "Finger 서비스 비활성화",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "Rocky Linux 9에서는 일반적으로 서비스와 설정 파일이 없습니다.",
+      "commands": [
+        {
+          "label": "Finger/inetd 서비스",
+          "command": "systemctl list-unit-files --type=service 2>/dev/null | grep -Ei 'finger|xinetd|inetd' || true; for f in /etc/inetd.conf /etc/xinetd.conf /etc/xinetd.d/*; do [ -e \"$f\" ] && ls -l \"$f\" || echo \"NOT_FOUND $f\"; done"
+        }
+      ],
+      "checkContent": "Finger 서비스 비활성화 여부 점검",
+      "remediation": "Finger 서비스 비활성화 설정"
+    },
+    {
+      "code": "U-35",
+      "title": "공유 서비스에 대한 익명 접근 제한 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "FTP, NFS, Samba 익명 접근 관련 설정을 확인합니다.",
+      "commands": [
+        {
+          "label": "ftp 계정",
+          "command": "getent passwd ftp || true"
+        },
+        {
+          "label": "공유 서비스 익명 설정",
+          "command": "grep -RniE 'anonymous|anonuid|anongid|guest[[:space:]]+ok' /etc/vsftpd* /etc/proftpd* /etc/exports /etc/samba/smb.conf 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "공유 서비스의 익명 접근 제한 설정 여부 점검",
+      "remediation": "공유 서비스의 익명 접근 제한 설정"
+    },
+    {
+      "code": "U-36",
+      "title": "r 계열 서비스 비활성화",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "rlogin, rsh, rexec 서비스가 없어야 합니다.",
+      "commands": [
+        {
+          "label": "r 계열 서비스",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'rlogin|rsh|rexec' || true; systemctl list-units --type=socket --all 2>/dev/null | grep -Ei 'rlogin|rsh|rexec' || true"
+        },
+        {
+          "label": "xinetd 및 inetd 설정 파일 존재 여부",
+          "command": "for f in /etc/xinetd/ /etc/inetd.conf /etc/xinetd.d/*; do [ -e \"$f\" ] && ls -ld \"$f\" || echo \"NOT_FOUND $f\"; done"
+        }
+      ],
+      "checkContent": "r-command 서비스 비활성화 여부 점검",
+      "remediation": "불필요한 r 계열 서비스 중지 및 비활성화 설정 ※ NET Backup 등 특별한 용도로 사용하지 않는다면 shell(514), login(513), exec(512) 서비스 중지 ※ rlogin, rsh, rexec 서비스는 backup, 클러스터링 등의 용도로 종종 사용되고 있으므로 해당 서비스 사용 유무를 확인하여 미사용시 서비스 중지 ※ /etc/hosts.equiv 또는 $HOME/.rhosts 파일을 통해 해당 서비스 사용 여부 확인 (파일이 존재하지 않거나 해당 파일 내에 설정이 없다면 사용하지 않는 것으로 간주)"
+    },
+    {
+      "code": "U-37",
+      "title": "crontab 설정파일 권한 설정",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "cron/at 실행 파일 및 설정 파일의 권한을 확인합니다.",
+      "commands": [
+        {
+          "label": "cron 및 at 명령 권한",
+          "command": "for f in /usr/bin/crontab /usr/bin/at; do [ -e \"$f\" ] && stat -Lc '%A %a %U %G %n' \"$f\" || echo \"NOT_FOUND $f\"; done"
+        },
+        {
+          "label": "cron 및 at 설정 권한",
+          "command": "for f in /etc/crontab /etc/cron.allow /etc/cron.deny /etc/at.allow /etc/at.deny; do [ -e \"$f\" ] && stat -Lc '%A %a %U %G %n' \"$f\" || echo \"NOT_FOUND $f\"; done; find /var/spool/cron /var/spool/at /var/spool/cron/atjobs /etc/cron.d /etc/cron.daily /etc/cron.hourly /etc/cron.monthly /etc/cron.weekly -maxdepth 1 ! -path '/etc/cron.hourly/0anacron' ! -path '/etc/cron.d/0hourly' -exec stat -Lc '%A %a %U %G %n' {} \\; 2>/dev/null"
+        }
+      ],
+      "checkContent": "crontab 및 at 서비스 관련 파일의 권한 적절성 여부 점검",
+      "remediation": "crontab 및 at 명령어 파일 권한 750 이하, cron 및 at 관련 파일 소유자 및 파일 권한 640 이하 설정"
+    },
+    {
+      "code": "U-38",
+      "title": "DoS 공격에 취약한 서비스 비활성화",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "echo, discard, daytime, chargen 서비스가 없어야 합니다.",
+      "commands": [
+        {
+          "label": "DoS 취약 서비스",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'echo|discard|daytime|chargen' || true; systemctl list-units --type=socket --all 2>/dev/null | grep -Ei 'echo|discard|daytime|chargen' || true"
+        }
+      ],
+      "checkContent": "사용하지 않는 DoS 공격에 취약한 서비스의 실행 여부 점검",
+      "remediation": "echo, discard, daytime, chargen, ntp, dns, snmp 등의 서비스 비활성화 설정"
+    },
+    {
+      "code": "U-39",
+      "title": "불필요한 NFS 서비스 비활성화",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "NFS를 사용하지 않으면 관련 서비스가 비활성화되어야 합니다.",
+      "commands": [
+        {
+          "label": "NFS 서비스",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'nfs|rpc-mountd' || true"
+        }
+      ],
+      "checkContent": "불필요한 NFS 서비스 사용 여부 점검",
+      "remediation": "NFS 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 ※ 로컬 서버에 마운트 되어 있는 디렉터리 제거 및 공유 디렉터리 제거 후 서비스 중지 가능"
+    },
+    {
+      "code": "U-40",
+      "title": "NFS 접근 통제",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "NFS 미사용 또는 /etc/exports 접근 통제와 권한을 확인합니다.",
+      "commands": [
+        {
+          "label": "NFS exports",
+          "command": "if [ -e /etc/exports ]; then stat -Lc '%A %a %U %G %n' /etc/exports; sed -n '1,200p' /etc/exports; else echo 'NOT_FOUND /etc/exports'; fi"
+        }
+      ],
+      "checkContent": "NFS(Network File System)의 접근 통제 설정 적용 여부 점검",
+      "remediation": "· NFS 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · 불가피하게 사용 시 접근 통제 설정 및 NFS 설정 파일 접근 권한 644 설정"
+    },
+    {
+      "code": "U-41",
+      "title": "불필요한 automountd 제거",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "automount/autofs 서비스가 비활성화되어야 합니다.",
+      "commands": [
+        {
+          "label": "automount 서비스",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'automount|autofs' || true"
+        }
+      ],
+      "checkContent": "automountd 서비스 데몬의 실행 여부 점검",
+      "remediation": "automountd 서비스 비활성화 설정"
+    },
+    {
+      "code": "U-42",
+      "title": "불필요한 RPC 서비스 확인",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "ABLESTACK의 2차 스토리지 마운트에 필요한 RPC 서비스는 예외 사유와 함께 확인합니다.",
+      "commands": [
+        {
+          "label": "RPC 서비스",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'rpc|nfs' || true"
+        }
+      ],
+      "checkContent": "불필요한 RPC 서비스의 실행 여부 점검",
+      "remediation": "불필요한 RPC 서비스 중지 및 비활성화 설정"
+    },
+    {
+      "code": "U-43",
+      "title": "NIS, NIS+ 점검",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "NIS 관련 서비스가 없어야 합니다.",
+      "commands": [
+        {
+          "label": "NIS 서비스",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'ypserv|ypbind|ypxfrd|yppasswdd|ypupdated' || true"
+        }
+      ],
+      "checkContent": "안전하지 않은 NIS 서비스의 비활성화, 안전한 NIS+ 서비스의 활성화 여부 점검",
+      "remediation": "NIS 관련 서비스 비활성화 설정"
+    },
+    {
+      "code": "U-44",
+      "title": "tftp, talk 서비스 비활성화",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "tftp, talk, ntalk 서비스가 없어야 합니다.",
+      "commands": [
+        {
+          "label": "tftp/talk 서비스",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'tftp|talk|ntalk' || true; systemctl list-units --type=socket --all 2>/dev/null | grep -Ei 'tftp|talk|ntalk' || true"
+        }
+      ],
+      "checkContent": "tftp, talk, ntalk 서비스의 활성화 여부 점검",
+      "remediation": "불필요한 tftp, talk, ntalk 서비스 비활성화 설정"
+    },
+    {
+      "code": "U-45",
+      "title": "메일 서비스 버전 점검",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "메일 서비스를 사용하지 않으면 중지 및 비활성화 상태를 확인합니다.",
+      "commands": [
+        {
+          "label": "메일 서비스",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'sendmail|postfix|exim' || true; aspkg -q sendmail postfix exim 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "취약한 버전의 메일 서비스 이용 여부 점검",
+      "remediation": "· 메일 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · 메일 서비스 사용 시 패치 관리 정책을 수립하여 주기적으로 패치 적용 설정"
+    },
+    {
+      "code": "U-46",
+      "title": "일반 사용자의 메일 서비스 실행 방지",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "메일 서비스 미사용 상태를 확인합니다.",
+      "commands": [
+        {
+          "label": "Sendmail 일반 사용자 실행 제한",
+          "command": "grep -RniE '^[[:space:]]*(O[[:space:]]*)?PrivacyOptions.*(restrictqrun|goaway)' /etc/mail/sendmail.cf /etc/mail/sendmail.mc 2>/dev/null || true"
+        },
+        {
+          "label": "Postfix 큐 관리 명령 권한",
+          "command": "if [ -e /usr/sbin/postsuper ]; then stat -Lc '%A %a %U %G %n' /usr/sbin/postsuper; else echo 'NOT_FOUND /usr/sbin/postsuper'; fi"
+        },
+        {
+          "label": "Exim 큐 조회 명령 권한",
+          "command": "if [ -e /usr/sbin/exiqgrep ]; then stat -Lc '%A %a %U %G %n' /usr/sbin/exiqgrep; else echo 'NOT_FOUND /usr/sbin/exiqgrep'; fi"
+        }
+      ],
+      "checkContent": "SMTP 서비스 사용 시 일반 사용자의 q 옵션 제한 여부 점검",
+      "remediation": "· 메일 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · 메일 서비스 사용 시 메일 서비스의 q 옵션 제한 설정"
+    },
+    {
+      "code": "U-47",
+      "title": "스팸 메일 릴레이 제한",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "메일 서비스 미사용 또는 릴레이 제한 설정을 확인합니다.",
+      "commands": [
+        {
+          "label": "Postfix 릴레이 설정",
+          "command": "if command -v postconf >/dev/null 2>&1; then postconf mynetworks relay_domains smtpd_recipient_restrictions smtpd_relay_restrictions; else echo 'postconf NOT_FOUND'; fi"
+        },
+        {
+          "label": "Sendmail 릴레이 설정",
+          "command": "grep -RniE 'promiscuous_relay|Relaying denied|^[^#].*(RELAY|REJECT)' /etc/mail/sendmail.mc /etc/mail/sendmail.cf /etc/mail/access 2>/dev/null || true"
+        },
+        {
+          "label": "Exim 릴레이 설정",
+          "command": "grep -RniE 'relay_from_hosts|hosts[[:space:]]*=' /etc/exim /etc/exim4 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "SMTP 서버의 릴레이 기능 제한 여부 점검",
+      "remediation": "· 메일 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · 메일 서비스 사용 시 릴레이 방지 설정 또는 릴레이 대상 접근 제어 설정"
+    },
+    {
+      "code": "U-48",
+      "title": "expn, vrfy 명령어 제한",
+      "importance": "중",
+      "guideStatus": "해당없음",
+      "guideNote": "메일 서비스 미사용 또는 VRFY/EXPN 제한 설정을 확인합니다.",
+      "commands": [
+        {
+          "label": "Postfix VRFY 제한",
+          "command": "if command -v postconf >/dev/null 2>&1; then postconf disable_vrfy_command; else echo 'postconf NOT_FOUND'; fi"
+        },
+        {
+          "label": "Sendmail EXPN·VRFY 제한",
+          "command": "grep -RniE '^[[:space:]]*(O[[:space:]]*)?PrivacyOptions.*(noexpn|novrfy|goaway)' /etc/mail/sendmail.cf /etc/mail/sendmail.mc 2>/dev/null || true"
+        },
+        {
+          "label": "Exim EXPN·VRFY 제한",
+          "command": "grep -RniE 'acl_smtp_(vrfy|expn)' /etc/exim /etc/exim4 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "SMTP 서비스 사용 시 expn, vrfy 명령어 사용 금지 설정 여부 점검",
+      "remediation": "· 메일 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · 메일 서비스 사용 시 메일 서비스 설정 파일에 noexpn, novrfy 또는 goaway 옵션 추가 설정"
+    },
+    {
+      "code": "U-49",
+      "title": "DNS 보안 버전 패치",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "DNS 서비스 미사용 또는 최신 패키지 적용 여부를 확인합니다.",
+      "commands": [
+        {
+          "label": "DNS 서비스 상태",
+          "command": "systemctl list-unit-files --type=service 2>/dev/null | grep -Ei 'named' || true; systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'named' || true"
+        },
+        {
+          "label": "named 버전",
+          "command": "if command -v named >/dev/null 2>&1; then named -v; else echo 'named NOT_FOUND'; fi"
+        }
+      ],
+      "checkContent": "BIND 최신 버전 사용 유무 및 주기적 보안 패치 여부 점검",
+      "remediation": "· DNS 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · DNS 서비스 사용 시 패치 관리 정책 수립 및 주기적으로 패치 적용 설정 ※ DNS 서비스의 경우 대부분의 버전에서 취약점이 보고되고 있으므로 OS 관리자, 서비스 개발자가 패치 적용에 따른 서비스 영향 정도를 정확히 파악하여 주기적인 패치 적용 정책 수리 후 적용"
+    },
+    {
+      "code": "U-50",
+      "title": "DNS Zone Transfer 설정",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "DNS 미사용 또는 allow-transfer 제한 설정을 확인합니다.",
+      "commands": [
+        {
+          "label": "DNS Zone Transfer",
+          "command": "grep -RniE 'allow-transfer|xfrnets' /etc/named.conf /etc/named /etc/bind 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "Secondary Name Server로만 Zone 정보 전송 제한 여부 점검",
+      "remediation": "· DNS 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · DNS 서비스 사용 시 DNS Zone Transfer를 허가된 사용자에게만 전송 허용하도록 설정"
+    },
+    {
+      "code": "U-51",
+      "title": "DNS 서비스의 취약한 동적 업데이트 설정 금지",
+      "importance": "중",
+      "guideStatus": "해당없음",
+      "guideNote": "DNS 미사용 또는 동적 업데이트 제한 설정을 확인합니다.",
+      "commands": [
+        {
+          "label": "DNS 동적 업데이트",
+          "command": "grep -RniE 'allow-update|update-policy' /etc/named.conf /etc/named /etc/bind 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "DNS 서비스의 취약한 동적 업데이트 설정 여부 점검",
+      "remediation": "· DNS 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · DNS 서비스 사용 시 일반적으로 동적 업데이트 기능이 필요 없으나 확인 필요함"
+    },
+    {
+      "code": "U-52",
+      "title": "telnet 서비스 비활성화",
+      "importance": "중",
+      "guideStatus": "양호",
+      "guideNote": "telnet 서비스와 소켓이 비활성화되어야 합니다.",
+      "commands": [
+        {
+          "label": "telnet 서비스",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'telnet' || true; systemctl list-units --type=socket --all 2>/dev/null | grep -Ei 'telnet' || true"
+        }
+      ],
+      "checkContent": "원격 접속 시 Telnet 프로토콜 사용 여부 점검",
+      "remediation": "Telnet, FTP 등 안전하지 않은 서비스 사용을 중지하고 SSH 설치 및 사용하도록 설정"
+    },
+    {
+      "code": "U-53",
+      "title": "FTP 서비스 정보 노출 제한",
+      "importance": "하",
+      "guideStatus": "해당없음",
+      "guideNote": "FTP 미사용 또는 배너/버전 노출 제한 설정을 확인합니다.",
+      "commands": [
+        {
+          "label": "FTP 서비스 및 배너",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'vsftpd|proftpd|pure-ftpd' || true; grep -RniE 'ftpd_banner|ServerIdent|banner_file' /etc/vsftpd* /etc/proftpd* /etc/pure-ftpd* 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "FTP 서비스 정보 노출 여부 점검",
+      "remediation": "· FTP 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · FTP 서비스 사용 시 FTP 설정 파일을 통해 접속 배너 설정 ※ 접속 배너에 서비스 이름이나 버전 정보를 노출하지 않는 것을 권고"
+    },
+    {
+      "code": "U-54",
+      "title": "암호화되지 않는 FTP 서비스 비활성화",
+      "importance": "중",
+      "guideStatus": "해당없음",
+      "guideNote": "암호화되지 않은 FTP 서비스를 사용하지 않아야 합니다.",
+      "commands": [
+        {
+          "label": "FTP 서비스 상태",
+          "command": "for s in inetd xinetd vsftpd proftpd pure-ftpd; do systemctl is-enabled \"$s\" 2>&1 | sed \"s/^/$s enabled: /\"; systemctl is-active \"$s\" 2>&1 | sed \"s/^/$s active: /\"; done"
+        }
+      ],
+      "checkContent": "암호화되지 않은 FTP 서비스 비활성화 여부 점검",
+      "remediation": "암호화되지 않은 FTP 서비스 중지 및 비활성화 설정"
+    },
+    {
+      "code": "U-55",
+      "title": "FTP 계정 Shell 제한",
+      "importance": "중",
+      "guideStatus": "해당없음",
+      "guideNote": "FTP 미사용 또는 FTP 계정이 nologin/false 쉘이어야 합니다.",
+      "commands": [
+        {
+          "label": "FTP 계정 쉘",
+          "command": "getent passwd ftp || true"
+        }
+      ],
+      "checkContent": "FTP 기본 계정에 쉘 설정 여부 점검",
+      "remediation": "· FTP 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · FTP 서비스 사용 시 FTP 계정에 /bin/false 쉘 부여 설정"
+    },
+    {
+      "code": "U-56",
+      "title": "FTP 서비스 접근 제어 설정",
+      "importance": "하",
+      "guideStatus": "해당없음",
+      "guideNote": "FTP 미사용 또는 접근 제어 설정을 확인합니다.",
+      "commands": [
+        {
+          "label": "FTP 접근 제어",
+          "command": "grep -RniE 'tcp_wrappers|userlist|allow|deny|hosts_allow|hosts_deny' /etc/vsftpd* /etc/proftpd* /etc/pure-ftpd* /etc/hosts.allow /etc/hosts.deny 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "FTP 서비스에 비인가자의 접근 가능 여부 점검",
+      "remediation": "· FTP 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · FTP 서비스 사용 시 접근 제어 설정"
+    },
+    {
+      "code": "U-57",
+      "title": "ftpusers 파일 설정",
+      "importance": "중",
+      "guideStatus": "양호",
+      "guideNote": "FTP 미사용 또는 ftpusers/user_list 설정을 확인합니다.",
+      "commands": [
+        {
+          "label": "FTP 차단 계정 파일",
+          "command": "for f in /etc/ftpusers /etc/vsftpd/ftpusers /etc/vsftpd/user_list; do if [ -e \"$f\" ]; then stat -Lc '%A %a %U %G %n' \"$f\"; sed -n '1,120p' \"$f\"; else echo \"NOT_FOUND $f\"; fi; done"
+        }
+      ],
+      "checkContent": "FTP 서비스에 root 계정 접근 제한 설정 여부 점검",
+      "remediation": "· FTP 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · FTP 서비스 사용 시 root 계정으로 직접 접속할 수 없도록 설정"
+    },
+    {
+      "code": "U-58",
+      "title": "불필요한 SNMP 서비스 구동 점검",
+      "importance": "중",
+      "guideStatus": "해당없음",
+      "guideNote": "SNMP를 사용하지 않으면 서비스가 비활성화되어야 합니다.",
+      "commands": [
+        {
+          "label": "SNMP 서비스",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'snmpd|snmptrapd' || true"
+        }
+      ],
+      "checkContent": "SNMP 서비스 활성화 여부 점검",
+      "remediation": "SNMP 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정"
+    },
+    {
+      "code": "U-59",
+      "title": "안전한 SNMP 버전 사용",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "SNMP 미사용 또는 v3 사용 여부를 확인합니다.",
+      "commands": [
+        {
+          "label": "SNMP v3 설정",
+          "command": "grep -RniE 'rouser|rwuser|createUser|usmUser' /etc/snmp 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "안전한 SNMP 버전 사용 여부 점검",
+      "remediation": "· SNMP 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · SNMP 서비스 사용 시 SNMP 버전을 v3 이상으로 적용하도록 설정"
+    },
+    {
+      "code": "U-60",
+      "title": "SNMP Community String 복잡성 설정",
+      "importance": "중",
+      "guideStatus": "해당없음",
+      "guideNote": "SNMP 미사용 또는 기본 community string 사용 여부를 확인합니다.",
+      "commands": [
+        {
+          "label": "SNMP community",
+          "command": "grep -RniE '^[[:space:]]*(rocommunity|rwcommunity|com2sec)' /etc/snmp 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "SNMP Community String 복잡성 설정 여부 점검",
+      "remediation": "· SNMP 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · SNMP 서비스 사용 시 SNMP Community String 기본값인 “public”, “private”이 아닌 영문자, 숫자 포함 10자리 이상 또는 영문자, 숫자, 특수문자 포함 8자리 이상으로 설정"
+    },
+    {
+      "code": "U-61",
+      "title": "SNMP Access Control 설정",
+      "importance": "상",
+      "guideStatus": "해당없음",
+      "guideNote": "SNMP 미사용 또는 접근 제어 설정을 확인합니다.",
+      "commands": [
+        {
+          "label": "SNMP 접근 제어",
+          "command": "grep -RniE '^[[:space:]]*(access|view|group|com2sec)' /etc/snmp 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "SNMP 접근 제어 설정 여부 점검",
+      "remediation": "· SNMP 서비스를 사용하지 않는 경우 서비스 중지 및 비활성화 설정 · SNMP 서비스 사용 시 SNMP 접근 제어 설정하도록 설정"
+    },
+    {
+      "code": "U-62",
+      "title": "로그인 시 경고 메시지 설정",
+      "importance": "하",
+      "guideStatus": "양호",
+      "guideNote": "콘솔 및 SSH 로그인 경고 메시지를 확인합니다.",
+      "commands": [
+        {
+          "label": "서버 로그인 경고 문구",
+          "command": "for f in /etc/motd /etc/issue /etc/issue.net; do echo \"--- $f\"; [ -e \"$f\" ] && sed -n '1,80p' \"$f\" || echo NOT_FOUND; done"
+        },
+        {
+          "label": "SSH Banner 경고 메시지 파일 경로",
+          "command": "if [ -f /etc/ssh/sshd_config ]; then grep -nE '^[[:space:]]*Banner[[:space:]]+/etc/issue\\.net([[:space:]]|$)' /etc/ssh/sshd_config || echo 'Banner /etc/issue.net NOT_CONFIGURED'; else echo 'NOT_FOUND /etc/ssh/sshd_config'; fi"
+        },
+        {
+          "label": "Postfix 서비스 상태",
+          "command": "if systemctl is-active --quiet postfix 2>/dev/null; then echo 'postfix 서비스가 실행 중입니다.'; else echo 'postfix 서비스가 실행되고 있지 않습니다.'; fi"
+        }
+      ],
+      "checkContent": "서버 및 서비스에 로그온 시 불필요한 정보 차단 설정 및 불법적인 사용에 대한 경고 메시지 출력 여부 점검",
+      "remediation": "Telnet, FTP, SMTP, DNS 서비스를 사용하는 경우 설정 파일을 통해 로그온 시 경고 메시지 설정"
+    },
+    {
+      "code": "U-63",
+      "title": "sudo 명령어 접근 관리",
+      "importance": "중",
+      "guideStatus": "양호",
+      "guideNote": "/etc/sudoers 소유자 root 및 권한 640 이하인지 확인합니다.",
+      "commands": [
+        {
+          "label": "sudoers 권한",
+          "command": "stat -Lc '%A %a %U %G %n' /etc/sudoers"
+        }
+      ],
+      "checkContent": "/etc/sudoers 파일 권한 적절성 여부 점검",
+      "remediation": "/etc/sudoers 파일 소유자 및 권한 변경 설정"
+    },
+    {
+      "code": "U-64",
+      "title": "주기적 보안 패치 및 벤더 권고사항 적용",
+      "importance": "상",
+      "guideStatus": "양호",
+      "guideNote": "EOL이 아닌 OS와 최신 보안 패치가 적용된 커널인지 확인합니다.",
+      "commands": [
+        {
+          "label": "운영체제 및 커널 정보",
+          "command": "hostnamectl"
+        }
+      ],
+      "checkContent": "시스템에서 최신 패치가 적용 여부 점검",
+      "remediation": "OS 관리자, 서비스 개발자가 패치 적용에 따른 서비스 영향 정도를 파악하여 OS 관리자 및 벤더에서 적용하도록 설정 ※ OS 패치의 경우 지속해서 취약점이 발표되고 있으므로 O/S 관리자, 서비스 개발자가 패치 적용에 따른 서비스 영향 정도를 정확히 파악하여 주기적인 패치 적용 정책을 수립하여 적용해야 함"
+    },
+    {
+      "code": "U-65",
+      "title": "NTP 및 시각 동기화 설정",
+      "importance": "중",
+      "guideStatus": "양호",
+      "guideNote": "chronyd 서비스, 동기화 소스, 서버 설정을 확인합니다.",
+      "commands": [
+        {
+          "label": "chronyd 서비스",
+          "command": "systemctl list-units --type=service --all 2>/dev/null | grep -Ei 'chronyd|ntpd|systemd-timesyncd' || true"
+        },
+        {
+          "label": "시간 동기화 소스",
+          "command": "if command -v chronyc >/dev/null 2>&1; then chronyc tracking; chronyc sources -v; else timedatectl status 2>/dev/null || true; fi"
+        },
+        {
+          "label": "chrony 서버 설정",
+          "command": "grep -nE '^[[:space:]]*(server|pool)[[:space:]]+' /etc/chrony.conf /etc/chrony.d/*.conf 2>/dev/null || true"
+        }
+      ],
+      "checkContent": "NTP 및 시각 동기화 설정 여부 점검",
+      "remediation": "NTP 설정 및 동기화 주기 설정"
+    },
+    {
+      "code": "U-66",
+      "title": "정책에 따른 시스템 로깅 설정",
+      "importance": "중",
+      "guideStatus": "양호",
+      "guideNote": "조직의 로그 기록 정책 수립 후 rsyslog 규칙과 비교해야 합니다.",
+      "commands": [
+        {
+          "label": "필수 rsyslog 정책 행",
+          "command": "if [ -f /etc/rsyslog.conf ]; then grep -HnE '^[[:space:]]*(\\*\\.info;mail\\.none;authpriv\\.none;cron\\.none|auth,authpriv\\.\\*|authpriv\\.\\*|mail\\.\\*|cron\\.\\*|\\*\\.alert|\\*\\.emerg)[[:space:]]+' /etc/rsyslog.conf /etc/rsyslog.d/*.conf 2>/dev/null || true; else echo 'NOT_FOUND /etc/rsyslog.conf'; fi"
+        }
+      ],
+      "checkContent": "내부 정책에 따른 시스템 로깅 설정 여부 점검",
+      "remediation": "로그 기록 정책을 수립하고, 정책에 따라 (r)syslog.conf 파일을 설정"
+    },
+    {
+      "code": "U-67",
+      "title": "로그 디렉터리 소유자 및 권한 설정",
+      "importance": "중",
+      "guideStatus": "예외처리",
+      "guideNote": "서비스 계정이 직접 기록하는 로그의 필수 소유권은 예외 사유와 함께 확인합니다.",
+      "exceptionReason": "sssd, pacemaker, pcp, grafana, chrony 관련 로그 디렉터리 및 파일은 각 서비스가 해당 서비스 계정으로 직접 접근하고 기록하도록 구성되어 있습니다. 이를 임의로 root 소유로 변경하면 서비스가 로그 파일을 생성하거나 갱신하지 못할 수 있으며, 특히 Pacemaker Alert 로그의 경우 hacluster 계정이 쓰기 권한을 잃어 장애 알림 기록이 중단될 수 있습니다. 따라서 해당 소유권은 제품 및 서비스 동작에 필요한 정상 설정으로, 보안 점검 시 예외 적용이 필요합니다.",
+      "commands": [
+        {
+          "label": "로그 디렉터리 권한",
+          "command": "stat -Lc '%A %a %U %G %n' /var/log"
+        },
+        {
+          "label": "로그 파일 소유자 및 권한",
+          "command": "find /var/log -xdev -maxdepth 1 -type f -exec stat -Lc '%A %a %U %G %s %y %n' {} \\; 2>/dev/null"
+        }
+      ],
+      "checkContent": "로그에 대한 접근 통제 및 관리 여부 점검",
+      "remediation": "디렉터리 내 로그 파일 소유자 및 권한 변경 설정"
+    }
+  ]
+}
