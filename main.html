@@ -44,6 +44,8 @@
                         다운로드</button>
                     <button class="pf-v6-c-button pf-m-link" type="button" id="button-open-modal-license-register">라이센스 관리</button>
                     <button style="display: none; "class="pf-v6-c-button pf-m-link" type="button" id="button-open-modal-security-update">보안 업데이트</button>
+                    <button style="display: none;" class="pf-v6-c-button pf-m-link" type="button"
+                        id="button-open-modal-security-evidence">보안 점검 증적</button>
                     <button class="pf-v6-c-button pf-m-secondary ablestack-ribbon-end-action" type="button"
                         id="button-open-modal-system-update" disabled
                         aria-disabled="true">ABLESTACK Version 업데이트</button>
@@ -121,8 +123,8 @@
                                                     <span class="pf-v6-c-description-list__text">펜스 장치 상태</span>
                                                 </dt>
                                                 <dd class="pf-v6-c-description-list__description">
-                                                    <div class="pf-v6-c-description-list__text" style="overflow: auto;display: flex;">
-                                                        <span id="gfs-fence-back-color" class="pf-v6-c-label pf-m-red" style="margin-right: 10px;align-self: center;">
+                                                    <div class="pf-v6-c-description-list__text ablestack-gfs-status-row">
+                                                        <span id="gfs-fence-back-color" class="pf-v6-c-label pf-m-red">
                                                             <span class="pf-v6-c-label__content">
                                                                 <span class="pf-v6-c-label__icon">
                                                                     <i id="gfs-fence-icon"
@@ -132,7 +134,7 @@
                                                                 <div id="gfs-fence-status">N/A</div>
                                                             </span>
                                                         </span>
-                                                        <div id="gfs-fence-text" style="align-self: center;">N/A</div>
+                                                        <div id="gfs-fence-text" class="ablestack-gfs-status-detail">N/A</div>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -141,8 +143,8 @@
                                                     <span class="pf-v6-c-description-list__text">잠금 장치 상태</span>
                                                 </dt>
                                                 <dd class="pf-v6-c-description-list__description">
-                                                    <div class="pf-v6-c-description-list__text" style="overflow: auto;display: flex;">
-                                                        <span id="gfs-lock-back-color" class="pf-v6-c-label pf-m-red" style="margin-right: 10px;align-self: center;">
+                                                    <div class="pf-v6-c-description-list__text ablestack-gfs-status-row">
+                                                        <span id="gfs-lock-back-color" class="pf-v6-c-label pf-m-red">
                                                             <span class="pf-v6-c-label__content">
                                                                 <span class="pf-v6-c-label__icon">
                                                                     <i id="gfs-lock-icon"
@@ -152,7 +154,7 @@
                                                                 <div id="gfs-lock-status">N/A</div>
                                                             </span>
                                                         </span>
-                                                        <div id="gfs-lock-text" style="align-self: center;">N/A</div>
+                                                        <div id="gfs-lock-text" class="ablestack-gfs-status-detail">N/A</div>
                                                     </div>
                                                 </dd>
                                             </div>
@@ -1527,6 +1529,12 @@
                             <a class="pf-v6-c-button pf-m-link" id="span-modal-wizard-cluster-config-hosts-file-download"
                                 href="#">파일을 다운로드 하시려면 클릭하십시오</a>
                         </span>
+                        <br />
+                        <span>
+                            - ABLESTACK 보안 취약점 증적 자료 :
+                            <a class="pf-v6-c-button pf-m-link pf-m-disabled" id="span-modal-security-evidence-download"
+                                href="#" aria-disabled="true">생성된 자료가 없습니다</a>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -2564,6 +2572,100 @@
     </div>
 </div>
 <!-- 보안 업데이트 : Modal 영역 끝 -->
+
+<!-- 보안 점검 증적 : Modal 영역 시작 -->
+<div id="div-modal-security-evidence" class="pf-v6-c-backdrop" style="display: none;">
+    <div class="pf-v6-l-bullseye">
+        <div class="pf-v6-c-modal-box ablestack-security-evidence-modal" role="dialog" aria-modal="true"
+            aria-label="ABLESTACK 보안 취약점 증적 자료">
+            <button id="button-close-modal-security-evidence" aria-disabled="false" aria-label="Close"
+                class="pf-v6-c-button pf-m-plain" type="button">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            <header class="pf-v6-c-modal-box__header ablestack-security-evidence-header">
+                <div class="ablestack-security-evidence-title-icon" aria-hidden="true">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <h1 class="pf-v6-c-modal-box__title">
+                        <span class="pf-v6-c-modal-box__title-text">ABLESTACK 보안 취약점 증적 자료</span>
+                    </h1>
+                    <p class="ablestack-security-evidence-subtitle">클러스터 보안 점검 결과를 문서 패키지로 생성합니다.</p>
+                </div>
+            </header>
+            <div class="pf-v6-c-modal-box__body">
+                <div class="ablestack-security-evidence-summary">
+                    <div class="ablestack-security-evidence-summary-item">
+                        <i class="fas fa-server" aria-hidden="true"></i>
+                        <div>
+                            <span>수집 범위</span>
+                            <strong>클러스터 전체 호스트</strong>
+                        </div>
+                    </div>
+                    <div class="ablestack-security-evidence-summary-item">
+                        <i class="fas fa-clipboard-check" aria-hidden="true"></i>
+                        <div>
+                            <span>점검 항목</span>
+                            <strong>U-01 ~ U-67</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="ablestack-security-evidence-formats">
+                    <span class="ablestack-security-evidence-formats-label">결과 파일</span>
+                    <span class="ablestack-security-evidence-format">PPTX</span>
+                    <span class="ablestack-security-evidence-format">XLSX</span>
+                    <span class="ablestack-security-evidence-format">TXT</span>
+                    <span class="ablestack-security-evidence-format">ZIP</span>
+                </div>
+                <div class="ablestack-security-evidence-notice">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
+                    <span>생성이 완료되면 아래에 표시되는 링크를 눌러 ZIP 파일을 다운로드할 수 있습니다.</span>
+                </div>
+                <div id="div-modal-security-evidence-status" class="pf-v6-c-alert pf-m-info pf-m-inline"
+                    aria-label="Security evidence status" aria-live="polite" aria-busy="false"
+                    style="display: none;">
+                    <div class="pf-v6-c-alert__icon">
+                        <i id="icon-modal-security-evidence-status"
+                            class="fas fa-fw fa-info-circle" aria-hidden="true"></i>
+                        <span id="spinner-modal-security-evidence-status"
+                            class="ablestack-security-evidence-status-spinner" style="display: none;">
+                            <svg class="pf-v6-c-spinner" role="progressbar" viewBox="0 0 100 100"
+                                aria-label="증적 자료 생성 중">
+                                <circle class="pf-v6-c-spinner__path" cx="50" cy="50" r="45" fill="none"></circle>
+                            </svg>
+                        </span>
+                    </div>
+                    <p class="pf-v6-c-alert__title" id="text-modal-security-evidence-status"></p>
+                </div>
+                <div id="div-modal-security-evidence-download"
+                    class="ablestack-security-evidence-download" style="display: none;">
+                    <div class="ablestack-security-evidence-download-icon" aria-hidden="true">
+                        <i class="fas fa-file-archive"></i>
+                    </div>
+                    <div class="ablestack-security-evidence-download-content">
+                        <strong>증적 자료가 준비되었습니다.</strong>
+                        <span id="text-modal-security-evidence-download-file"></span>
+                        <a id="link-modal-security-evidence-download" href="#"
+                            class="pf-v6-c-button pf-m-link pf-m-inline" download>
+                            ZIP 파일 다운로드
+                            <i class="fas fa-download" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <footer class="pf-v6-c-modal-box__footer ablestack-security-evidence-footer">
+                <button id="button-execution-modal-security-evidence" aria-disabled="false"
+                    class="pf-v6-c-button pf-m-primary" type="button" data-ouia-safe="true">
+                    증적 자료 생성
+                </button>
+                <button id="button-cancel-modal-security-evidence" aria-disabled="false"
+                    class="pf-v6-c-button pf-m-link" type="button" data-ouia-safe="true">취소</button>
+            </footer>
+        </div>
+    </div>
+</div>
+<!-- 보안 점검 증적 : Modal 영역 끝 -->
+
 <!-- ssh port 변경  : Modal 영역 시작 -->
 <div id="div-modal-ssh-port-change" class="pf-v6-c-backdrop" style="display: none;">
     <div class="pf-v6-l-bullseye">

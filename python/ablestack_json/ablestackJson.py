@@ -9,6 +9,9 @@ SCVM, CCVM의 cloud-init 실행 및 완료 여부 확인하는 스크립트
 '''
 import json
 import argparse
+import shlex
+import socket
+import subprocess
 
 from ablestack import *
 
@@ -22,6 +25,8 @@ def parseArgs():
     parser.add_argument('--depth1', metavar='name', type=str, help='ablestack.json 1 depth key')
     parser.add_argument('--depth2', metavar='name', type=str, help='ablestack.json 2 depth key')
     parser.add_argument('--value', metavar='name', type=str, help='ablestack.json value')
+    parser.add_argument('--all-hosts', action='store_true',
+                        help='apply the update to every ablecube host in cluster.json')
 
     return parser.parse_args()
 
@@ -99,6 +104,111 @@ def jsonUpdate():
 
     return ret
 
+def jsonUpdateAllHosts():
+    if args.depth1 is None or args.depth2 is None or args.value is None:
+        return createReturn(
+            code=400,
+            val='--depth1, --depth2 and --value are required with --all-hosts'
+        )
+
+    local_update = jsonUpdate()
+    try:
+        local_result = json.loads(local_update)
+    except Exception:
+        return createReturn(code=500, val='local ablestack.json update result parse error')
+
+    if local_result.get('code') != 200:
+        return local_update
+
+    try:
+        hosts = cluster_json_data["clusterConfig"]["hosts"]
+        local_hostname = socket.gethostname()
+        local_names = {local_hostname, local_hostname.split('.')[0]}
+        updated_hosts = [local_hostname]
+        failed_hosts = []
+        processed_targets = set()
+
+        remote_args = [
+            '/usr/bin/python3',
+            pluginpath + '/python/ablestack_json/ablestackJson.py',
+            'update',
+            '--depth1', args.depth1,
+            '--depth2', args.depth2,
+            '--value', args.value
+        ]
+        remote_command = ' '.join(shlex.quote(value) for value in remote_args)
+
+        for host in hosts:
+            hostname = str(host.get('hostname', '')).strip()
+            target = str(host.get('ablecube', '')).strip()
+
+            if hostname in local_names:
+                continue
+            if not target:
+                failed_hosts.append({
+                    'host': hostname or 'unknown',
+                    'target': target,
+                    'error': 'ablecube management address is empty'
+                })
+                continue
+            if target in processed_targets:
+                continue
+
+            processed_targets.add(target)
+            try:
+                result = subprocess.run(
+                    [
+                        '/usr/bin/ssh',
+                        '-o', 'BatchMode=yes',
+                        '-o', 'StrictHostKeyChecking=no',
+                        '-o', 'ConnectTimeout=5',
+                        target,
+                        remote_command
+                    ],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    timeout=20,
+                    check=False
+                )
+
+                output_lines = [
+                    line.strip() for line in result.stdout.splitlines()
+                    if line.strip()
+                ]
+                remote_result = json.loads(output_lines[-1]) if output_lines else {}
+
+                if result.returncode == 0 and remote_result.get('code') == 200:
+                    updated_hosts.append(hostname or target)
+                else:
+                    error_message = result.stderr.strip()
+                    if not error_message:
+                        error_message = str(remote_result.get('val', 'remote update failed'))
+                    failed_hosts.append({
+                        'host': hostname or target,
+                        'target': target,
+                        'error': error_message
+                    })
+            except Exception as e:
+                failed_hosts.append({
+                    'host': hostname or target,
+                    'target': target,
+                    'error': str(e)
+                })
+
+        result_value = {
+            'depth1': args.depth1,
+            'depth2': args.depth2,
+            'value': args.value,
+            'updatedHosts': updated_hosts,
+            'failedHosts': failed_hosts
+        }
+        if failed_hosts:
+            return createReturn(code=207, val=result_value)
+        return createReturn(code=200, val=result_value)
+    except Exception as e:
+        return createReturn(code=500, val='cluster ablestack.json update error: ' + str(e))
+
 def jsonAllUpdate():
     try:
         json_data = openAblestackJson()
@@ -147,7 +257,10 @@ if __name__ == '__main__':
         ret = jsonStatus()
         print(ret)
     elif (args.action) == 'update':
-        ret = jsonUpdate()
+        if args.all_hosts:
+            ret = jsonUpdateAllHosts()
+        else:
+            ret = jsonUpdate()
         print(ret)
     elif (args.action) == 'allUpdate':
         ret = jsonAllUpdate()

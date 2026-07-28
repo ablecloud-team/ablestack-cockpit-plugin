@@ -1,0 +1,63 @@
+ABLESTACK SECURITY EVIDENCE REPORT
+REPORT_VERSION: 1.0
+GENERATED_AT: 2026-07-23T14:02:49+09:00
+OUTPUT_FILE: ablecube1-security-evidence.txt
+CATALOG_VERSION: 1.0
+CATALOG_SOURCE: ABLESTACK 보안취약점 가이드 v1.3.pptx (KISA 2026 기반)
+TARGET_COUNT: 1
+TARGETS: ablecube1
+ITEM_COUNT: 1
+ITEMS: U-64
+====================================================================================================
+
+####################################################################################################
+ABLESTACK HOST BEGIN
+TARGET: ablecube1
+HOSTNAME: ablecube1
+FQDN: ablecube1
+IP_ADDRESSES: (샘플 화면에서 확인 불가)
+OS: ABLESTACK Diplo v4.3.1
+KERNEL: (샘플 화면에서 확인 불가)
+COLLECTED_AT: 2026-07-23T14:02:49+09:00
+COLLECTED_BY: root
+COLLECTOR_VERSION: demo-from-provided-screenshot
+CATALOG_SOURCE: ABLESTACK 보안취약점 가이드 v1.3.pptx (KISA 2026 기반)
+####################################################################################################
+
+====================================================================================================
+ABLESTACK ITEM BEGIN
+ITEM_CODE: U-64
+ITEM_TITLE: 주기적 보안 패치 및 벤더 권고사항 적용
+IMPORTANCE: 상
+GUIDE_STATUS: 양호
+GUIDE_NOTE: EOL이 아닌 OS와 최신 보안 패치가 적용된 커널인지 확인합니다.
+HOST: ablecube1
+TARGET: ablecube1
+COLLECTED_AT: 2026-07-23T14:02:49+09:00
+----------------------------------------------------------------------------------------------------
+COMMAND_INDEX: 1
+COMMAND_LABEL: OS 버전
+[root@ablecube1 ~]# cat /etc/os-release
+OUTPUT_BEGIN
+NAME="Rocky Linux"
+VERSION="9.6 (Blue Onyx)"
+ID="rocky"
+ID_LIKE="rhel centos fedora"
+VERSION_ID="9.6"
+PLATFORM_ID="platform:el9"
+PRETTY_NAME="ABLESTACK Diplo v4.3.1"
+ANSI_COLOR="0;32"
+[SOURCE_IMAGE_CROPPED_AFTER_THIS_LINE]
+OUTPUT_END
+EXIT_CODE: 0
+ITEM_STATUS: COLLECTED
+ABLESTACK ITEM END
+====================================================================================================
+
+####################################################################################################
+ABLESTACK HOST END
+TARGET: ablecube1
+HOSTNAME: ablecube1
+####################################################################################################
+TRANSPORT_EXIT_CODE: 0
+====================================================================================================

@@ -53,6 +53,7 @@ $(document).ready(function () {
   $('#button-open-modal-wizard-monitoring-center').hide();
   $('#button-link-monitoring-center').hide();
   $('#button-config-file-download').hide();
+  $('#button-open-modal-security-evidence').hide();
   refreshSystemUpdateButton();
 
   $('#div-modal-wizard-storage-vm').load("./src/features/storage-vm-wizard.html");
@@ -1426,6 +1427,7 @@ function checkDeployStatus() {
     $('#button-open-modal-wizard-monitoring-center').hide();
     $('#button-link-monitoring-center').hide();
     $('#button-config-file-download').hide();
+    $('#button-open-modal-security-evidence').hide();
     /*
     가상머신 배포 및 클러스터 구성 상태를 세션 스토리지에서 조회
     - 클러스터 구성준비 상태 = false, true
@@ -1455,6 +1457,7 @@ function checkDeployStatus() {
     const step11 = sessionStorage.getItem("gfs_configure");
     const step12 = sessionStorage.getItem("local_configure");
     const step13 = sessionStorage.getItem("security_patch");
+    $('#button-open-modal-security-evidence').toggle(step13 == "true");
 
     // 배포 상태조회
     if (os_type == "ablestack-hci") {
@@ -1754,6 +1757,7 @@ function checkDeployStatus() {
                   $('#button-link-monitoring-center').show();
                   $('#button-cloud-vm-backup').removeClass('pf-m-disabled');
                   $('#button-cloud-vm-restore').removeClass('pf-m-disabled');
+                  $('#button-cloud-cluster-ssh-port').removeClass('pf-m-disabled');
 
                   showRibbon('success', 'ABLESTACK 클라우드센터 VM 배포되었으며 모니터링센터 구성이 완료되었습니다. 가상어플라이언스 상태가 정상입니다.');
                   // 운영 상태조회
@@ -5458,6 +5462,180 @@ $(document).on('click', '#button-execution-modal-system-update', function () {
 });
 /** ABLESTACK Version 업데이트 제어 관련 action end */
 
+/** 보안 점검 증적 제어 관련 action start */
+const SECURITY_EVIDENCE_HELPER = pluginpath + '/python/security_evidence/security_evidence_package.py';
+let securityEvidenceModalBlobUrl = null;
+
+function showSecurityEvidenceStatus(message, tone, isLoading) {
+  const $status = $('#div-modal-security-evidence-status');
+  const loading = Boolean(isLoading);
+  $status.removeClass('pf-m-info pf-m-success pf-m-danger');
+  $status.addClass(tone || 'pf-m-info');
+  $status.attr('aria-busy', loading ? 'true' : 'false');
+  $('#icon-modal-security-evidence-status').toggle(!loading);
+  $('#spinner-modal-security-evidence-status').toggle(loading);
+  $('#text-modal-security-evidence-status').text(message);
+  $status.show();
+}
+
+function downloadSecurityEvidencePackage(metadata) {
+  if (!metadata || !metadata.path) {
+    return Promise.reject(new Error('다운로드할 증적 파일 경로가 없습니다.'));
+  }
+  return cockpit.spawn(
+    ['/usr/bin/cat', metadata.path],
+    { superuser: true, binary: true }
+  ).then(function (packageBytes) {
+    const blobUrl = URL.createObjectURL(
+      new Blob([packageBytes], { type: 'application/zip' })
+    );
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = metadata.filename || 'ABLESTACK 보안 취약점 증적 자료.zip';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.setTimeout(function () {
+      URL.revokeObjectURL(blobUrl);
+    }, 30000);
+  });
+}
+window.downloadSecurityEvidencePackage = downloadSecurityEvidencePackage;
+
+function clearSecurityEvidenceModalDownloadLink() {
+  if (securityEvidenceModalBlobUrl) {
+    URL.revokeObjectURL(securityEvidenceModalBlobUrl);
+    securityEvidenceModalBlobUrl = null;
+  }
+  $('#link-modal-security-evidence-download')
+    .attr('href', '#')
+    .removeAttr('download');
+  $('#text-modal-security-evidence-download-file').text('');
+  $('#div-modal-security-evidence-download').hide();
+}
+
+function prepareSecurityEvidenceModalDownloadLink(metadata) {
+  if (!metadata || !metadata.path) {
+    return Promise.reject(new Error('다운로드할 증적 파일 경로가 없습니다.'));
+  }
+  return cockpit.spawn(
+    ['/usr/bin/cat', metadata.path],
+    { superuser: true, binary: true }
+  ).then(function (packageBytes) {
+    clearSecurityEvidenceModalDownloadLink();
+    securityEvidenceModalBlobUrl = URL.createObjectURL(
+      new Blob([packageBytes], { type: 'application/zip' })
+    );
+    const filename = metadata.filename || 'ABLESTACK 보안 취약점 증적 자료.zip';
+    $('#link-modal-security-evidence-download')
+      .attr('href', securityEvidenceModalBlobUrl)
+      .attr('download', filename);
+    $('#text-modal-security-evidence-download-file').text(filename);
+    $('#div-modal-security-evidence-download').css('display', 'flex');
+  });
+}
+
+function refreshSecurityEvidenceDownloadLink() {
+  const $link = $('#span-modal-security-evidence-download');
+  if (!$link.length) {
+    return Promise.resolve();
+  }
+  $link
+    .addClass('pf-m-disabled')
+    .attr('aria-disabled', 'true')
+    .text('최신 생성 자료를 확인 중입니다')
+    .off('click.securityEvidence');
+
+  return cockpit.spawn(
+    ['python3', SECURITY_EVIDENCE_HELPER, 'latest'],
+    { superuser: true }
+  ).then(function (data) {
+    const result = JSON.parse(data);
+    if (result.code != 200) {
+      $link.text('생성된 자료가 없습니다');
+      return;
+    }
+    const metadata = result.val;
+    $link
+      .removeClass('pf-m-disabled')
+      .attr('aria-disabled', 'false')
+      .text('최신 자료 다운로드 (' + metadata.generatedAt + ')')
+      .on('click.securityEvidence', function (event) {
+        event.preventDefault();
+        downloadSecurityEvidencePackage(metadata).catch(function (error) {
+          alert('보안 취약점 증적 자료 다운로드에 실패했습니다: ' + error);
+        });
+      });
+  }).catch(function () {
+    $link.text('생성된 자료가 없습니다');
+  });
+}
+window.refreshSecurityEvidenceDownloadLink = refreshSecurityEvidenceDownloadLink;
+
+function markSecurityPatchCompleted() {
+  sessionStorage.setItem('security_patch', 'true');
+  $('#button-open-modal-security-update').hide();
+  $('#button-open-modal-security-evidence').show();
+}
+
+$('#button-open-modal-security-evidence').on('click', function () {
+  $('#div-modal-security-evidence').show();
+  $('#div-modal-security-evidence-status').hide();
+  clearSecurityEvidenceModalDownloadLink();
+});
+
+$('#button-close-modal-security-evidence, #button-cancel-modal-security-evidence').on('click', function () {
+  $('#div-modal-security-evidence').hide();
+  clearSecurityEvidenceModalDownloadLink();
+});
+
+$('#button-execution-modal-security-evidence').on('click', function () {
+  const $execute = $('#button-execution-modal-security-evidence');
+  const $cancel = $('#button-cancel-modal-security-evidence');
+  clearSecurityEvidenceModalDownloadLink();
+  $execute.prop('disabled', true).attr('aria-disabled', 'true');
+  $cancel.prop('disabled', true).attr('aria-disabled', 'true');
+  showSecurityEvidenceStatus(
+    '전체 호스트의 보안 점검 증적을 수집하고 있습니다. 잠시만 기다려주세요.',
+    'pf-m-info',
+    true
+  );
+
+  cockpit.spawn(
+    ['python3', SECURITY_EVIDENCE_HELPER, 'generate'],
+    { superuser: true }
+  ).then(function (data) {
+    const result = JSON.parse(data);
+    if (result.code != 200) {
+      throw new Error(result.val || '증적 자료 생성에 실패했습니다.');
+    }
+    return prepareSecurityEvidenceModalDownloadLink(result.val).then(function () {
+      const hostSummary = result.val.requestedHosts
+        ? ' (요청 ' + result.val.requestedHosts + '대, 수집 ' + result.val.hosts + '대)'
+        : '';
+      const warning = result.val.collectorStatus
+        ? ' 일부 호스트의 SSH 수집 결과를 확인해주세요.'
+        : '';
+      showSecurityEvidenceStatus(
+        'ABLESTACK 보안 취약점 증적 자료 생성이 완료되었습니다.'
+          + hostSummary + warning,
+        result.val.collectorStatus ? 'pf-m-info' : 'pf-m-success'
+      );
+      refreshSecurityEvidenceDownloadLink();
+    });
+  }).catch(function (error) {
+    showSecurityEvidenceStatus(
+      '보안 취약점 증적 자료 생성 또는 다운로드 링크 준비에 실패했습니다: ' + error,
+      'pf-m-danger'
+    );
+  }).finally(function () {
+    $execute.prop('disabled', false).attr('aria-disabled', 'false');
+    $cancel.prop('disabled', false).attr('aria-disabled', 'false');
+  });
+});
+/** 보안 점검 증적 제어 관련 action end */
+
 /** 보안 업데이트 제어 관련 action start */
 $('#button-open-modal-security-update').on('click', function () {
   $('#div-modal-security-update').show();
@@ -5719,6 +5897,7 @@ $('#button-execution-modal-security-update').on('click', function () {
                       $('#div-modal-spinner').hide();
                       $("#modal-status-alert-title").html("보안 업데이트 적용");
                       $("#modal-status-alert-body").html("보안 업데이트 적용이 완료되었습니다.");
+                      markSecurityPatchCompleted();
                       $('#div-modal-status-alert').show();
                     } else {
                       $('#div-modal-spinner').hide();
@@ -5802,6 +5981,7 @@ $('#button-execution-modal-security-update').on('click', function () {
                             $('#div-modal-spinner').hide();
                             $("#modal-status-alert-title").html("보안 업데이트 적용");
                             $("#modal-status-alert-body").html("보안 업데이트 적용이 완료되었습니다.");
+                            markSecurityPatchCompleted();
                             $('#div-modal-status-alert').show();
                           } else {
                             $('#div-modal-spinner').hide();
@@ -5837,6 +6017,7 @@ $('#button-execution-modal-security-update').on('click', function () {
                         $('#div-modal-spinner').hide();
                         $("#modal-status-alert-title").html("보안 업데이트 적용");
                         $("#modal-status-alert-body").html("보안 업데이트 적용이 완료되었습니다.");
+                        markSecurityPatchCompleted();
                         $('#div-modal-status-alert').show();
                       } else {
                         $('#div-modal-spinner').hide();
@@ -5916,6 +6097,7 @@ $('#button-execution-modal-security-update').on('click', function () {
                       $('#div-modal-spinner').hide();
                       $("#modal-status-alert-title").html("보안 업데이트 적용");
                       $("#modal-status-alert-body").html("보안 업데이트 적용이 완료되었습니다.");
+                      markSecurityPatchCompleted();
                       $('#div-modal-status-alert').show();
                     } else {
                       $('#div-modal-spinner').hide();
@@ -5932,6 +6114,7 @@ $('#button-execution-modal-security-update').on('click', function () {
                   $('#div-modal-spinner').hide();
                   $("#modal-status-alert-title").html("보안 업데이트 적용");
                   $("#modal-status-alert-body").html("보안 업데이트 적용이 완료되었습니다.");
+                  markSecurityPatchCompleted();
                   $('#div-modal-status-alert').show();
                 } else {
                   $('#div-modal-spinner').hide();
@@ -5998,6 +6181,7 @@ $('#button-execution-modal-security-update').on('click', function () {
                       $('#div-modal-spinner').hide();
                       $("#modal-status-alert-title").html("보안 업데이트 적용");
                       $("#modal-status-alert-body").html("보안 업데이트 적용이 완료되었습니다.");
+                      markSecurityPatchCompleted();
                       $('#div-modal-status-alert').show();
                     } else {
                       $('#div-modal-spinner').hide();

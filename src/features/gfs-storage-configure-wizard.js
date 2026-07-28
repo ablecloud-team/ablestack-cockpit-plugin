@@ -645,14 +645,25 @@ function deployGfsStorage() {
                                               var create_gfs_result = JSON.parse(data);
                                               console.log(create_gfs_result);
                                               if (create_gfs_result.code == "200"){
-                                                var gfs_boostrap_cmd = ['python3', pluginpath + '/python/ablestack_json/ablestackJson.py','update', '--depth1', 'bootstrap', '--depth2', 'gfs_configure', '--value', 'true']
+                                                var gfs_boostrap_cmd = ['python3', pluginpath + '/python/ablestack_json/ablestackJson.py','update', '--depth1', 'bootstrap', '--depth2', 'gfs_configure', '--value', 'true', '--all-hosts']
                                                 console.log(gfs_boostrap_cmd);
                                                 cockpit.spawn(gfs_boostrap_cmd)
-                                                .then(function(){
-                                                  createLoggerInfo("deployGfsStorage success");
-                                                  setGfsProgressStep("span-gfs-progress-step3",2);
-                                                  //최종 화면 호출
-                                                  showDivisionGFSConfigFinish();
+                                                .then(function(data){
+                                                  var gfs_bootstrap_result = JSON.parse(data);
+                                                  if (gfs_bootstrap_result.code == "200"){
+                                                    createLoggerInfo("deployGfsStorage success");
+                                                    setGfsProgressStep("span-gfs-progress-step3",2);
+                                                    //최종 화면 호출
+                                                    showDivisionGFSConfigFinish();
+                                                  }else{
+                                                    setGfsProgressFail(3);
+                                                    createLoggerInfo("GFS configuration succeeded, but gfs_configure synchronization failed");
+                                                    alert("GFS 구성은 완료되었으나 일부 호스트의 구성 상태 동기화에 실패했습니다.");
+                                                  }
+                                                }).catch(function(data){
+                                                  setGfsProgressFail(3);
+                                                  createLoggerInfo("GFS configuration succeeded, but gfs_configure synchronization command failed");
+                                                  alert("GFS 구성은 완료되었으나 구성 상태 동기화 명령 실행에 실패했습니다 : "+data);
                                                 })
                                               }else{
                                                 setGfsProgressFail(3);
@@ -812,14 +823,25 @@ function deployGfsStorage() {
                                             var create_gfs_result = JSON.parse(data);
                                             console.log(create_gfs_result);
                                             if (create_gfs_result.code == "200"){
-                                              var gfs_boostrap_cmd = ['python3', pluginpath + '/python/ablestack_json/ablestackJson.py','update', '--depth1', 'bootstrap', '--depth2', 'gfs_configure', '--value', 'true']
+                                              var gfs_boostrap_cmd = ['python3', pluginpath + '/python/ablestack_json/ablestackJson.py','update', '--depth1', 'bootstrap', '--depth2', 'gfs_configure', '--value', 'true', '--all-hosts']
                                               console.log(gfs_boostrap_cmd);
                                               cockpit.spawn(gfs_boostrap_cmd)
-                                              .then(function(){
-                                                createLoggerInfo("deployGfsStorage success");
-                                                setGfsProgressStep("span-gfs-progress-step3",2);
-                                                //최종 화면 호출
-                                                showDivisionGFSConfigFinish();
+                                              .then(function(data){
+                                                var gfs_bootstrap_result = JSON.parse(data);
+                                                if (gfs_bootstrap_result.code == "200"){
+                                                  createLoggerInfo("deployGfsStorage success");
+                                                  setGfsProgressStep("span-gfs-progress-step3",2);
+                                                  //최종 화면 호출
+                                                  showDivisionGFSConfigFinish();
+                                                }else{
+                                                  setGfsProgressFail(3);
+                                                  createLoggerInfo("GFS configuration succeeded, but gfs_configure synchronization failed");
+                                                  alert("GFS 구성은 완료되었으나 일부 호스트의 구성 상태 동기화에 실패했습니다.");
+                                                }
+                                              }).catch(function(data){
+                                                setGfsProgressFail(3);
+                                                createLoggerInfo("GFS configuration succeeded, but gfs_configure synchronization command failed");
+                                                alert("GFS 구성은 완료되었으나 구성 상태 동기화 명령 실행에 실패했습니다 : "+data);
                                               })
                                             }else{
                                               setGfsProgressFail(3);
