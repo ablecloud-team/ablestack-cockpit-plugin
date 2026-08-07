@@ -94,7 +94,7 @@ def create_local_disk(disks):
             fstab_line = f"/dev/{vg}/{lv_glue} /mnt/glue xfs defaults 0 0"
 
             run_command(f"parted -s {disk} mklabel gpt mkpart primary 0% 100% set 1 lvm on")
-            run_command(f"pvcreate {partition}")
+            run_command(f"pvcreate {partition} -y")
             run_command(f"vgcreate {vg} {partition}")
             run_command(f"lvcreate -n {lv_glue} {vg} -l +100%FREE -y")
             run_command("mkdir -p /mnt/glue")
