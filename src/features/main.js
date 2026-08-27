@@ -4371,6 +4371,9 @@ function updateLicenseStatus() {
         licenseDescription = `
           <div class="license-info">
             <p><i class="fas fa-check-circle" style="color: green;"></i> 라이선스가 등록되어 있습니다.</p>
+            <hr>
+            <p><strong>라이선스 유형:</strong> ${result.val.oem}</p>
+            <hr>
             <p><strong>시작일:</strong> ${result.val.issued}</p>
             <p><strong>만료일:</strong> ${result.val.expired}</p>
             <hr>
@@ -4389,6 +4392,9 @@ function updateLicenseStatus() {
         licenseDescription = `
           <div class="license-info">
           <p style="font-size: 15.7px; color: crimson;"><i class="fas fa-exclamation-triangle" style="color: red;"></i> 등록된 라이선스의 유효기간이 만료되었습니다.새로운 라이선스를 등록해 주세요.</p>
+            <hr>
+            <p><strong>라이선스 유형:</strong> ${result.val.oem}</p>
+            <hr>
             <p><strong>시작일:</strong> ${result.val.issued}</p>
             <p><strong>만료일:</strong> ${result.val.expired}</p>
             <hr>
