@@ -25,10 +25,34 @@ firewall-cmd --list-all 2>&1 | tee -a $LOGFILE
 # 라이선스 종류에 따라 설정 $1="hv" or "ablestack" or "clostack"
 sh /usr/share/cloudstack-common/scripts/util/update-mold-theme-from-license.sh "$1"
 
+# setCrushmap
 if [ "${os_type}" = "ablestack-hci" ]; then
-  # Crushmap 설정 추가 (ceph autoscale)
-  scvm=$(grep scvm-mngt /etc/hosts | awk {'print $1'})
-  ssh -o StrictHostKeyChecking=no $scvm /usr/local/sbin/setCrushmap.sh
+  # /etc/hosts에서 SCVM 관리 IP를 한 개만 가져옵니다.
+  scvm="$(
+    awk '$0 !~ /^[[:space:]]*#/ && $0 ~ /scvm-mngt/ {
+      print $1
+      exit
+    }' /etc/hosts
+  )"
+
+  if [ -z "${scvm}" ]; then
+    echo "[ERROR] /etc/hosts에서 scvm-mngt 주소를 찾을 수 없습니다."
+    exit 1
+  fi
+
+  echo "[INFO] ${scvm}에서 CRUSH map 설정을 실행합니다."
+
+  ssh \
+    -o BatchMode=yes \
+    -o ConnectTimeout=10 \
+    -o StrictHostKeyChecking=no \
+    "root@${scvm}" \
+    "/usr/local/sbin/setCrushmap.sh"
+
+  if [ "$?" -ne 0 ]; then
+    echo "[ERROR] SCVM의 CRUSH map 설정에 실패했습니다."
+    exit 1
+  fi
 fi
 
 # resize partition

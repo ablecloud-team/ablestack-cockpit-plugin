@@ -2358,12 +2358,13 @@
                     <div class="pf-v6-c-alert__icon">
                         <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
                     </div>
-                    <p class="pf-v6-c-alert__title"><strong>업데이트 전 주의사항</strong></p>
+                    <p class="pf-v6-c-alert__title"><strong>업데이트 안내 및 주의사항</strong></p>
                     <div class="pf-v6-c-alert__description">
                         <ol>
-                            <li>업데이트 전 서비스 및 가상머신 중지 여부 확인</li>
-                            <li>업데이트 완료 후 시스템 재부팅 필요 (사용자가 직접 수행)</li>
-                            <li>업데이트는 각 호스트에서 개별적으로 실행 필요</li>
+                            <li>사용자 가상머신 정지 후 업데이트를 권장합니다.</li>
+                            <li>업데이트는 각 호스트에서 개별적으로 실행하며 롤링 업데이트 방식을 권장합니다.</li>
+                            <li>업데이트는 에이블스택 필수 패키지 및 서비스 대상이며 일부 패키지 및 서비스는 수동 업데이트가 필요할 수 있습니다. </li>
+                            <li>전체 업데이트는 커널 업데이트가 포함될 수 있으며 호스트 재부팅이 필요할 수 있습니다.</li>
                         </ol>
                     </div>
                 </div>
@@ -2390,23 +2391,23 @@
                     <div class="pf-v6-c-form__group">
                         <div class="pf-v6-c-form__group-label">
                             <label class="pf-v6-c-form__label">
-                                <span class="pf-v6-c-form__label-text">업데이트 방식</span>
+                                <span class="pf-v6-c-form__label-text">업데이트 구분</span>
                                 <span class="pf-v6-c-form__label-required" aria-hidden="true">&#42;</span>
                             </label>
                         </div>
                         <div class="pf-v6-c-form__group-control">
-                            <div class="ablestack-update-type-group" role="radiogroup" aria-label="업데이트 방식">
+                            <div class="ablestack-update-type-group" role="radiogroup" aria-label="업데이트 구분">
                                 <label class="pf-v6-c-radio ablestack-update-type-option" for="radio-system-update-type-all">
                                     <input class="pf-v6-c-radio__input" type="radio" id="radio-system-update-type-all"
                                         name="radio-system-update-type" value="all" checked />
                                     <span class="pf-v6-c-radio__label">전체 업데이트</span>
-                                    <span class="pf-v6-c-radio__description">커널, Mold 등 전체 업데이트</span>
+                                    <span class="pf-v6-c-radio__description">패키지 전체 업데이트</span>
                                 </label>
                                 <label class="pf-v6-c-radio ablestack-update-type-option" for="radio-system-update-type-mold">
                                     <input class="pf-v6-c-radio__input" type="radio" id="radio-system-update-type-mold"
                                         name="radio-system-update-type" value="mold" />
                                     <span class="pf-v6-c-radio__label">Mold 업데이트</span>
-                                    <span class="pf-v6-c-radio__description">Mold만 업데이트</span>
+                                    <span class="pf-v6-c-radio__description">Mold 서비스 업데이트</span>
                                 </label>
                             </div>
                         </div>
