@@ -33,7 +33,7 @@ $(document).ready(function () {
   // 타입별 클라우드센터 가상머신 상태 변경
   insertCloudVmCard(os_type);
 
-  // 라이센스 관리 버튼 초기 표시
+  // 라이선스 관리 버튼 초기 표시
   $('#button-open-modal-license-register').show();
 
   $('#dropdown-menu-storage-cluster-status').hide();
@@ -124,7 +124,7 @@ $(document).ready(function () {
     ribbonWorker();
   }, 30000);
 
-  // 라이센스 관련 이벤트 핸들러
+  // 라이선스 관련 이벤트 핸들러
   initializeLicenseHandlers();
   checkLicenseStatusConfirm();
   // 초기 버튼 비활성화
@@ -135,12 +135,12 @@ $(document).ready(function () {
     $('#div-modal-status-alert').hide();
   });
 
-  // 라이센스 키 입력 필드 유효성 검사
+  // 라이선스 키 입력 필드 유효성 검사
   $('#input-license-key').on('input', function () {
     validateLicenseInputs();
   });
 
-  // 라이센스 파일 선택 필드 유효성 검사
+  // 라이선스 파일 선택 필드 유효성 검사
   $('#input-license-file').on('change', function () {
     validateLicenseInputs();
   });
@@ -168,7 +168,7 @@ $(document).ready(function () {
     validateLicenseInputs();
   });
 
-  // 라이센스 상태 확인 함수
+  // 라이선스 상태 확인 함수
   function checkLicenseStatusConfirm() {
     cockpit.spawn(['python3', pluginpath + '/python/license/register_license.py', '--status'])
       .then(function (data) {
@@ -176,7 +176,7 @@ $(document).ready(function () {
         if (result.code == 200) {
           updateLicenseUI(result);
 
-          // 라이센스 버튼은 항상 표시되도록 수정
+          // 라이선스 버튼은 항상 표시되도록 수정
           $('#button-open-modal-license-register').show();
         } else {
           // 에러 시에도 버튼은 표시
@@ -185,7 +185,7 @@ $(document).ready(function () {
           // 에러 UI 업데이트
           // $('#div-license-description').html(`
           //   <div class="license-info error">
-          //     <p><i class="fas fa-exclamation-triangle" style="color: red;"></i> 라이센스 상태를 확인할 수 없습니다.</p>
+          //     <p><i class="fas fa-exclamation-triangle" style="color: red;"></i> 라이선스 상태를 확인할 수 없습니다.</p>
           //     <p>시스템 오류가 발생했습니다.</p>
           //   </div>
           // `);
@@ -198,44 +198,50 @@ $(document).ready(function () {
         // 에러 UI 업데이트
         $('#div-license-description').html(`
           <div class="license-info error">
-            <p><i class="fas fa-exclamation-triangle" style="color: red;"></i> 라이센스 상태를 확인할 수 없습니다.</p>
+            <p><i class="fas fa-exclamation-triangle" style="color: red;"></i> 라이선스 상태를 확인할 수 없습니다.</p>
             <p>시스템 오류가 발생했습니다.</p>
           </div>
         `);
       });
   }
 
-  // 라이센스 상태에 따른 UI 업데이트 함수
+  // 라이선스 상태에 따른 UI 업데이트 함수
   function updateLicenseUI(result) {
     let licenseDescription = '';
 
     if (result.code == "200" && result.val && result.val.status === 'active') {
-      // 유효한 라이센스가 있는 경우
+      // 유효한 라이선스가 있는 경우
       licenseDescription = `
         <div class="license-info">
-          <p><i class="fas fa-check-circle" style="color: green;"></i> 라이센스가 등록되어 있습니다.</p>
+          <p><i class="fas fa-check-circle" style="color: green;"></i> 라이선스가 등록되어 있습니다.</p>
+          <hr>
+          <p><strong>라이선스 유형:</strong> ${result.val.oem}</p>
+          <hr>
           <p><strong>시작일:</strong> ${result.val.issued}</p>
           <p><strong>만료일:</strong> ${result.val.expired}</p>
           <hr>
-          <p class="text-muted">새로운 라이센스를 등록하면 기존 라이센스가 교체됩니다.</p>
+          <p class="text-muted">새로운 라이선스를 등록하면 기존 라이선스가 교체됩니다.</p>
         </div>
       `;
     } else if (result.code == "404") {
-      // 라이센스가 없는 경우
+      // 라이선스가 없는 경우
       licenseDescription = `
         <div class="license-info">
-          <p><i class="fas fa-exclamation-circle" style="orange;"></i> 등록된 라이센스가 없습니다.</p>
-          <p>라이센스 파일을 선택하여 등록해주세요.</p>
+          <p><i class="fas fa-exclamation-circle" style="orange;"></i> 등록된 라이선스가 없습니다.</p>
+          <p>라이선스 파일을 선택하여 등록해주세요.</p>
         </div>
       `;
     } else if (result.code == "200" && result.val.status === 'inactive') {
       licenseDescription = `
         <div class="license-info">
-        <p style="font-size: 15.7px; color: crimson;"><i class="fas fa-exclamation-triangle" style="color: red;"></i> 등록된 라이선스의 유효기간이 만료되었습니다.새로운 라이센스를 등록해 주세요.</p>
+          <p style="font-size: 15.7px; color: crimson;"><i class="fas fa-exclamation-triangle" style="color: red;"></i> 등록된 라이선스의 유효기간이 만료되었습니다.새로운 라이선스를 등록해 주세요.</p>
+          <hr>
+          <p><strong>라이선스 유형:</strong> ${result.val.oem}</p>
+          <hr>
           <p><strong>시작일:</strong> ${result.val.issued}</p>
           <p><strong>만료일:</strong> ${result.val.expired}</p>
           <hr>
-          <p class="text-muted">새로운 라이센스를 등록하면 기존 라이센스가 교체됩니다.</p>
+          <p class="text-muted">새로운 라이선스를 등록하면 기존 라이선스가 교체됩니다.</p>
         </div>
       `;
     }
@@ -243,7 +249,7 @@ $(document).ready(function () {
       // 오류가 발생한 경우
       licenseDescription = `
         <div class="license-info error">
-          <p><i class="fas fa-exclamation-triangle" style="color: red;"></i> 라이센스 상태 확인 중 오류가 발생했습니다.</p>
+          <p><i class="fas fa-exclamation-triangle" style="color: red;"></i> 라이선스 상태 확인 중 오류가 발생했습니다.</p>
           <p>${result.val}</p>
         </div>
       `;
@@ -252,9 +258,9 @@ $(document).ready(function () {
     $('#div-license-description').html(licenseDescription);
   }
 
-  // 라이센스 관련 이벤트 핸들러
+  // 라이선스 관련 이벤트 핸들러
   function initializeLicenseHandlers() {
-    // 라이센스 등록 모달 열기
+    // 라이선스 등록 모달 열기
     $('#button-open-modal-license-register').on('click', function () {
       $('#div-modal-license-register').show();
       checkLicenseStatusConfirm();
@@ -271,17 +277,17 @@ $(document).ready(function () {
       $('#button-execution-modal-license-register').prop('disabled', !this.files.length);
     });
 
-    // 라이센스 등록 실행
+    // 라이선스 등록 실행
     $('#button-execution-modal-license-register').on('click', function () {
       const licenseFile = $('#input-license-file')[0].files[0];
       if (!licenseFile) {
-        alert("라이센스 파일을 선택해주세요.");
+        alert("라이선스 파일을 선택해주세요.");
         return;
       }
 
       // 로딩 스피너 표시
-      $('#div-modal-spinner-header-txt').text('라이센스 등록중입니다...');
-      $('#div-modal-spinner-body-txt').text('라이센스를 등록하는 중입니다. 잠시만 기다려주세요.');
+      $('#div-modal-spinner-header-txt').text('라이선스 등록중입니다...');
+      $('#div-modal-spinner-body-txt').text('라이선스를 등록하는 중입니다. 잠시만 기다려주세요.');
       $('#div-modal-spinner').show();
 
       const reader = new FileReader();
@@ -289,7 +295,7 @@ $(document).ready(function () {
         const fileContent = e.target.result;
         const base64Content = btoa(fileContent);
 
-        // 라이센스 등록 API 호출
+        // 라이선스 등록 API 호출
         cockpit.spawn([
           'python3',
           '/usr/share/cockpit/ablestack/python/license/register_license.py',
@@ -303,10 +309,10 @@ $(document).ready(function () {
             const result = JSON.parse(data);
             if (result.code == "200") {
               $('#div-modal-license-register').hide();
-              alert("라이센스가 성공적으로 등록되었습니다.");
+              alert("라이선스가 성공적으로 등록되었습니다.");
               location.reload();
             } else {
-              alert("라이센스 등록 실패: " + result.val);
+              alert("라이선스 등록 실패: " + result.val);
               location.reload();
             }
           })
@@ -314,7 +320,7 @@ $(document).ready(function () {
             $('#div-modal-spinner').hide();
             $('#div-modal-license-register').hide();
             console.error("Error:", error);
-            alert("라이센스 등록 중 오류가 발생했습니다: " + error);
+            alert("라이선스 등록 중 오류가 발생했습니다: " + error);
             location.reload();
           });
       };
@@ -322,7 +328,7 @@ $(document).ready(function () {
     });
   }
 
-  // 페이지 로드 시 라이센스 상태 확인
+  // 페이지 로드 시 라이선스 상태 확인
   checkLicenseStatusConfirm();
 });
 // document.ready 영역 끝
@@ -721,7 +727,7 @@ function checkLicenseStatus() {
       .then(function (data) {
         var result = JSON.parse(data);
         if (result.code == 200) {
-          // 라이센스 상태가 active인 경우
+          // 라이선스 상태가 active인 경우
           if (result.val && result.val.status === 'active') {
             sessionStorage.setItem("license_status", "active");
             resolve();
@@ -4351,7 +4357,7 @@ function updateModalContent(mountPoint, multipaths, devices, physicalVolume, vol
     }
   }
 }
-// 라이센스 상태 확인 및 표시
+// 라이선스 상태 확인 및 표시
 function updateLicenseStatus() {
   // superuser 권한으로 실행
   cockpit.spawn(['python3', '/usr/share/cockpit/ablestack/python/license/register_license.py', '--status'], { superuser: true })
@@ -4361,39 +4367,45 @@ function updateLicenseStatus() {
       console.log(result.code, result.val.status)
 
       if (result.code == "200" && result.val && result.val.status === 'active') {
-        // 유효한 라이센스가 있는 경우
+        // 유효한 라이선스가 있는 경우
         licenseDescription = `
           <div class="license-info">
-            <p><i class="fas fa-check-circle" style="color: green;"></i> 라이센스가 등록되어 있습니다.</p>
+            <p><i class="fas fa-check-circle" style="color: green;"></i> 라이선스가 등록되어 있습니다.</p>
+            <hr>
+            <p><strong>라이선스 유형:</strong> ${result.val.oem}</p>
+            <hr>
             <p><strong>시작일:</strong> ${result.val.issued}</p>
             <p><strong>만료일:</strong> ${result.val.expired}</p>
             <hr>
-            <p class="text-muted">새로운 라이센스를 등록하면 기존 라이센스가 교체됩니다.</p>
+            <p class="text-muted">새로운 라이선스를 등록하면 기존 라이선스가 교체됩니다.</p>
           </div>
         `;
       } else if (result.code == "404") {
-        // 라이센스가 없는 경우
+        // 라이선스가 없는 경우
         licenseDescription = `
           <div class="license-info">
-            <p><i class="fas fa-exclamation-circle" style="orange;"></i> 등록된 라이센스가 없습니다.</p>
-            <p>라이센스 파일을 선택하여 등록해주세요.</p>
+            <p><i class="fas fa-exclamation-circle" style="orange;"></i> 등록된 라이선스가 없습니다.</p>
+            <p>라이선스 파일을 선택하여 등록해주세요.</p>
           </div>
         `;
       } else if (result.code == "200" && result.val.status == 'inactive') {
         licenseDescription = `
           <div class="license-info">
-          <p style="font-size: 15.7px; color: crimson;"><i class="fas fa-exclamation-triangle" style="color: red;"></i> 등록된 라이선스의 유효기간이 만료되었습니다.새로운 라이센스를 등록해 주세요.</p>
+          <p style="font-size: 15.7px; color: crimson;"><i class="fas fa-exclamation-triangle" style="color: red;"></i> 등록된 라이선스의 유효기간이 만료되었습니다.새로운 라이선스를 등록해 주세요.</p>
+            <hr>
+            <p><strong>라이선스 유형:</strong> ${result.val.oem}</p>
+            <hr>
             <p><strong>시작일:</strong> ${result.val.issued}</p>
             <p><strong>만료일:</strong> ${result.val.expired}</p>
             <hr>
-            <p class="text-muted">새로운 라이센스를 등록하면 기존 라이센스가 교체됩니다.</p>
+            <p class="text-muted">새로운 라이선스를 등록하면 기존 라이선스가 교체됩니다.</p>
           </div>
         `;
       } else {
         // 오류가 발생한 경우
         licenseDescription = `
           <div class="license-info error">
-            <p><i class="fas fa-exclamation-triangle" style="color: red;"></i> 라이센스 상태 확인 중 오류가 발생했습니다.</p>
+            <p><i class="fas fa-exclamation-triangle" style="color: red;"></i> 라이선스 상태 확인 중 오류가 발생했습니다.</p>
             <p>${result.val}</p>
           </div>
         `;
@@ -4402,21 +4414,21 @@ function updateLicenseStatus() {
       $('#div-license-description').html(licenseDescription);
     })
     .catch(function (error) {
-      console.error("라이센스 상태 확인 실패:", error);
+      console.error("라이선스 상태 확인 실패:", error);
       $('#div-license-description').html(`
         <div class="license-info error">
-          <p><i class="fas fa-exclamation-triangle" style="color: red;"></i> 라이센스 상태를 확인할 수 없습니다.</p>
+          <p><i class="fas fa-exclamation-triangle" style="color: red;"></i> 라이선스 상태를 확인할 수 없습니다.</p>
           <p>시스템 오류가 발생했습니다.</p>
         </div>
       `);
     });
 }
-// 라이센스 등록 버튼 클릭 이벤트
+// 라이선스 등록 버튼 클릭 이벤트
 $('#button-execution-modal-license-register').on('click', function () {
   // ... 기존 코드 ...
 });
 
-// 모달이 열릴 때 라이센스 상태 확인
+// 모달이 열릴 때 라이선스 상태 확인
 $('#button-open-modal-license-register').on('click', function () {
   $('#div-modal-license-register').show();
   updateLicenseStatus();
@@ -4427,9 +4439,9 @@ $('#input-license-file').on('change', function () {
   $('#button-execution-modal-license-register').prop('disabled', !this.files.length);
 });
 
-// 라이센스 관련 이벤트 핸들러
+// 라이선스 관련 이벤트 핸들러
 function initializeLicenseHandlers() {
-  // 라이센스 등록 모달 열기
+  // 라이선스 등록 모달 열기
   $('#button-open-modal-license-register').on('click', function () {
     $('#div-modal-license-register').show();
     checkLicenseStatusConfirm();
@@ -4446,17 +4458,17 @@ function initializeLicenseHandlers() {
     $('#button-execution-modal-license-register').prop('disabled', !this.files.length);
   });
 
-  // 라이센스 등록 실행
+  // 라이선스 등록 실행
   $('#button-execution-modal-license-register').on('click', function () {
     const licenseFile = $('#input-license-file')[0].files[0];
     if (!licenseFile) {
-      alert("라이센스 파일을 선택해주세요.");
+      alert("라이선스 파일을 선택해주세요.");
       return;
     }
 
     // 로딩 스피너 표시
-    $('#div-modal-spinner-header-txt').text('라이센스 등록중입니다...');
-    $('#div-modal-spinner-body-txt').text('라이센스를 등록하는 중입니다. 잠시만 기다려주세요.');
+    $('#div-modal-spinner-header-txt').text('라이선스 등록중입니다...');
+    $('#div-modal-spinner-body-txt').text('라이선스를 등록하는 중입니다. 잠시만 기다려주세요.');
     $('#div-modal-spinner').show();
 
     const reader = new FileReader();
@@ -4464,7 +4476,7 @@ function initializeLicenseHandlers() {
       const fileContent = e.target.result;
       const base64Content = btoa(fileContent);
 
-      // 라이센스 등록 API 호출
+      // 라이선스 등록 API 호출
       cockpit.spawn([
         'python3',
         '/usr/share/cockpit/ablestack/python/license/register_license.py',
@@ -4478,10 +4490,10 @@ function initializeLicenseHandlers() {
           const result = JSON.parse(data);
           if (result.code == "200") {
             $('#div-modal-license-register').hide();
-            alert("라이센스가 성공적으로 등록되었습니다.");
+            alert("라이선스가 성공적으로 등록되었습니다.");
             location.reload();
           } else {
-            alert("라이센스 등록 실패: " + result.val);
+            alert("라이선스 등록 실패: " + result.val);
             location.reload();
           }
         })
@@ -4489,7 +4501,7 @@ function initializeLicenseHandlers() {
           $('#div-modal-spinner').hide();
           $('#div-modal-license-register').hide();
           console.error("Error:", error);
-          alert("라이센스 등록 중 오류가 발생했습니다: " + error);
+          alert("라이선스 등록 중 오류가 발생했습니다: " + error);
           location.reload();
         });
     };
