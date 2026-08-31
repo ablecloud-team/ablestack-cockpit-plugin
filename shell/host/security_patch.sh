@@ -183,8 +183,8 @@ EOF
 
   # 방화벽/SELinux
   command -v firewall-cmd >/dev/null 2>&1 && {
+    firewall-cmd --add-port=${SSH_PORT}/tcp >/dev/null 2>&1 || true
     firewall-cmd --add-port=${SSH_PORT}/tcp --permanent >/dev/null 2>&1 || true
-    firewall-cmd --reload >/dev/null 2>&1 || true
   }
   command -v semanage >/dev/null 2>&1 && {
     semanage port -a -t ssh_port_t -p tcp ${SSH_PORT} 2>/dev/null || \

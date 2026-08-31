@@ -73,8 +73,8 @@ podman-compose up -d
 # ---------------------------------------------
 if systemctl is-active firewalld &> /dev/null; then
   echo "[INFO] firewalld에서 7070 포트 설정 중..."
+  sudo firewall-cmd --add-port=7070/tcp
   sudo firewall-cmd --permanent --add-port=7070/tcp
-  sudo firewall-cmd --reload
   echo "[INFO] 7070 포트 설정 완료"
 else
   echo "[WARN] firewalld가 실행 중이 아닙니다. 수동으로 포트를 열어야 할 수 있습니다."
@@ -471,7 +471,7 @@ GLUE_EOF
   curl -s -X PUT "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_GLUE_ID}/default-client-scopes/${EXISTING_SCOPE_ID}" \
     -H "Authorization: Bearer ${TOKEN}" \
     >/dev/null
- 
+
   # 기존 role_list 스코프 타입 변경(default->optional)
   curl -s -X DELETE "${KC_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_GLUE_ID}/default-client-scopes/${EXISTING_SCOPE_ROLE_ID}" \
     -H "Authorization: Bearer ${TOKEN}" \
