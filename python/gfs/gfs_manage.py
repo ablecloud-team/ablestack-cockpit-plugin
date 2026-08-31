@@ -359,7 +359,7 @@ def create_gfs(disks, vg_name, lv_name, gfs_name, mount_point, cluster_name, num
         run_command(f"lvcreate --yes --activate sy -l+100%FREE -n {lv_name} {vg_name} ")
         # GFS2 파일 시스템 생성
         lv_path = get_lv_path(vg_name, lv_name)
-        run_command(f"mkfs.gfs2 -j{num_journals} -p lock_dlm -t {cluster_name}:{gfs_name} {lv_path} -O -K -q")
+        run_command(f"mkfs.gfs2 -j{num_journals} -p lock_dlm -t {cluster_name}:{gfs_name} {lv_path} -O -K -q -J 512")
 
         for ip in list_ips:
             ssh_client = connect_to_host(ip)
