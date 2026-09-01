@@ -12,6 +12,10 @@ import json
 from ablestack import *
 
 json_file_path = pluginpath+"/tools/properties/cluster.json"
+ablestack_json_file_path = pluginpath+"/tools/properties/ablestack.json"
+
+DEFAULT_GFS_JOURNAL_SIZE_MB = 512
+DEFAULT_GFS_RESOURCE_GROUP_SIZE_MB = 1024
 
 def openClusterJson():
     try:
@@ -25,6 +29,31 @@ def openClusterJson():
 
 json_data = openClusterJson()
 os_type = json_data["clusterConfig"]["type"]
+
+
+def get_gfs_mkfs_sizes():
+    """Return validated GFS2 journal and resource group sizes in MB."""
+    journal_size_mb = DEFAULT_GFS_JOURNAL_SIZE_MB
+    resource_group_size_mb = DEFAULT_GFS_RESOURCE_GROUP_SIZE_MB
+
+    try:
+        with open(ablestack_json_file_path, 'r') as json_file:
+            gfs_config = json.load(json_file).get("gfs", {})
+
+        configured_journal_size = int(gfs_config.get("journal_size_mb", journal_size_mb))
+        if (8 <= configured_journal_size <= 1024
+                and configured_journal_size & (configured_journal_size - 1) == 0):
+            journal_size_mb = configured_journal_size
+
+        configured_resource_group_size = int(
+            gfs_config.get("resource_group_size_mb", resource_group_size_mb)
+        )
+        if 32 <= configured_resource_group_size <= 2048:
+            resource_group_size_mb = configured_resource_group_size
+    except (OSError, ValueError, TypeError, AttributeError, json.JSONDecodeError):
+        pass
+
+    return journal_size_mb, resource_group_size_mb
 
 def run_command(command, ssh_client=None, ignore_errors=False, suppress_errors=True):
     """Run a shell command and return its output. Suppress or handle errors as specified."""
@@ -359,7 +388,11 @@ def create_gfs(disks, vg_name, lv_name, gfs_name, mount_point, cluster_name, num
         run_command(f"lvcreate --yes --activate sy -l+100%FREE -n {lv_name} {vg_name} ")
         # GFS2 파일 시스템 생성
         lv_path = get_lv_path(vg_name, lv_name)
-        run_command(f"mkfs.gfs2 -j{num_journals} -p lock_dlm -t {cluster_name}:{gfs_name} {lv_path} -O -K -q -J 512")
+        journal_size_mb, resource_group_size_mb = get_gfs_mkfs_sizes()
+        run_command(
+            f"mkfs.gfs2 -j{num_journals} -p lock_dlm -t {cluster_name}:{gfs_name} "
+            f"{lv_path} -O -K -q -J {journal_size_mb} -r {resource_group_size_mb}"
+        )
 
         for ip in list_ips:
             ssh_client = connect_to_host(ip)
