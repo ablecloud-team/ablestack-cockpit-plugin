@@ -662,12 +662,21 @@ $('#cloud-cluster-connect').on('click', function(){
 // 클라우드 센터 클러스터 상태 조회 및 조회 결과값으로 화면 변경하는 함수
 function CardCloudClusterStatus(){
   return new Promise((resolve) => {
+    var usesInfrastructureClusterCard = os_type == "ablestack-hci"
+      || os_type == "ablestack-vm"
+      || os_type == "ablestack-hci-filesystem";
+    $('#card-storage-cluster-status-title').text(usesInfrastructureClusterCard ? '인프라 클러스터 상태' : '인프라 클러스터 상태');
+    $('#cccs-resource-status-group').toggle(!usesInfrastructureClusterCard);
+    $('#cccs-current-dc-group').toggle(usesInfrastructureClusterCard);
+    $('#cccs-execution-node-title').text(usesInfrastructureClusterCard ? 'CCVM 실행 노드' : 'VM실행노드');
+
     //초기 상태 체크 중 표시
     $('#cccs-status').html("상태 체크 중 &bull;&bull;&bull;&nbsp;&nbsp;&nbsp;<svg class='pf-v6-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-v6-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
     $("#cccs-back-color").attr('class','pf-v6-c-label pf-m-orange');
     $("#cccs-cluster-icon").attr('class','fas fa-fw fa-exclamation-triangle');
 
-    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', 'pcsDetail' ], { host: pcs_exe_host})
+    var statusAction = usesInfrastructureClusterCard ? 'infrastructureDetail' : 'pcsDetail';
+    cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/cloud_cluster_status/card-cloud-cluster-status.py', statusAction ], { host: pcs_exe_host})
     .then(function(data){
       cockpit.spawn(['/usr/bin/python3', pluginpath + '/python/ablestack_json/ablestackJson.py', 'status', '--depth1', 'bootstrap', '--depth2', 'ccvm' ])
         .then(function (bootstrap_data){
@@ -715,6 +724,11 @@ function CardCloudClusterStatus(){
       });
       var retVal = JSON.parse(data);
       console.log(retVal);
+      if (usesInfrastructureClusterCard) {
+        renderInfrastructureClusterStatus(retVal);
+        resolve();
+        return;
+      }
       if(retVal.code == '200'){
         var nodeText = '( ';
         var selectHtml = '<option selected="" value="null">노드를 선택해주세요.</option>';
@@ -805,6 +819,63 @@ function CardCloudClusterStatus(){
       resolve();
     });
   });
+}
+
+function renderInfrastructureClusterStatus(retVal) {
+  if (retVal.code != 200) {
+    $('#cccs-status').text('Health Err');
+    $('#cccs-back-color').attr('class', 'pf-v6-c-label pf-m-red');
+    $('#cccs-cluster-icon').attr('class', 'fas fa-fw fa-exclamation-triangle');
+    $('#cccs-node-info').text('N/A');
+    $('#cccs-execution-node').text('N/A');
+    $('#cccs-current-dc').text('N/A');
+    $('#cccs-low-info').text('인프라 클러스터 상태를 확인할 수 없습니다.');
+    applyCardStatusTone($('#cccs-low-info'), 'danger');
+    sessionStorage.setItem('cc_status', 'HEALTH_ERR');
+    return;
+  }
+
+  var infrastructure = retVal.val;
+  var health = infrastructure.health;
+  var tone = health == 'ok' ? 'green' : (health == 'warn' ? 'orange' : 'red');
+  var icon = health == 'ok' ? 'fas fa-fw fa-check-circle' : 'fas fa-fw fa-exclamation-triangle';
+  var healthText = health == 'ok' ? 'Health Ok' : (health == 'warn' ? 'Health Warn' : 'Health Err');
+  var onlineNodes = infrastructure.online_nodes || [];
+  var offlineNodes = infrastructure.offline_nodes || [];
+  var selectHtml = '<option selected="" value="null">노드를 선택해주세요.</option>';
+
+  $('#cccs-back-color').attr('class', 'pf-v6-c-label pf-m-' + tone);
+  $('#cccs-cluster-icon').attr('class', icon);
+  $('#cccs-status').text(healthText);
+  $('#cccs-node-info').text(
+    'Online (' + (onlineNodes.join(', ') || '-') + ')'
+    + '  |  Offline (' + (offlineNodes.join(', ') || '-') + ')'
+  );
+  $('#cccs-execution-node').text(infrastructure.ccvm_running_node || 'N/A');
+  $('#cccs-current-dc').text(infrastructure.current_dc || 'N/A');
+  $('#cccs-low-info').text(infrastructure.message);
+  applyCardStatusTone($('#cccs-low-info'), health == 'ok' ? 'ok' : (health == 'warn' ? 'warn' : 'danger'));
+  sessionStorage.setItem('cc_status', 'HEALTH_' + health.toUpperCase());
+
+  $('#form-select-cloud-vm-migration-node option').remove();
+  if (infrastructure.resource_started) {
+    onlineNodes.forEach(function(node) {
+      if (node != infrastructure.ccvm_running_node) {
+        selectHtml += '<option value="' + node + '">' + node + '</option>';
+      }
+    });
+    $('#form-select-cloud-vm-migration-node').append(selectHtml);
+    $('#button-cloud-cluster-start').addClass('pf-m-disabled');
+    $('#button-cloud-cluster-stop, #button-cloud-cluster-cleanup').removeClass('pf-m-disabled');
+    $('#button-cloud-cluster-migration').toggleClass('pf-m-disabled', onlineNodes.length < 2);
+    $('#button-cloud-cluster-connect').removeClass('pf-m-disabled');
+    $('#card-action-cloud-vm-change, #button-cloud-vm-snap-rollback').addClass('pf-m-disabled');
+    $('#button-cloud-vm-snap-backup, #button-mold-service-control, #button-mold-db-control, #button-mold-secondary-size-expansion, #card-action-cloud-vm-db-dump, #menu-item-set-auto-shutdown-step-two').removeClass('pf-m-disabled');
+  } else {
+    $('#div-mold-service-status, #div-mold-db-status').text('N/A');
+    $('#button-cloud-cluster-start, #button-cloud-cluster-cleanup, #card-action-cloud-vm-change, #button-cloud-vm-snap-backup, #button-cloud-vm-snap-rollback').removeClass('pf-m-disabled');
+    $('#button-cloud-cluster-stop, #button-cloud-cluster-migration, #button-cloud-cluster-connect, #button-mold-service-control, #button-mold-db-control, #button-mold-secondary-size-expansion, #card-action-cloud-vm-db-dump, #menu-item-set-auto-shutdown-step-two').addClass('pf-m-disabled');
+  }
 }
 /**
  * Meathod Name : license_check
