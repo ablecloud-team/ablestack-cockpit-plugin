@@ -174,14 +174,6 @@
                                                     <div class="pf-v6-c-description-list__text">&nbsp;</div>
                                                 </dd>
                                             </div>
-                                            <div class="pf-v6-c-description-list__group">
-                                                <dt class="pf-v6-c-description-list__term">
-                                                    <span class="pf-v6-c-description-list__text">&nbsp;</span>
-                                                </dt>
-                                                <dd class="pf-v6-c-description-list__description">
-                                                    <div class="pf-v6-c-description-list__text">&nbsp;</div>
-                                                </dd>
-                                            </div>
                                         </dl>
                                     </section>
                                 </div>
@@ -464,10 +456,10 @@
                                 <div class="pf-v6-c-divider" role="separator"></div>
                                 <div id="gfs-integration-low-info" class="pf-v6-c-card__footer ablestack-status-text ablestack-status-danger">GFS 통합이 구성되지 않았습니다.</div>
                             </div>
-                            <!-- 클라우드센터 클러스터 상태 카드 영역 끝 -->
+                            <!-- 인프라 클러스터 상태 카드 영역 끝 -->
                         </div>
                         <div class="pf-v6-l-grid__item pf-m-6-col" id="div-card-cloud-cluster-status">
-                            <!-- 클라우드센터 클러스터 상태 카드 영역 시작-->
+                            <!-- 인프라 클러스터 상태 카드 영역 시작-->
                             <div class="pf-v6-c-card pf-m-hoverable pf-m-compact" id="card-cloud-cluster-status" style="overflow: visible;">
                                 <div class="pf-v6-c-card__header">
                                     <div class="pf-v6-c-card__header-main">
@@ -475,7 +467,7 @@
                                             style="font-size: var(--pf-v6-global--icon--FontSize--lg);padding-right: 15px"
                                             aria-hidden="true"></i>
                                     </div>
-                                    <div class="pf-v6-c-card__title ablestack-card-title-status" id="card-storage-cluster-status-title">클라우드센터 클러스터 상태
+                                    <div class="pf-v6-c-card__title ablestack-card-title-status" id="card-storage-cluster-status-title">인프라 클러스터 상태
                                     </div>
                                     <div class="pf-v6-c-card__actions">
                                         <div class="ablestack-menu-dropdown">
@@ -563,7 +555,7 @@
                                                     </div>
                                                 </dd>
                                             </div>
-                                            <div class="pf-v6-c-description-list__group">
+                                            <div id="cccs-resource-status-group" class="pf-v6-c-description-list__group">
                                                 <dt class="pf-v6-c-description-list__term">
                                                     <span class="pf-v6-c-description-list__text">리소스 상태</span>
                                                 </dt>
@@ -572,24 +564,25 @@
                                                         N/A</div>
                                                 </dd>
                                             </div>
-                                            <div class="pf-v6-c-description-list__group">
+                                            <div id="cccs-execution-node-group" class="pf-v6-c-description-list__group">
                                                 <dt class="pf-v6-c-description-list__term">
-                                                    <span class="pf-v6-c-description-list__text">VM실행노드</span>
+                                                    <span id="cccs-execution-node-title" class="pf-v6-c-description-list__text">VM실행노드</span>
                                                 </dt>
                                                 <dd class="pf-v6-c-description-list__description">
                                                     <div id="cccs-execution-node" class="pf-v6-c-description-list__text">
                                                         N/A</div>
                                                 </dd>
                                             </div>
-                                            <div class="pf-v6-c-description-list__group">
+                                            <div id="cccs-current-dc-group" class="pf-v6-c-description-list__group" style="display: none;">
                                                 <dt class="pf-v6-c-description-list__term">
-                                                    <span class="pf-v6-c-description-list__text">&nbsp;</span>
+                                                    <span class="pf-v6-c-description-list__text">현재 DC</span>
                                                 </dt>
                                                 <dd class="pf-v6-c-description-list__description">
-                                                    <div class="pf-v6-c-description-list__text">&nbsp;</div>
+                                                    <div id="cccs-current-dc" class="pf-v6-c-description-list__text">
+                                                        N/A</div>
                                                 </dd>
                                             </div>
-                                            <div class="pf-v6-c-description-list__group">
+                                            <div id="cccs-empty-row-1" class="pf-v6-c-description-list__group">
                                                 <dt class="pf-v6-c-description-list__term">
                                                     <span class="pf-v6-c-description-list__text">&nbsp;</span>
                                                 </dt>
@@ -603,7 +596,7 @@
                                 <div class="pf-v6-c-divider" role="separator"></div>
                                 <div id="cccs-low-info" class="pf-v6-c-card__footer ablestack-status-text ablestack-status-danger">클라우드센터 클러스터가 구성되지 않았습니다.</div>
                             </div>
-                            <!-- 클라우드센터 클러스터 상태 카드 영역 끝 -->
+                            <!-- 인프라 클러스터 상태 카드 영역 끝 -->
                         </div>
                         <div class="pf-v6-l-grid__item pf-m-6-col" id="div-card-storage-vm-status">
                             <!-- 스토리지센터VM 상태 카드 영역 시작-->

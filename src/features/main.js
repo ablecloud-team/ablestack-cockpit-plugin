@@ -1440,7 +1440,7 @@ function checkDeployStatus() {
     - 스토리지센터 가상머신 상태 = HEALTH_ERR(배포x), RUNNING, SHUT OFF 등
     - 스토리지센터 가상머신 부트스트랩 실행 상태 = false, true
     - 스토리지센터 클러스터 상태 = HEALTH_ERR(구성x), HEALTH_OK, HEALTH_WARN 등
-    - 클라우드센터 클러스터 상태 = HEALTH_ERR1(구성x), HEALTH_ERR2(리소스 구성x), HEALTH_OK
+    - 인프라 클러스터 상태 = HEALTH_ERR1(구성x), HEALTH_ERR2(리소스 구성x), HEALTH_OK
     - 클라우드센터 가상머신 상태 = HEALTH_ERR(배포x), RUNNING, SHUT OFF 등
     - 클라우드센터 가상머신 부트스트랩 실행 상태 = false, true
     */
@@ -1542,7 +1542,7 @@ function checkDeployStatus() {
                       if (step6 != "RUNNING") {
                         msg += '클라우드센터 가상머신이 ' + step6 + ' 상태 입니다.\n';
                         msg += '클라우드센터 가상머신 Mold 서비스 , DB 상태를 확인하여 정지상태일 경우 서비스 재시작\n';
-                        msg += '또는 클라우드센터 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
+                        msg += '또는 인프라 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
                         showRibbon('warning', msg);
                       }
                       if (step13 == "false") {
@@ -1633,7 +1633,7 @@ function checkDeployStatus() {
                         if (step6 != "RUNNING") {
                           msg += '클라우드센터 가상머신이 ' + step6 + ' 상태 입니다.\n';
                           msg += '클라우드센터 가상머신 Mold 서비스 , DB 상태를 확인하여 정지상태일 경우 서비스 재시작\n';
-                          msg += '또는 클라우드센터 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
+                          msg += '또는 인프라 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
                           showRibbon('warning', msg);
                         }
                         if (step13 == "false") {
@@ -1699,7 +1699,7 @@ function checkDeployStatus() {
                         if (step6 != "RUNNING") {
                           msg += '클라우드센터 가상머신이 ' + step6 + ' 상태 입니다.\n';
                           msg += '클라우드센터 가상머신 Mold 서비스 , DB 상태를 확인하여 정지상태일 경우 서비스 재시작\n';
-                          msg += '또는 클라우드센터 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
+                          msg += '또는 인프라 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
                           showRibbon('warning', msg);
                         }
                         if (step13 == "false") {
@@ -1772,7 +1772,7 @@ function checkDeployStatus() {
                     if (step6 != "RUNNING") {
                       msg += '클라우드센터 가상머신이 ' + step6 + ' 상태 입니다.\n';
                       msg += '클라우드센터 가상머신 Mold 서비스 , DB 상태를 확인하여 정지상태일 경우 서비스 재시작\n';
-                      msg += '또는 클라우드센터 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
+                      msg += '또는 인프라 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
                       showRibbon('warning', msg);
                     }
                   }
@@ -1835,7 +1835,7 @@ function checkDeployStatus() {
                   if (step6 != "RUNNING") {
                     msg += '클라우드센터 가상머신이 ' + step6 + ' 상태 입니다.\n';
                     msg += '클라우드센터 가상머신 Mold 서비스 , DB 상태를 확인하여 정지상태일 경우 서비스 재시작\n';
-                    msg += '또는 클라우드센터 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
+                    msg += '또는 인프라 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
                     showRibbon('warning', msg);
                   }
                 }
@@ -1932,7 +1932,7 @@ function checkDeployStatus() {
                         if (step6 != "RUNNING") {
                           msg += '클라우드센터 가상머신이 ' + step6 + ' 상태 입니다.\n';
                           msg += '클라우드센터 가상머신 Mold 서비스 , DB 상태를 확인하여 정지상태일 경우 서비스 재시작\n';
-                          msg += '또는 클라우드센터 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
+                          msg += '또는 인프라 클러스터 상태 카드에서 가상머신 시작하여 문제를 해결할 수 있습니다.';
                           showRibbon('warning', msg);
                         }
                         if (step13 == "false") {
