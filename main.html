@@ -2400,7 +2400,7 @@
                                     <input class="pf-v6-c-radio__input" type="radio" id="radio-system-update-type-mold"
                                         name="radio-system-update-type" value="mold" />
                                     <span class="pf-v6-c-radio__label">Mold 업데이트</span>
-                                    <span class="pf-v6-c-radio__description">Mold 서비스 업데이트</span>
+                                    <span class="pf-v6-c-radio__description">Mold RPM 전용 ISO 사용</span>
                                 </label>
                             </div>
                         </div>
@@ -2420,7 +2420,7 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <th scope="row">ABLESTACK</th>
+                                <th scope="row" id="system-update-version-label">ABLESTACK</th>
                                 <td><span id="system-update-current-ablestack-version">N/A</span></td>
                                 <td><span id="system-update-target-ablestack-version">N/A</span></td>
                             </tr>
@@ -2462,8 +2462,8 @@
                     <p class="pf-v6-c-alert__title"><strong>업데이트 전 주의사항</strong></p>
                     <div class="pf-v6-c-alert__description">
                         <ol>
-                            <li>업데이트 전 서비스 및 가상머신 중지 여부 확인</li>
-                            <li>업데이트 완료 후 시스템 재부팅 필요 (사용자가 직접 수행)</li>
+                            <li id="system-update-warning-services">업데이트 전 서비스 및 가상머신 중지 여부 확인</li>
+                            <li id="system-update-warning-restart">업데이트 완료 후 시스템 재부팅 필요 (사용자가 직접 수행)</li>
                             <li>업데이트는 각 호스트에서 개별적으로 실행 필요</li>
                         </ol>
                     </div>
