@@ -4999,6 +4999,9 @@ const SYSTEM_UPDATE_SCRIPT_NAMES = {
   all: "update-all.sh",
   mold: "update-mold.sh"
 };
+const SYSTEM_UPDATE_MOLD_PACKAGES = [
+  "cloudstack-common", "cloudstack-agent", "cloudstack-management", "cloudstack-usage", "cloudstack-ui"
+];
 
 function isAblestackTrue(value) {
   return value === true || value === "true";
@@ -5111,6 +5114,7 @@ function resetSystemUpdateModal() {
 
 function clearSystemUpdateLoadedInfo() {
   systemUpdateInfo = null;
+  $('#system-update-version-label').text(getSelectedSystemUpdateType() == 'mold' ? 'Mold' : 'ABLESTACK');
   $('#system-update-current-ablestack-version').text('N/A');
   $('#system-update-target-ablestack-version').text('N/A');
   $('#button-open-modal-system-update-confirm').prop('disabled', true).attr('aria-disabled', 'true');
@@ -5134,8 +5138,10 @@ function updateSystemUpdateInfo(info) {
     copy_path: info.copy_path || SYSTEM_UPDATE_COPY_PATH
   });
   $('#input-system-update-mount-path').val(info.mount_path);
-  $('#system-update-current-ablestack-version').text(info.current_ablestack_version || 'N/A');
-  $('#system-update-target-ablestack-version').text(info.target_ablestack_version || 'N/A');
+  const isMold = updateType == 'mold';
+  $('#system-update-version-label').text(isMold ? 'Mold' : 'ABLESTACK');
+  $('#system-update-current-ablestack-version').text((isMold ? info.current_mold_version : info.current_ablestack_version) || 'N/A');
+  $('#system-update-target-ablestack-version').text((isMold ? info.target_mold_version : info.target_ablestack_version) || 'N/A');
   $('#button-open-modal-system-update-confirm').prop('disabled', false).attr('aria-disabled', 'false');
 }
 
@@ -5204,6 +5210,77 @@ function parseSystemUpdateKeyValues(data) {
   return values;
 }
 
+function loadMoldUpdateInfoFallback(mountPath) {
+  if (mountPath.charAt(0) != '/') {
+    return Promise.reject(new Error('ISO 마운트 경로는 절대 경로로 입력해야 합니다.'));
+  }
+  // 도우미가 없는 구버전 호스트에서도 스크립트를 실행하지 않고 RPM 헤더만 검사한다.
+  const rpmCommand = cockpit.spawn(['aspkg', '--version'], { superuser: true })
+    .then(function () { return 'aspkg'; })
+    .catch(function () {
+      return cockpit.spawn(['rpm', '--version'], { superuser: true })
+        .then(function () { return 'rpm'; })
+        .catch(function () { throw new Error('Mold RPM을 확인할 수 있는 rpm/aspkg 명령이 없습니다.'); });
+    });
+  const rpmFiles = cockpit.spawn([
+    '/bin/bash', '-c', [
+      'set -e',
+      'mount_path="$1"',
+      'if [ -d "$mount_path/rpms" ]; then rpm_dir="$mount_path/rpms"',
+      'elif [ -d "$mount_path/AppStream/Packages/mold" ]; then rpm_dir="$mount_path/AppStream/Packages/mold"',
+      'else rpm_dir="$mount_path"; fi',
+      'printf "%s\\0" "$rpm_dir"',
+      'find "$rpm_dir" -type f -name "*.rpm" -print0'
+    ].join('\n'), 'mold-iso-info', mountPath
+  ], { superuser: true });
+
+  return Promise.all([rpmCommand, rpmFiles]).then(function (results) {
+    const command = results[0];
+    const paths = String(results[1]).split('\0').filter(function (path) { return path !== ''; });
+    const rpmDir = paths.shift();
+    if (paths.length == 0) {
+      throw new Error('Mold RPM 파일을 찾을 수 없습니다: ' + rpmDir);
+    }
+    return Promise.all(paths.map(function (path) {
+      return cockpit.spawn([
+        command, '-qp', '--qf', '%{NAME}\t%{VERSION}-%{RELEASE}\t%{ARCH}\n', '--', path
+      ], { superuser: true }).then(function (data) {
+        const record = String(data).trim();
+        const fields = record.split('\t');
+        if (fields.length != 3 || fields.some(function (field) { return field === ''; }) || record.indexOf('\n') >= 0) {
+          throw new Error('RPM 정보 형식이 잘못되었습니다: ' + path);
+        }
+        return { name: fields[0], version: fields[1], arch: fields[2], path: path };
+      });
+    })).then(function (records) {
+      const packages = SYSTEM_UPDATE_MOLD_PACKAGES.map(function (name) {
+        const matches = records.filter(function (record) { return record.name == name; });
+        if (matches.length == 0) {
+          throw new Error('필수 Mold RPM이 없습니다: ' + name);
+        }
+        if (matches.length > 1) {
+          throw new Error(name + ' RPM이 중복되었습니다. 패키지별 하나씩만 준비하세요.');
+        }
+        return matches[0];
+      });
+      return cockpit.spawn([
+        command, '-q', '--qf', '%{VERSION}-%{RELEASE}\n', '--', 'cloudstack-common'
+      ], { superuser: true }).then(function (data) {
+        return String(data).trim() || 'N/A';
+      }).catch(function () {
+        return 'N/A';
+      }).then(function (currentVersion) {
+        return {
+          mold_rpm_dir: rpmDir,
+          mold_packages: packages,
+          current_mold_version: currentVersion,
+          target_mold_version: packages.find(function (pkg) { return pkg.name == 'cloudstack-common'; }).version
+        };
+      });
+    });
+  });
+}
+
 function loadSystemUpdateInfoFallback(mountPath, updateType) {
   const normalizedMountPath = normalizeSystemUpdatePath(mountPath);
   const ksPath = joinSystemUpdatePath(normalizedMountPath, "ks/ablestack-ks.cfg");
@@ -5214,17 +5291,19 @@ function loadSystemUpdateInfoFallback(mountPath, updateType) {
     cockpit.spawn(["test", "-d", normalizedMountPath], { superuser: true }),
     cockpit.spawn(["test", "-f", updateScriptPath], { superuser: true }),
     cockpit.spawn(["cat", "/etc/os-release"], { superuser: true }),
-    cockpit.spawn(["cat", ksPath], { superuser: true })
+    updateType == 'mold' ? loadMoldUpdateInfoFallback(normalizedMountPath)
+      : cockpit.spawn(["cat", ksPath], { superuser: true })
   ]).then(function (data) {
     const currentInfo = parseSystemUpdateKeyValues(data[2]);
-    const targetKsInfo = parseSystemUpdateKeyValues(data[3]);
-    const targetAblestackVersion = targetKsInfo.ABLESTACK_VERSION || "";
+    const isMold = updateType == 'mold';
+    const targetAblestackVersion = isMold ? (currentInfo.PRETTY_NAME || 'N/A')
+      : (parseSystemUpdateKeyValues(data[3]).ABLESTACK_VERSION || '');
 
     if (targetAblestackVersion == "") {
       throw new Error("ks/ablestack-ks.cfg 파일에서 ABLESTACK_VERSION 값을 찾을 수 없습니다.");
     }
 
-    return {
+    return Object.assign({
       mount_path: normalizedMountPath,
       copy_path: SYSTEM_UPDATE_COPY_PATH,
       current_ablestack_version: currentInfo.PRETTY_NAME || "N/A",
@@ -5233,51 +5312,54 @@ function loadSystemUpdateInfoFallback(mountPath, updateType) {
       update_label: getSystemUpdateTypeLabel(updateType),
       update_script: updateScriptPath,
       work_update_script: joinSystemUpdatePath(SYSTEM_UPDATE_COPY_PATH, scriptName)
-    };
+    }, isMold ? data[3] : {});
   });
 }
 
 function runSystemUpdateFallback(mountPath, updateType) {
   const normalizedMountPath = normalizeSystemUpdatePath(mountPath);
   const scriptName = getSystemUpdateScriptName(updateType);
-  return cockpit.spawn(
-    [
-      "/bin/bash",
-      "-c",
+  const validation = updateType == 'mold' ? loadSystemUpdateInfoFallback(mountPath, updateType) : Promise.resolve();
+  return validation.then(function () {
+    return cockpit.spawn(
       [
-        "set -e",
-        "src=\"$1\"",
-        "dest=\"$2\"",
-        "script=\"$3\"",
-        "update_type=\"$4\"",
-        "case \"$script\" in update-all.sh|update-mold.sh) ;; *) echo \"지원하지 않는 업데이트 스크립트입니다.\" >&2; exit 1 ;; esac",
-        "case \"$update_type\" in all|mold) ;; *) echo \"지원하지 않는 업데이트 방식입니다.\" >&2; exit 1 ;; esac",
-        "[ -d \"$src\" ] || { echo \"입력한 ISO 마운트 경로가 존재하지 않습니다.\" >&2; exit 1; }",
-        "[ -f \"$src/$script\" ] || { echo \"$script 파일을 찾을 수 없습니다.\" >&2; exit 1; }",
-        "src_real=$(readlink -f \"$src\")",
-        "dest_real=$(readlink -m \"$dest\")",
-        "[ \"$src_real\" != \"$dest_real\" ] || { echo \"ISO 마운트 경로와 복사 대상 경로를 분리해야 합니다.\" >&2; exit 1; }",
-        "case \"$dest_real/\" in \"$src_real\"/*) echo \"ISO 마운트 경로와 복사 대상 경로를 분리해야 합니다.\" >&2; exit 1 ;; esac",
-        "case \"$src_real/\" in \"$dest_real\"/*) echo \"ISO 마운트 경로와 복사 대상 경로를 분리해야 합니다.\" >&2; exit 1 ;; esac",
-        "[ ! -L \"$dest\" ] || { echo \"$dest 경로가 심볼릭 링크입니다.\" >&2; exit 1; }",
-        "rm -rf \"$dest\"",
-        "mkdir -p \"$dest\"",
-        "cp -rRp \"$src\"/. \"$dest\"/ || cp -Rp \"$src\"/. \"$dest\"/",
-        "cd \"$dest\"",
-        "export ABLESTACK_UPDATE_MOUNT_PATH=\"$src_real\"",
-        "export ABLESTACK_UPDATE_WORK_PATH=\"$dest_real\"",
-        "export ABLESTACK_UPDATE_COPY_PATH=\"$dest_real\"",
-        "export ABLESTACK_UPDATE_TYPE=\"$update_type\"",
-        "exec /bin/bash \"./$script\""
-      ].join("\n"),
-      "ablestack-update",
-      normalizedMountPath,
-      SYSTEM_UPDATE_COPY_PATH,
-      scriptName,
-      updateType
-    ],
-    { superuser: true }
-  ).then(function (data) {
+        "/bin/bash",
+        "-c",
+        [
+          "set -e",
+          "src=\"$1\"",
+          "dest=\"$2\"",
+          "script=\"$3\"",
+          "update_type=\"$4\"",
+          "case \"$script\" in update-all.sh|update-mold.sh) ;; *) echo \"지원하지 않는 업데이트 스크립트입니다.\" >&2; exit 1 ;; esac",
+          "case \"$update_type\" in all|mold) ;; *) echo \"지원하지 않는 업데이트 방식입니다.\" >&2; exit 1 ;; esac",
+          "[ -d \"$src\" ] || { echo \"입력한 ISO 마운트 경로가 존재하지 않습니다.\" >&2; exit 1; }",
+          "[ -f \"$src/$script\" ] || { echo \"$script 파일을 찾을 수 없습니다.\" >&2; exit 1; }",
+          "src_real=$(readlink -f \"$src\")",
+          "dest_real=$(readlink -m \"$dest\")",
+          "[ \"$src_real\" != \"$dest_real\" ] || { echo \"ISO 마운트 경로와 복사 대상 경로를 분리해야 합니다.\" >&2; exit 1; }",
+          "case \"$dest_real/\" in \"$src_real\"/*) echo \"ISO 마운트 경로와 복사 대상 경로를 분리해야 합니다.\" >&2; exit 1 ;; esac",
+          "case \"$src_real/\" in \"$dest_real\"/*) echo \"ISO 마운트 경로와 복사 대상 경로를 분리해야 합니다.\" >&2; exit 1 ;; esac",
+          "[ ! -L \"$dest\" ] || { echo \"$dest 경로가 심볼릭 링크입니다.\" >&2; exit 1; }",
+          "rm -rf \"$dest\"",
+          "mkdir -p \"$dest\"",
+          "cp -rRp \"$src\"/. \"$dest\"/ || cp -Rp \"$src\"/. \"$dest\"/",
+          "cd \"$dest\"",
+          "export ABLESTACK_UPDATE_MOUNT_PATH=\"$src_real\"",
+          "export ABLESTACK_UPDATE_WORK_PATH=\"$dest_real\"",
+          "export ABLESTACK_UPDATE_COPY_PATH=\"$dest_real\"",
+          "export ABLESTACK_UPDATE_TYPE=\"$update_type\"",
+          "exec /bin/bash \"./$script\""
+        ].join("\n"),
+        "ablestack-update",
+        normalizedMountPath,
+        SYSTEM_UPDATE_COPY_PATH,
+        scriptName,
+        updateType
+      ],
+      { superuser: true }
+    );
+  }).then(function (data) {
     return {
       code: 200,
       val: {
@@ -5352,6 +5434,13 @@ function closeSystemUpdateConfirmModal() {
 }
 
 function resetSystemUpdateConfirmModal() {
+  const isMold = systemUpdateInfo && systemUpdateInfo.update_type == 'mold';
+  $('#system-update-warning-services').text(isMold
+    ? 'Mold 서비스 재시작에 따른 관리 연결 중단 가능성 확인'
+    : '업데이트 전 서비스 및 가상머신 중지 여부 확인');
+  $('#system-update-warning-restart').text(isMold
+    ? '업데이트 완료 후 mold 및 mold-agent 서비스 자동 재시작'
+    : '업데이트 완료 후 시스템 재부팅 필요 (사용자가 직접 수행)');
   $('#modal-input-system-update-warning-check').prop('checked', false);
   $('#system-update-confirm-type').text('N/A');
   $('#button-execution-modal-system-update').prop('disabled', true).attr('aria-disabled', 'true');
@@ -5437,7 +5526,9 @@ $(document).on('click', '#button-execution-modal-system-update', function () {
     $("#modal-status-alert-title").html("ABLESTACK Version 업데이트");
     if (retVal.code == 200) {
       const resultLabel = retVal.val && retVal.val.update_label ? retVal.val.update_label : updateLabel;
-      $("#modal-status-alert-body").html("ABLESTACK " + resultLabel + " 실행이 완료되었습니다.<br/>업데이트 후 시스템 재부팅이 필요합니다.");
+      const completionText = updateType == 'mold' ? '업데이트 대상의 Mold 서비스 상태를 확인했습니다.'
+        : '업데이트 후 시스템 재부팅이 필요합니다.';
+      $("#modal-status-alert-body").html("ABLESTACK " + resultLabel + " 실행이 완료되었습니다.<br/>" + completionText);
     } else {
       $("#modal-status-alert-body").text("ABLESTACK Version 업데이트 실행 중 오류가 발생했습니다 " + retVal.val);
     }
