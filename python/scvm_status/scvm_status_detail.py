@@ -138,7 +138,7 @@ def statusDeteil():
             if manageNicGw == "" :
                 manageNicGw = "N/A"
 
-            output = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm /usr/bin/cat -n /etc/resolv.conf | awk '$1 == 5 {print $3}'"], universal_newlines=True, shell=True, env=env)
+            output = check_output(["/usr/bin/ssh -o StrictHostKeyChecking=no scvm /usr/bin/cat -n /etc/resolv.conf | grep 'nameserver' | head -n 1 | awk '{print $3}'"], universal_newlines=True, shell=True, env=env)
             manageNicDns = output.strip()
             if manageNicDns == "":
                 manageNicDns = "N/A"
