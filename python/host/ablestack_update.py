@@ -22,6 +22,14 @@ except Exception:
 OS_RELEASE_PATH = Path("/etc/os-release")
 TARGET_KS_PATH = Path("ks/ablestack-ks.cfg")
 UPDATE_WORK_DIR = Path("/opt/ABLESTACK_UPDATE")
+MOLD_PACKAGES = (
+    "cloudstack-common",
+    "cloudstack-agent",
+    "cloudstack-management",
+    "cloudstack-usage",
+    "cloudstack-ui",
+)
+MOLD_RPM_QUERY_FORMAT = "%{NAME}\t%{VERSION}-%{RELEASE}\t%{ARCH}\n"
 UPDATE_SCRIPT_MAP = {
     "all": {
         "label": "전체 업데이트",
@@ -104,35 +112,106 @@ def is_path_relative_to(path, parent):
         return False
 
 
+def detect_rpm_command():
+    for command in ("aspkg", "rpm"):
+        if shutil.which(command) is None:
+            continue
+        proc = subprocess.run(
+            [command, "--version"],
+            text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+        )
+        if proc.returncode == 0:
+            return command
+    raise RuntimeError("Mold RPM을 확인할 수 있는 rpm/aspkg 명령이 없습니다.")
+
+
+def read_mold_iso_info(mount):
+    # update-mold.sh의 검색 순서와 일치시킨다. ks/config/저장소 메타데이터는 불필요하다.
+    rpm_dir = mount
+    for relative_path in ("rpms", "AppStream/Packages/mold"):
+        candidate = mount / relative_path
+        if candidate.is_dir():
+            rpm_dir = candidate
+            break
+
+    rpm_paths = sorted(path for path in rpm_dir.rglob("*.rpm")
+                       if path.is_file() and not path.is_symlink())
+    if not rpm_paths:
+        raise FileNotFoundError(f"Mold RPM 파일을 찾을 수 없습니다: {rpm_dir}")
+
+    rpm_command = detect_rpm_command()
+    packages = {}
+    for rpm_path in rpm_paths:
+        proc = subprocess.run(
+            [rpm_command, "-qp", "--qf", MOLD_RPM_QUERY_FORMAT, "--", str(rpm_path)],
+            text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+        )
+        if proc.returncode != 0:
+            raise ValueError(f"RPM 정보를 읽을 수 없습니다: {rpm_path}\n{proc.stderr.strip()}")
+        fields = proc.stdout.strip().split("\t")
+        if len(fields) != 3 or not all(fields) or "\n" in proc.stdout.strip():
+            raise ValueError(f"RPM 정보 형식이 잘못되었습니다: {rpm_path}")
+        name, version, arch = fields
+        if name not in MOLD_PACKAGES:
+            continue
+        if name in packages:
+            raise ValueError(f"{name} RPM이 중복되었습니다. 패키지별 하나씩만 준비하세요.")
+        packages[name] = {"name": name, "version": version, "arch": arch, "path": str(rpm_path)}
+
+    missing = [name for name in MOLD_PACKAGES if name not in packages]
+    if missing:
+        raise FileNotFoundError(f"필수 Mold RPM이 없습니다: {', '.join(missing)}")
+
+    # 호스트의 cloudstack-common에서 VERSION-RELEASE만 읽는다 (패키지명, epoch, 아키텍처 제외).
+    # 설치 가능 여부/CCVM 상태 검사는 실행 스크립트가 담당한다.
+    current = subprocess.run(
+        [rpm_command, "-q", "--qf", "%{VERSION}-%{RELEASE}\n", "--", "cloudstack-common"],
+        text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+    )
+    current_version = current.stdout.strip() if current.returncode == 0 else ""
+    return {
+        "mold_rpm_dir": str(rpm_dir),
+        "mold_packages": [packages[name] for name in MOLD_PACKAGES],
+        "current_mold_version": current_version or "N/A",
+        "target_mold_version": packages["cloudstack-common"]["version"],
+    }
+
+
 def read_update_info(mount_path, update_type="all"):
     mount = validate_mount_path(mount_path)
     script_info = get_update_script_info(update_type)
     script_relative_path = script_info["script"]
-    ks_path = mount / TARGET_KS_PATH
     update_script_path = mount / script_relative_path
 
-    if not ks_path.exists():
-        raise FileNotFoundError(f"{TARGET_KS_PATH} 파일을 찾을 수 없습니다.")
-    if not update_script_path.exists():
+    if not update_script_path.is_file():
         raise FileNotFoundError(f"{script_relative_path} 파일을 찾을 수 없습니다.")
 
     current_info = parse_key_values(OS_RELEASE_PATH)
-    target_ks_info = parse_key_values(ks_path)
-
-    target_ablestack_version = target_ks_info.get("ABLESTACK_VERSION", "")
-
-    if target_ablestack_version == "":
-        raise ValueError(f"{TARGET_KS_PATH} 파일에서 ABLESTACK_VERSION 값을 찾을 수 없습니다.")
+    current_ablestack_version = current_info.get("PRETTY_NAME", "N/A")
+    mold_info = {}
+    if update_type == "mold":
+        mold_info = read_mold_iso_info(mount)
+        # Mold 전용 업데이트는 OS 버전을 변경하지 않는다.
+        target_ablestack_version = current_ablestack_version
+    else:
+        ks_path = mount / TARGET_KS_PATH
+        if not ks_path.is_file():
+            raise FileNotFoundError(f"{TARGET_KS_PATH} 파일을 찾을 수 없습니다.")
+        target_ks_info = parse_key_values(ks_path)
+        target_ablestack_version = target_ks_info.get("ABLESTACK_VERSION", "")
+        if target_ablestack_version == "":
+            raise ValueError(f"{TARGET_KS_PATH} 파일에서 ABLESTACK_VERSION 값을 찾을 수 없습니다.")
 
     return {
         "mount_path": str(mount),
         "copy_path": str(UPDATE_WORK_DIR),
-        "current_ablestack_version": current_info.get("PRETTY_NAME", "N/A"),
+        "current_ablestack_version": current_ablestack_version,
         "target_ablestack_version": target_ablestack_version,
         "update_type": update_type,
         "update_label": script_info["label"],
         "update_script": str(update_script_path),
         "work_update_script": str(UPDATE_WORK_DIR / script_relative_path),
+        **mold_info,
     }
 
 
