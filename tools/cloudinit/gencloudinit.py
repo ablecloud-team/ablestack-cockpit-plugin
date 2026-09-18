@@ -577,9 +577,20 @@ def scvmGen(pn_nic=None, pn_ip=None, pn_prefix=24, cn_nic=None, cn_ip=None, cn_p
                     'permissions': '0777'
                 }
             )
+    with open(f'{pluginpath}/shell/host/sortEth.sh', 'rt') as sort_eth_file:
+        sort_eth = sort_eth_file.read()
+    yam2['write_files'].append(
+        {
+            'encoding': 'base64',
+            'content': base64.encodebytes(sort_eth.encode()),
+            'owner': 'root:root',
+            'path': '/usr/local/sbin/sortEth.sh',
+            'permissions': '0755'
+        }
+    )
     # 인터페이스 이름이 동일 하지 않을 경우, scvm에 np0, np1이 붙을 수 있기에 고정으로 사용
     yam2['runcmd'] = [
-    ['/usr/bin/sh', '/usr/local/sbin/sortEth.sh'],
+    ['/usr/bin/bash', '/usr/local/sbin/sortEth.sh'],
     ['/usr/bin/systemctl', 'enable', '--now', 'cockpit.service']
     ]
 

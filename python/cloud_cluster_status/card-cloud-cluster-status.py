@@ -87,12 +87,15 @@ def infrastructureDetail():
                 offline_nodes.append(node)
             nodes.append({'name': node, 'online': is_online})
 
-        if not pacemaker_running or not corosync_running:
+        if offline_nodes:
+            health = 'warn'
+            if not online_nodes:
+                message = '전체 노드가 오프라인 상태입니다.'
+            else:
+                message = f"{', '.join(offline_nodes)} 노드가 오프라인 상태입니다."
+        elif not pacemaker_running or not corosync_running:
             health = 'err'
             message = 'Pacemaker 또는 Corosync 서비스가 비정상입니다.'
-        elif offline_nodes:
-            health = 'warn'
-            message = f"오프라인 노드가 있습니다: {', '.join(offline_nodes)}"
         elif not resource_started:
             health = 'warn'
             message = 'cloudcenter_res가 Started 상태가 아닙니다.'

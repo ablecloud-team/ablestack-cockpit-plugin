@@ -816,6 +816,9 @@ function CardCloudClusterStatus(){
     }).catch(function(data){
       createLoggerInfo("ClusterStatusInfo spawn error");
       console.log('ClusterStatusInfo spawn error');
+      if (usesInfrastructureClusterCard) {
+        renderInfrastructureClusterStatus({ code: 500 });
+      }
       resolve();
     });
   });
@@ -849,7 +852,7 @@ function renderInfrastructureClusterStatus(retVal) {
   $('#cccs-status').text(healthText);
   $('#cccs-node-info').text(
     'Online (' + (onlineNodes.join(', ') || '-') + ')'
-    + '  |  Offline (' + (offlineNodes.join(', ') || '-') + ')'
+    + (offlineNodes.length > 0 ? '  |  Offline (' + offlineNodes.join(', ') + ')' : '')
   );
   $('#cccs-execution-node').text(infrastructure.ccvm_running_node || 'N/A');
   $('#cccs-current-dc').text(infrastructure.current_dc || 'N/A');
