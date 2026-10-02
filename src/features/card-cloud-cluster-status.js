@@ -275,9 +275,11 @@ $('#button-execution-modal-monitoring-config-update').on('click', function(){
           prometheus_config_cmd.push(config_json.clusterConfig.hosts[i].ablecube);
         }
 
-        prometheus_config_cmd.push('--scvm');
-        for(var i = 0 ; i < config_json.clusterConfig.hosts.length ; i ++ ){
-          prometheus_config_cmd.push(config_json.clusterConfig.hosts[i].scvmMngt);
+        if (config_json.clusterConfig.type == "ablestack-hci" || config_json.clusterConfig.type == "ablestack-hci-filesystem"){
+          prometheus_config_cmd.push('--scvm');
+          for(var i = 0 ; i < config_json.clusterConfig.hosts.length ; i ++ ){
+            prometheus_config_cmd.push(config_json.clusterConfig.hosts[i].scvmMngt);
+          }
         }
 
         if (console_log) { console.log(prometheus_config_cmd); }
