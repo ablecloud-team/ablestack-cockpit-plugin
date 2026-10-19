@@ -982,7 +982,7 @@ function autoConfigWallIP(){
         $("#form-input-wall-monitoring-ccvm-ip").val(clusterJsonConf.clusterConfig.ccvm.ip);
         for (let i = 0 ; i < host_count ; i++){
             $("#form-input-wall-monitoring-cubehost"+(i+1)+"-ip").val(clusterJsonConf.clusterConfig.hosts[i].ablecube);
-            if (os_type != "ablestack-vm"){
+            if (os_type == "ablestack-hci" || os_type == "ablestack-hci-filesystem"){
                 $("#form-input-wall-monitoring-scvm"+(i+1)+"-ip").val(clusterJsonConf.clusterConfig.hosts[i].scvmMngt);
             }
         }
