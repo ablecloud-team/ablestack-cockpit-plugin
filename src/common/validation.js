@@ -294,7 +294,7 @@ function imageNameCheck(name) {
  * History : 2024.05.08 최초 작성
  */
 function checkIqn(iqn) {
- var regex = /^iqn.(19[0-9][0-9]|20[0-9][0-9])-(0[1-9]|1[1-2])(.[a-zA-z0-9]+)+:[a-zA-z0-9]+$/;
+ var regex = /^iqn.(19[0-9][0-9]|20[0-9][0-9])-(0[1-9]|1[0-2])(.[a-zA-z0-9]+)+:[a-zA-z0-9]+$/;
  return regex.test(iqn)
 }
 
@@ -308,6 +308,6 @@ function checkIqn(iqn) {
  * History : 2024.05.08 최초 작성
  */
 function checkNqn(nqn) {
- var regex = /^nqn.(19[0-9][0-9]|20[0-9][0-9])-(0[1-9]|1[1-2])(.[a-zA-z0-9]+)+:[a-zA-z0-9]+$/;
+ var regex = /^nqn.(19[0-9][0-9]|20[0-9][0-9])-(0[1-9]|1[0-2])(.[a-zA-z0-9]+)+:[a-zA-z0-9]+$/;
  return regex.test(nqn)
 }

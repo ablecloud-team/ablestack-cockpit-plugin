@@ -58,24 +58,86 @@ $(document).ready(function(){
 // document.ready 영역 끝
 
 // 이벤트 처리 함수
+// Use viewport coordinates so scrollable cards and dialogs cannot clip menus.
+function glueMenuPosition(anchor, menuWidth, menuHeight, viewportWidth, viewportHeight, alignRight){
+  var edge = 8;
+  var gap = 4;
+  var width = Math.min(menuWidth, Math.max(0, viewportWidth - edge * 2));
+  var below = Math.max(0, viewportHeight - edge - anchor.bottom - gap);
+  var above = Math.max(0, anchor.top - edge - gap);
+  var openAbove = below < menuHeight && above > below;
+  var height = Math.min(menuHeight, openAbove ? above : below);
+  var left = alignRight ? anchor.right - width : anchor.left;
+  return {
+    left: Math.max(edge, Math.min(left, viewportWidth - edge - width)),
+    top: openAbove ? anchor.top - gap - height : anchor.bottom + gap,
+    width: width,
+    maxHeight: height
+  };
+}
+
 function closeAblestackMenus(){
   $('.pf-v6-c-menu.ablestack-menu').each(function(){
-    $(this).attr('hidden', true).hide();
+    var $menu = $(this);
+    // Hide before restoring styles so closing cannot animate the menu size.
+    $menu.attr('hidden', true).hide();
+    if($menu.hasClass('glue-floating-menu')){
+      var originalStyle = $menu.data('glue-original-style');
+      if(originalStyle == null){
+        $menu.removeAttr('style');
+      }else{
+        $menu.attr('style', originalStyle);
+      }
+      $menu.removeClass('glue-floating-menu glue-menu-measuring').removeData('glue-original-style');
+    }
+    $menu.attr('hidden', true).hide();
   });
   $('.pf-v6-c-menu-toggle[aria-expanded="true"]').attr('aria-expanded', 'false');
   $('.ablestack-menu-dropdown.pf-m-expanded, .ablestack-menu-select.pf-m-expanded').removeClass('pf-m-expanded');
 }
 
 function openAblestackMenu($toggle, $menu){
-  if(!$menu || !$menu.length){
+  if(!$menu || !$menu.length || !$toggle || !$toggle.length){
     return;
   }
+  $menu.data('glue-original-style', $menu.attr('style') || '');
+  var anchor = $toggle[0].getBoundingClientRect();
+  var isSelect = $toggle.closest('.ablestack-menu-select').length > 0;
+  var viewportWidth = document.documentElement.clientWidth;
+  var viewportHeight = document.documentElement.clientHeight;
+  var menu = $menu[0];
+  // Set the size before display and measure invisibly at the viewport origin.
+  // This avoids both an oversized first frame and overflow during measurement.
+  $menu.addClass('glue-floating-menu glue-menu-measuring');
+  menu.style.setProperty('--glue-menu-width', isSelect ? anchor.width + 'px' : 'max-content');
+  menu.style.setProperty('--glue-menu-max-width', Math.max(0, viewportWidth - 16) + 'px');
   $menu.removeAttr('hidden').show();
-  if($toggle && $toggle.length){
-    $toggle.attr('aria-expanded', 'true');
-    $toggle.closest('.ablestack-menu-dropdown, .ablestack-menu-select').addClass('pf-m-expanded');
-  }
+  var bounds = menu.getBoundingClientRect();
+  var position = glueMenuPosition(anchor, isSelect ? anchor.width : bounds.width, Math.min(bounds.height, 300),
+    viewportWidth, viewportHeight, $menu.hasClass('pf-m-align-right'));
+  menu.style.setProperty('--glue-menu-width', position.width + 'px');
+  menu.style.setProperty('--glue-menu-left', position.left + 'px');
+  menu.style.setProperty('--glue-menu-top', position.top + 'px');
+  menu.style.setProperty('--glue-menu-max-height', position.maxHeight + 'px');
+  $menu.removeClass('glue-menu-measuring');
+  $toggle.attr('aria-expanded', 'true');
+  $toggle.closest('.ablestack-menu-dropdown, .ablestack-menu-select').addClass('pf-m-expanded');
 }
+
+// Close when the anchor moves; scrolling inside the menu itself stays usable.
+window.addEventListener('scroll', function(e){
+  if(!$(e.target).closest('.glue-floating-menu').length){
+    closeAblestackMenus();
+  }
+}, true);
+$(window).on('resize', closeAblestackMenus);
+$(document).on('keydown', function(e){
+  if(e.key === 'Escape'){
+    var $toggle = $('.pf-v6-c-menu-toggle[aria-expanded="true"]').first();
+    closeAblestackMenus();
+    $toggle.trigger('focus');
+  }
+});
 
 function toggleAblestackMenu($toggle){
   var $container = $toggle.closest('.ablestack-menu-dropdown, .ablestack-menu-select');
@@ -561,21 +623,7 @@ function glueVmList(){
   });
 }
 
-// glue 배치 호스트 리스트 기능
-$('#button-gluefs-glue-hosts-list-setting, #button-glue-hosts-list-setting, #button-update-nfs-glue-hosts-list-setting, #button-smb-glue-hosts-list-setting, #button-ingress-glue-hosts-list-setting, #button-update-ingress-glue-hosts-list-setting, #button-iscsi-glue-hosts-list-setting, #button-nvmeof-glue-hosts-list-setting, #button-update-iscsi-glue-hosts-list-setting, #button-object-gateway-glue-hosts-list-setting, #button-update-object-gateway-glue-hosts-list-setting').on('click', function(e){
-  $('#'+e.target.parentElement.children[2].id).toggle();
-});
-
-// iscsi portal 리스트 기능
-$('#button-iscsi-portal-list-setting, #button-update-iscsi-portal-list-setting').on('click', function(e){
-  $('#'+e.target.parentElement.children[2].id).toggle();
-});
-
-$('#button-iscsi-image-list-setting, #button-update-iscsi-image-list-setting').on('click', function(e){
-  $('#'+e.target.parentElement.children[2].id).toggle();
-});
-
-
+// Host, portal and image selectors use the delegated menu toggle handler above.
 function scanHostKey(){
   //createLoggerInfo("scanHostKey() start");
   cockpit.spawn(['python3', pluginpath + '/python/host/ssh-scan.py'])

@@ -8,13 +8,26 @@
 function smbServiceList(){
   //조회
   $('#button-smb-service-search').html("<svg class='pf-v6-c-spinner pf-m-md' role='progressbar' aria-valuetext='Loading...' viewBox='0 0 100 100' ><circle class='pf-v6-c-spinner__path' cx='50' cy='50' r='45' fill='none'></circle></svg>");
-  fetch('https://'+glue_api_ip+':'+glue_api_port+'/api/v1/smb',{
+  var api_url = 'https://'+glue_api_ip+':'+glue_api_port;
+  Promise.all([fetch(api_url+'/api/v1/smb',{
     method: 'GET',
     headers: {
       'accept': 'application/json',
       'Content-Type': 'application/x-www-form-urlencoded'
     }
-  }).then(res => res.json()).then(data => {
+  }).then(res => res.json()),
+  fetch(api_url+'/api/v1/glue/hosts', { method: 'GET' })
+    .then(res => {
+      if (!res.ok) throw new Error('호스트 IP 조회 실패');
+      return res.json();
+    })
+    .catch(function(error){
+      console.log('SMB 스토리지 IP 조회 실패: '+error);
+      return [];
+    })
+  ]).then(function(results){
+    var data = results[0];
+    var hosts = Array.isArray(results[1]) ? results[1] : [];
     $('#smb-service-list tr').remove();
 
     for(var i=0; i < data.length; i++){
@@ -64,7 +77,14 @@ function smbServiceList(){
 
         insert_tr += '<tr role="row">';
         insert_tr += '  <td role="cell" data-label="호스트">'+data[i].hostname+'</td>';
-        insert_tr += '  <td role="cell" data-label="IP">'+data[i].ip_address+'</td>';
+        var host = hosts.find(function(host){
+          return host && host.hostname === data[i].hostname;
+        });
+        var ip_cell = $('<span>').text(data[i].ip_address).html();
+        if(host && host.addr && host.addr !== data[i].ip_address){
+          ip_cell += ' (관리)<br/>'+$('<span>').text(host.addr).html()+' (스토리지)';
+        }
+        insert_tr += '  <td role="cell" data-label="IP">'+ip_cell+'</td>';
         insert_tr += '  <td role="cell" data-label="상태">'+data[i].status+'</td>';
         insert_tr += '  <td role="cell" data-label="보안 타입">'+data[i].security_type+'</td>';
         if(data[i].security_type == 'normal'){
