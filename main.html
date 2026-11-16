@@ -2394,13 +2394,19 @@
                                     <input class="pf-v6-c-radio__input" type="radio" id="radio-system-update-type-all"
                                         name="radio-system-update-type" value="all" checked />
                                     <span class="pf-v6-c-radio__label">전체 업데이트</span>
-                                    <span class="pf-v6-c-radio__description">패키지 전체 업데이트</span>
+                                    <span class="pf-v6-c-radio__description">백그라운드 실행. 완료 후 재부팅하고 Tools를 별도 업데이트합니다.</span>
                                 </label>
                                 <label class="pf-v6-c-radio ablestack-update-type-option" for="radio-system-update-type-mold">
                                     <input class="pf-v6-c-radio__input" type="radio" id="radio-system-update-type-mold"
                                         name="radio-system-update-type" value="mold" />
                                     <span class="pf-v6-c-radio__label">Mold 업데이트</span>
                                     <span class="pf-v6-c-radio__description">Mold RPM 전용 ISO 사용</span>
+                                </label>
+                                <label class="pf-v6-c-radio ablestack-update-type-option" for="radio-system-update-type-tools">
+                                    <input class="pf-v6-c-radio__input" type="radio" id="radio-system-update-type-tools"
+                                        name="radio-system-update-type" value="tools" />
+                                    <span class="pf-v6-c-radio__label">ABLESTACK Tools 업데이트</span>
+                                    <span class="pf-v6-c-radio__description">재부팅 후 실행. 현재 커널과 설치 대상 커널을 확인합니다.</span>
                                 </label>
                             </div>
                         </div>

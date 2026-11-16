@@ -34,7 +34,7 @@ async function testSystemUpdateFallback(source) {
       if (args[0] === 'test') {
         if (args[1] === '-f') {
           if (options.missingScript) throw new Error('missing update/update-mold.sh');
-          if (!['/mnt/iso/update/update-all.sh', '/mnt/iso/update/update-mold.sh'].includes(args[2])) {
+          if (!['/mnt/iso/update/update-all.sh', '/mnt/iso/update/update-mold.sh', '/mnt/iso/update/update-qemu-exec-tools.sh'].includes(args[2])) {
             throw new Error('updater is outside the ISO update directory: ' + args[2]);
           }
         }
@@ -62,9 +62,14 @@ async function testSystemUpdateFallback(source) {
       if (args[0] === '/bin/bash' && args[3] === 'mold-iso-info') {
         return ['/mnt/iso/rpms', ...records.map((record) => record.path), ''].join('\0');
       }
+      if (args[0] === '/bin/bash' && args[1] === '/mnt/iso/update/update-qemu-exec-tools.sh') {
+        assert(args.includes('--check') && args.includes('--iso-root'), 'Tools info is a kernel check only');
+        if (options.kernelMismatch) throw new Error('현재 커널 버전이 맞지 않아 설치할 수 없습니다.');
+        return 'TOOLS_CURRENT_KERNEL=5.14.0-new\nTOOLS_TARGET_KERNEL=5.14.0-new\n';
+      }
       if (args[0] === '/bin/bash' && args[3] === 'ablestack-update') {
         executions++;
-        return 'update complete';
+        return options.background ? 'ABLESTACK_UPDATE_STARTED_PID=12345\n' : 'update complete';
       }
       throw new Error('Unexpected command: ' + JSON.stringify(args));
     } };
@@ -172,6 +177,39 @@ async function testSystemUpdateFallback(source) {
     assert(command[6] === 'update/update-all.sh' && command[7] === 'all', 'full script and type');
     assert(result.val.update_script === '/opt/ABLESTACK_UPDATE/update/update-all.sh', 'nested execution result');
     assert(f.executions === 1, 'one execution');
+  });
+  test('Tools info checks the running kernel without requiring KS', async () => {
+    const f = fixture({type: 'tools'});
+    const info = await f.api.loadSystemUpdateInfoFallback('/mnt/iso', 'tools');
+    assert(info.current_kernel === '5.14.0-new' && info.target_kernel === '5.14.0-new', 'kernel versions');
+    assert(info.update_label === 'ABLESTACK Tools 업데이트', 'Tools label');
+    assert(info.update_script.endsWith('/update/update-qemu-exec-tools.sh'), 'separate Tools script');
+    assert(!f.calls.some((args) => args[0] === 'cat' && args[1].includes('/ks/')), 'no KS requirement');
+    f.api.updateSystemUpdateInfo(info);
+    f.api.resetSystemUpdateConfirmModal();
+    assert(f.$('#system-update-version-label').text() === 'Tools 대상 커널', 'show kernel label');
+    assert(f.$('#system-update-current-ablestack-version').text() === '5.14.0-new', 'show running kernel');
+    assert(f.$('#system-update-warning-services').text().includes('재부팅'), 'require reboot before Tools');
+  });
+  test('Tools kernel mismatch prevents copy and installation', async () => {
+    const f = fixture({type: 'tools', kernelMismatch: true});
+    await rejects(() => f.api.runSystemUpdateFallback('/mnt/iso', 'tools'), /현재 커널 버전/);
+    assert(f.executions === 0, 'must stop before mutation');
+  });
+  test('Tools run executes the separate installer', async () => {
+    const f = fixture({type: 'tools'});
+    const result = await f.api.runSystemUpdateFallback('/mnt/iso', 'tools');
+    const command = f.calls.find((args) => args[3] === 'ablestack-update');
+    assert(command[6] === 'update/update-qemu-exec-tools.sh' && command[7] === 'tools', 'Tools command');
+    assert(result.val.update_type === 'tools' && !result.val.background, 'Tools completes synchronously');
+  });
+  test('Background launch is reported as started rather than complete', async () => {
+    const f = fixture({background: true});
+    const result = await f.api.runSystemUpdateFallback('/mnt/iso', 'all');
+    assert(result.val.background && result.val.pid === 12345, 'background process acknowledgment');
+    assert(result.val.message.includes('백그라운드에서 시작'), 'show launch state');
+    assert(!result.val.message.includes('실행이 완료'), 'do not claim the update finished');
+    assert(result.val.log_file === '/var/log/ablestack-update.log', 'existing log');
   });
   test('Version and confirmation text follow the selected update type', async () => {
     const f = fixture({ ks: 'ABLESTACK_VERSION="ABLESTACK Next"\n' });

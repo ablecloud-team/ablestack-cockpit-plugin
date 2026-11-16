@@ -1,6 +1,8 @@
 """ISO validation and copy/run regression tests; RPM commands are simulated."""
 import importlib.util
 import json
+import fcntl
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -29,6 +31,7 @@ class UpdateIsoTests(unittest.TestCase):
         self.addCleanup(patch.stopall)
         patch.object(update, "OS_RELEASE_PATH", os_release).start()
         patch.object(update, "UPDATE_WORK_DIR", self.work).start()
+        patch.object(update, "UPDATE_LOCK_PATH", self.root / "update.lock").start()
         self.commands = []
         self.available = {"rpm"}
         self.blocked = set()
@@ -73,6 +76,13 @@ class UpdateIsoTests(unittest.TestCase):
         (self.script_dir / "update-all.sh").write_text(
             '#!/bin/bash\nset -eu\ntest -f ks/ablestack-ks.cfg\n'
             'printf "all:%s:%s" "$PWD" "$ABLESTACK_UPDATE_TYPE"\n')
+
+    def tools_iso(self):
+        (self.script_dir / "update-qemu-exec-tools.sh").write_text(
+            '#!/bin/bash\nset -eu\n'
+            'if [ "${1:-}" = --check ]; then\n'
+            'printf "TOOLS_CURRENT_KERNEL=5.14.0-new\\nTOOLS_TARGET_KERNEL=5.14.0-new\\n"\n'
+            'else printf "tools:%s:%s" "$PWD" "$ABLESTACK_UPDATE_TYPE"; fi\n')
 
     def test_mold_reads_five_headers_without_ks_config_or_appstream(self):
         self.mold_iso()
@@ -253,6 +263,70 @@ class UpdateIsoTests(unittest.TestCase):
         (self.script_dir / "update-mold.sh").write_text('echo "update failed" >&2\nexit 7\n')
         with self.assertRaisesRegex(RuntimeError, "update failed"):
             update.run_update(str(self.mount), "mold")
+
+    def test_tools_check_and_run_use_separate_script_without_ks(self):
+        self.tools_iso()
+        info = update.read_update_info(str(self.mount), "tools")
+        self.assertEqual(info["current_kernel"], "5.14.0-new")
+        self.assertEqual(info["target_kernel"], "5.14.0-new")
+        self.assertEqual(info["update_label"], "ABLESTACK Tools 업데이트")
+        result = update.run_update(str(self.mount), "tools")
+        self.assertEqual(result["stdout"], f"tools:{self.work}:tools")
+        self.assertFalse(result["background"])
+        self.assertFalse((self.work / "ks").exists())
+
+    def test_tools_kernel_mismatch_does_not_replace_work_directory(self):
+        self.tools_iso()
+        (self.script_dir / "update-qemu-exec-tools.sh").write_text(
+            'echo "현재 커널 버전이 맞지 않아 설치할 수 없습니다."\nexit 1\n')
+        self.work.mkdir()
+        marker = self.work / "previous-update"
+        marker.write_text("keep")
+        with self.assertRaisesRegex(ValueError, "현재 커널 버전"):
+            update.run_update(str(self.mount), "tools")
+        self.assertEqual(marker.read_text(), "keep")
+
+    def test_tools_can_run_from_preserved_work_after_reboot_without_copying_itself(self):
+        self.tools_iso()
+        update.run_update(str(self.mount), "tools")
+        marker = self.work / "keep"
+        marker.write_text("keep")
+        result = update.run_update(str(self.work), "tools")
+        self.assertEqual(result["stdout"], f"tools:{self.work}:tools")
+        self.assertTrue(marker.exists())
+
+    def test_background_start_is_not_reported_as_completed_update(self):
+        self.full_iso()
+        (self.script_dir / "update-all.sh").write_text('printf "ABLESTACK_UPDATE_STARTED_PID=9876\\n"\n')
+        result = update.run_update(str(self.mount), "all")
+        self.assertTrue(result["background"])
+        self.assertEqual(result["pid"], 9876)
+        self.assertIn("백그라운드에서 시작", result["message"])
+        self.assertNotIn("실행이 완료", result["message"])
+        self.assertIn("Tools", result["message"])
+
+    def test_busy_update_prevents_replacing_active_work(self):
+        self.full_iso()
+        self.work.mkdir()
+        marker = self.work / "active-update"
+        marker.write_text("keep")
+        with update.UPDATE_LOCK_PATH.open("w") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            with self.assertRaisesRegex(RuntimeError, "이미 업데이트"):
+                update.run_update(str(self.mount), "all")
+        self.assertEqual(marker.read_text(), "keep")
+
+    def test_closing_parent_lock_preserves_inherited_background_lock(self):
+        with update.update_work_lock() as lock_fd:
+            inherited = os.dup(lock_fd)
+        try:
+            with self.assertRaisesRegex(RuntimeError, "이미 업데이트"):
+                with update.update_work_lock():
+                    self.fail("must stay locked")
+        finally:
+            os.close(inherited)
+        with update.update_work_lock():
+            pass
 
 
 if __name__ == "__main__":

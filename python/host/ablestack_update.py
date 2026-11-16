@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+from contextlib import contextmanager
+import fcntl
 import json
 import os
 import shutil
 import shlex
+import re
 import subprocess
 from pathlib import Path
 
@@ -22,6 +25,7 @@ except Exception:
 OS_RELEASE_PATH = Path("/etc/os-release")
 TARGET_KS_PATH = Path("ks/ablestack-ks.cfg")
 UPDATE_WORK_DIR = Path("/opt/ABLESTACK_UPDATE")
+UPDATE_LOCK_PATH = Path("/run/lock/ablestack-update.lock")
 MOLD_PACKAGES = (
     "cloudstack-common",
     "cloudstack-agent",
@@ -38,6 +42,10 @@ UPDATE_SCRIPT_MAP = {
     "mold": {
         "label": "Mold 업데이트",
         "script": Path("update/update-mold.sh"),
+    },
+    "tools": {
+        "label": "ABLESTACK Tools 업데이트",
+        "script": Path("update/update-qemu-exec-tools.sh"),
     },
 }
 
@@ -71,10 +79,14 @@ def normalize_value(value):
 
 
 def parse_key_values(path):
-    values = {}
     if not path.exists():
-        return values
-    for raw_line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        return {}
+    return parse_key_values_text(path.read_text(encoding="utf-8", errors="replace"))
+
+
+def parse_key_values_text(content):
+    values = {}
+    for raw_line in content.splitlines():
         line = raw_line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
@@ -193,6 +205,21 @@ def read_update_info(mount_path, update_type="all"):
         mold_info = read_mold_iso_info(mount)
         # Mold 전용 업데이트는 OS 버전을 변경하지 않는다.
         target_ablestack_version = current_ablestack_version
+    elif update_type == "tools":
+        proc = subprocess.run(
+            ["/bin/bash", str(update_script_path), "--check", "--iso-root", str(mount)],
+            text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+        )
+        if proc.returncode != 0:
+            raise ValueError(proc.stdout.strip() or proc.stderr.strip() or "ABLESTACK Tools 커널 확인 실패")
+        values = parse_key_values_text(proc.stdout)
+        if not values.get("TOOLS_CURRENT_KERNEL") or not values.get("TOOLS_TARGET_KERNEL"):
+            raise ValueError("ABLESTACK Tools 스크립트에서 커널 확인 결과를 읽을 수 없습니다.")
+        mold_info = {
+            "current_kernel": values["TOOLS_CURRENT_KERNEL"],
+            "target_kernel": values["TOOLS_TARGET_KERNEL"],
+        }
+        target_ablestack_version = current_ablestack_version
     else:
         ks_path = mount / TARGET_KS_PATH
         if not ks_path.is_file():
@@ -262,11 +289,37 @@ def copy_update_files(source_path, target_path):
     )
 
 
+@contextmanager
+def update_work_lock():
+    UPDATE_LOCK_PATH.parent.mkdir(parents=True, exist_ok=True)
+    lock_fd = os.open(str(UPDATE_LOCK_PATH), os.O_CREAT | os.O_RDWR, 0o600)
+    try:
+        try:
+            fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise RuntimeError("이미 업데이트가 실행 중입니다. 업데이트 완료 후 다시 실행하세요.")
+        yield lock_fd
+    finally:
+        # nohup 작업에 넘긴 잠금은 유지한다. LOCK_UN은 자식의 잠금도 해제한다.
+        os.close(lock_fd)
+
+
 def run_update(mount_path, update_type="all"):
+    with update_work_lock() as lock_fd:
+        return run_update_locked(mount_path, update_type, lock_fd)
+
+
+def run_update_locked(mount_path, update_type, lock_fd):
     info = read_update_info(mount_path, update_type)
     script_info = get_update_script_info(update_type)
     mount = Path(info["mount_path"])
-    work_dir = prepare_update_work_dir(mount)
+    # 재부팅 후에는 전체 업데이트가 복사한 ISO에서 Tools만 바로 실행할 수 있다.
+    if update_type == "tools" and mount == UPDATE_WORK_DIR.resolve():
+        if UPDATE_WORK_DIR.is_symlink():
+            raise ValueError(f"{UPDATE_WORK_DIR} 경로가 심볼릭 링크입니다.")
+        work_dir = mount
+    else:
+        work_dir = prepare_update_work_dir(mount)
     work_update_script = work_dir / script_info["script"]
 
     if not work_update_script.exists():
@@ -277,6 +330,7 @@ def run_update(mount_path, update_type="all"):
     env["ABLESTACK_UPDATE_WORK_PATH"] = str(work_dir)
     env["ABLESTACK_UPDATE_COPY_PATH"] = str(work_dir)
     env["ABLESTACK_UPDATE_TYPE"] = update_type
+    env["ABLESTACK_UPDATE_LOCK_FD"] = str(lock_fd)
 
     proc = subprocess.run(
         ["/bin/bash", f"./{script_info['script'].as_posix()}"],
@@ -285,14 +339,24 @@ def run_update(mount_path, update_type="all"):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         env=env,
+        pass_fds=(lock_fd,),
         check=False,
     )
     if proc.returncode != 0:
         message = proc.stderr.strip() or proc.stdout.strip() or "ABLESTACK Version 업데이트 실행 중 오류가 발생했습니다."
         raise RuntimeError(message)
 
+    started = re.search(r"^ABLESTACK_UPDATE_STARTED_PID=([0-9]+)$", proc.stdout, re.M)
+    background = update_type == "all" and started is not None
+    message = ("전체 업데이트를 백그라운드에서 시작했습니다. /var/log/ablestack-update.log에서 완료를 확인한 후 "
+               "재부팅하고 ABLESTACK Tools 업데이트를 실행하세요." if background else
+               f"{script_info['label']} 실행이 완료되었습니다.")
     return {
-        "message": f"ABLESTACK {script_info['label']} 실행이 완료되었습니다.",
+        **info,
+        "message": message,
+        "background": background,
+        "pid": int(started.group(1)) if background else None,
+        "log_file": "/var/log/ablestack-update.log",
         "mount_path": info["mount_path"],
         "copy_path": str(work_dir),
         "update_type": update_type,

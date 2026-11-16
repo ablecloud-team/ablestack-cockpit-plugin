@@ -57,6 +57,10 @@
   padding: 12px 14px;
 }
 
+.ablestack-update-type-option:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .ablestack-update-type-option .pf-v6-c-radio__label,
 .ablestack-update-type-option .pf-v6-c-radio__description {
   grid-column: 2;
