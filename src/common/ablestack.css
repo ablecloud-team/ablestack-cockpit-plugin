@@ -781,3 +781,14 @@ html.pf-v6-theme-dark #div-modal-disk-image-create .pf-v6-c-form-control {
   --pf-v6-c-alert--BoxShadow: none;
   box-shadow: none;
 }
+
+/* Update log text is localized for the UI; on-disk logs remain English. */
+.ablestack-update-log { margin-top: 1rem; min-width: 0; }
+.ablestack-update-log pre {
+    max-height: 20rem;
+    overflow: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    padding: 0.75rem;
+    background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+}

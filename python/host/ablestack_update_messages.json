@@ -1,0 +1,1718 @@
+[
+  {
+    "en": "{p0} completed",
+    "ko": "{p0} 완료",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "{p0} failed",
+    "ko": "{p0} 실패",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "{p0} check passed",
+    "ko": "{p0} 확인 완료",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "{p0} check failed",
+    "ko": "{p0} 확인 실패",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "Starts a nohup background worker and returns immediately.",
+    "ko": "기본 실행은 nohup 백그라운드 작업을 시작하고 즉시 반환합니다."
+  },
+  {
+    "en": "Monitor progress and completion: tail -f /var/log/ablestack-update.log",
+    "ko": "진행/완료 여부: tail -f /var/log/ablestack-update.log"
+  },
+  {
+    "en": "Include Cockpit packages in the update.",
+    "ko": "cockpit 관련 패키지도 업데이트 대상에 포함합니다."
+  },
+  {
+    "en": "Exclude Cockpit packages from the update (default).",
+    "ko": "cockpit 관련 패키지를 업데이트 대상에서 제외합니다. 기본값입니다."
+  },
+  {
+    "en": "Show this help message.",
+    "ko": "도움말을 출력합니다."
+  },
+  {
+    "en": "Invalid UPDATE_COCKPIT value: {p0}",
+    "ko": "UPDATE_COCKPIT 값이 올바르지 않습니다: {p0}"
+  },
+  {
+    "en": "Unknown option: {p0}",
+    "ko": "알 수 없는 옵션입니다: {p0}"
+  },
+  {
+    "en": "{p0} preserving previous backup: {p1} -> {p2}",
+    "ko": "{p0} 기존 백업 보존: {p1} -> {p2}",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "{p0} backup completed: {p1} -> {p2}",
+    "ko": "{p0} 백업 완료: {p1} -> {p2}",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "{p0} backup skipped: {p1} does not exist",
+    "ko": "{p0} 백업 생략: {p1} 없음",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "{p0} restore completed: {p1} -> {p2}",
+    "ko": "{p0} 복원 완료: {p1} -> {p2}",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "{p0} restore skipped: {p1} does not exist",
+    "ko": "{p0} 복원 생략: {p1} 없음",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "Restoring preserved host Cockpit properties: {p0}",
+    "ko": "호스트 cockpit properties 보존 복원 시작: {p0}",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "Skipping sos RPM policy patch: {p0} does not exist",
+    "ko": "sos rpm policy 수정 생략: {p0} 없음"
+  },
+  {
+    "en": "sos RPM policy command patch completed: {p0}",
+    "ko": "sos rpm policy 명령 수정 완료: {p0}"
+  },
+  {
+    "en": "Failed to create a temporary file for: {p0}",
+    "ko": "임시 파일 생성 실패: {p0}"
+  },
+  {
+    "en": "PRETTY_NAME applied: {p0} -> {p1}",
+    "ko": "PRETTY_NAME 적용 완료: {p0} -> {p1}"
+  },
+  {
+    "en": "Failed to apply PRETTY_NAME: {p0}",
+    "ko": "PRETTY_NAME 적용 실패: {p0}"
+  },
+  {
+    "en": "Current cluster node identified: {p0}",
+    "ko": "현재 클러스터 노드 식별: {p0}"
+  },
+  {
+    "en": "Could not identify the cluster node name of this host.",
+    "ko": "현재 호스트의 클러스터 노드명을 식별하지 못했습니다."
+  },
+  {
+    "en": "The pcs command is not available.",
+    "ko": "pcs 명령을 찾을 수 없습니다."
+  },
+  {
+    "en": "Excluding storage clone instance on this host: {p0} node={p1}",
+    "ko": "현재 호스트에서 스토리지 clone 인스턴스 제외: {p0} node={p1}"
+  },
+  {
+    "en": "Storage resource not found; skipping ban: {p0}",
+    "ko": "스토리지 리소스 없음, ban 생략: {p0}"
+  },
+  {
+    "en": "Clearing storage clone ban on this host: {p0} node={p1}",
+    "ko": "현재 호스트 스토리지 clone ban 해제: {p0} node={p1}"
+  },
+  {
+    "en": "Stage 1 verification started: CCVM update completion",
+    "ko": "1단계 자동 검증 시작: ccvm 업데이트 완료 확인"
+  },
+  {
+    "en": "CCVM package processes idle",
+    "ko": "ccvm 패키지 프로세스 종료"
+  },
+  {
+    "en": "CCVM package operations have not finished.",
+    "ko": "ccvm 패키지 작업이 종료되지 않았습니다."
+  },
+  {
+    "en": "CCVM SSH connectivity",
+    "ko": "ccvm SSH 연결"
+  },
+  {
+    "en": "CCVM SSH connectivity has not recovered.",
+    "ko": "ccvm SSH 연결이 정상화되지 않았습니다."
+  },
+  {
+    "en": "cloudcenter_res running on the current host",
+    "ko": "cloudcenter_res 정상 실행"
+  },
+  {
+    "en": "cloudcenter_res is unhealthy after the CCVM update.",
+    "ko": "ccvm 업데이트 후 cloudcenter_res 상태가 비정상입니다."
+  },
+  {
+    "en": "Stage 1 verification completed: CCVM update completion",
+    "ko": "1단계 자동 검증 완료: ccvm 업데이트 완료 확인"
+  },
+  {
+    "en": "Stage 2 started: relocating CCVM to another host (including restart)",
+    "ko": "2단계 자동 진행 시작: ccvm 다른 호스트 재배치(재기동 포함)"
+  },
+  {
+    "en": "Stage 2 started: CCVM migration",
+    "ko": "2단계 자동 진행 시작: ccvm 마이그레이션"
+  },
+  {
+    "en": "cloudcenter_res running on the target host",
+    "ko": "cloudcenter_res 대상 호스트 실행"
+  },
+  {
+    "en": "cloudcenter_res did not reach Started on the target host.",
+    "ko": "cloudcenter_res 가 대상 호스트에서 Started 되지 않았습니다."
+  },
+  {
+    "en": "cloudcenter_res moved off the current host",
+    "ko": "현재 호스트에서 cloudcenter_res 이탈"
+  },
+  {
+    "en": "cloudcenter_res is still running on the current host.",
+    "ko": "cloudcenter_res 가 현재 호스트에서 내려가지 않았습니다."
+  },
+  {
+    "en": "CCVM SSH connectivity recovery",
+    "ko": "ccvm SSH 연결 정상화"
+  },
+  {
+    "en": "CCVM started on the target host, but SSH connectivity has not recovered.",
+    "ko": "ccvm 이 대상 호스트에서 Started 되었지만 SSH 연결이 정상화되지 않았습니다."
+  },
+  {
+    "en": "Stage 2 verification completed: CCVM relocated to another host (including restart)",
+    "ko": "2단계 자동 검증 완료: ccvm 다른 호스트 재배치(재기동 포함)"
+  },
+  {
+    "en": "Stage 2 verification completed: CCVM migration",
+    "ko": "2단계 자동 검증 완료: ccvm 마이그레이션"
+  },
+  {
+    "en": "Stage 3 started: storage maintenance and health checks",
+    "ko": "3단계 자동 진행 시작: 스토리지 유지보수/안정성 확인"
+  },
+  {
+    "en": "No UNCLEAN cluster nodes",
+    "ko": "클러스터 UNCLEAN 상태 없음"
+  },
+  {
+    "en": "UNCLEAN state detected in the cluster.",
+    "ko": "클러스터에 UNCLEAN 상태가 감지되었습니다."
+  },
+  {
+    "en": "Kernel log free of storage errors",
+    "ko": "업데이트 시작 이후 새 커널 스토리지 오류 없음"
+  },
+  {
+    "en": "Storage errors detected in the kernel log.",
+    "ko": "최근 커널 로그에 스토리지 오류가 감지되었습니다."
+  },
+  {
+    "en": "Stage 3 verification completed: storage maintenance and health checks",
+    "ko": "3단계 자동 검증 완료: 스토리지 유지보수/안정성 확인"
+  },
+  {
+    "en": "Host package update verification started",
+    "ko": "호스트 패키지 업데이트 완료 자동 검증 시작"
+  },
+  {
+    "en": "UNCLEAN cluster state detected after the host update.",
+    "ko": "호스트 업데이트 후 클러스터에 UNCLEAN 상태가 감지되었습니다."
+  },
+  {
+    "en": "Storage errors detected in the kernel log after the host update.",
+    "ko": "호스트 업데이트 후 커널 로그에 스토리지 오류가 감지되었습니다."
+  },
+  {
+    "en": "Host package update verification completed",
+    "ko": "호스트 패키지 업데이트 완료 자동 검증 완료"
+  },
+  {
+    "en": "Restarting mold-agent after the host update",
+    "ko": "호스트 업데이트 완료 후 mold-agent 서비스 재시작 시작"
+  },
+  {
+    "en": "Host mold-agent active",
+    "ko": "호스트 mold-agent 활성 상태"
+  },
+  {
+    "en": "mold-agent restart completed after the host update",
+    "ko": "호스트 업데이트 완료 후 mold-agent 서비스 재시작 완료"
+  },
+  {
+    "en": "First mold-agent restart failed; resetting failed state and retrying",
+    "ko": "호스트 업데이트 완료 후 mold-agent 서비스 1차 재시작 실패, 상태 초기화 후 재시도"
+  },
+  {
+    "en": "mold-agent restart failed after the host update",
+    "ko": "호스트 업데이트 완료 후 mold-agent 서비스 재시작 실패"
+  },
+  {
+    "en": "Failed to restart mold-agent.",
+    "ko": "mold-agent 서비스 재시작에 실패했습니다."
+  },
+  {
+    "en": "CCVM stopped on this host",
+    "ko": "호스트에서 ccvm 정지"
+  },
+  {
+    "en": "Deferring CCVM NVRAM removal after the host update: CCVM is still running on this host.",
+    "ko": "호스트 업데이트 완료 후 ccvm NVRAM 파일 삭제 보류: ccvm 이 이 호스트에서 아직 실행 중입니다."
+  },
+  {
+    "en": "CCVM NVRAM file removed after the host update: {p0}",
+    "ko": "호스트 업데이트 완료 후 ccvm NVRAM 파일 삭제 완료: {p0}"
+  },
+  {
+    "en": "Skipping CCVM NVRAM removal after the host update: {p0} does not exist",
+    "ko": "호스트 업데이트 완료 후 ccvm NVRAM 파일 삭제 생략: {p0} 없음"
+  },
+  {
+    "en": "SCVM NVRAM file removed after the host update: {p0}",
+    "ko": "호스트 업데이트 완료 후 scvm NVRAM 파일 삭제 완료: {p0}"
+  },
+  {
+    "en": "Skipping SCVM NVRAM removal after the host update: {p0} does not exist",
+    "ko": "호스트 업데이트 완료 후 scvm NVRAM 파일 삭제 생략: {p0} 없음"
+  },
+  {
+    "en": "Restarting mold after the CCVM update",
+    "ko": "ccvm 업데이트 완료 후 mold 서비스 재시작 시작"
+  },
+  {
+    "en": "CCVM SSH connectivity has not recovered before the mold restart.",
+    "ko": "mold 서비스 재시작 전 ccvm SSH 연결이 정상화되지 않았습니다."
+  },
+  {
+    "en": "mold restart completed after the CCVM update",
+    "ko": "ccvm 업데이트 완료 후 mold 서비스 재시작 완료"
+  },
+  {
+    "en": "mold restart failed after the CCVM update",
+    "ko": "ccvm 업데이트 완료 후 mold 서비스 재시작 실패"
+  },
+  {
+    "en": "Clearing all CCVM move constraints: {p0}",
+    "ko": "ccvm 이동 제약 전체 해제: {p0}"
+  },
+  {
+    "en": "Recovering the CCVM resource: clear constraints, cleanup, enable",
+    "ko": "ccvm 리소스 복구 시도: constraint 해제, cleanup, enable"
+  },
+  {
+    "en": "cloudcenter_res restart recovery",
+    "ko": "cloudcenter_res 재기동 복구"
+  },
+  {
+    "en": "CCVM resource recovery result: started on {p0}",
+    "ko": "ccvm 리소스 복구 결과: started on {p0}"
+  },
+  {
+    "en": "Preparing the resource before moving CCVM: clear, cleanup",
+    "ko": "ccvm 이동 전 리소스 상태 정리: clear, cleanup"
+  },
+  {
+    "en": "Attempting CCVM relocation to another host (including restart)",
+    "ko": "ccvm 다른 호스트 재배치 시도(재기동 포함)"
+  },
+  {
+    "en": "CCVM relocation to another host verified (including restart)",
+    "ko": "ccvm 다른 호스트 재배치 확인 완료(재기동 포함)"
+  },
+  {
+    "en": "Attempting to move CCVM",
+    "ko": "ccvm 이동 시도"
+  },
+  {
+    "en": "CCVM move verified",
+    "ko": "ccvm 이동 확인 완료"
+  },
+  {
+    "en": "CCVM relocation command succeeded, but pcs status verification failed: target={p0} attempt={p1}",
+    "ko": "ccvm 재배치 명령은 성공했지만 pcs status 재검증 실패: target={p0} attempt={p1}"
+  },
+  {
+    "en": "CCVM relocation command failed: target={p0} attempt={p1}",
+    "ko": "ccvm 재배치 명령 실패: target={p0} attempt={p1}"
+  },
+  {
+    "en": "CCVM relocation fallback recovery succeeded: started on {p0}",
+    "ko": "ccvm 재배치 fallback 복구 성공: started on {p0}"
+  },
+  {
+    "en": "CCVM PCS resource not found; skipping move: {p0}",
+    "ko": "ccvm PCS 리소스가 없어 이동 단계 생략: {p0}"
+  },
+  {
+    "en": "CCVM relocation fallback: trying the next online node.",
+    "ko": "ccvm 재배치 fallback 진행: 다음 온라인 노드 후보를 시도합니다."
+  },
+  {
+    "en": "Failed to relocate CCVM to another online node.",
+    "ko": "ccvm 을 다른 온라인 노드로 재배치하지 못했습니다."
+  },
+  {
+    "en": "Clearing storage clone bans on the current host.",
+    "ko": "현재 호스트의 스토리지 clone ban 을 해제합니다."
+  },
+  {
+    "en": "Excluding storage clone instances on this host from cluster management before the host update.",
+    "ko": "호스트 업데이트 전 현재 호스트의 스토리지 clone 인스턴스를 클러스터 관리 대상에서 제외합니다."
+  },
+  {
+    "en": "before script exit",
+    "ko": "스크립트 종료 전"
+  },
+  {
+    "en": "Run this script as root.",
+    "ko": "root로 실행해야 합니다."
+  },
+  {
+    "en": "Could not find update-all.sh.",
+    "ko": "update-all.sh 파일을 찾지 못했습니다."
+  },
+  {
+    "en": "Place update-qemu-exec-tools.sh in the same directory as update-all.sh.",
+    "ko": "update-qemu-exec-tools.sh를 update-all.sh와 같은 디렉터리에 넣어야 합니다."
+  },
+  {
+    "en": "ISO_ROOT/BaseOS does not exist.",
+    "ko": "ISO_ROOT/BaseOS 가 없습니다."
+  },
+  {
+    "en": "ISO_ROOT/AppStream does not exist.",
+    "ko": "ISO_ROOT/AppStream 이 없습니다."
+  },
+  {
+    "en": "ISO_ROOT/config does not exist.",
+    "ko": "ISO_ROOT/config 가 없습니다."
+  },
+  {
+    "en": "ISO_ROOT/ks does not exist.",
+    "ko": "ISO_ROOT/ks 가 없습니다."
+  },
+  {
+    "en": "ISO_ROOT/ks/ablestack-ks.cfg does not exist.",
+    "ko": "ISO_ROOT/ks/ablestack-ks.cfg 가 없습니다."
+  },
+  {
+    "en": "ISO_ROOT/config/dnf-3 does not exist.",
+    "ko": "ISO_ROOT/config/dnf-3 가 없습니다."
+  },
+  {
+    "en": "ISO_ROOT/config/rpm does not exist.",
+    "ko": "ISO_ROOT/config/rpm 가 없습니다."
+  },
+  {
+    "en": "Could not read ABLESTACK_VERSION.",
+    "ko": "ABLESTACK_VERSION 을 읽지 못했습니다."
+  },
+  {
+    "en": "No usable dnf/aspm command is available.",
+    "ko": "사용 가능한 dnf/aspm 이 없습니다."
+  },
+  {
+    "en": "No usable rpm/aspkg command is available.",
+    "ko": "사용 가능한 rpm/aspkg 가 없습니다."
+  },
+  {
+    "en": "Package manager commands verified",
+    "ko": "패키지 도구 확인 완료"
+  },
+  {
+    "en": "Package command repair required: restoring aspm/aspkg links or wrappers.",
+    "ko": "패키지 명령 상태 보정 필요: aspm/aspkg 링크 또는 wrapper 재적용을 진행합니다."
+  },
+  {
+    "en": "Package command state: dnf-3.blocked={p0} rpm.blocked={p1} aspm_link={p2} aspkg_link={p3} dnf3_wrapper={p4} rpm_wrapper={p5}",
+    "ko": "패키지 명령 상태: dnf-3.blocked={p0} rpm.blocked={p1} aspm_link={p2} aspkg_link={p3} dnf3_wrapper={p4} rpm_wrapper={p5}"
+  },
+  {
+    "en": "Package commands are unhealthy. Check dnf/yum/rpm and aspm/aspkg.",
+    "ko": "패키지 명령 상태가 비정상입니다. dnf/yum/rpm 또는 aspm/aspkg 상태를 확인하세요."
+  },
+  {
+    "en": "Cleaning the host package cache",
+    "ko": "호스트 패키지 캐시 정리 시작"
+  },
+  {
+    "en": "Preparing host package metadata",
+    "ko": "호스트 패키지 메타데이터 준비 진행 중"
+  },
+  {
+    "en": "Installed kernels before update:",
+    "ko": "업데이트 전 kernel 목록:"
+  },
+  {
+    "en": "Installed kernels after update:",
+    "ko": "업데이트 후 kernel 목록:"
+  },
+  {
+    "en": "Running package update with --nobest; detailed log: {p0}",
+    "ko": "패키지 업데이트 실행: --nobest, 상세 로그: {p0}"
+  },
+  {
+    "en": "ERROR: Package update failed (exit={p0}). Detailed log: {p1}",
+    "ko": "ERROR: 패키지 업데이트 실패(exit={p0}). 상세 로그: {p1}"
+  },
+  {
+    "en": "WARN: Some latest package candidates were skipped due to dependencies or conflicts. Installable updates completed.",
+    "ko": "WARN: 종속성 또는 충돌로 일부 패키지의 최신 후보를 설치하지 못했습니다. 설치 가능한 항목의 처리는 완료했습니다."
+  },
+  {
+    "en": "Skipped update details: {p0}",
+    "ko": "업데이트 보류 상세: {p0}"
+  },
+  {
+    "en": "Skipped update details log: {p0}",
+    "ko": "업데이트 보류 상세 로그: {p0}"
+  },
+  {
+    "en": "Host package update started",
+    "ko": "호스트 업데이트 시작"
+  },
+  {
+    "en": "Excluding host Cockpit RPMs to preserve the session: {p0}",
+    "ko": "cockpit 세션 유지를 위해 호스트 cockpit 관련 RPM 업데이트 제외: {p0}"
+  },
+  {
+    "en": "Including host Cockpit RPMs as requested",
+    "ko": "옵션에 따라 호스트 cockpit 관련 RPM도 업데이트 대상에 포함"
+  },
+  {
+    "en": "Host package update started: selecting installable candidates and recording dependency/conflict skips",
+    "ko": "호스트 패키지 업데이트 시작: 설치 가능한 후보 선택, 종속성/충돌 보류 항목 기록"
+  },
+  {
+    "en": "Updating host packages",
+    "ko": "호스트 패키지 업데이트 진행 중"
+  },
+  {
+    "en": "Host package update failed. Check {p0}/host-update.log",
+    "ko": "호스트 패키지 업데이트 실패: {p0}/host-update.log 확인"
+  },
+  {
+    "en": "Host package update completed (some latest package candidates skipped)",
+    "ko": "호스트 업데이트 완료 (일부 패키지 최신 후보 업데이트 보류)"
+  },
+  {
+    "en": "Host package update completed",
+    "ko": "호스트 업데이트 완료"
+  },
+  {
+    "en": "ERROR: Could not read PRETTY_NAME from /etc/os-release.",
+    "ko": "ERROR: /etc/os-release의 PRETTY_NAME을 읽지 못했습니다."
+  },
+  {
+    "en": "ERROR: Could not query the default kernel for boot title synchronization",
+    "ko": "ERROR: 부팅 제목 동기화를 위한 기본 커널 조회 실패"
+  },
+  {
+    "en": "ERROR: Could not determine the default kernel path: {p0}",
+    "ko": "ERROR: 기본 커널 경로를 확인할 수 없습니다: {p0}"
+  },
+  {
+    "en": "ERROR: Failed to synchronize the boot title with PRETTY_NAME: {p0}",
+    "ko": "ERROR: PRETTY_NAME과 부팅 제목 동기화 실패: {p0}"
+  },
+  {
+    "en": "Boot title synchronized: {p0} -> {p1}",
+    "ko": "부팅 제목 동기화 완료: {p0} -> {p1}"
+  },
+  {
+    "en": "ERROR: Could not find the boot entry for the default kernel: {p0}",
+    "ko": "ERROR: 기본 커널의 부팅 엔트리를 찾지 못했습니다: {p0}"
+  },
+  {
+    "en": "ERROR: Required kernel boot preparation command is missing: {p0}",
+    "ko": "ERROR: 커널 부팅 준비에 필요한 명령이 없습니다: {p0}"
+  },
+  {
+    "en": "ERROR: Kernel image or module directory is missing: {p0}",
+    "ko": "ERROR: 커널 이미지 또는 모듈 디렉터리가 없습니다: {p0}"
+  },
+  {
+    "en": "Creating or repairing initramfs: {p0}",
+    "ko": "initramfs 생성/복구 시작: {p0}"
+  },
+  {
+    "en": "ERROR: Failed to create initramfs: {p0}",
+    "ko": "ERROR: initramfs 생성 실패: {p0}"
+  },
+  {
+    "en": "ERROR: initramfs validation failed: {p0}",
+    "ko": "ERROR: initramfs 검증 실패: {p0}"
+  },
+  {
+    "en": "initramfs validated: {p0}",
+    "ko": "initramfs 검증 완료: {p0}"
+  },
+  {
+    "en": "ERROR: Failed to query the default boot kernel",
+    "ko": "ERROR: 기본 부팅 커널 조회 실패"
+  },
+  {
+    "en": "Setting the default boot kernel: /boot/vmlinuz-{p0}",
+    "ko": "기본 부팅 커널 설정: /boot/vmlinuz-{p0}"
+  },
+  {
+    "en": "ERROR: Failed to set the default boot kernel: {p0}",
+    "ko": "ERROR: 기본 부팅 커널 설정 실패: {p0}"
+  },
+  {
+    "en": "ERROR: Failed to recheck the default boot kernel",
+    "ko": "ERROR: 기본 부팅 커널 재조회 실패"
+  },
+  {
+    "en": "ERROR: Default boot kernel verification failed: {p0}",
+    "ko": "ERROR: 기본 부팅 커널 검증 실패: {p0}"
+  },
+  {
+    "en": "Default boot kernel verified: {p0}",
+    "ko": "기본 부팅 커널 검증 완료: {p0}"
+  },
+  {
+    "en": "Failed to query installed kernels",
+    "ko": "설치된 커널 조회 실패"
+  },
+  {
+    "en": "No installed kernels found.",
+    "ko": "설치된 커널이 없습니다."
+  },
+  {
+    "en": "Running kernel: {p0}",
+    "ko": "현재 실행 커널: {p0}"
+  },
+  {
+    "en": "Latest installed kernel: {p0}",
+    "ko": "최신 설치 커널: {p0}"
+  },
+  {
+    "en": "Updating the latest kernel boot entry: {p0}",
+    "ko": "최신 커널 엔트리 수정: {p0}"
+  },
+  {
+    "en": "Failed to update the kernel boot entry title",
+    "ko": "커널 엔트리 제목 수정 실패"
+  },
+  {
+    "en": "Failed to configure the kernel console",
+    "ko": "커널 콘솔 설정 실패"
+  },
+  {
+    "en": "Could not find the latest kernel boot entry: {p0}",
+    "ko": "최신 커널 conf 파일을 찾지 못했습니다: {p0}"
+  },
+  {
+    "en": "Host kernel boot preparation failed",
+    "ko": "호스트 커널 부팅 준비 실패"
+  },
+  {
+    "en": "Removing older kernel: kernel-{p0}",
+    "ko": "이전 커널 삭제: kernel-{p0}"
+  },
+  {
+    "en": "Applying host common files",
+    "ko": "호스트 공통 파일 적용 시작"
+  },
+  {
+    "en": "Host common files applied",
+    "ko": "호스트 공통 파일 적용 완료"
+  },
+  {
+    "en": "Applying host package command blocking",
+    "ko": "호스트 패키지 명령 차단 적용"
+  },
+  {
+    "en": "Package commands are already blocked.",
+    "ko": "이미 차단 상태입니다."
+  },
+  {
+    "en": "Saving updated dnf-3 executable: /usr/bin/dnf-3 -> {p0}/dnf-3.blocked",
+    "ko": "업데이트된 dnf-3 원본 갱신: /usr/bin/dnf-3 -> {p0}/dnf-3.blocked"
+  },
+  {
+    "en": "Saving updated rpm executable: /usr/bin/rpm -> {p0}/rpm.blocked",
+    "ko": "업데이트된 rpm 원본 갱신: /usr/bin/rpm -> {p0}/rpm.blocked"
+  },
+  {
+    "en": "{p0}/dnf-3.blocked is missing.",
+    "ko": "{p0}/dnf-3.blocked 가 없습니다."
+  },
+  {
+    "en": "{p0}/rpm.blocked is missing.",
+    "ko": "{p0}/rpm.blocked 가 없습니다."
+  },
+  {
+    "en": "Preserving the existing libvirt QEMU hook: {p0}",
+    "ko": "기존 libvirt qemu hook 이동: {p0}"
+  },
+  {
+    "en": "{p0} NVRAM path is missing or unsafe; keeping the pending reset: {p1}",
+    "ko": "{p0} NVRAM 경로를 확인하지 못했거나 안전하지 않아 pending을 유지합니다: {p1}"
+  },
+  {
+    "en": "{p0} one-time UEFI NVRAM reset completed: {p1}, backup={p2}",
+    "ko": "{p0} UEFI NVRAM 1회 재생성 처리 완료: {p1}, backup={p2}"
+  },
+  {
+    "en": "{p0} UEFI NVRAM reset failed; retrying on the next start: {p1}",
+    "ko": "{p0} UEFI NVRAM 처리 실패, 다음 시작 때 재시도합니다: {p1}"
+  },
+  {
+    "en": "{p0} UEFI NVRAM file already absent; removing the pending reset: {p1}",
+    "ko": "{p0} UEFI NVRAM 파일이 이미 없어 pending을 제거합니다: {p1}"
+  },
+  {
+    "en": "{p0} NVRAM boot reset skipped: unknown VM",
+    "ko": "{p0} NVRAM boot reset 생략: 알 수 없는 VM"
+  },
+  {
+    "en": "{p0} NVRAM boot reset skipped: unsafe path {p1}",
+    "ko": "{p0} NVRAM boot reset 생략: 안전하지 않은 경로 {p1}"
+  },
+  {
+    "en": "{p0} UEFI NVRAM boot reset completed: {p1}, backup={p2}",
+    "ko": "{p0} UEFI NVRAM boot reset 완료: {p1}, backup={p2}"
+  },
+  {
+    "en": "{p0} UEFI NVRAM boot reset failed; keeping the pending reset: {p1}",
+    "ko": "{p0} UEFI NVRAM boot reset 실패, pending 유지: {p1}"
+  },
+  {
+    "en": "{p0} UEFI NVRAM boot reset completed: file absent {p1}",
+    "ko": "{p0} UEFI NVRAM boot reset 완료: 파일 없음 {p1}"
+  },
+  {
+    "en": "libvirt QEMU hook installed: {p0}",
+    "ko": "libvirt qemu hook 설치 완료: {p0}"
+  },
+  {
+    "en": "{p0} NVRAM reset scheduling skipped: libvirt QEMU hook installation failed",
+    "ko": "{p0} NVRAM 재생성 예약 생략: libvirt qemu hook 설치 실패"
+  },
+  {
+    "en": "{p0} NVRAM reset scheduling skipped: failed to write the pending file",
+    "ko": "{p0} NVRAM 재생성 예약 생략: pending 파일 기록 실패"
+  },
+  {
+    "en": "{p0} NVRAM reset pending file written: {p1}/{p0} -> {p2}",
+    "ko": "{p0} NVRAM 재생성 pending 기록 완료: {p1}/{p0} -> {p2}"
+  },
+  {
+    "en": "{p0} current state: {p1}",
+    "ko": "{p0} 현재 상태: {p1}"
+  },
+  {
+    "en": "CCVM will not restart independently. Relocation to another host may restart it.",
+    "ko": "ccvm은 단독 자동 재시작하지 않습니다. 다른 호스트로 재배치되며 재기동이 발생할 수 있습니다."
+  },
+  {
+    "en": "{p0} will not restart automatically. A restart may be required to apply updates.",
+    "ko": "{p0}은 자동 재시작하지 않습니다. 업데이트 적용을 위해 재기동이 필요할 수 있습니다."
+  },
+  {
+    "en": "VM presence: scvm={p0}(running={p1}) ccvm={p2}(running={p3})",
+    "ko": "VM 존재 상태: scvm={p0}(running={p1}) ccvm={p2}(running={p3})"
+  },
+  {
+    "en": "SCVM is defined but not running. Start SCVM and retry.",
+    "ko": "scvm 이 정의되어 있지만 실행 중이 아닙니다. scvm 을 기동한 뒤 다시 실행하세요."
+  },
+  {
+    "en": "CCVM is defined but not running. Start CCVM and retry.",
+    "ko": "ccvm 이 정의되어 있지만 실행 중이 아닙니다. ccvm 을 기동한 뒤 다시 실행하세요."
+  },
+  {
+    "en": "Removing {p0} temporary directory: {p1}",
+    "ko": "{p0} 임시 디렉터리 삭제: {p1}"
+  },
+  {
+    "en": "Copying update files to {p0}",
+    "ko": "{p0} 에 업데이트 파일 복사 진행 중"
+  },
+  {
+    "en": "Preparing the remote directory",
+    "ko": "원격 디렉터리 준비"
+  },
+  {
+    "en": "Copying BaseOS",
+    "ko": "BaseOS 복사"
+  },
+  {
+    "en": "Copying AppStream",
+    "ko": "AppStream 복사"
+  },
+  {
+    "en": "Copying config",
+    "ko": "config 복사"
+  },
+  {
+    "en": "Copying ks",
+    "ko": "ks 복사"
+  },
+  {
+    "en": "Finishing file copy",
+    "ko": "복사 완료 정리"
+  },
+  {
+    "en": "Update files copied to {p0}",
+    "ko": "{p0} 에 업데이트 파일 복사 완료"
+  },
+  {
+    "en": "WARN: Some latest package candidates skipped on {p0}. Detailed log: {p1}",
+    "ko": "WARN: {p0} 일부 패키지 최신 후보 업데이트 보류. 상세 로그: {p1}"
+  },
+  {
+    "en": "WARN: Failed to collect skipped update summary from {p0}. Check the host log and remote {p1}",
+    "ko": "WARN: {p0} 업데이트 보류 요약 수집 실패. 호스트 전체 로그와 원격 {p1} 확인"
+  },
+  {
+    "en": "Disabling CCVM Cockpit: {p0}",
+    "ko": "ccvm Cockpit 비활성화 시작: {p0}",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "ERROR: Failed to mask CCVM Cockpit socket/service",
+    "ko": "ERROR: ccvm Cockpit socket/service 마스킹 실패"
+  },
+  {
+    "en": "ERROR: CCVM {p0} mask verification failed: {p1}",
+    "ko": "ERROR: ccvm {p0} 마스킹 확인 실패: {p1}"
+  },
+  {
+    "en": "ERROR: CCVM {p0} stop verification failed: {p1}",
+    "ko": "ERROR: ccvm {p0} 중지 확인 실패: {p1}"
+  },
+  {
+    "en": "CCVM {p0} disabled and verified: {p1}/{p2}",
+    "ko": "ccvm {p0} 비활성화 확인 완료: {p1}/{p2}"
+  },
+  {
+    "en": "CCVM Cockpit disabled: {p0}",
+    "ko": "ccvm Cockpit 비활성화 완료: {p0}",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "Preserving previous backup: {p0} -> {p1}",
+    "ko": "기존 백업 보존: {p0} -> {p1}"
+  },
+  {
+    "en": "Initialization completed",
+    "ko": "초기화 완료"
+  },
+  {
+    "en": "Update version: {p0}",
+    "ko": "버전 확인: {p0}"
+  },
+  {
+    "en": "Excluding Cockpit RPMs from update",
+    "ko": "cockpit 관련 RPM 업데이트 제외"
+  },
+  {
+    "en": "Including Cockpit RPMs in update",
+    "ko": "cockpit 관련 RPM 업데이트 포함"
+  },
+  {
+    "en": "Cockpit settings backed up",
+    "ko": "cockpit 설정 백업 완료"
+  },
+  {
+    "en": "Excluding Mold RPMs from the SCVM update",
+    "ko": "scvm의 Mold 관련 RPM 업데이트 제외"
+  },
+  {
+    "en": "Excluding cloudstack* RPMs from the SCVM update",
+    "ko": "scvm의 cloudstack* 관련 RPM 업데이트 제외"
+  },
+  {
+    "en": "before package update",
+    "ko": "패키지 업데이트 전"
+  },
+  {
+    "en": "Cleaning package cache and preparing metadata",
+    "ko": "패키지 캐시 정리 및 메타데이터 준비 시작"
+  },
+  {
+    "en": "Package metadata prepared",
+    "ko": "패키지 메타데이터 준비 완료"
+  },
+  {
+    "en": "Package update started: --nobest, recording dependency/conflict skips",
+    "ko": "패키지 업데이트 시작: --nobest, 종속성/충돌 보류 항목 기록"
+  },
+  {
+    "en": "Package update completed (some latest package candidates skipped)",
+    "ko": "패키지 업데이트 완료 (일부 패키지 최신 후보 업데이트 보류)"
+  },
+  {
+    "en": "Package update completed",
+    "ko": "패키지 업데이트 완료"
+  },
+  {
+    "en": "Cockpit settings restored after package update",
+    "ko": "cockpit 설정 복원 완료: 패키지 업데이트 후"
+  },
+  {
+    "en": "Kernel update detected",
+    "ko": "커널 업데이트 감지"
+  },
+  {
+    "en": "No kernel RPM changes in this run: verifying installed kernel boot readiness",
+    "ko": "이번 실행의 커널 RPM 변경 없음: 기존 커널 부팅 준비 검증"
+  },
+  {
+    "en": "Restart required to activate the updated kernel",
+    "ko": "커널 적용을 위한 재기동 필요"
+  },
+  {
+    "en": "Kernel post-processing completed",
+    "ko": "커널 후처리 완료"
+  },
+  {
+    "en": "Applying common files",
+    "ko": "공통 파일 적용 시작"
+  },
+  {
+    "en": "Common files applied and Cockpit settings restored",
+    "ko": "공통 파일 적용 및 cockpit 설정 복원 완료"
+  },
+  {
+    "en": "Applying package command blocking",
+    "ko": "패키지 명령 차단 적용 시작"
+  },
+  {
+    "en": "Package command blocking applied",
+    "ko": "패키지 명령 차단 적용 완료"
+  },
+  {
+    "en": "CCVM post-processing started: disabling Cockpit socket/service",
+    "ko": "ccvm 후처리 시작: Cockpit socket/service 비활성화"
+  },
+  {
+    "en": "after update",
+    "ko": "업데이트 후"
+  },
+  {
+    "en": "CCVM post-processing completed",
+    "ko": "ccvm 후처리 완료"
+  },
+  {
+    "en": "Remote update completed (some latest package candidates skipped)",
+    "ko": "원격 업데이트 전체 완료 (일부 패키지 최신 후보 업데이트 보류)"
+  },
+  {
+    "en": "Remote update completed",
+    "ko": "원격 업데이트 전체 완료"
+  },
+  {
+    "en": "{p0} remote update - {p0} {p1} ({p0}s)",
+    "ko": "{p0} 원격 업데이트 - {p0} {p1} ({p0}s)"
+  },
+  {
+    "en": "{p0} remote update in progress {p1} ({p0}s)",
+    "ko": "{p0} 원격 업데이트 진행 중 {p1} ({p0}s)"
+  },
+  {
+    "en": "WARN: Failed to save skipped update summary from {p0}. Check the host and remote skipped update logs",
+    "ko": "WARN: {p0} 업데이트 보류 요약 저장 실패. 호스트 전체 로그와 원격 보류 로그 확인"
+  },
+  {
+    "en": "{p0} remote update completed (some latest package candidates skipped)",
+    "ko": "{p0} 원격 업데이트 완료 (일부 패키지 최신 후보 업데이트 보류)"
+  },
+  {
+    "en": "{p0} remote update completed",
+    "ko": "{p0} 원격 업데이트 완료"
+  },
+  {
+    "en": "{p0} remote update failed",
+    "ko": "{p0} 원격 업데이트 실패"
+  },
+  {
+    "en": "SCVM kernel update detected.",
+    "ko": "scvm 커널 업데이트가 감지되었습니다."
+  },
+  {
+    "en": "Restart SCVM to apply the update.",
+    "ko": "scvm 업데이트 적용을 위해 scvm 재기동이 필요합니다."
+  },
+  {
+    "en": "SCVM update failed",
+    "ko": "scvm 업데이트 실패"
+  },
+  {
+    "en": "CCVM update failed",
+    "ko": "ccvm 업데이트 실패"
+  },
+  {
+    "en": "Scheduling a UEFI NVRAM reset for CCVM restart or relocation.",
+    "ko": "ccvm 재기동/재배치 대비 UEFI NVRAM 재생성을 예약합니다."
+  },
+  {
+    "en": "CCVM kernel update detected.",
+    "ko": "ccvm 커널 업데이트가 감지되었습니다."
+  },
+  {
+    "en": "Restart CCVM to apply the update.",
+    "ko": "ccvm 업데이트 적용을 위해 ccvm 재기동이 필요합니다."
+  },
+  {
+    "en": "========== Update results ==========",
+    "ko": "========== 업데이트 결과 =========="
+  },
+  {
+    "en": "Host update: completed (some latest package candidates skipped)",
+    "ko": "호스트 업데이트: 완료 (일부 패키지 최신 후보 업데이트 보류)"
+  },
+  {
+    "en": "Host update: completed",
+    "ko": "호스트 업데이트: 완료"
+  },
+  {
+    "en": "VM updates completed: {p0}",
+    "ko": "VM 업데이트 완료: {p0}"
+  },
+  {
+    "en": "VM updates failed: {p0}",
+    "ko": "VM 업데이트 실패: {p0}"
+  },
+  {
+    "en": "WARN: Some latest package candidates were skipped for {p0}.",
+    "ko": "WARN: {p0} 업데이트는 일부 패키지의 최신 후보 설치를 보류했습니다."
+  },
+  {
+    "en": "{p0} skipped package/dependency details: {p1}/{p2}-dependency-skips.log",
+    "ko": "{p0} 보류 패키지/종속성 상세: {p1}/{p2}-dependency-skips.log"
+  },
+  {
+    "en": "Host running kernel: {p0}",
+    "ko": "호스트 현재 커널: {p0}"
+  },
+  {
+    "en": "The flock command is required.",
+    "ko": "flock 명령이 필요합니다."
+  },
+  {
+    "en": "Invalid update lock file descriptor",
+    "ko": "잘못된 업데이트 잠금 FD"
+  },
+  {
+    "en": "An update is already running. Check {p0}",
+    "ko": "이미 업데이트가 실행 중입니다. {p0} 로그를 확인하세요."
+  },
+  {
+    "en": "The nohup command is required.",
+    "ko": "nohup 명령이 필요합니다."
+  },
+  {
+    "en": "The setsid command is required.",
+    "ko": "setsid 명령이 필요합니다."
+  },
+  {
+    "en": "Full update started in the background. PID: {p0}",
+    "ko": "전체 업데이트를 백그라운드에서 시작했습니다. PID: {p0}"
+  },
+  {
+    "en": "Monitor progress and completion: tail -f {p0}",
+    "ko": "진행/완료 여부: tail -f {p0}"
+  },
+  {
+    "en": "Wait for the completion log, reboot, then run update-qemu-exec-tools.sh.",
+    "ko": "완료 로그를 확인한 후 재부팅하고 update-qemu-exec-tools.sh를 실행하세요."
+  },
+  {
+    "en": "Full update finished: completed. Reboot, then update ABLESTACK Tools.",
+    "ko": "전체 업데이트 종료: 완료. 재부팅 후 ABLESTACK Tools 업데이트를 실행하세요."
+  },
+  {
+    "en": "ERROR: Full update finished: failed (exit={p0}). Check the log.",
+    "ko": "ERROR: 전체 업데이트 종료: 실패(exit={p0}). 로그를 확인하세요."
+  },
+  {
+    "en": "Configuration: ABLESTACK-HCI",
+    "ko": "구성 : ABLESTACK-HCI"
+  },
+  {
+    "en": "Configuration: ABLESTACK-VM",
+    "ko": "구성 : ABLESTACK-VM"
+  },
+  {
+    "en": "CCVM update stage started",
+    "ko": "ccvm 업데이트 단계 시작"
+  },
+  {
+    "en": "No CCVM present: skipping the CCVM update stage",
+    "ko": "ccvm 없음: ccvm 업데이트 단계 생략"
+  },
+  {
+    "en": "SCVM update stage started",
+    "ko": "scvm 업데이트 단계 시작"
+  },
+  {
+    "en": "SCVM package processes idle",
+    "ko": "scvm 패키지 프로세스 종료"
+  },
+  {
+    "en": "SCVM package operations have not finished.",
+    "ko": "scvm 패키지 작업이 종료되지 않았습니다."
+  },
+  {
+    "en": "SCVM SSH connectivity",
+    "ko": "scvm SSH 연결"
+  },
+  {
+    "en": "SCVM SSH connectivity has not recovered.",
+    "ko": "scvm SSH 연결이 정상화되지 않았습니다."
+  },
+  {
+    "en": "SCVM update verification completed",
+    "ko": "scvm 업데이트 완료 자동 검증 완료"
+  },
+  {
+    "en": "No SCVM present: ABLESTACK-VM configuration; skipping the SCVM update stage",
+    "ko": "scvm 없음: ABLESTACK-VM 구성, scvm 업데이트 단계 생략"
+  },
+  {
+    "en": "Configuring host local repositories",
+    "ko": "호스트 로컬 repo 구성 시작"
+  },
+  {
+    "en": "after host RPM update",
+    "ko": "호스트 RPM 업데이트 후"
+  },
+  {
+    "en": "Host kernel update detected.",
+    "ko": "호스트 커널 업데이트가 감지되었습니다."
+  },
+  {
+    "en": "No host kernel RPM changes in this run: verifying installed kernel boot readiness",
+    "ko": "이번 실행의 호스트 커널 RPM 변경 없음: 기존 커널 부팅 준비 검증"
+  },
+  {
+    "en": "Reboot the host to apply the update.",
+    "ko": "호스트 업데이트 적용을 위해 호스트 재기동이 필요합니다."
+  },
+  {
+    "en": "Host latest running kernel and boot readiness verified",
+    "ko": "호스트 최신 커널 실행 및 부팅 준비 확인 완료"
+  },
+  {
+    "en": "Host post-processing: applying common files",
+    "ko": "호스트 후처리 시작: 공통 파일 적용"
+  },
+  {
+    "en": "Host boot title synchronization failed",
+    "ko": "호스트 부팅 제목 동기화 실패"
+  },
+  {
+    "en": "after applying common files",
+    "ko": "공통 파일 적용 후"
+  },
+  {
+    "en": "Host post-processing: blocking package commands",
+    "ko": "호스트 후처리 시작: 패키지 명령 차단"
+  },
+  {
+    "en": "after blocking package commands",
+    "ko": "패키지 명령 차단 후"
+  },
+  {
+    "en": "Host post-processing completed",
+    "ko": "호스트 후처리 완료"
+  },
+  {
+    "en": "Install ABLESTACK Tools separately after rebooting into the updated kernel: {p0}/update/update-qemu-exec-tools.sh",
+    "ko": "ABLESTACK Tools는 재부팅 후 업데이트된 커널에서 별도로 설치하세요: {p0}/update/update-qemu-exec-tools.sh"
+  },
+  {
+    "en": "Full update background worker started: PID={p0}",
+    "ko": "전체 업데이트 백그라운드 실행 시작: PID={p0}"
+  },
+  {
+    "en": "Run after the full update and after rebooting into the updated kernel.",
+    "ko": "전체 업데이트 완료 후 재부팅하여 업데이트된 커널로 부팅한 다음 실행합니다."
+  },
+  {
+    "en": "Check the kernel and ISO without installing.",
+    "ko": "커널과 ISO를 확인하며 설치는 수행하지 않습니다."
+  },
+  {
+    "en": "ABLESTACK update ISO root (default: detected from the script location)",
+    "ko": "ABLESTACK 업데이트 ISO 루트 (기본값: 스크립트 위치에서 검색)"
+  },
+  {
+    "en": "Log: /var/log/ablestack-update.log",
+    "ko": "로그: /var/log/ablestack-update.log"
+  },
+  {
+    "en": "A path is required for --iso-root.",
+    "ko": "--iso-root 경로가 필요합니다."
+  },
+  {
+    "en": "An update is already running. Wait for completion and retry.",
+    "ko": "이미 업데이트가 실행 중입니다. 완료 후 다시 실행하세요."
+  },
+  {
+    "en": "No usable aspkg/rpm command is available.",
+    "ko": "사용 가능한 aspkg/rpm 명령이 없습니다."
+  },
+  {
+    "en": "No usable aspm/dnf command is available.",
+    "ko": "사용 가능한 aspm/dnf 명령이 없습니다."
+  },
+  {
+    "en": "Could not find the ISO root.",
+    "ko": "ISO 루트를 찾을 수 없습니다."
+  },
+  {
+    "en": "The ISO must contain BaseOS and AppStream directories.",
+    "ko": "ISO의 BaseOS/AppStream 디렉터리가 필요합니다."
+  },
+  {
+    "en": "The ISO config/tools directory is missing.",
+    "ko": "ISO의 config/tools 디렉터리가 없습니다."
+  },
+  {
+    "en": "Exactly one config/tools/*.iso is required. Found: {p0}",
+    "ko": "config/tools/*.iso는 1개여야 합니다. 현재 개수: {p0}"
+  },
+  {
+    "en": "Failed to query installed kernel-core packages",
+    "ko": "설치된 kernel-core 조회 실패"
+  },
+  {
+    "en": "Could not determine the installed kernel.",
+    "ko": "설치된 커널을 확인할 수 없습니다."
+  },
+  {
+    "en": "Failed to query ISO kernel RPM: {p0}",
+    "ko": "ISO 커널 RPM 조회 실패: {p0}"
+  },
+  {
+    "en": "Invalid kernel-core RPM: {p0}",
+    "ko": "잘못된 kernel-core RPM: {p0}"
+  },
+  {
+    "en": "Could not find the target kernel-core RPM for this architecture in the ISO.",
+    "ko": "ISO에서 현재 아키텍처의 대상 kernel-core RPM을 찾을 수 없습니다."
+  },
+  {
+    "en": "Update ISO target kernel: {p0}",
+    "ko": "업데이트 ISO 대상 커널: {p0}"
+  },
+  {
+    "en": "Cannot install ABLESTACK Tools: running kernel ({p0}) does not match the installation target. Latest installed kernel: {p1}, ISO target kernel: {p2}. Complete the full update and reboot into the target kernel.",
+    "ko": "현재 커널 버전({p0})이 설치 대상 커널과 맞지 않아 ABLESTACK Tools를 설치할 수 없습니다. 최신 설치 커널: {p1}, ISO 대상 커널: {p2}. 전체 업데이트를 완료한 후 재부팅하여 대상 커널로 부팅하세요."
+  },
+  {
+    "en": "The running kernel module directory or boot image is missing: {p0}",
+    "ko": "현재 커널의 모듈 또는 부팅 이미지가 없습니다: {p0}"
+  },
+  {
+    "en": "Kernel versions match: ABLESTACK Tools can be installed",
+    "ko": "커널 일치 확인 완료: ABLESTACK Tools 설치 가능"
+  },
+  {
+    "en": "ERROR: Failed to unmount Tools ISO: {p0}",
+    "ko": "ERROR: Tools ISO 마운트 해제 실패: {p0}"
+  },
+  {
+    "en": "Mounting Tools ISO: {p0}",
+    "ko": "Tools ISO 마운트: {p0}"
+  },
+  {
+    "en": "Failed to mount Tools ISO",
+    "ko": "Tools ISO 마운트 실패"
+  },
+  {
+    "en": "Tools ISO does not contain install-linux.sh.",
+    "ko": "Tools ISO에 install-linux.sh가 없습니다."
+  },
+  {
+    "en": "Installing ABLESTACK Tools: running kernel={p0}",
+    "ko": "ABLESTACK Tools 설치 시작: 현재 커널={p0}"
+  },
+  {
+    "en": "ABLESTACK Tools installation failed (exit={p0}). Check the installation log.",
+    "ko": "ABLESTACK Tools 설치 실패(exit={p0}). 설치 로그를 확인하세요."
+  },
+  {
+    "en": "ABLESTACK Tools package verification failed after installation",
+    "ko": "설치 후 ABLESTACK Tools 패키지 확인 실패"
+  },
+  {
+    "en": "ABLESTACK Tools update completed",
+    "ko": "ABLESTACK Tools 업데이트 완료"
+  },
+  {
+    "en": "Usage: bash /mount/path/update/update-mold.sh [--check] [--role host|ccvm]",
+    "ko": "사용법: bash /마운트경로/update/update-mold.sh [--check] [--role host|ccvm]"
+  },
+  {
+    "en": "Default         Update this host and the CCVM running on this host",
+    "ko": "기본 동작       현재 호스트와 이 호스트에서 실행 중인 ccvm 업데이트"
+  },
+  {
+    "en": "Check RPMs, installation state, and dependencies (no installation or service restart)",
+    "ko": "RPM/설치 상태/의존성 확인만 수행 (설치 및 서비스 재시작 없음)"
+  },
+  {
+    "en": "Process CCVM packages on this machine only (internal remote execution)",
+    "ko": "현재 머신의 CCVM 패키지만 처리 (원격 실행 시 내부 사용)"
+  },
+  {
+    "en": "Show help",
+    "ko": "도움말"
+  },
+  {
+    "en": "RPM directory: rpms/ or AppStream/Packages/mold/ under the ISO root, or the ISO root itself",
+    "ko": "RPM 경로: ISO 루트의 rpms/ 또는 AppStream/Packages/mold/ 또는 ISO 루트"
+  },
+  {
+    "en": "Include exactly one RPM per package. External repositories are not used.",
+    "ko": "패키지별로 설치할 RPM을 하나씩 포함해야 합니다. 외부 저장소는 사용하지 않습니다."
+  },
+  {
+    "en": "Set CCVM_HOST to override the SSH destination (default: ccvm).",
+    "ko": "CCVM_HOST 환경변수로 SSH 대상을 지정할 수 있습니다 (기본값: ccvm)."
+  },
+  {
+    "en": "A value is required for --role.",
+    "ko": "--role 값이 필요합니다."
+  },
+  {
+    "en": "Unknown argument: {p0}",
+    "ko": "알 수 없는 인자: {p0}"
+  },
+  {
+    "en": "Unsupported role: {p0}",
+    "ko": "지원하지 않는 역할: {p0}"
+  },
+  {
+    "en": "Invalid CCVM_HOST: {p0}",
+    "ko": "잘못된 CCVM_HOST: {p0}"
+  },
+  {
+    "en": "The flock command is not available.",
+    "ko": "flock 명령을 찾을 수 없습니다."
+  },
+  {
+    "en": "Another Mold update is already running on this machine.",
+    "ko": "이 머신에서 다른 Mold 업데이트가 실행 중입니다."
+  },
+  {
+    "en": "Failed to clean up CCVM temporary files: {p0}",
+    "ko": "CCVM 임시 파일 정리 실패: {p0}"
+  },
+  {
+    "en": "Update stopped (exit={p0}). Log: {p1}",
+    "ko": "업데이트 중단 (종료 코드 {p0}). 로그: {p1}"
+  },
+  {
+    "en": "{p0} started",
+    "ko": "{p0} 시작",
+    "nested": [
+      "p0"
+    ]
+  },
+  {
+    "en": "ISO location: {p0} / RPM location: {p1}",
+    "ko": "ISO 위치: {p0} / RPM 위치: {p1}"
+  },
+  {
+    "en": "Package commands: {p0} / {p1}",
+    "ko": "패키지 도구: {p0} / {p1}"
+  },
+  {
+    "en": "Failed to read RPM: {p0}",
+    "ko": "RPM 읽기 실패: {p0}"
+  },
+  {
+    "en": "Could not find an RPM for {p0}: {p1}",
+    "ko": "{p0} RPM을 찾지 못했습니다: {p1}"
+  },
+  {
+    "en": "{p0} has {p1} RPMs. Include only one version and architecture per package.",
+    "ko": "{p0} RPM이 {p1} 개입니다. 패키지별로 한 버전/아키텍처만 넣으세요."
+  },
+  {
+    "en": "Selected RPM: {p0} -> {p1}",
+    "ko": "RPM 선택: {p0} -> {p1}"
+  },
+  {
+    "en": "{p0} has no running node: skipping CCVM and continuing the host update.",
+    "ko": "{p0} 실행 노드 없음: CCVM은 생략하고 호스트 업데이트를 계속합니다."
+  },
+  {
+    "en": "{p0} is running on another host ({p1}): skipping the CCVM update",
+    "ko": "{p0} 는 다른 호스트({p1})에서 실행 중: CCVM 업데이트 생략"
+  },
+  {
+    "en": "{p0} is running on this host ({p1}).",
+    "ko": "{p0} 가 현재 호스트({p1})에서 실행 중입니다."
+  },
+  {
+    "en": "PCS status query failed: checking CCVM state in local libvirt.",
+    "ko": "PCS 상태 조회 실패: 로컬 libvirt의 CCVM 실행 상태로 확인합니다."
+  },
+  {
+    "en": "virsh is not available: updating this host only.",
+    "ko": "virsh 없음: 현재 호스트만 업데이트합니다."
+  },
+  {
+    "en": "Failed to query local VM list",
+    "ko": "로컬 VM 목록 조회 실패"
+  },
+  {
+    "en": "No CCVM on this host: updating this host only.",
+    "ko": "이 호스트에 ccvm 없음: 현재 호스트만 업데이트합니다."
+  },
+  {
+    "en": "Failed to query CCVM state",
+    "ko": "ccvm 상태 조회 실패"
+  },
+  {
+    "en": "CCVM is running on this host: SSH destination {p0}",
+    "ko": "이 호스트에서 ccvm 실행 중: SSH 대상 {p0}"
+  },
+  {
+    "en": "CCVM state on this host: {p0}. Skipping the CCVM stage.",
+    "ko": "이 호스트의 ccvm 상태: {p0}. CCVM 단계를 생략합니다."
+  },
+  {
+    "en": "Package {p0} is not installed.",
+    "ko": "{p0} 패키지가 설치되어 있지 않습니다."
+  },
+  {
+    "en": "Failed to read RPM metadata: {p0}",
+    "ko": "RPM 메타데이터 읽기 실패: {p0}"
+  },
+  {
+    "en": "Installed: {p0} / ISO: {p1}",
+    "ko": "설치됨: {p0} / ISO: {p1}"
+  },
+  {
+    "en": "RPM dependency, conflict, and architecture check",
+    "ko": "RPM 의존성/충돌/아키텍처 검사"
+  },
+  {
+    "en": "All target RPMs already match the ISO versions.",
+    "ko": "모든 대상 RPM이 ISO 버전과 같습니다."
+  },
+  {
+    "en": "Failed to verify installed package: {p0}",
+    "ko": "설치 확인 실패: {p0}"
+  },
+  {
+    "en": "Failed to verify RPM: {p0}",
+    "ko": "RPM 확인 실패: {p0}"
+  },
+  {
+    "en": "Installed package differs from the ISO: {p0} / {p1}",
+    "ko": "설치 결과가 ISO와 다릅니다: {p0} / {p1}"
+  },
+  {
+    "en": "Mold RPM update",
+    "ko": "Mold RPM 업데이트"
+  },
+  {
+    "en": "Restarting {p0} service",
+    "ko": "{p0} 서비스 재시작"
+  },
+  {
+    "en": "Service {p0} is not active.",
+    "ko": "{p0} 서비스가 활성 상태가 아닙니다."
+  },
+  {
+    "en": "Service {p0} is healthy: skipping restart",
+    "ko": "{p0} 정상 동작 중: 재시작 생략"
+  },
+  {
+    "en": "Local RPMs and services verified",
+    "ko": "로컬 RPM 및 서비스 확인 완료"
+  },
+  {
+    "en": "The {p0} command is required.",
+    "ko": "{p0} 명령이 필요합니다."
+  },
+  {
+    "en": "CCVM SSH connection or temporary directory creation failed",
+    "ko": "CCVM SSH 연결/임시 경로 생성 실패"
+  },
+  {
+    "en": "Invalid CCVM temporary directory.",
+    "ko": "CCVM 임시 경로가 잘못되었습니다."
+  },
+  {
+    "en": "Copying CCVM script and RPMs",
+    "ko": "CCVM 스크립트/RPM 복사"
+  },
+  {
+    "en": "CCVM preflight check",
+    "ko": "CCVM 사전 검사"
+  },
+  {
+    "en": "The systemctl command is not available.",
+    "ko": "systemctl 명령을 찾을 수 없습니다."
+  },
+  {
+    "en": "Preflight check completed. No RPMs installed or services restarted.",
+    "ko": "사전 검사 완료. RPM 설치 및 서비스 재시작은 수행하지 않았습니다."
+  },
+  {
+    "en": "CCVM update",
+    "ko": "CCVM 업데이트"
+  },
+  {
+    "en": "Update completed: {p0} (CCVM processed: {p1}). Log: {p2}",
+    "ko": "업데이트 완료: {p0} (CCVM 처리: {p1}). 로그: {p2}"
+  },
+  {
+    "en": "The timeout command is required for firewall recovery",
+    "ko": "방화벽 복구에 timeout 명령이 필요합니다."
+  },
+  {
+    "en": "firewalld is active but already masked; cannot preserve this state safely",
+    "ko": "firewalld가 실행 중이면서 마스킹되어 있어 현재 상태를 안전하게 보존할 수 없습니다."
+  },
+  {
+    "en": "firewalld was already masked and inactive; leaving it unchanged",
+    "ko": "firewalld가 이미 마스킹·정지되어 있어 기존 상태를 유지합니다."
+  },
+  {
+    "en": "firewalld is changing state: {state}",
+    "ko": "firewalld 상태가 변경 중입니다: {state}"
+  },
+  {
+    "en": "Could not back up runtime firewall settings; package update not started",
+    "ko": "방화벽 런타임 설정을 백업하지 못해 패키지 업데이트를 시작하지 않았습니다."
+  },
+  {
+    "en": "Could not back up kernel firewall rules; package update not started",
+    "ko": "커널 방화벽 규칙을 백업하지 못해 패키지 업데이트를 시작하지 않았습니다."
+  },
+  {
+    "en": "A runtime firewalld unit already exists; package update not started",
+    "ko": "기존 firewalld 런타임 유닛이 있어 패키지 업데이트를 시작하지 않았습니다."
+  },
+  {
+    "en": "Pausing firewalld for package update; backup: {path}",
+    "ko": "패키지 업데이트를 위해 firewalld를 일시 정지합니다. 백업: {path}"
+  },
+  {
+    "en": "Could not pause and temporarily mask firewalld",
+    "ko": "firewalld 정지 및 임시 마스킹에 실패했습니다."
+  },
+  {
+    "en": "Temporary firewalld mask verification failed",
+    "ko": "firewalld 임시 마스킹 확인에 실패했습니다."
+  },
+  {
+    "en": "Could not retain working kernel firewall rules; package update not started",
+    "ko": "기존 커널 방화벽 규칙을 유지하지 못해 패키지 업데이트를 시작하지 않았습니다."
+  },
+  {
+    "en": "firewalld paused and temporarily masked; working kernel rules retained",
+    "ko": "firewalld 정지 및 임시 마스킹 완료. 기존 커널 방화벽 규칙을 유지합니다."
+  },
+  {
+    "en": "Restoring the original firewalld state",
+    "ko": "firewalld를 업데이트 전 상태로 복원합니다."
+  },
+  {
+    "en": "firewalld boot setting restoration failed: {state}",
+    "ko": "firewalld 부팅 시 활성화 설정 복원에 실패했습니다: {state}"
+  },
+  {
+    "en": "Original firewalld state restored and verified",
+    "ko": "firewalld의 기존 실행 상태와 설정 복원 및 검증이 완료되었습니다."
+  },
+  {
+    "en": "firewalld recovery failed; backup: {path}",
+    "ko": "firewalld 복구에 실패했습니다. 백업: {path}"
+  },
+  {
+    "en": "The journalctl command is required for storage checks",
+    "ko": "스토리지 검사에 journalctl 명령이 필요합니다."
+  },
+  {
+    "en": "Could not create the storage diagnostic directory",
+    "ko": "스토리지 진단 디렉터리를 생성하지 못했습니다."
+  },
+  {
+    "en": "Could not read the kernel journal before update",
+    "ko": "업데이트 전 커널 저널을 읽지 못했습니다."
+  },
+  {
+    "en": "Could not capture a kernel journal cursor for storage checks",
+    "ko": "스토리지 검사를 위한 커널 저널 시작 지점을 기록하지 못했습니다."
+  },
+  {
+    "en": "Could not read recent kernel storage diagnostics",
+    "ko": "최근 커널 스토리지 진단 로그를 읽지 못했습니다."
+  },
+  {
+    "en": "Storage errors occurred within the last 5 minutes; update not started",
+    "ko": "최근 5분 이내에 스토리지 오류가 발생해 업데이트를 시작하지 않았습니다."
+  },
+  {
+    "en": "Storage log checkpoint captured; older messages saved to {path}",
+    "ko": "스토리지 로그 검사 시작 지점을 기록했습니다. 이전 기록 보존 경로: {path}"
+  },
+  {
+    "en": "Storage log checkpoint is missing",
+    "ko": "스토리지 로그 검사 시작 지점이 없습니다."
+  },
+  {
+    "en": "Could not read kernel storage diagnostics after the update checkpoint",
+    "ko": "업데이트 시작 지점 이후 커널 스토리지 진단 로그를 읽지 못했습니다."
+  },
+  {
+    "en": "New storage errors since update start; details: {path}",
+    "ko": "업데이트 시작 이후 새로운 스토리지 오류가 발생했습니다. 상세 로그: {path}"
+  },
+  {
+    "en": "Host UEFI firmware backup: {path}",
+    "ko": "호스트 UEFI 펌웨어 백업: {path}"
+  },
+  {
+    "en": "Host UEFI firmware check skipped; no OVMF images installed",
+    "ko": "OVMF 파일이 설치되어 있지 않아 호스트 UEFI 펌웨어 검사를 생략합니다."
+  },
+  {
+    "en": "Host UEFI firmware ready: qcow2; converted={count}; descriptors={descriptors}",
+    "ko": "호스트 UEFI 펌웨어 QCOW2 형식 준비 완료: 변환 파일 {count}개, 정의 파일 {descriptors}개"
+  },
+  {
+    "en": "Host UEFI firmware preparation failed",
+    "ko": "호스트 UEFI 펌웨어 준비에 실패했습니다."
+  },
+  {
+    "en": "Host UEFI firmware preparation failed after a package error",
+    "ko": "패키지 오류 후 호스트 UEFI 펌웨어 복구에 실패했습니다."
+  },
+  {
+    "en": "Host UEFI firmware preparation failed: {reason}; backup={path}",
+    "ko": "호스트 UEFI 펌웨어 준비에 실패했습니다. 원인: {reason}; 백업: {path}",
+    "nested": [
+      "reason"
+    ]
+  },
+  {
+    "en": "Host UEFI rollback failed: {path}; {reason}",
+    "ko": "호스트 UEFI 펌웨어 원복에 실패했습니다: {path}; {reason}",
+    "nested": [
+      "reason"
+    ]
+  },
+  {
+    "en": "VM firmware check skipped; domain is not defined locally: {vm}",
+    "ko": "현재 호스트에 정의되지 않은 VM의 펌웨어 검사를 생략합니다: {vm}"
+  },
+  {
+    "en": "VM firmware check skipped; transient domain must use its controller XML: {vm}",
+    "ko": "일시적 VM은 관리 주체의 XML을 사용하므로 직접적인 펌웨어 XML 변경을 생략합니다: {vm}"
+  },
+  {
+    "en": "VM firmware check skipped; no pflash loader: {vm}",
+    "ko": "pflash 로더가 없어 VM 펌웨어 검사를 생략합니다: {vm}"
+  },
+  {
+    "en": "VM firmware check failed: {vm}; {reason}",
+    "ko": "VM 펌웨어 검사 실패: {vm}; {reason}",
+    "nested": [
+      "reason"
+    ]
+  },
+  {
+    "en": "VM firmware validation failed; do not reboot until repaired: {vm}",
+    "ko": "VM 펌웨어 검증에 실패했습니다. 복구 전 재부팅하지 마세요: {vm}"
+  },
+  {
+    "en": "VM firmware formats verified: {vm} loader={loader} nvram={nvram}",
+    "ko": "VM 펌웨어 형식 검증 완료: {vm} 로더={loader}, NVRAM={nvram}"
+  },
+  {
+    "en": "VM firmware formats synchronized: {vm} loader={loader} nvram={nvram}; backup: {path}",
+    "ko": "VM 펌웨어 XML 형식 보정 완료: {vm} 로더={loader}, NVRAM={nvram}; 백업: {path}"
+  },
+  {
+    "en": "Legacy NVRAM reset cancelled; existing variables preserved: {vm} backup={path}",
+    "ko": "기존 NVRAM을 보존하도록 이전 초기화 예약을 취소했습니다: {vm}; 예약 파일 백업: {path}"
+  },
+  {
+    "en": "Could not create the NVRAM preservation directory",
+    "ko": "NVRAM 보존 디렉터리를 생성하지 못했습니다."
+  },
+  {
+    "en": "Could not create the NVRAM pending backup",
+    "ko": "NVRAM 초기화 예약의 백업 디렉터리를 생성하지 못했습니다."
+  },
+  {
+    "en": "Could not cancel a legacy NVRAM reset",
+    "ko": "이전 NVRAM 초기화 예약을 취소하지 못했습니다."
+  },
+  {
+    "en": "SCVM NVRAM preserved after the host update: {path}",
+    "ko": "호스트 업데이트 후 SCVM NVRAM을 보존합니다: {path}"
+  },
+  {
+    "en": "CCVM NVRAM preserved after the host update: {path}",
+    "ko": "호스트 업데이트 후 CCVM NVRAM을 보존합니다: {path}"
+  },
+  {
+    "en": "No unique compatible firmware descriptor for VM: {vm}",
+    "ko": "VM 조건에 맞는 펌웨어 정의를 하나로 결정하지 못했습니다: {vm}"
+  },
+  {
+    "en": "Existing NVRAM size differs from the template; preserving it for manual recovery: {path}",
+    "ko": "기존 NVRAM과 템플릿 크기가 달라 수동 복구를 위해 원본을 보존합니다: {path}"
+  },
+  {
+    "en": "Firmware image is missing: {path}",
+    "ko": "펌웨어 파일이 없습니다: {path}"
+  },
+  {
+    "en": "NVRAM template format differs from its firmware descriptor: {path}",
+    "ko": "NVRAM 템플릿과 펌웨어 정의의 형식이 다릅니다: {path}"
+  },
+  {
+    "en": "VM firmware repair started; package update and VM restart are not performed",
+    "ko": "VM 펌웨어 복구를 시작합니다. 패키지 업데이트와 VM 재시작은 실행하지 않습니다."
+  },
+  {
+    "en": "VM firmware repair completed; start SCVM manually and verify guest connectivity",
+    "ko": "VM 펌웨어 복구 완료. SCVM을 수동으로 시작하고 게스트 접속을 확인하세요."
+  }
+]

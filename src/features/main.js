@@ -5450,12 +5450,48 @@ function loadSystemUpdateInfo() {
     });
 }
 
+
+let systemUpdateLogTimer = null;
+let systemUpdateLogGeneration = 0;
+
+function refreshSystemUpdateLog() {
+  const generation = systemUpdateLogGeneration;
+  const updateType = getSelectedSystemUpdateType();
+  return cockpit.spawn(["python3", pluginpath + "/python/host/ablestack_update.py", "log", "--update-type", updateType], { superuser: true })
+    .then(function (data) {
+      if (generation !== systemUpdateLogGeneration) return;
+      const result = JSON.parse(data);
+      if (result.code != 200) throw new Error(String(result.val || '로그 조회 실패'));
+      $('#system-update-log-path').text(result.val.log_file || '');
+      $('#system-update-log-output').text(result.val.text || '아직 기록된 업데이트 로그가 없습니다.');
+    })
+    .catch(function (error) {
+      if (generation === systemUpdateLogGeneration) {
+        $('#system-update-log-output').text('로그 조회 실패: ' + getSystemUpdateErrorText(error));
+      }
+    });
+}
+
+function stopSystemUpdateLog() {
+  systemUpdateLogGeneration++;
+  if (systemUpdateLogTimer !== null) window.clearInterval(systemUpdateLogTimer);
+  systemUpdateLogTimer = null;
+}
+
+function startSystemUpdateLog() {
+  stopSystemUpdateLog();
+  refreshSystemUpdateLog();
+  systemUpdateLogTimer = window.setInterval(refreshSystemUpdateLog, 5000);
+}
+
 function openSystemUpdateModal() {
   resetSystemUpdateModal();
   $('#div-modal-system-update').show();
+  startSystemUpdateLog();
 }
 
 function closeSystemUpdateModal() {
+  stopSystemUpdateLog();
   $('#div-modal-system-update').hide();
 }
 
@@ -5492,6 +5528,8 @@ $(document).on('click', '#button-close-modal-system-update, #button-cancel-modal
   closeSystemUpdateModal();
 });
 
+$(document).on('click', '#button-refresh-system-update-log', refreshSystemUpdateLog);
+
 $(document).on('click', '#button-system-update-load-info', function () {
   loadSystemUpdateInfo();
 });
@@ -5502,6 +5540,7 @@ $(document).on('input', '#input-system-update-mount-path', function () {
 });
 
 $(document).on('change', 'input[name="radio-system-update-type"]', function () {
+  startSystemUpdateLog();
   if (getSelectedSystemUpdateType() == 'tools' && !$.trim($('#input-system-update-mount-path').val())) {
     $('#input-system-update-mount-path').val(SYSTEM_UPDATE_COPY_PATH);
   }
@@ -5564,6 +5603,8 @@ $(document).on('click', '#button-execution-modal-system-update', function () {
     $("#modal-status-alert-title").html("ABLESTACK Version 업데이트");
     if (retVal.code == 200) {
       const result = retVal.val || {};
+      $('#div-modal-system-update').show();
+      startSystemUpdateLog();
       const completionText = result.background
         ? '진행/완료 여부: /var/log/ablestack-update.log. 완료 후 재부팅하고 ABLESTACK Tools 업데이트를 실행하세요.'
         : updateType == 'tools' ? 'ABLESTACK Tools 업데이트가 완료되었습니다.'
@@ -5571,6 +5612,8 @@ $(document).on('click', '#button-execution-modal-system-update', function () {
             : '업데이트 완료 후 재부팅하고 ABLESTACK Tools 업데이트를 실행하세요.';
       $("#modal-status-alert-body").text((result.message || updateLabel + ' 실행이 완료되었습니다.') + ' ' + completionText);
     } else {
+      $('#div-modal-system-update').show();
+      startSystemUpdateLog();
       $("#modal-status-alert-body").text("ABLESTACK Version 업데이트 실행 중 오류가 발생했습니다 " + retVal.val);
     }
     $('#div-modal-status-alert').show();

@@ -3,6 +3,7 @@
 
 import argparse
 from contextlib import contextmanager
+from functools import lru_cache
 import fcntl
 import json
 import os
@@ -10,6 +11,7 @@ import shutil
 import shlex
 import re
 import subprocess
+from string import Formatter
 from pathlib import Path
 
 try:
@@ -26,6 +28,11 @@ OS_RELEASE_PATH = Path("/etc/os-release")
 TARGET_KS_PATH = Path("ks/ablestack-ks.cfg")
 UPDATE_WORK_DIR = Path("/opt/ABLESTACK_UPDATE")
 UPDATE_LOCK_PATH = Path("/run/lock/ablestack-update.lock")
+UPDATE_LOG_PATHS = {
+    "all": Path("/var/log/ablestack-update.log"),
+    "tools": Path("/var/log/ablestack-update.log"),
+    "mold": Path("/var/log/ablestack-mold-update.log"),
+}
 MOLD_PACKAGES = (
     "cloudstack-common",
     "cloudstack-agent",
@@ -52,8 +59,8 @@ UPDATE_SCRIPT_MAP = {
 
 def parse_args():
     parser = argparse.ArgumentParser(description="ABLESTACK ISO update helper")
-    parser.add_argument("action", choices=["info", "run"], help="Action to execute")
-    parser.add_argument("--mount-path", required=True, help="Mounted ABLESTACK ISO path")
+    parser.add_argument("action", choices=["info", "run", "log"], help="Action to execute")
+    parser.add_argument("--mount-path", help="Mounted ABLESTACK ISO path")
     parser.add_argument(
         "--update-type",
         choices=sorted(UPDATE_SCRIPT_MAP.keys()),
@@ -61,6 +68,81 @@ def parse_args():
         help="Update type to execute",
     )
     return parser.parse_args()
+
+
+@lru_cache(maxsize=1)
+def update_log_translations():
+    """Load display templates only; never rewrite the on-disk update log."""
+    catalog = Path(__file__).with_name("ablestack_update_messages.json")
+    try:
+        entries = json.loads(catalog.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ()
+    compiled = []
+    for entry in entries:
+        pattern, fields, weight = [], set(), 0
+        for literal, name, _, _ in Formatter().parse(entry["en"]):
+            pattern.append(re.escape(literal))
+            weight += len(literal)
+            if name is not None:
+                pattern.append(f"(?P={name})" if name in fields else f"(?P<{name}>[^\\r\\n]*?)")
+                fields.add(name)
+        generic = entry["en"] in ("{p0} failed", "{p0} completed", "{p0} started",
+                                  "{p0} check passed", "{p0} check failed")
+        compiled.append((weight, re.compile("^" + "".join(pattern) + "$"),
+                         entry["ko"], entry.get("nested", ()), generic))
+    return tuple(sorted(compiled, key=lambda item: -item[0]))
+
+
+def localize_update_output(output):
+    """Translate known script messages, preserving timestamps, values and raw RPM output."""
+    def translate(message, depth=0, allow_generic=False):
+        # Match specific messages (with or without a severity prefix) before
+        # generic endings, so "update not started" is not treated as a start.
+        for generic_pass in (False, True):
+            if generic_pass:
+                severity = re.match(r"^(ERROR: |WARN: )(.*)$", message)
+                if severity and depth < 3:
+                    return severity[1] + translate(severity[2], depth + 1, allow_generic)
+                if not allow_generic:
+                    break
+            for _, pattern, korean, nested, generic in update_log_translations():
+                if generic != generic_pass:
+                    continue
+                match = pattern.fullmatch(message)
+                if match is not None:
+                    values = match.groupdict()
+                    if depth < 3:
+                        for field in nested:
+                            values[field] = translate(values[field], depth + 1, True)
+                    return korean.format_map(values)
+        return message
+
+    lines = []
+    for line in output.splitlines(keepends=True):
+        body = line.rstrip("\r\n")
+        ending = line[len(body):]
+        match = re.match(r"^((?:\[[^\]\r\n]+\]\s*)*)(.*)$", body)
+        lines.append(match[1] + translate(match[2], allow_generic=bool(match[1])) + ending)
+    return "".join(lines)
+
+
+def read_update_log(update_type="all"):
+    """Read a bounded tail of a fixed log path; caller input cannot select a file."""
+    get_update_script_info(update_type)
+    path = UPDATE_LOG_PATHS[update_type]
+    try:
+        with path.open("rb") as source:
+            size = source.seek(0, os.SEEK_END)
+            offset = max(0, size - 65536)
+            source.seek(offset)
+            data = source.read(65536)
+        if offset:
+            data = data.partition(b"\n")[2]
+        raw = b"\n".join(data.splitlines()[-300:]).decode("utf-8", errors="replace")
+    except FileNotFoundError:
+        raw = ""
+    return {"log_file": str(path), "text": localize_update_output(raw)}
 
 
 def normalize_value(value):
@@ -211,7 +293,7 @@ def read_update_info(mount_path, update_type="all"):
             text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
         )
         if proc.returncode != 0:
-            raise ValueError(proc.stdout.strip() or proc.stderr.strip() or "ABLESTACK Tools 커널 확인 실패")
+            raise ValueError(localize_update_output(proc.stdout.strip() or proc.stderr.strip()) or "ABLESTACK Tools 커널 확인 실패")
         values = parse_key_values_text(proc.stdout)
         if not values.get("TOOLS_CURRENT_KERNEL") or not values.get("TOOLS_TARGET_KERNEL"):
             raise ValueError("ABLESTACK Tools 스크립트에서 커널 확인 결과를 읽을 수 없습니다.")
@@ -264,7 +346,7 @@ def prepare_update_work_dir(mount_path):
     proc = copy_update_files(mount_path, target_path)
     if proc.returncode != 0:
         message = proc.stderr.strip() or proc.stdout.strip() or "ISO 파일 복사 중 오류가 발생했습니다."
-        raise RuntimeError(message)
+        raise RuntimeError(localize_update_output(message))
 
     return target_path
 
@@ -344,7 +426,7 @@ def run_update_locked(mount_path, update_type, lock_fd):
     )
     if proc.returncode != 0:
         message = proc.stderr.strip() or proc.stdout.strip() or "ABLESTACK Version 업데이트 실행 중 오류가 발생했습니다."
-        raise RuntimeError(message)
+        raise RuntimeError(localize_update_output(message))
 
     started = re.search(r"^ABLESTACK_UPDATE_STARTED_PID=([0-9]+)$", proc.stdout, re.M)
     background = update_type == "all" and started is not None
@@ -362,15 +444,17 @@ def run_update_locked(mount_path, update_type, lock_fd):
         "update_type": update_type,
         "update_label": script_info["label"],
         "update_script": str(work_update_script),
-        "stdout": proc.stdout.strip(),
-        "stderr": proc.stderr.strip(),
+        "stdout": localize_update_output(proc.stdout.strip()),
+        "stderr": localize_update_output(proc.stderr.strip()),
     }
 
 
 def main():
     args = parse_args()
     try:
-        if args.action == "info":
+        if args.action == "log":
+            ret = createReturn(code=200, val=read_update_log(args.update_type))
+        elif args.action == "info":
             ret = createReturn(code=200, val=read_update_info(args.mount_path, args.update_type))
         else:
             ret = createReturn(code=200, val=run_update(args.mount_path, args.update_type))
