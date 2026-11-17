@@ -1,6 +1,8 @@
 """ISO validation and copy/run regression tests; RPM commands are simulated."""
 import importlib.util
 import json
+import fcntl
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -21,12 +23,15 @@ class UpdateIsoTests(unittest.TestCase):
         self.root = Path(self.temp.name).resolve()
         self.mount = self.root / "iso"
         self.mount.mkdir()
+        self.script_dir = self.mount / "update"
+        self.script_dir.mkdir()
         self.work = self.root / "work"
         os_release = self.root / "os-release"
         os_release.write_text('PRETTY_NAME="ABLESTACK Current"\n')
         self.addCleanup(patch.stopall)
         patch.object(update, "OS_RELEASE_PATH", os_release).start()
         patch.object(update, "UPDATE_WORK_DIR", self.work).start()
+        patch.object(update, "UPDATE_LOCK_PATH", self.root / "update.lock").start()
         self.commands = []
         self.available = {"rpm"}
         self.blocked = set()
@@ -57,7 +62,7 @@ class UpdateIsoTests(unittest.TestCase):
         return path
 
     def mold_iso(self, directory="rpms"):
-        (self.mount / "update-mold.sh").write_text(
+        (self.script_dir / "update-mold.sh").write_text(
             '#!/bin/bash\nset -eu\n'
             'test -f rpms/cloudstack-common-2.0-1.noarch.rpm\n'
             'printf "mold:%s:%s" "$PWD" "$ABLESTACK_UPDATE_TYPE"\n')
@@ -68,9 +73,16 @@ class UpdateIsoTests(unittest.TestCase):
         ks = self.mount / update.TARGET_KS_PATH
         ks.parent.mkdir(parents=True, exist_ok=True)
         ks.write_text('ABLESTACK_VERSION="ABLESTACK Next"\n')
-        (self.mount / "update-all.sh").write_text(
+        (self.script_dir / "update-all.sh").write_text(
             '#!/bin/bash\nset -eu\ntest -f ks/ablestack-ks.cfg\n'
             'printf "all:%s:%s" "$PWD" "$ABLESTACK_UPDATE_TYPE"\n')
+
+    def tools_iso(self):
+        (self.script_dir / "update-qemu-exec-tools.sh").write_text(
+            '#!/bin/bash\nset -eu\n'
+            'if [ "${1:-}" = --check ]; then\n'
+            'printf "TOOLS_CURRENT_KERNEL=5.14.0-new\\nTOOLS_TARGET_KERNEL=5.14.0-new\\n"\n'
+            'else printf "tools:%s:%s" "$PWD" "$ABLESTACK_UPDATE_TYPE"; fi\n')
 
     def test_mold_reads_five_headers_without_ks_config_or_appstream(self):
         self.mold_iso()
@@ -79,7 +91,8 @@ class UpdateIsoTests(unittest.TestCase):
         self.assertEqual(info["current_mold_version"], "1.0-1")
         self.assertEqual(info["current_ablestack_version"], info["target_ablestack_version"])
         self.assertEqual([p["name"] for p in info["mold_packages"]], list(update.MOLD_PACKAGES))
-        self.assertEqual(info["work_update_script"], str(self.work / "update-mold.sh"))
+        self.assertEqual(info["update_script"], str(self.script_dir / "update-mold.sh"))
+        self.assertEqual(info["work_update_script"], str(self.work / "update/update-mold.sh"))
         self.assertTrue(all(command[0] == "rpm" for command in self.commands))
 
     def test_mold_ignores_ks_version_even_if_present(self):
@@ -103,7 +116,7 @@ class UpdateIsoTests(unittest.TestCase):
         self.assertEqual(current_query[current_query.index("--qf") + 1], "%{VERSION}-%{RELEASE}\n")
         self.assertNotIn("EPOCHNUM", update.MOLD_RPM_QUERY_FORMAT)
 
-    def test_mold_supports_script_root_and_legacy_rpm_layout(self):
+    def test_mold_supports_iso_root_and_appstream_rpm_layout(self):
         for layout in (".", "AppStream/Packages/mold"):
             with self.subTest(layout=layout):
                 self.mold_iso(directory=layout)
@@ -112,13 +125,13 @@ class UpdateIsoTests(unittest.TestCase):
 
     def test_mold_missing_script_is_rejected(self):
         self.mold_iso()
-        (self.mount / "update-mold.sh").unlink()
+        (self.script_dir / "update-mold.sh").unlink()
         with self.assertRaisesRegex(FileNotFoundError, "update-mold.sh"):
             update.read_update_info(str(self.mount), "mold")
 
     def test_mold_script_directory_is_rejected(self):
         self.mold_iso()
-        script = self.mount / "update-mold.sh"
+        script = self.script_dir / "update-mold.sh"
         script.unlink()
         script.mkdir()
         with self.assertRaises(FileNotFoundError):
@@ -131,7 +144,7 @@ class UpdateIsoTests(unittest.TestCase):
             update.read_update_info(str(self.mount), "mold")
 
     def test_mold_no_rpms_is_rejected(self):
-        (self.mount / "update-mold.sh").write_text("#!/bin/bash\n")
+        (self.script_dir / "update-mold.sh").write_text("#!/bin/bash\n")
         with self.assertRaisesRegex(FileNotFoundError, "RPM 파일"):
             update.read_update_info(str(self.mount), "mold")
 
@@ -186,6 +199,8 @@ class UpdateIsoTests(unittest.TestCase):
         info = update.read_update_info(str(self.mount))
         self.assertEqual(info["target_ablestack_version"], "ABLESTACK Next")
         self.assertEqual(info["current_ablestack_version"], "ABLESTACK Current")
+        self.assertEqual(info["update_script"], str(self.script_dir / "update-all.sh"))
+        self.assertEqual(info["work_update_script"], str(self.work / "update/update-all.sh"))
         self.assertNotIn("target_mold_version", info)
         self.assertEqual(self.commands, [])
 
@@ -203,6 +218,15 @@ class UpdateIsoTests(unittest.TestCase):
         self.mold_iso()
         with self.assertRaises(FileNotFoundError):
             update.read_update_info(str(self.mount), "all")
+
+    def test_root_level_script_does_not_replace_required_update_directory(self):
+        for update_type, script_name in (("mold", "update-mold.sh"), ("all", "update-all.sh")):
+            with self.subTest(update_type=update_type):
+                self.mold_iso()
+                self.full_iso()
+                (self.script_dir / script_name).rename(self.mount / script_name)
+                with self.assertRaises(FileNotFoundError):
+                    update.read_update_info(str(self.mount), update_type)
 
     def test_mold_run_copies_small_iso_and_executes_its_script(self):
         self.mold_iso()
@@ -236,9 +260,73 @@ class UpdateIsoTests(unittest.TestCase):
 
     def test_script_failure_is_reported(self):
         self.mold_iso()
-        (self.mount / "update-mold.sh").write_text('echo "update failed" >&2\nexit 7\n')
+        (self.script_dir / "update-mold.sh").write_text('echo "update failed" >&2\nexit 7\n')
         with self.assertRaisesRegex(RuntimeError, "update failed"):
             update.run_update(str(self.mount), "mold")
+
+    def test_tools_check_and_run_use_separate_script_without_ks(self):
+        self.tools_iso()
+        info = update.read_update_info(str(self.mount), "tools")
+        self.assertEqual(info["current_kernel"], "5.14.0-new")
+        self.assertEqual(info["target_kernel"], "5.14.0-new")
+        self.assertEqual(info["update_label"], "ABLESTACK Tools 업데이트")
+        result = update.run_update(str(self.mount), "tools")
+        self.assertEqual(result["stdout"], f"tools:{self.work}:tools")
+        self.assertFalse(result["background"])
+        self.assertFalse((self.work / "ks").exists())
+
+    def test_tools_kernel_mismatch_does_not_replace_work_directory(self):
+        self.tools_iso()
+        (self.script_dir / "update-qemu-exec-tools.sh").write_text(
+            'echo "현재 커널 버전이 맞지 않아 설치할 수 없습니다."\nexit 1\n')
+        self.work.mkdir()
+        marker = self.work / "previous-update"
+        marker.write_text("keep")
+        with self.assertRaisesRegex(ValueError, "현재 커널 버전"):
+            update.run_update(str(self.mount), "tools")
+        self.assertEqual(marker.read_text(), "keep")
+
+    def test_tools_can_run_from_preserved_work_after_reboot_without_copying_itself(self):
+        self.tools_iso()
+        update.run_update(str(self.mount), "tools")
+        marker = self.work / "keep"
+        marker.write_text("keep")
+        result = update.run_update(str(self.work), "tools")
+        self.assertEqual(result["stdout"], f"tools:{self.work}:tools")
+        self.assertTrue(marker.exists())
+
+    def test_background_start_is_not_reported_as_completed_update(self):
+        self.full_iso()
+        (self.script_dir / "update-all.sh").write_text('printf "ABLESTACK_UPDATE_STARTED_PID=9876\\n"\n')
+        result = update.run_update(str(self.mount), "all")
+        self.assertTrue(result["background"])
+        self.assertEqual(result["pid"], 9876)
+        self.assertIn("백그라운드에서 시작", result["message"])
+        self.assertNotIn("실행이 완료", result["message"])
+        self.assertIn("Tools", result["message"])
+
+    def test_busy_update_prevents_replacing_active_work(self):
+        self.full_iso()
+        self.work.mkdir()
+        marker = self.work / "active-update"
+        marker.write_text("keep")
+        with update.UPDATE_LOCK_PATH.open("w") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            with self.assertRaisesRegex(RuntimeError, "이미 업데이트"):
+                update.run_update(str(self.mount), "all")
+        self.assertEqual(marker.read_text(), "keep")
+
+    def test_closing_parent_lock_preserves_inherited_background_lock(self):
+        with update.update_work_lock() as lock_fd:
+            inherited = os.dup(lock_fd)
+        try:
+            with self.assertRaisesRegex(RuntimeError, "이미 업데이트"):
+                with update.update_work_lock():
+                    self.fail("must stay locked")
+        finally:
+            os.close(inherited)
+        with update.update_work_lock():
+            pass
 
 
 if __name__ == "__main__":

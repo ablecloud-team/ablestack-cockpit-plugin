@@ -72,7 +72,6 @@ mkdir /nfs/secondary
 
 ################# Setting Database
 mysqladmin -uroot password $DATABASE_PASSWD
-systemctl enable --now mold-usage.service
 cloudstack-setup-databases cloud:$DATABASE_PASSWD --deploy-as=root:$DATABASE_PASSWD  2>&1 | tee -a $LOGFILE
 
 # 글로벌설정 DB 업데이트
@@ -91,6 +90,14 @@ for i in "${global_settings[@]}"; do
     echo "잘못된 설정 항목: $i" | tee -a "$LOGFILE"
   fi
 done
+
+# Management 암호화 키 파일 권한 보정
+KEY_FILE="/etc/cloudstack/management/key"
+
+if [[ -f "$KEY_FILE" ]]; then
+    chown root:cloud "$KEY_FILE"
+    chmod 640 "$KEY_FILE"
+fi
 
 cloudstack-setup-management  2>&1 | tee -a $LOGFILE
 
@@ -148,6 +155,9 @@ fi
 
 # ccvm mold db 백업
 (crontab -l 2>/dev/null; echo "0 1 * * * /usr/bin/python3 /usr/share/ablestack/backup_mysql.py") | crontab -
+
+# mold-usage 서비스 시작
+systemctl enable --now mold-usage.service
 
 # Delete bootstrap script file
 rm -rf /root/bootstrap.sh
