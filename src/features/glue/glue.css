@@ -1,0 +1,144 @@
+/* Keep layout changes local to the Glue service page and its dialogs. */
+#main-page-glue-ablestack .pf-v6-c-page__main-section {
+  padding-inline: var(--pf-t--global--spacer--md);
+}
+
+#main-page-glue-ablestack .pf-v6-c-page__main,
+#main-page-glue-ablestack .pf-v6-l-grid__item {
+  min-width: 0;
+}
+
+#main-page-glue-ablestack .pf-v6-c-tabs__list {
+  scrollbar-width: auto;
+}
+
+#main-page-glue-ablestack .pf-v6-c-tabs__list::-webkit-scrollbar {
+  display: block;
+  height: 6px;
+}
+
+#main-page-glue-ablestack .pf-v6-c-card__header {
+  flex-wrap: wrap;
+  row-gap: var(--pf-t--global--spacer--sm);
+}
+
+#main-page-glue-ablestack .pf-v6-c-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pf-t--global--spacer--sm);
+}
+
+@media (max-width: 75rem) {
+  #main-page-glue-ablestack .pf-v6-l-grid__item.pf-m-6-col {
+    grid-column: span 12;
+  }
+}
+
+.glue-modal .pf-v6-c-modal-box > .pf-v6-c-button:first-child {
+  position: absolute;
+  inset-block-start: var(--pf-v6-c-modal-box__close--InsetBlockStart);
+  inset-inline-end: var(--pf-v6-c-modal-box__close--InsetInlineEnd);
+}
+
+.glue-modal .pf-v6-c-modal-box > .pf-v6-c-button:first-child + .pf-v6-c-modal-box__header {
+  padding-inline-end: 3rem;
+}
+
+.glue-modal .pf-v6-c-modal-box__title,
+.glue-modal .pf-v6-c-modal-box__title-text {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Legacy dialogs put the form directly in the modal instead of a body. */
+.glue-modal .pf-v6-c-modal-box > .pf-v6-c-form {
+  min-height: 0;
+  margin: 0 !important;
+  padding: var(--pf-t--global--spacer--md) var(--pf-v6-c-modal-box__body--PaddingInlineEnd)
+    var(--pf-t--global--spacer--md) var(--pf-v6-c-modal-box__body--PaddingInlineStart);
+  overflow: auto;
+}
+
+/* Service warnings occupy their own row instead of the form's label column. */
+.glue-modal .glue-service-warning {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-column: 1 / -1;
+  gap: var(--pf-t--global--spacer--sm);
+  align-items: start;
+  min-width: 0;
+  margin: 0;
+  color: #c9190b;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.glue-modal .glue-service-warning > i {
+  line-height: inherit;
+}
+
+/* The GlueFS create dialog needs its own field alignment. */
+#div-modal-create-gluefs .pf-v6-c-form__group-label,
+#div-modal-create-gluefs .pf-v6-c-form__label {
+  margin-left: 0 !important;
+  width: auto !important;
+}
+
+.glue-modal .pf-v6-c-form__group-control,
+.glue-modal .ablestack-menu-select,
+.glue-modal .pf-v6-c-form__group > .ablestack-menu-dropdown {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#div-modal-create-gluefs .pf-v6-c-form-control,
+#div-modal-create-gluefs .pf-v6-c-menu-toggle {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+/* Fixed menus escape modal/table overflow without moving their DOM nodes. */
+.pf-v6-c-menu.ablestack-menu.glue-floating-menu {
+  /* PatternFly otherwise transitions all properties, including menu width. */
+  transition: none !important;
+  position: fixed;
+  inset: auto !important;
+  inset-block-start: var(--glue-menu-top) !important;
+  inset-inline-start: var(--glue-menu-left) !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+  width: var(--glue-menu-width) !important;
+  min-width: 0 !important;
+  max-width: min(20rem, var(--glue-menu-max-width)) !important;
+  height: auto !important;
+  max-height: var(--glue-menu-max-height, 300px) !important;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.pf-v6-c-menu.ablestack-menu.glue-menu-measuring {
+  visibility: hidden;
+  pointer-events: none;
+  inset-block-start: 0 !important;
+  inset-inline-start: 0 !important;
+}
+
+.glue-modal .ablestack-menu-select .glue-floating-menu {
+  max-width: var(--glue-menu-max-width) !important;
+}
+
+.glue-floating-menu .pf-v6-c-menu__item {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.glue-modal .ablestack-menu-select .pf-v6-c-check.pf-v6-c-menu__item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--pf-t--global--spacer--sm);
+}

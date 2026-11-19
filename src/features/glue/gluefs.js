@@ -247,10 +247,10 @@ function gluefsSubvolumeGroupList(gluefs_name, gluefs_data_pool){
         insert_tr += '  <td role="cell" data-label="사용량" id="gluef-subvolume-groups-total-capacity">'+Byte(data[i].Info.bytes_quota)+'</td>';
         insert_tr += '  <td class="pf-v6-c-table__icon" role="cell" data-label="편집">';
         insert_tr += '    <div class="ablestack-menu-dropdown">';
-        insert_tr += '      <button class="pf-v6-c-menu-toggle pf-m-plain" id="card-action-glue-file-system-status'+i+'" aria-expanded="false" type="button" aria-label="Actions">';
+        insert_tr += '      <button class="pf-v6-c-menu-toggle pf-m-plain" id="card-action-gluefs-subvolume-group-status'+i+'" aria-expanded="false" type="button" aria-label="Actions">';
         insert_tr += '        <i class="fas fa-ellipsis-v" aria-hidden="true"></i>';
         insert_tr += '      </button>';
-        insert_tr += '      <ul class="pf-v6-c-menu ablestack-menu pf-m-align-right pf-m-disabled" aria-labelledby="card-action-glue-file-system-status'+i+'" id="dropdown-menu-card-action-gluefs-subvolume-group-status'+i+'">';
+        insert_tr += '      <ul class="pf-v6-c-menu ablestack-menu pf-m-align-right pf-m-disabled" aria-labelledby="card-action-gluefs-subvolume-group-status'+i+'" id="dropdown-menu-card-action-gluefs-subvolume-group-status'+i+'">';
         insert_tr += '        <li>';
         insert_tr += '          <button class="pf-v6-c-menu__item" type="button" onclick=\'glueFsSubvolumeGroupUpdate("'+data[i].name+'","'+byteOnlyGib(data[i].Info.bytes_quota)+'")\' >SubVolume Group 수정</button>';
         insert_tr += '          <button class="pf-v6-c-menu__item" type="button" onclick=\'glueFsSubvolumeGroupDelete("'+data[i].name+'","'+data[i].path+'")\' >SubVolume Group 삭제</button>';

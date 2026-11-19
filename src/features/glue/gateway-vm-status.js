@@ -19,7 +19,7 @@ $('#button-cancel-modal-gateway-vm-start').on('click', function(){
 });
 
 $('#button-execution-modal-gateway-vm-start').on('click', function(){
-  $('#dropdown-menu-gateway-vm-status').toggle();
+  closeAblestackMenus();
   $('#div-modal-start-gateway-vm').hide();
   $('#div-modal-spinner-header-txt').text('게이트웨이 VM을 시작하고 있습니다.');
   $('#div-modal-spinner').show();
@@ -68,7 +68,7 @@ $('#button-cancel-modal-gateway-vm-stop').on('click', function(){
 });
 
 $('#button-execution-modal-gateway-vm-stop').on('click', function(){
-  $('#dropdown-menu-gateway-vm-status').toggle();
+  closeAblestackMenus();
   $('#div-modal-stop-gateway-vm').hide();
   $('#div-modal-spinner-header-txt').text('게이트웨이 VM을 정지하고 있습니다.');
   $('#div-modal-spinner').show();
@@ -116,7 +116,7 @@ $('#button-cancel-modal-gateway-vm-destroy').on('click', function(){
 });
 
 $('#button-execution-modal-gateway-vm-destroy').on('click', function(){
-  $('#dropdown-menu-cloud-cluster-status').toggle();
+  closeAblestackMenus();
   $('#div-modal-destroy-gateway-vm').hide();
   $('#div-modal-spinner-header-txt').text('게이트웨이 VM을 삭제하고 있습니다.');
   $('#div-modal-spinner').show();
@@ -157,7 +157,7 @@ $('#button-close-modal-gateway-vm-cleanup').on('click', function(){
 });
 
 $('#button-execution-modal-gateway-vm-cleanup').on('click', function(){
-  $('#dropdown-menu-cloud-cluster-status').toggle();
+  closeAblestackMenus();
   $('#div-modal-cleanup-gateway-vm').hide();
   $('#div-modal-spinner-header-txt').text('게이트웨이 VM을 클린업하고 있습니다.');
   $('#div-modal-spinner').show();
@@ -209,7 +209,7 @@ $('#button-execution-modal-gateway-vm-migration').on('click', function(){
   if(valSelect == 'null'){
     $('#div-modal-migration-gateway-vm-select').text('선택이 잘못되었습니다. 마이그레이션할 노드를 선택해주세요.');
   }else{
-    $('#dropdown-menu-cloud-cluster-status').toggle();
+    closeAblestackMenus();
     $('#div-modal-migration-gateway-vm').hide();
     $('#div-modal-spinner-header-txt').text('게이트웨이 VM을 마이그레이션하고 있습니다.');
     $('#div-modal-spinner').show();
