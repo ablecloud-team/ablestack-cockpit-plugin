@@ -8,8 +8,6 @@ import paramiko
 import subprocess
 import os
 import json
-import stat
-import tempfile
 
 from ablestack import *
 
@@ -18,56 +16,6 @@ ablestack_json_file_path = pluginpath+"/tools/properties/ablestack.json"
 
 DEFAULT_GFS_JOURNAL_SIZE_MB = 512
 DEFAULT_GFS_RESOURCE_GROUP_SIZE_MB = 1024
-DEFAULT_GFS_STRIPE_SIZE_KIB = 128
-GFS_STRIPE_SIZES_KIB = (64, 128, 256, 512)
-
-
-def validate_gfs_stripe_size(value):
-    if isinstance(value, bool) or str(value) not in {str(size) for size in GFS_STRIPE_SIZES_KIB}:
-        raise ValueError("Stripe size must be 64, 128, 256 or 512 KiB.")
-    return int(value)
-
-
-def get_gfs_stripe_size():
-    try:
-        with open(ablestack_json_file_path, 'r') as stream:
-            config = json.load(stream)
-    except FileNotFoundError:
-        return DEFAULT_GFS_STRIPE_SIZE_KIB
-    return validate_gfs_stripe_size(config.get('gfs', {}).get('stripe_size_kib', DEFAULT_GFS_STRIPE_SIZE_KIB))
-
-
-def set_gfs_stripe_size(value):
-    size = validate_gfs_stripe_size(value)
-    with open(ablestack_json_file_path, 'r') as stream:
-        config = json.load(stream)
-        metadata = os.fstat(stream.fileno())
-    config.setdefault('gfs', {})['stripe_size_kib'] = size
-    config['gfs'].setdefault('stripe_size_kib_description',
-        'LVM stripe size in KiB; choose 64, 128, 256 or 512. Default: 128 KiB.')
-    descriptor, temporary = tempfile.mkstemp(prefix='.ablestack-gfs-', dir=os.path.dirname(ablestack_json_file_path))
-    try:
-        with os.fdopen(descriptor, 'w', encoding='utf-8') as stream:
-            os.fchmod(stream.fileno(), stat.S_IMODE(metadata.st_mode))
-            os.fchown(stream.fileno(), metadata.st_uid, metadata.st_gid)
-            json.dump(config, stream, indent=4, ensure_ascii=False)
-            stream.write('\n')
-            stream.flush()
-            os.fsync(stream.fileno())
-        os.replace(temporary, ablestack_json_file_path)
-    finally:
-        if os.path.exists(temporary):
-            os.unlink(temporary)
-
-
-def gfs_settings(stripe_size_kib=None):
-    try:
-        if stripe_size_kib is not None:
-            set_gfs_stripe_size(stripe_size_kib)
-        ret = createReturn(code=200, val={'stripe_size_kib': get_gfs_stripe_size()})
-    except Exception as error:
-        ret = createReturn(code=500, val='GFS settings error: ' + str(error))
-    return print(json.dumps(json.loads(ret), indent=4))
 
 def openClusterJson():
     try:
@@ -389,16 +337,10 @@ def get_lv_path(vg_name, lv_name):
 
     raise FileNotFoundError(f"Logical Volume {vg_name}/{lv_name} 경로를 찾을 수 없습니다.")
 
-def create_gfs(disks, vg_name, lv_name, gfs_name, mount_point, cluster_name, num_journals, list_ips, stripe_size_kib=None):
+def create_gfs(disks, vg_name, lv_name, gfs_name, mount_point, cluster_name, num_journals, list_ips):
+    time.sleep(25)
     """Create and a single GFS2 file system on the provided disks."""
     try:
-        if not disks or any(not disk.strip() for disk in disks) or len(set(disks)) != len(disks):
-            raise ValueError("Select at least one disk without duplicates.")
-        if stripe_size_kib is not None:
-            set_gfs_stripe_size(stripe_size_kib)
-        stripe_size_kib = get_gfs_stripe_size()
-        stripe_count = len(disks)
-        time.sleep(25)
         # Prepare a list to store disk devices
         pv_disks = []
         # Create a physical volume on each disk and add to the volume group
@@ -425,8 +367,11 @@ def create_gfs(disks, vg_name, lv_name, gfs_name, mount_point, cluster_name, num
                     for ip in list_ips:
                         ssh_client = connect_to_host(ip)
                         run_command(f"partprobe {disk}", ssh_client, ignore_errors=True)
-                partition = (f"{disk}1" if "mpath" not in disk else
-                             disk.replace("dm-uuid-mpath-", "dm-uuid-part1-mpath-"))
+                    # 파티션 이름 확인
+                    if "mpath" not in disk:
+                        partition = f"{disk}1"
+                    else:
+                        partition = disk.replace("dm-uuid-mpath-","dm-uuid-part1-mpath-")
 
             # 물리 볼륨 생성
             run_command(f"pvcreate -ff --yes {partition}")
@@ -440,11 +385,7 @@ def create_gfs(disks, vg_name, lv_name, gfs_name, mount_point, cluster_name, num
         # 공유 볼륨 그룹 생성
         run_command(f"vgcreate --yes --shared {vg_name} {' '.join(pv_disks)} ")
         # 논리 볼륨 생성
-        run_command(
-            f"lvcreate --yes --activate sy -n {lv_name} -i {stripe_count} "
-            f"-I {stripe_size_kib}k -l 100%FREE {vg_name}",
-            suppress_errors=False
-        )
+        run_command(f"lvcreate --yes --activate sy -l+100%FREE -n {lv_name} {vg_name} ")
         # GFS2 파일 시스템 생성
         lv_path = get_lv_path(vg_name, lv_name)
         journal_size_mb, resource_group_size_mb = get_gfs_mkfs_sizes()
@@ -512,8 +453,8 @@ def create_gfs(disks, vg_name, lv_name, gfs_name, mount_point, cluster_name, num
 
         ret = createReturn(code=200, val="Create GFS Success")
         return print(json.dumps(json.loads(ret), indent=4))
-    except Exception as error:
-        ret = createReturn(code=500, val="Create GFS Failure: " + str(error))
+    except Exception:
+        ret = createReturn(code=500, val="Create GFS Failure")
         return print(json.dumps(json.loads(ret), indent=4))
 
 def create_ccvm_cluster(gfs_name, mount_point, cluster_name, list_ips):
@@ -917,10 +858,6 @@ def main():
     parser.add_argument('--setup-cluster', type=str, help="Setup the cluster with the provided cluster name.")
     parser.add_argument('--configure-stonith', type=str, help="Configure STONITH devices with a list of comma-separated values (ipaddr,port,username,password).")
     parser.add_argument('--create-gfs', action='store_true', help='Flag to create GFS2 file system.')
-    parser.add_argument('--get-gfs-settings', action='store_true', help='Read GFS stripe settings.')
-    parser.add_argument('--set-gfs-settings', action='store_true', help='Save GFS stripe settings.')
-    parser.add_argument('--stripe-size-kib', type=int, choices=GFS_STRIPE_SIZES_KIB,
-                        help='Stripe size in KiB; save to ablestack.json before creating the LV.')
     parser.add_argument('--disks', help='Comma separated list of disks to use.')
     parser.add_argument('--vg-name', help='Volume group name.')
     parser.add_argument('--lv-name', help='Logical volume name.')
@@ -951,13 +888,6 @@ def main():
     parser.add_argument('--list-ip', type=str, help="The IP addresses of the local hosts for cluster operations, separated by spaces.")
 
     args = parser.parse_args()
-
-    if args.get_gfs_settings:
-        return gfs_settings()
-    if args.set_gfs_settings:
-        if args.stripe_size_kib is None:
-            parser.error('--stripe-size-kib is required for --set-gfs-settings')
-        return gfs_settings(args.stripe_size_kib)
 
     if args.configure_stonith:
         if not args.list_ip:
@@ -1036,8 +966,7 @@ def main():
             num_journals = args.journal_nums
             list_ips = args.list_ip.split()
 
-            create_gfs(disks, vg_name, lv_name, gfs_name, mount_point, cluster_name, num_journals, list_ips,
-                       stripe_size_kib=args.stripe_size_kib)
+            create_gfs(disks, vg_name, lv_name, gfs_name, mount_point, cluster_name, num_journals, list_ips)
 
     if args.create_ccvm_cluster:
         if not all([args.gfs_name, args.cluster_name,args.mount_point, args.list_ip]):
