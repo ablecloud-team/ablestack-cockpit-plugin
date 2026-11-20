@@ -148,30 +148,6 @@
                     <div class="pf-v6-c-form__group-control pf-m-stack" id="disk-gfs-storage-pci-list" style="margin-top:8px;max-height: 300px;overflow-y: auto;">
                     </div>
                   </div>
-
-                  <div class="pf-v6-c-form__group gfs-stripe-setting">
-                    <div class="pf-v6-c-form__group-label">
-                      <label class="pf-v6-c-form__label" for="gfs-stripe-size-kib"><span class="pf-v6-c-form__label-text">Stripe당 데이터 블록 크기</span></label>
-                      <span class="gfs-stripe-help">
-                        <button type="button" class="pf-v6-c-button pf-m-plain" aria-label="Stripe당 데이터 블록 크기 설명" aria-describedby="gfs-stripe-help-tooltip"><i class="fas fa-question-circle" aria-hidden="true"></i></button>
-                        <span id="gfs-stripe-help-tooltip" role="tooltip" class="gfs-stripe-tooltip">
-                          <table><thead><tr><th>블록 크기</th><th>분산 특성</th><th>워크로드 예시</th></tr></thead><tbody>
-                            <tr><th scope="row">64KiB</th><td>작은 단위로 LUN에 분산</td><td>작은 랜덤 I/O</td></tr>
-                            <tr><th scope="row">128KiB</th><td>분산과 I/O 크기의 균형</td><td>일반적인 VM</td></tr>
-                            <tr><th scope="row">256KiB</th><td>상대적으로 큰 단위로 분산</td><td>혼합 워크로드</td></tr>
-                            <tr><th scope="row">512KiB</th><td>큰 I/O에 적합할 수 있음</td><td>순차 I/O 중심</td></tr>
-                          </tbody></table>
-                        </span>
-                      </span>
-                    </div>
-                    <div class="pf-v6-c-form__group-control">
-                      <select id="gfs-stripe-size-kib" class="pf-v6-c-form-control" disabled>
-                        <option value="64">64KiB</option><option value="128" selected>128KiB</option><option value="256">256KiB</option><option value="512">512KiB</option>
-                      </select>
-                      <p>Stripe 수: 선택한 디스크 <span id="gfs-stripe-disk-count">0</span>개 <span id="gfs-stripe-status" role="status"></span></p>
-                      <div id="gfs-stripe-error" role="alert" style="display:none"><span id="gfs-stripe-error-text"></span> <button id="gfs-stripe-retry" type="button" class="pf-v6-c-button pf-m-link">다시 불러오기</button></div>
-                    </div>
-                  </div>
                 </section>
               </form>
               <br/>
@@ -283,9 +259,6 @@
                           </div>
                         </dd>
                       </div>
-
-                      <div class="pf-v6-c-description-list__group"><dt class="pf-v6-c-description-list__term">Stripe 수</dt><dd class="pf-v6-c-description-list__description"><span id="span-gfs-stripe-count"></span></dd></div>
-                      <div class="pf-v6-c-description-list__group"><dt class="pf-v6-c-description-list__term">Stripe당 데이터 블록 크기</dt><dd class="pf-v6-c-description-list__description"><span id="span-gfs-stripe-size"></span></dd></div>
                     </dl>
                   </div>
                 </div>

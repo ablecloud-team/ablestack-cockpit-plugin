@@ -20,8 +20,6 @@
         "journal_size_mb": 512,
         "journal_size_mb_description": "Journal size in MB; set to a power of two from 8MB to 1024MB (for example, 128MB, 256MB, or 512MB).",
         "resource_group_size_mb": 1024,
-        "resource_group_size_mb_description": "Resource group size in MB; set from 32MB to 2048MB.",
-        "stripe_size_kib": 128,
-        "stripe_size_kib_description": "LVM stripe size in KiB; choose 64, 128, 256 or 512. Default: 128 KiB."
+        "resource_group_size_mb_description": "Resource group size in MB; set from 32MB to 2048MB."
     }
 }

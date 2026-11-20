@@ -10,46 +10,6 @@ var cur_step_wizard_gfs_config = "1";
 var completed = false;
 var os_type = sessionStorage.getItem("os_type");
 
-
-var gfsStripeSettingsReady = false;
-var gfsStripeSavedSize = 128;
-
-function loadGfsStripeSettings(size) {
-  gfsStripeSettingsReady = false;
-  $('#gfs-stripe-size-kib').prop('disabled', true);
-  $('#gfs-stripe-status').text('설정 확인·저장 중');
-  $('#gfs-stripe-error').hide();
-  var cmd = ['python3', pluginpath + '/python/gfs/gfs_manage.py'];
-  if (size === undefined) cmd.push('--get-gfs-settings');
-  else cmd.push('--set-gfs-settings', '--stripe-size-kib', String(size));
-  return cockpit.spawn(cmd).then(function(data) {
-    var result = JSON.parse(data);
-    var saved = Number(result.val && result.val.stripe_size_kib);
-    if (result.code != 200 || [64, 128, 256, 512].indexOf(saved) < 0) {
-      throw new Error(typeof result.val === 'string' ? result.val : 'Stripe 설정을 확인할 수 없습니다.');
-    }
-    gfsStripeSavedSize = saved;
-    $('#gfs-stripe-size-kib').val(String(saved));
-    gfsStripeSettingsReady = true;
-    $('#gfs-stripe-status').text('');
-  }).catch(function(error) {
-    $('#gfs-stripe-size-kib').val(String(gfsStripeSavedSize));
-    $('#gfs-stripe-status').text('');
-    $('#gfs-stripe-error-text').text('Stripe 설정 확인·저장 실패: ' + (error.message || String(error)));
-    $('#gfs-stripe-error').show();
-  }).then(function() {
-    $('#gfs-stripe-size-kib').prop('disabled', false);
-  });
-}
-
-$('#gfs-stripe-size-kib').on('change', function() {
-  loadGfsStripeSettings(Number($(this).val()));
-});
-$('#gfs-stripe-retry').on('click', function() { loadGfsStripeSettings(); });
-$(document).on('change', 'input[name="form-gfs-storage-checkbox-disk"]', function() {
-  $('#gfs-stripe-disk-count').text($('input[name="form-gfs-storage-checkbox-disk"]:checked').length);
-});
-
 // Document.ready 시작
 $(document).ready(function(){
   // GFS 스토리지 구성 마법사 페이지 준비
@@ -85,7 +45,6 @@ $(document).ready(function(){
 
   //디스크 구성방식 초기 세팅
   setGfsDiskInfo();
-  loadGfsStripeSettings();
 
 });
 // document ready 끝
@@ -679,7 +638,7 @@ function deployGfsStorage() {
                                             var create_gfs_cmd = ['python3', pluginpath + '/python/gfs/gfs_manage.py', '--create-gfs',
                                                         '--disks', general_virtual_disk_name , '--vg-name', gfs_vg_name, '--lv-name', gfs_lv_name,
                                                         '--gfs-name', gfs_name, '--mount-point', gfs_mount_point, '--cluster-name', gfs_cluster_name,
-                                                        '--journal-nums', journal_nums, '--list-ip', all_host_name, '--stripe-size-kib', String(gfsStripeSavedSize)]
+                                                        '--journal-nums', journal_nums, '--list-ip', all_host_name]
                                             console.log(create_gfs_cmd);
                                             cockpit.spawn(create_gfs_cmd)
                                             .then(function(data){
@@ -857,7 +816,7 @@ function deployGfsStorage() {
                                           var create_gfs_cmd = ['python3', pluginpath + '/python/gfs/gfs_manage.py', '--create-gfs',
                                                       '--disks', general_virtual_disk_name , '--vg-name', gfs_vg_name, '--lv-name', gfs_lv_name,
                                                       '--gfs-name', gfs_name, '--mount-point', gfs_mount_point, '--cluster-name', gfs_cluster_name,
-                                                      '--journal-nums', journal_nums, '--list-ip', all_host_name, '--stripe-size-kib', String(gfsStripeSavedSize)]
+                                                      '--journal-nums', journal_nums, '--list-ip', all_host_name]
                                           console.log(create_gfs_cmd);
                                           cockpit.spawn(create_gfs_cmd)
                                           .then(function(data){
@@ -1085,8 +1044,6 @@ function setGfsReviewInfo(){
 
   $('#span-gfs-externel-storage-sync').text(externel_storage_sync);
   $('#span-gfs-disk').text(gfs_disk);
-  $('#span-gfs-stripe-count').text($('input[name="form-gfs-storage-checkbox-disk"]:checked').length);
-  $('#span-gfs-stripe-size').text(gfsStripeSavedSize + 'KiB');
 
   cockpit.spawn(['cat', pluginpath + '/tools/properties/cluster.json']).then(function(data){
     var retVal = JSON.parse(data);
@@ -1105,10 +1062,6 @@ function setGfsReviewInfo(){
  * History : 2025.07.23 최초 작성
  */
 function validateGfsStorage() {
-  if (!gfsStripeSettingsReady) {
-    alert('Stripe 설정 확인·저장이 완료된 후 다시 시도해주세요.');
-    return Promise.resolve(false);
-  }
   return cockpit.spawn(['cat', pluginpath + '/tools/properties/cluster.json']).then(function(data){
     var retVal = JSON.parse(data);
     var hosts = retVal.clusterConfig.hosts;
